@@ -11,8 +11,8 @@ It helps you compose your helm releases!
     - `$ wget -o ...`
     - `$ curl -o ...`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.1.4`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.1.4`
+    - `$ docker run diamon/helmwave:0.1.5`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.1.5`
 
 ### Build
 
@@ -34,7 +34,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.1.4
+version: 0.1.5
 
 
 repositories:
@@ -86,7 +86,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: my-project
-version: 0.1.4
+version: 0.1.5
 
 
 repositories:
@@ -159,7 +159,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1.4
+   0.1.5
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -192,7 +192,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.1.4
+version: 0.1.5
 
 
 repositories:
@@ -224,7 +224,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.1.4
+version: 0.1.5
 
 
 repositories:
@@ -255,7 +255,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.1.4
+  version: 0.1.5
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -348,11 +348,89 @@ HelmWave uses [Go templates](https://godoc.org/text/template) for templating.
 Helmwave supports all built-in functions, [Sprig library](https://godoc.org/github.com/Masterminds/sprig), and several advanced functions:
 - `toYaml` marshals a map into a string
 - `fromYaml` reads a golang string and generates a map
+- `readFile` get file as string
 - `get` (Sprig's original `get` is available as `sprigGet`)
 - `setValueAtPath` PATH NEW_VALUE traverses a golang map, replaces the value at the PATH with NEW_VALUE
 - `requiredEnv` The requiredEnv function allows you to declare a particular environment variable as required for template rendering. If the environment variable is unset or empty, the template rendering will fail with an error message.
 
 I am working for added more functions. 
+
+#### readFile
+
+<details>
+  <summary>my-releases.yml</summary>
+  
+  ```yaml
+releases:
+  - name: redis
+    repo: bitnami
+  - name: memcached
+    repo: bitnami
+  ```
+</details>
+
+<details>
+  <summary>helmwave.yml.tpl</summary>
+  
+  ```yaml
+  project: my
+  version: 0.1.5
+  
+  
+  repositories:
+    - name: bitnami
+      url: https://charts.bitnami.com/bitnami
+  
+  
+  .global: &global
+    install: true
+  
+  
+  releases:
+  {{- with readFile "my-releases.yml" | fromYaml | get "releases" }}
+    {{- range $v := . }}
+    - name: {{ $v | get "name" }}
+      chart: {{ $v | get "repo" }}/{{ $v | get "name" }}
+      options:
+        <<: *global
+    {{- end }}
+  {{- end }}
+  ``` 
+  
+</details>
+
+```bash
+$ helmwave render
+```
+
+<details>
+  <summary>helmwave.yml</summary>
+  
+  ```yaml
+  project: my
+  version: 0.1.5
+  
+  repositories:
+    - name: bitnami
+      url: https://charts.bitnami.com/bitnami
+  
+  .global: &global
+    install: true
+  
+  releases:
+    - name: redis
+      chart: bitnami/redis
+      options:
+        <<: *global
+    - name: memcached
+      chart: bitnami/memcached
+      options:
+        <<: *global
+  ``` 
+  
+</details>
+
+
 
 ## 🚀 Features
 

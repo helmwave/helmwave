@@ -1,0 +1,5 @@
+releases:
+  - name: redis
+    repo: bitnami
+  - name: memcached
+    repo: bitnami
