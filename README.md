@@ -11,9 +11,20 @@ It helps you compose your helm releases!
     - `$ wget -o ...`
     - `$ curl -o ...`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.1.1`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.1.1`
+    - `$ docker run diamon/helmwave:0.1.4`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.1.4`
 
+### Build
+
+> golang:1.15
+
+```bash
+$ export GO111MODULE=on
+$ git clone git@github.com:zhilyaev/helmwave.git $GOPATH/src/github.com/zhilyaev/helmwave
+$ cd $GOPATH/src/github.com/zhilyaev/helmwave
+$ go build github.com/zhilyaev/helmwave/cmd/helmwave
+$ mv helmwave /usr/local/bin 
+```
 
 ## 🔰 Getting Started 
 
@@ -23,7 +34,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.1.3
+version: 0.1.4
 
 
 repositories:
@@ -75,7 +86,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: my-project
-version: 0.1.3
+version: 0.1.4
 
 
 repositories:
@@ -148,7 +159,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1.3
+   0.1.4
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -181,7 +192,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.1.1
+version: 0.1.4
 
 
 repositories:
@@ -213,7 +224,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.1.1
+version: 0.1.4
 
 
 repositories:
@@ -233,6 +244,104 @@ releases:
       <<: *options
 ```
 
+### Planfile, plan
+
+This command will generate helmwave.plan.
+
+`helmwave.plan` is an object save to yaml.
+
+<details>
+  <summary>helmwave.plan looks like</summary>
+  
+  ```
+  project: my-project
+  version: 0.1.4
+  repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+    username: ""
+    password: ""
+    certfile: ""
+    keyfile: ""
+    cafile: ""
+    insecureskiptlsverify: false
+    force: false
+  releases:
+  - name: redis-a
+    chart: bitnami/redis
+    tags: []
+    values: []
+    options:
+      chartpathoptions:
+        cafile: ""
+        certfile: ""
+        keyfile: ""
+        insecureskiptlsverify: false
+        keyring: ""
+        password: ""
+        repourl: ""
+        username: ""
+        verify: false
+        version: ""
+      install: true
+      devel: false
+      namespace: my-namespace
+      skipcrds: false
+      timeout: 0s
+      wait: false
+      disablehooks: false
+      dryrun: false
+      force: false
+      resetvalues: false
+      reusevalues: false
+      recreate: false
+      maxhistory: 0
+      atomic: false
+      cleanuponfail: false
+      subnotes: false
+      description: ""
+      postrenderer: null
+      disableopenapivalidation: false
+  - name: redis-b
+    chart: bitnami/redis
+    tags: []
+    values: []
+    options:
+      chartpathoptions:
+        cafile: ""
+        certfile: ""
+        keyfile: ""
+        insecureskiptlsverify: false
+        keyring: ""
+        password: ""
+        repourl: ""
+        username: ""
+        verify: false
+        version: ""
+      install: true
+      devel: false
+      namespace: my-namespace
+      skipcrds: false
+      timeout: 0s
+      wait: false
+      disablehooks: false
+      dryrun: false
+      force: false
+      resetvalues: false
+      reusevalues: false
+      recreate: false
+      maxhistory: 0
+      atomic: false
+      cleanuponfail: false
+      subnotes: false
+      description: ""
+      postrenderer: null
+      disableopenapivalidation: false
+  ```
+</details>
+
+
+
 ## 📄 Templating
 HelmWave uses [Go templates](https://godoc.org/text/template) for templating.
 
@@ -245,7 +354,7 @@ Helmwave supports all built-in functions, [Sprig library](https://godoc.org/gith
 
 I am working for added more functions. 
 
-## Features
+## 🚀 Features
 
 - [x] Helm release is working via official golang module [helm](https://github.com/helm/helm/tree/master/pkg)
 - [x] Minimal docker image without helm binary or another plugins
@@ -255,18 +364,19 @@ I am working for added more functions.
 - [x] Templating values
 
 
-## Coming soon...
+## 🛸 Coming soon...
 - [ ] Dependencies helm release
 - [ ] OCI, testing...
+- [ ] Force Update repositories
 - [ ] Formatting output
 - [ ] Applying from planfile
 - [ ] Dependencies helmwave
 - [ ] More templating functions
 
 
-## Full Configuration
+## 🧬 Full Configuration
 
-### Repository
+### 🗄 Repository
 
 ```yaml
 - name: bitnami
@@ -281,7 +391,7 @@ I am working for added more functions.
 ```
 
 
-### Release
+### 🛥 Release
 
 ```yaml
 - name: redis
@@ -309,14 +419,14 @@ I am working for added more functions.
     postrenderer: null
     disableopenapivalidation: false
     chartpathoptions:
-          cafile: ""
-          certfile: ""
-          keyfile: ""
-          insecureskiptlsverify: false
-          keyring: ""
-          password: ""
-          repourl: ""
-          username: ""
-          verify: false
-          version: ""
+      cafile: ""
+      certfile: ""
+      keyfile: ""
+      insecureskiptlsverify: false
+      keyring: ""
+      password: ""
+      repourl: ""
+      username: ""
+      verify: false
+      version: ""
 ```
