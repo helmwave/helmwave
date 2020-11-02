@@ -58,14 +58,14 @@ func FuncMap() template.FuncMap {
 
 	funcMap["toYaml"] = ToYaml
 	funcMap["fromYaml"] = FromYaml
+	funcMap["exec"] = Exec
+	funcMap["setValueAtPath"] = SetValueAtPath
+	funcMap["requiredEnv"] = RequiredEnv
+	funcMap["required"] = Required
 
 	for name, f := range aliased {
 		funcMap[name] = f
 	}
 
 	return funcMap
-}
-
-func Include(filename string) (string, error) {
-	return "", nil
 }
