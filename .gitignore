@@ -1,6 +1,9 @@
-main
-helmwave.yml
-./helmwave
-helmwave.yml
-helmwave.yml.tpl
 .idea/
+
+/helmwave
+/helmwave.yml
+/helmwave.yml.tpl
+
+./helmwave
+./helmwave.yml
+./helmwave.yml.tpl
