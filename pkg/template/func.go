@@ -62,6 +62,8 @@ func FuncMap() template.FuncMap {
 	funcMap["setValueAtPath"] = SetValueAtPath
 	funcMap["requiredEnv"] = RequiredEnv
 	funcMap["required"] = Required
+	funcMap["readFile"] = ReadFile
+	funcMap["get"] = Get
 
 	for name, f := range aliased {
 		funcMap[name] = f
