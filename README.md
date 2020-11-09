@@ -8,11 +8,10 @@ It helps you compose your helm releases!
 ## 📥 Installation
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -o ...`
-    - `$ curl -o ...`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.1.6/helmwave-0.1.6-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.1.5`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.1.5`
+    - `$ docker run diamon/helmwave:0.1.6`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.1.6`
 
 ### Build
 
@@ -34,7 +33,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.1.5
+version: 0.1.6
 
 
 repositories:
@@ -86,7 +85,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: my-project
-version: 0.1.5
+version: 0.1.6
 
 
 repositories:
@@ -159,7 +158,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1.5
+   0.1.6
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -192,7 +191,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.1.5
+version: 0.1.6
 
 
 repositories:
@@ -224,7 +223,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.1.5
+version: 0.1.6
 
 
 repositories:
@@ -255,7 +254,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.1.5
+  version: 0.1.6
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -373,7 +372,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.1.5
+  version: 0.1.6
   
   
   repositories:
@@ -407,7 +406,7 @@ $ helmwave render
   
   ```yaml
   project: my
-  version: 0.1.5
+  version: 0.1.6
   
   repositories:
     - name: bitnami
