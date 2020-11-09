@@ -19,4 +19,3 @@ jobs:
           goos: ${{ matrix.goos }}
           project_path: "./cmd/helmwave"
           goarch: ${{ matrix.goarch }}
-          extra_files: README.md
