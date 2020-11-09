@@ -353,7 +353,6 @@ Helmwave supports all built-in functions, [Sprig library](https://godoc.org/gith
 - `setValueAtPath` PATH NEW_VALUE traverses a golang map, replaces the value at the PATH with NEW_VALUE
 - `requiredEnv` The requiredEnv function allows you to declare a particular environment variable as required for template rendering. If the environment variable is unset or empty, the template rendering will fail with an error message.
 
-I am working for added more functions. 
 
 #### readFile
 
