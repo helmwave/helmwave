@@ -11,6 +11,8 @@ jobs:
         uses: actions/checkout@master
       - name: Generate the artifacts
         uses: skx/github-action-build@master
+        with:
+          builder: .github/build.sh
       - name: Upload the artifacts
         uses: skx/github-action-publish-binaries@master
         env:
