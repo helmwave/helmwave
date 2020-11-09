@@ -1,5 +1,8 @@
 FROM golang:1.15-alpine AS builder
 
+LABEL maintainer="helmwave+zhilyaev.dmitriy@gmail.com"
+LABEL name="helmwave"
+
 # enable Go modules support
 ENV GO111MODULE=on
 
