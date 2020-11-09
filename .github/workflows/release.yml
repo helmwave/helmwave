@@ -16,6 +16,6 @@ jobs:
       - uses: wangyoucao577/go-release-action@master
         with:
           github_token: ${{ secrets.TOKEN }}
-          goos: ${{ matrix.goos }}
+          goos: ${{ matrix.goos }}K
           goarch: ${{ matrix.goarch }}
           extra_files: README.md
