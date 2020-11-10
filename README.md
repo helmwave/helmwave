@@ -1,5 +1,5 @@
 # 🌊 HelmWave
-🏖 HelmWave is **helm-native** tool for deploy your chart.
+🏖 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your chart.
 It helps you compose your helm releases!
 
 
