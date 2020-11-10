@@ -5,6 +5,22 @@ It helps you compose your helm releases!
 
 > Inspired by the [helmfile](https://github.com/roboll/helmfile)
 
+## Сomparison
+ item        | 🌊 HelmWave | helmfile 
+-------------| ------------| ----------- 
+Docker image | 23 mb       | 190 mb
+Without helm binary |✅|❌
+All options helm|✅| partially
+Helm version | only 3 | 2 and 3
+Parallel helm install/upgarde |✅|❌
+Repository Skipping|✅|❌
+Install only needs repositories|✅|❌
+Tags|✅| labels
+Planfile|✅|❌
+Sprig | ✅|✅
+Call helm | via Golang Module | shell executor
+
+
 ## 📥 Installation
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
