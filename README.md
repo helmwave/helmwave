@@ -532,3 +532,5 @@ $ helmwave render
       verify: false
       version: ""
 ```
+
+<img  alt="logo" src="logo.jpg" style="max-height:100%;" height="200px" />
