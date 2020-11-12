@@ -1,6 +1,13 @@
-# 🌊 HelmWave 
+<p align="center">
+  <img  src="logo.svg" style="max-height:100%;" height="220px" />
+</p>
 
-![build](https://github.com/zhilyaev/helmwave/workflows/.github/workflows/release.yml/badge.svg)
+<h1 align="center"> HelmWave </h1>
+
+<p align="center">
+  <img  src="https://github.com/zhilyaev/helmwave/workflows/.github/workflows/release.yml/badge.svg" />
+</p>
+
 
 🏖 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your chart.
 It helps you compose your helm releases!
