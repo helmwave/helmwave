@@ -13,7 +13,7 @@ func (c *Config) Render(ctx *cli.Context) error {
 	if c.Debug == false {
 		fmt.Println("📄 Render", c.Tpl.File, "->", c.Yml.File)
 	}
-	return template.Tpl2yml(c.Tpl.File, c.Yml.File, c.Debug)
+	return template.Tpl2yml(c.Tpl.File, c.Yml.File, nil, c.Debug)
 }
 
 func (c *Config) Planfile(ctx *cli.Context) error {

@@ -24,10 +24,13 @@ func (rel *Config) In(a []Config) bool {
 	return false
 }
 
+type adapter struct {
+}
+
 func (rel *Config) RenderValues(debug bool) {
 	for i, v := range rel.Values {
 		p := v + ".plan"
-		err := template.Tpl2yml(v, p, debug)
+		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel}, debug)
 		if err != nil {
 			fmt.Println(err)
 		}
