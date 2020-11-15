@@ -6,6 +6,7 @@ type Config struct {
 	Name    string
 	Chart   string
 	Tags    []string
+	Store   map[string]interface{}
 	Values  []string
 	Options action.Upgrade
 }
