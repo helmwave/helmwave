@@ -536,6 +536,7 @@ $ helmwave render
   chart: bitnami/redis
   tags: []
   values: []
+  store: 
   options:
     install: true
     devel: false
