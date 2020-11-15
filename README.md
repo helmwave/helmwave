@@ -15,29 +15,34 @@ It helps you compose your helm releases!
 
 > Inspired by the [helmfile](https://github.com/roboll/helmfile)
 
-## Сomparison
- item        | 🌊 HelmWave | helmfile 
--------------| ------------| ----------- 
-Docker image | 23 mb       | 190 mb
+
+## Comparison
+ 🚀 Features  | 🌊 HelmWave   | helmfile 
+-------------| :------------:|:-----------:
+Docker image | 23 mb | 190 mb
 Without helm binary |✅|❌
-All options helm|✅| partially
-Helm version | only 3 | 2 and 3
-Parallel helm install/upgarde |✅|❌
+All options helm|✅|partially
+Helm 3 |✅|✅
+Helm 2 |❌|✅
+Parallel helm install/upgrade |✅|❌
 Repository Skipping|✅|❌
 Install only needs repositories|✅|❌
-Tags|✅| labels
+Tags|✅| You can use labels
+Store|✅| You can use labels
 Planfile|✅|❌
 Sprig | ✅|✅
-Call helm | via Golang Module | shell executor
+Call helm | via Golang Module | Shell Executor
+Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 
+`*` - WIP 
 
 ## 📥 Installation
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.1.6/helmwave-0.1.6-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.2.0/helmwave-0.2.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.1.6`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.1.6`
+    - `$ docker run diamon/helmwave:0.2.0`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.2.0`
 
 ### Build
 
@@ -59,7 +64,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.1.6
+version: 0.2.0
 
 
 repositories:
@@ -111,7 +116,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: my-project
-version: 0.1.6
+version: 0.2.0
 
 
 repositories:
@@ -174,6 +179,47 @@ This command will deploy only `redis-b`
 $ helmwave -t redis,b deploy
 ```
 
+
+## 🔰 Store 
+It allows pass you custom values to render release. 
+
+`helmwave.yml`:
+
+```yaml 
+project: my-project
+version: 0.2.0
+
+releases:
+  - name: backend
+    chart: my/backend
+    options:
+      install: true
+    store:
+      secret:
+        type: vault
+        path: secret/my/frontend
+    values:
+      - my-custom-values.yml
+
+  - name: frontend
+    chart: my/frontend
+    options:
+      install: true
+    store:
+      secret:
+        type: vault
+        path: secret/my/frontend
+    values:
+      - my-custom-values.yml
+```
+
+`my-custom-values.yml`:
+```yaml
+secretForApp:
+  kind: {{ .Release.Store.secret.type }}
+  path: {{ .Release.Store.secret.path | quote }}
+```
+
 ## 🛠 CLI Reference
 
 ```console
@@ -184,7 +230,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1.6
+   0.2.0
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -217,7 +263,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.1.6
+version: 0.2.0
 
 
 repositories:
@@ -249,7 +295,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.1.6
+version: 0.2.0
 
 
 repositories:
@@ -280,7 +326,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.1.6
+  version: 0.2.0
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -398,7 +444,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.1.6
+  version: 0.2.0
   
   
   repositories:
@@ -432,7 +478,7 @@ $ helmwave render
   
   ```yaml
   project: my
-  version: 0.1.6
+  version: 0.2.0
   
   repositories:
     - name: bitnami
@@ -454,16 +500,6 @@ $ helmwave render
   
 </details>
 
-
-
-## 🚀 Features
-
-- [x] Helm release is working via official golang module [helm](https://github.com/helm/helm/tree/master/pkg)
-- [x] Minimal docker image without helm binary or another plugins
-- [x] Support helm repositories
-- [x] Parallel applying helm releases
-- [x] Templating helmwave.yml
-- [x] Templating values
 
 
 ## 🛸 Coming soon...
@@ -513,7 +549,7 @@ $ helmwave render
     resetvalues: false
     reusevalues: false
     recreate: false
-    maxhistory: 0 # infinity
+    maxhistory: 0
     atomic: false
     cleanuponfail: false
     subnotes: false
