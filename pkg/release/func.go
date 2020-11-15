@@ -29,7 +29,12 @@ func (rel *Config) RenderValues(debug bool) {
 	for i, v := range rel.Values {
 		if _, err := os.Stat(v); err != nil {
 			if os.IsNotExist(err) {
-				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+				if len(rel.Values) == 1 {
+					rel.Values = []string{}
+				} else {
+					rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+				}
+
 				continue
 			} else {
 				fmt.Println(err)
