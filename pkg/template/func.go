@@ -9,7 +9,11 @@ import (
 	"text/template"
 )
 
-func Tpl2yml(tpl string, yml string, debug bool) error {
+func Tpl2yml(tpl string, yml string, data interface{}, debug bool) error {
+	if data == nil {
+		data = map[string]interface{}{}
+	}
+
 	if debug {
 		fmt.Println("📄 Render", tpl, "->", yml)
 	}
@@ -21,7 +25,7 @@ func Tpl2yml(tpl string, yml string, debug bool) error {
 	// Template
 	t := template.Must(template.New("tpl").Funcs(FuncMap()).Parse(string(src)))
 	var buf bytes.Buffer
-	err = t.Execute(&buf, map[string]interface{}{})
+	err = t.Execute(&buf, data)
 	if err != nil {
 		return err
 	}
