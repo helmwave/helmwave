@@ -3,6 +3,7 @@ package release
 import (
 	"fmt"
 	"github.com/zhilyaev/helmwave/pkg/template"
+	"os"
 	"sort"
 )
 
@@ -24,11 +25,17 @@ func (rel *Config) In(a []Config) bool {
 	return false
 }
 
-type adapter struct {
-}
-
 func (rel *Config) RenderValues(debug bool) {
 	for i, v := range rel.Values {
+		if _, err := os.Stat(v); err != nil {
+			if os.IsNotExist(err) {
+				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+				continue
+			} else {
+				fmt.Println(err)
+			}
+		}
+
 		p := v + ".plan"
 		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel}, debug)
 		if err != nil {

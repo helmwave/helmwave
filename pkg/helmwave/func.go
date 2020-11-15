@@ -22,12 +22,6 @@ func (c *Config) Log(format string, v ...interface{}) {
 	}
 }
 
-func (c *Config) RenderValues() {
-	for _, rel := range c.Plan.Body.Releases {
-		rel.RenderValues(c.Debug)
-	}
-}
-
 func (c Config) ActionCfg(ns string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER")
