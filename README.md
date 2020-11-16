@@ -1,5 +1,5 @@
 <p align="center">
-  <img  src="img/logo.png" style="max-height:100%;" height="220px" />
+  <img  src="https://raw.githubusercontent.com/zhilyaev/helmwave/main/img/logo.png" style="max-height:100%;" height="220px" />
 </p>
 
 <h1 align="center"> HelmWave </h1>
@@ -9,8 +9,7 @@
 </p>
 
 
-🏖 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your chart.
-It helps you compose your helm releases!
+🌊 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**.
 
 
 > Inspired by the [helmfile](https://github.com/roboll/helmfile)
@@ -39,10 +38,10 @@ Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 ## 📥 Installation
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.2.0/helmwave-0.2.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.3.0/helmwave-0.3.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.2.0`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.2.0`
+    - `$ docker run diamon/helmwave:0.3.0`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.3.0`
 
 ### Build
 
@@ -64,7 +63,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.2.0
+version: 0.3.0
 
 
 repositories:
@@ -97,10 +96,10 @@ Congratulations!
 ```shell script
 $ helm list -n my-namespace
 NAME                    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
-redis-a                 my-namespace    2               2020-10-31 17:05:35.829766 +0300 MSK    deployed        redis-11.2.3            6.0.9      
-redis-b                 my-namespace    16              2020-10-31 17:05:39.437556 +0300 MSK    deployed        redis-11.2.3            6.0.9  
+redis-a                 my-namespace    1               2020-10-31 17:05:35.829766 +0300 MSK    deployed        redis-11.2.3            6.0.9      
+redis-b                 my-namespace    1               2020-10-31 17:05:39.437556 +0300 MSK    deployed        redis-11.2.3            6.0.9  
 
-$ k get po -n my-namespace                                                                                                                            (k8s-sbs-dev/stage)
+$ k get po -n my-namespace                                                                                                                         
 NAME               READY   STATUS    RESTARTS   AGE
 redis-a-master-0   1/1     Running   0          64s
 redis-a-slave-0    1/1     Running   0          31s
@@ -116,7 +115,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: my-project
-version: 0.2.0
+version: 0.3.0
 
 
 repositories:
@@ -187,7 +186,7 @@ It allows pass you custom values to render release.
 
 ```yaml 
 project: my-project
-version: 0.2.0
+version: 0.3.0
 
 releases:
   - name: backend
@@ -230,7 +229,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.2.0
+   0.3.0
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -263,7 +262,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.2.0
+version: 0.3.0
 
 
 repositories:
@@ -295,7 +294,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.2.0
+version: 0.3.0
 
 
 repositories:
@@ -326,7 +325,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.2.0
+  version: 0.3.0
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -444,7 +443,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.2.0
+  version: 0.3.0
   
   
   repositories:
@@ -478,7 +477,7 @@ $ helmwave render
   
   ```yaml
   project: my
-  version: 0.2.0
+  version: 0.3.0
   
   repositories:
     - name: bitnami
