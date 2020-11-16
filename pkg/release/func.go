@@ -31,8 +31,10 @@ func (rel *Config) RenderValues(debug bool) {
 			if os.IsNotExist(err) {
 				if len(rel.Values) == 1 {
 					rel.Values = []string{}
-				} else {
+				} else if len(rel.Values)-1 == i {
 					rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+				} else {
+					rel.Values = rel.Values[:i]
 				}
 
 				continue
