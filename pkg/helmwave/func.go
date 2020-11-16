@@ -30,10 +30,6 @@ func (c Config) ActionCfg(ns string, settings *helm.EnvSettings) (*action.Config
 		ns = settings.Namespace()
 	}
 
-	if c.Debug {
-		fmt.Println("Namespace of action config is", ns)
-	}
-
 	err := cfg.Init(settings.RESTClientGetter(), ns, helmDriver, c.Log)
 	return cfg, err
 }
