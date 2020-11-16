@@ -22,3 +22,11 @@ func (c *Config) PlanReleases() {
 		yml.Print(c.Plan.Body.Releases)
 	}
 }
+
+func (c *Config) RenderValues() {
+	for i, rel := range c.Plan.Body.Releases {
+		rel.RenderValues(c.Debug)
+		// Make easy
+		c.Plan.Body.Releases[i].Values = rel.Values
+	}
+}

@@ -7,6 +7,8 @@ import (
 	"github.com/zhilyaev/helmwave/pkg/release"
 	"github.com/zhilyaev/helmwave/pkg/template"
 	"github.com/zhilyaev/helmwave/pkg/yml"
+	helm "helm.sh/helm/v3/pkg/cli"
+	"os"
 )
 
 func (c *Config) Render(ctx *cli.Context) error {
@@ -82,12 +84,16 @@ func (c *Config) SyncReleases(ctx *cli.Context) error {
 
 func (c *Config) DoRelease(r *release.Config) {
 	fmt.Printf("🛥 %s -> %s\n", r.Name, r.Options.Namespace)
-	cfg, err := c.ActionCfg(r.Options.Namespace)
+
+	// I hate Private
+	_ = os.Setenv("HELM_NAMESPACE", r.Options.Namespace)
+	settings := helm.New()
+	cfg, err := c.ActionCfg(r.Options.Namespace, settings)
 	if err != nil {
 		fmt.Println("❌", err)
 	}
 
-	err = r.Sync(cfg, c.Helm)
+	err = r.Sync(cfg, settings)
 	if err != nil {
 		fmt.Println("❌", err)
 	} else {

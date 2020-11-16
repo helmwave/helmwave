@@ -7,7 +7,7 @@ import (
 
 func New() *helmwave.Config {
 	return &helmwave.Config{
-		Version: "0.2.0",
+		Version: "0.2.1",
 		Helm:    cli.New(),
 	}
 }

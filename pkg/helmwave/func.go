@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/zhilyaev/helmwave/pkg/yml"
 	"helm.sh/helm/v3/pkg/action"
+	helm "helm.sh/helm/v3/pkg/cli"
 	"log"
 	"os"
 )
@@ -22,18 +23,17 @@ func (c *Config) Log(format string, v ...interface{}) {
 	}
 }
 
-func (c *Config) RenderValues() {
-	for _, rel := range c.Plan.Body.Releases {
-		rel.RenderValues(c.Debug)
-	}
-}
-
-func (c Config) ActionCfg(ns string) (*action.Configuration, error) {
+func (c Config) ActionCfg(ns string, settings *helm.EnvSettings) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER")
 	if len(ns) == 0 {
-		ns = c.Helm.Namespace()
+		ns = settings.Namespace()
 	}
-	err := cfg.Init(c.Helm.RESTClientGetter(), ns, helmDriver, c.Log)
+
+	if c.Debug {
+		fmt.Println("Namespace of action config is", ns)
+	}
+
+	err := cfg.Init(settings.RESTClientGetter(), ns, helmDriver, c.Log)
 	return cfg, err
 }
