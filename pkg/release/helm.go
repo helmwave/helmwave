@@ -11,13 +11,14 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/storage/driver"
 	"os"
+	"path/filepath"
 )
 
 func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              os.Stdout,
-		ChartPath:        rel.Chart,
+		ChartPath:        filepath.Clean(rel.Chart),
 		Keyring:          client.Keyring,
 		SkipUpdate:       client.SkipRefresh,
 		Getters:          getter.All(settings),
@@ -32,13 +33,10 @@ func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
 }
 
 func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) error {
-	err := rel.DependencyUpdate(settings)
-	if err != nil {
-		return err
-	}
+	_ = rel.DependencyUpdate(settings)
 	// I hate private field
 	client := action.NewUpgrade(cfg)
-	err = mergo.Merge(client, rel.Options)
+	err := mergo.Merge(client, rel.Options)
 	if err != nil {
 		return err
 	}
