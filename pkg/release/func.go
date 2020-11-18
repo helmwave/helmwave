@@ -12,10 +12,6 @@ func contains(t string, a []string) bool {
 	return i < len(a) && a[i] == t
 }
 
-func RemoveIndex(s []Config, index int) []Config {
-	return append(s[:index], s[index+1:]...)
-}
-
 func (rel *Config) In(a []Config) bool {
 	for _, r := range a {
 		if rel == &r {
@@ -25,24 +21,22 @@ func (rel *Config) In(a []Config) bool {
 	return false
 }
 
-func (rel *Config) RenderValues(debug bool) {
-	for i, v := range rel.Values {
-		if _, err := os.Stat(v); err != nil {
-			if os.IsNotExist(err) {
-				if len(rel.Values) == 1 {
-					rel.Values = []string{}
-				} else if len(rel.Values)-1 == i {
-					rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
-				} else {
-					rel.Values = rel.Values[:i]
-				}
+func (rel *Config) PlanValues() {
 
-				continue
-			} else {
-				fmt.Println(err)
+	for i := len(rel.Values) - 1; i >= 0; i-- {
+		if _, err := os.Stat(rel.Values[i]); err != nil {
+			if os.IsNotExist(err) {
+				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
 			}
 		}
+	}
 
+}
+
+func (rel *Config) RenderValues(debug bool) {
+	rel.PlanValues()
+
+	for i, v := range rel.Values {
 		p := v + ".plan"
 		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel}, debug)
 		if err != nil {
