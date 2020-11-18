@@ -1,6 +1,7 @@
 package helmwave
 
 import (
+	"fmt"
 	"github.com/zhilyaev/helmwave/pkg/release"
 	"github.com/zhilyaev/helmwave/pkg/repo"
 )
@@ -14,7 +15,11 @@ func (c *Config) PlanReleases() {
 }
 
 func (c *Config) RenderValues() {
-	for _, rel := range c.Plan.Body.Releases {
+	for i, rel := range c.Plan.Body.Releases {
 		rel.RenderValues(c.Debug)
+		c.Plan.Body.Releases[i].Values = rel.Values
+		if c.Debug {
+			fmt.Println("🐞 Values of", rel.Name, ":", c.Plan.Body.Releases[i].Values)
+		}
 	}
 }
