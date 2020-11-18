@@ -2,15 +2,12 @@ package release
 
 import (
 	"fmt"
+	"github.com/zhilyaev/helmwave/pkg/helper"
 	"github.com/zhilyaev/helmwave/pkg/template"
+	"helm.sh/helm/v3/pkg/chart/loader"
 	"os"
-	"sort"
+	"strings"
 )
-
-func contains(t string, a []string) bool {
-	i := sort.SearchStrings(a, t)
-	return i < len(a) && a[i] == t
-}
 
 func (rel *Config) In(a []Config) bool {
 	for _, r := range a {
@@ -46,4 +43,22 @@ func (rel *Config) RenderValues(debug bool) {
 		rel.Values[i] = p
 	}
 
+}
+
+func (rel *Config) ReposDeps() (repos []string, err error) {
+	chart, err := loader.Load(rel.Chart)
+	if err != nil {
+		return nil, err
+	}
+
+	deps := chart.Metadata.Dependencies
+
+	for _, d := range deps {
+		if strings.HasPrefix(d.Repository, "@") {
+			d.Repository = helper.TrimFirstRune(d.Repository)
+		}
+		repos = append(repos, d.Repository)
+	}
+
+	return repos, nil
 }

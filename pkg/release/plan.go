@@ -1,6 +1,7 @@
 package release
 
 import (
+	"github.com/zhilyaev/helmwave/pkg/helper"
 	"sort"
 	"strings"
 )
@@ -34,7 +35,7 @@ func Plan(tags []string, releases []Config) (plan []Config) {
 
 			} else {
 				// if myTag in [myTag2, myTag, myTag1]
-				if contains(t, r.Tags) && !r.In(plan) {
+				if helper.Contains(t, r.Tags) && !r.In(plan) {
 					plan = append(plan, r)
 				}
 			}
