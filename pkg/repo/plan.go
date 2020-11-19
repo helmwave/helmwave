@@ -13,10 +13,7 @@ func Plan(releases []release.Config, repositories []Config) []Config {
 		for _, rel := range releases {
 			// bitnami/redis -> bitnami
 			name := strings.Split(rel.Chart, "/")[0]
-			deps, err := rel.ReposDeps()
-			if err != nil {
-				panic(err)
-			}
+			deps, _ := rel.ReposDeps()
 
 			if (name == rep.Name || helper.Contains(rep.Name, deps)) && !rep.In(plan) {
 				plan = append(plan, rep)
