@@ -2,21 +2,20 @@ package template
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/Masterminds/sprig/v3"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"text/template"
 )
 
-func Tpl2yml(tpl string, yml string, data interface{}, debug bool) error {
+func Tpl2yml(tpl string, yml string, data interface{}) error {
 	if data == nil {
 		data = map[string]interface{}{}
 	}
 
-	if debug {
-		fmt.Println("📄 Render", tpl, "->", yml)
-	}
+	log.Info("📄 Render", tpl, "->", yml)
+
 	src, err := ioutil.ReadFile(tpl)
 	if err != nil {
 		return err
@@ -30,9 +29,7 @@ func Tpl2yml(tpl string, yml string, data interface{}, debug bool) error {
 		return err
 	}
 
-	if debug {
-		fmt.Printf("%+v\n", buf.String())
-	}
+	log.Infof("%+v\n", buf.String())
 
 	f, err := os.Create(yml)
 	if err != nil {

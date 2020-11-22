@@ -1,8 +1,8 @@
 package release
 
 import (
-	"fmt"
 	"github.com/imdario/mergo"
+	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	helm "helm.sh/helm/v3/pkg/cli"
@@ -54,7 +54,7 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 
 	ch, err := loader.Load(chart)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	if req := ch.Metadata.Dependencies; req != nil {
@@ -64,11 +64,11 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 	}
 
 	if !(ch.Metadata.Type == "" || ch.Metadata.Type == "application") {
-		fmt.Printf("%s charts are not installable \n", ch.Metadata.Type)
+		log.Warnf("%s charts are not installable \n", ch.Metadata.Type)
 	}
 
 	if ch.Metadata.Deprecated {
-		fmt.Println("⚠️ This chart is deprecated")
+		log.Warn("⚠️ This chart is deprecated")
 	}
 
 	if client.Install {
@@ -77,7 +77,7 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 		histClient.Max = 1
 		_, err := histClient.Run(rel.Name)
 		if err == driver.ErrReleaseNotFound {
-			fmt.Printf("🧐 Release %q in %q does not exist. Installing it now.\n", rel.Name, rel.Options.Namespace)
+			log.Infof("🧐 Release %q in %q does not exist. Installing it now.\n", rel.Name, rel.Options.Namespace)
 
 			instClient := action.NewInstall(cfg)
 

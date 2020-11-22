@@ -1,7 +1,7 @@
 package helmwave
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/wayt/parallel"
 	"github.com/zhilyaev/helmwave/pkg/release"
@@ -12,10 +12,8 @@ import (
 )
 
 func (c *Config) Render(ctx *cli.Context) error {
-	if c.Debug == false {
-		fmt.Println("📄 Render", c.Tpl.File, "->", c.Yml.File)
-	}
-	return template.Tpl2yml(c.Tpl.File, c.Yml.File, nil, c.Debug)
+	log.Debug("📄 Render", c.Tpl.File, "->", c.Yml.File)
+	return template.Tpl2yml(c.Tpl.File, c.Yml.File, nil)
 }
 
 func (c *Config) Planfile(ctx *cli.Context) error {
@@ -24,27 +22,35 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println("🛠 Your planfile is", c.Plan.File)
+	log.Info("🛠 Your planfile is", c.Plan.File)
 	c.ReadHelmWaveYml()
 	c.Plan.Body.Project = c.Yml.Body.Project
 	c.Plan.Body.Version = c.Yml.Body.Version
+
+	// Releases
 	c.PlanReleases()
 	c.RenderValues()
-
-	fmt.Print("🛠 -> 🛥 [ ")
-	for _, rel := range c.Plan.Body.Releases {
-		fmt.Print(rel.Name, " ")
+	names := make([]string, 0)
+	for _, v := range c.Plan.Body.Releases {
+		names = append(names, v.Name)
 	}
-	fmt.Println("]")
+	log.Infof("🛠 -> 🛥 %v", names)
+
+	// Repos
 	c.PlanRepos()
-
-	fmt.Print("🛠 -> 🗄  [ ")
-	for _, rep := range c.Plan.Body.Repositories {
-		fmt.Print(rep.Name, " ")
+	names = make([]string, 0)
+	for _, v := range c.Plan.Body.Repositories {
+		names = append(names, v.Name)
 	}
-	fmt.Println("]")
+	log.Infof("🛠 -> 🗄 %v", names)
+
 	return yml.Save(c.Plan.File, c.Plan.Body)
 }
+
+//func (c *Config) LogHelper(format string, v ...interface{}) {
+//	format = fmt.Sprintf("🐞 %s\n", format)
+//	log.Output(2, fmt.Sprintf(format, v...))
+//}
 
 func (c *Config) SyncRepos(ctx *cli.Context) error {
 	err := c.Planfile(ctx)
@@ -52,7 +58,7 @@ func (c *Config) SyncRepos(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println("🗄 Sync repositories")
+	log.Info("🗄 Sync repositories")
 	for _, r := range c.Plan.Body.Repositories {
 		r.Sync(c.Helm)
 	}
@@ -65,10 +71,11 @@ func (c *Config) SyncReleases(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println("🛥 Sync releases")
+	log.Info("🛥 Sync releases")
 
 	if c.Parallel {
 		g := &parallel.Group{}
+		log.Debug("Run in parallel mode")
 		for i, _ := range c.Plan.Body.Releases {
 			g.Go(c.DoRelease, &c.Plan.Body.Releases[i])
 		}
@@ -83,20 +90,20 @@ func (c *Config) SyncReleases(ctx *cli.Context) error {
 }
 
 func (c *Config) DoRelease(r *release.Config) {
-	fmt.Printf("🛥 %s -> %s\n", r.Name, r.Options.Namespace)
+	log.Info("🛥 %s -> %s\n", r.Name, r.Options.Namespace)
 
 	// I hate Private
 	_ = os.Setenv("HELM_NAMESPACE", r.Options.Namespace)
 	settings := helm.New()
 	cfg, err := c.ActionCfg(r.Options.Namespace, settings)
 	if err != nil {
-		fmt.Println("❌", err)
+		log.Fatal("❌", err)
 	}
 
 	err = r.Sync(cfg, settings)
 	if err != nil {
-		fmt.Println("❌", err)
+		log.Fatal("❌", err)
 	} else {
-		fmt.Printf("✅ %s -> %s\n", r.Name, r.Options.Namespace)
+		log.Infof("✅ %s -> %s\n", r.Name, r.Options.Namespace)
 	}
 }

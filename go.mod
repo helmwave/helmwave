@@ -11,6 +11,8 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11
 	github.com/mitchellh/copystructure v1.0.0 // indirect
+	github.com/prometheus/common v0.7.0
+	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/wayt/parallel v0.0.0-20161122220654-0890dde4af08

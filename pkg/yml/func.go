@@ -1,10 +1,9 @@
 package yml
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -46,5 +45,5 @@ func String(in interface{}) string {
 }
 
 func Print(in interface{}) {
-	fmt.Println(String(in))
+	println(String(in))
 }
