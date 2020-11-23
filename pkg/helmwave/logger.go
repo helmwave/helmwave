@@ -27,11 +27,17 @@ func (c *Config) InitLoggerLevel() error {
 func (c *Config) InitLoggerFormat() {
 	switch c.Logger.Format {
 	case "json":
-		log.SetFormatter(&log.JSONFormatter{})
-		//c.Logger.Engine.SetFormatter(&log.JSONFormatter{})
+		log.SetFormatter(&log.JSONFormatter{
+			PrettyPrint: true,
+		})
 	case "pad":
 		log.SetFormatter(&log.TextFormatter{
 			PadLevelText: true,
+			ForceColors:  true,
+		})
+	case "text":
+		log.SetFormatter(&log.TextFormatter{
+			ForceColors: true,
 		})
 	}
 }

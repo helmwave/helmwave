@@ -23,12 +23,10 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Destination: &app.Yml.File,
 		},
 		&cli.StringFlag{
-			Name:        "planfile",
-			Aliases:     []string{"p"},
-			Usage:       "Path to planfile",
-			Value:       "helmwave.plan",
-			EnvVars:     []string{"HELMWAVE_PLANFILE"},
-			Destination: &app.Plan.File,
+			Name:        "plan-dir",
+			Value:       ".helmwave/",
+			EnvVars:     []string{"HELMWAVE_PLAN_DIR"},
+			Destination: &app.PlanDir,
 		},
 		&cli.StringSliceFlag{
 			Name:        "tags",

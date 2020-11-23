@@ -16,7 +16,7 @@ func (c *Config) PlanReleases() {
 
 func (c *Config) RenderValues() {
 	for i, rel := range c.Plan.Body.Releases {
-		rel.RenderValues()
+		rel.RenderValues(c.PlanDir)
 		c.Plan.Body.Releases[i].Values = rel.Values
 		log.Debugf("🐞 Values of %s : %+v", rel.Name, c.Plan.Body.Releases[i].Values)
 	}

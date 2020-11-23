@@ -22,8 +22,10 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 		return err
 	}
 
+	c.Plan.File = c.PlanDir + "planfile"
 	log.Info("🛠 Your planfile is ", c.Plan.File)
 	c.ReadHelmWaveYml()
+
 	c.Plan.Body.Project = c.Yml.Body.Project
 	c.Plan.Body.Version = c.Yml.Body.Version
 

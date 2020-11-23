@@ -2,9 +2,9 @@ package yml
 
 import (
 	log "github.com/sirupsen/logrus"
+	"github.com/zhilyaev/helmwave/pkg/helper"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"os"
 )
 
 func Read(file string, yml *Body) {
@@ -20,7 +20,7 @@ func Read(file string, yml *Body) {
 }
 
 func Save(file string, in interface{}) error {
-	f, err := os.Create(file)
+	f, err := helper.CreateFile(file)
 	if err != nil {
 		return err
 	}

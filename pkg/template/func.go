@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"github.com/Masterminds/sprig/v3"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhilyaev/helmwave/pkg/helper"
 	"io/ioutil"
-	"os"
 	"text/template"
 )
 
@@ -30,7 +30,7 @@ func Tpl2yml(tpl string, yml string, data interface{}) error {
 
 	log.Debugf("Content of %s:\n %+v\n", yml, buf.String())
 
-	f, err := os.Create(yml)
+	f, err := helper.CreateFile(yml)
 	if err != nil {
 		return err
 	}
