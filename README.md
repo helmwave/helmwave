@@ -38,10 +38,10 @@ Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 ## 📥 Installation
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.3.3/helmwave-0.3.3-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.4.0/helmwave-0.4.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.3.3`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.3.3`
+    - `$ docker run diamon/helmwave:0.4.0`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.4.0`
 
 ### Build
 
@@ -63,7 +63,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.3.3
+version: 0.4.0
 
 
 repositories:
@@ -115,7 +115,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: my-project
-version: 0.3.3
+version: 0.4.0
 
 
 repositories:
@@ -186,7 +186,7 @@ It allows pass you custom values to render release.
 
 ```yaml 
 project: my-project
-version: 0.3.3
+version: 0.4.0
 
 releases:
   - name: backend
@@ -229,7 +229,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.3.3
+   0.4.0
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -247,12 +247,12 @@ COMMANDS:
 GLOBAL OPTIONS:
    --tpl value                 Main tpl file (default: "helmwave.yml.tpl") [$HELMWAVE_TPL_FILE]
    --file value, -f value      Main yml file (default: "helmwave.yml") [$HELMWAVE_FILE, $HELMWAVE_YAML_FILE, $HELMWAVE_YML_FILE]
-   --planfile value, -p value  (default: "helmwave.plan") [$HELMWAVE_PLANFILE]
-   --tags value, -t value      Chose tags: -t tag1 -t tag3,tag4 [$HELMWAVE_TAGS]
-   --debug, -d                 Debug helmwave (default: false) [$HELMWAVE_DEBUG]
-   --parallel                  Parallel mode (default: true) [$HELMWAVE_PARALLEL]
+   --planfile value, -p value  Path to planfile (default: "helmwave.plan") [$HELMWAVE_PLANFILE]
+   --tags value, -t value      It allows you choose releases for sync. Example: -t tag1 -t tag3,tag4 [$HELMWAVE_TAGS]
+   --parallel helm install     it allows you call helm install in parallel mode  (default: true) [$HELMWAVE_PARALLEL]
+   --log-format value          You can set: [ text | json | pad ] (default: "text") [$HELMWAVE_LOG_FORMAT]
+   --log-level value           You can set: [ debug | info | warn | panic | fatal | trace ] (default: "info") [$HELMWAVE_LOG_LEVEL, $HELMWAVE_LOG_LVL]
    --version, -v               print the version (default: false)
-
 ```
 
 ### Render, r
@@ -262,7 +262,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.3.3
+version: 0.4.0
 
 
 repositories:
@@ -294,7 +294,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.3.3
+version: 0.4.0
 
 
 repositories:
@@ -325,7 +325,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.3.3
+  version: 0.4.0
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -443,7 +443,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.3.3
+  version: 0.4.0
   
   
   repositories:
@@ -477,7 +477,7 @@ $ helmwave render
   
   ```yaml
   project: my
-  version: 0.3.3
+  version: 0.4.0
   
   repositories:
     - name: bitnami
