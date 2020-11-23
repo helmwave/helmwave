@@ -502,13 +502,13 @@ $ helmwave render
 
 
 ## 🛸 Coming soon...
-- [ ] Dependencies helm release
+- [x] Dependencies helm release
 - [ ] OCI, testing...
 - [ ] Force Update repositories
-- [ ] Formatting output
+- [x] Formatting output
 - [ ] Applying from planfile
 - [ ] Dependencies helmwave
-- [ ] More templating functions
+- [x] More templating functions
 
 
 ## 🧬 Full Configuration
