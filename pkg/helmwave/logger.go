@@ -29,5 +29,9 @@ func (c *Config) InitLoggerFormat() {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
 		//c.Logger.Engine.SetFormatter(&log.JSONFormatter{})
+	case "pad":
+		log.SetFormatter(&log.TextFormatter{
+			PadLevelText: true,
+		})
 	}
 }

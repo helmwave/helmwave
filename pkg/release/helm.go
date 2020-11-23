@@ -33,10 +33,13 @@ func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
 }
 
 func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) error {
-	_ = rel.DependencyUpdate(settings)
+	err := rel.DependencyUpdate(settings)
+	if err != nil {
+		log.Debug(err)
+	}
 	// I hate private field
 	client := action.NewUpgrade(cfg)
-	err := mergo.Merge(client, rel.Options)
+	err = mergo.Merge(client, rel.Options)
 	if err != nil {
 		return err
 	}
@@ -77,7 +80,7 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 		histClient.Max = 1
 		_, err := histClient.Run(rel.Name)
 		if err == driver.ErrReleaseNotFound {
-			log.Infof("🧐 Release %q in %q does not exist. Installing it now.\n", rel.Name, rel.Options.Namespace)
+			log.Debugf("🧐 Release %q in %q does not exist. Installing it now.\n", rel.Name, rel.Options.Namespace)
 
 			instClient := action.NewInstall(cfg)
 

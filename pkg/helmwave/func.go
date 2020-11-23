@@ -11,7 +11,8 @@ import (
 func (c *Config) ReadHelmWaveYml() {
 	yml.Read(c.Yml.File, &c.Yml.Body)
 	if c.Yml.Body.Version != c.Version {
-		log.Warn("⚠️ Unsupported version", c.Yml.Body.Version)
+		log.Warn("⚠️ Unsupported version ", c.Yml.Body.Version)
+		log.Debug("🌊 HelmWave version ", c.Version)
 	}
 }
 
@@ -22,6 +23,6 @@ func (c Config) ActionCfg(ns string, settings *helm.EnvSettings) (*action.Config
 		ns = settings.Namespace()
 	}
 
-	err := cfg.Init(settings.RESTClientGetter(), ns, helmDriver, log.Infof)
+	err := cfg.Init(settings.RESTClientGetter(), ns, helmDriver, log.Debugf)
 	return cfg, err
 }

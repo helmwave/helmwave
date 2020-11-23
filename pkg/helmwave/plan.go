@@ -18,7 +18,6 @@ func (c *Config) RenderValues() {
 	for i, rel := range c.Plan.Body.Releases {
 		rel.RenderValues()
 		c.Plan.Body.Releases[i].Values = rel.Values
-		log.Debug("🐞 Values of", rel.Name, ":", c.Plan.Body.Releases[i].Values)
-
+		log.Debugf("🐞 Values of %s : %+v", rel.Name, c.Plan.Body.Releases[i].Values)
 	}
 }
