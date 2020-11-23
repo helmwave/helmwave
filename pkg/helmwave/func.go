@@ -1,25 +1,18 @@
 package helmwave
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/yml"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
-	"log"
 	"os"
 )
 
 func (c *Config) ReadHelmWaveYml() {
 	yml.Read(c.Yml.File, &c.Yml.Body)
 	if c.Yml.Body.Version != c.Version {
-		fmt.Println("⚠️ Unsupported version", c.Yml.Body.Version)
-	}
-}
-
-func (c *Config) Log(format string, v ...interface{}) {
-	if c.Debug {
-		format = fmt.Sprintf("[debug] %s\n", format)
-		log.Output(2, fmt.Sprintf(format, v...))
+		log.Warn("⚠️ Unsupported version ", c.Yml.Body.Version)
+		log.Debug("🌊 HelmWave version ", c.Version)
 	}
 }
 
@@ -30,6 +23,6 @@ func (c Config) ActionCfg(ns string, settings *helm.EnvSettings) (*action.Config
 		ns = settings.Namespace()
 	}
 
-	err := cfg.Init(settings.RESTClientGetter(), ns, helmDriver, c.Log)
+	err := cfg.Init(settings.RESTClientGetter(), ns, helmDriver, log.Debugf)
 	return cfg, err
 }

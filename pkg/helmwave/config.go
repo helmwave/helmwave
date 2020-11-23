@@ -9,11 +9,11 @@ import (
 
 type Config struct {
 	Version  string
-	Debug    bool
 	Helm     *helm.EnvSettings
 	Tags     cli.StringSlice
 	Tpl      template.Tpl
 	Yml      yml.Config
 	Plan     yml.Config
+	Logger   *Log
 	Parallel bool
 }

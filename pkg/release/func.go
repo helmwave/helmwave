@@ -1,7 +1,7 @@
 package release
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/helper"
 	"github.com/zhilyaev/helmwave/pkg/template"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -30,14 +30,14 @@ func (rel *Config) PlanValues() {
 
 }
 
-func (rel *Config) RenderValues(debug bool) {
+func (rel *Config) RenderValues() {
 	rel.PlanValues()
 
 	for i, v := range rel.Values {
 		p := v + ".plan"
-		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel}, debug)
+		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})
 		if err != nil {
-			fmt.Println(err)
+			log.Warn(err)
 		}
 
 		rel.Values[i] = p

@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	helmwave "github.com/zhilyaev/helmwave/pkg/cli"
-	"log"
 	"os"
 )
 
 func main() {
 	app = helmwave.New()
 	c := &cli.App{
+		Before:          before,
 		CommandNotFound: command404,
 		Name:            "🌊 HelmWave",
 		Usage:           "composer for helm",
@@ -28,5 +28,10 @@ func main() {
 }
 
 func command404(c *cli.Context, s string) {
-	fmt.Printf("👻 Command '%v' not found \n", s)
+	log.Errorf("👻 Command '%v' not found \n", s)
+	os.Exit(127)
+}
+
+func before(c *cli.Context) error {
+	return app.InitLogger()
 }

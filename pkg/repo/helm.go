@@ -2,8 +2,8 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"github.com/gofrs/flock"
+	"github.com/prometheus/common/log"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
@@ -41,7 +41,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) {
 	}
 
 	if f.Has(o.Name) {
-		fmt.Printf("❎ %q already exists with the same configuration, skipping\n", o.Name)
+		log.Infof("❎ %q already exists with the same configuration, skipping\n", o.Name)
 	} else {
 		chartRepo, err := repo.NewChartRepository(o, getter.All(helm))
 		if err != nil {
@@ -50,7 +50,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) {
 
 		_, err = chartRepo.DownloadIndexFile()
 		if err != nil {
-			fmt.Printf("⚠️ looks like %v is not a valid chart repository or cannot be reached", o.URL)
+			log.Warn("⚠️ looks like %v is not a valid chart repository or cannot be reached", o.URL)
 		}
 
 		f.Update(o)
@@ -59,6 +59,6 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) {
 			panic(err)
 		}
 
-		fmt.Printf("✅ %q has been added to your repositories\n", o.Name)
+		log.Infof("✅ %q has been added to your repositories\n", o.Name)
 	}
 }
