@@ -7,3 +7,12 @@
 ./helmwave
 ./helmwave.yml
 ./helmwave.yml.tpl
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
