@@ -1,6 +1,9 @@
 package helmwave
 
-import log "github.com/sirupsen/logrus"
+import (
+	log "github.com/sirupsen/logrus"
+	"github.com/zhilyaev/helmwave/pkg/formatter"
+)
 
 type Log struct {
 	//Engine *log.Logger
@@ -33,11 +36,11 @@ func (c *Config) InitLoggerFormat() {
 	case "pad":
 		log.SetFormatter(&log.TextFormatter{
 			PadLevelText: true,
-			ForceColors:  true,
 		})
+	case "emoji":
+		log.SetFormatter(&formatter.Config{})
 	case "text":
-		log.SetFormatter(&log.TextFormatter{
-			ForceColors: true,
-		})
+		log.SetFormatter(&log.TextFormatter{})
 	}
+
 }

@@ -45,7 +45,7 @@ func flags(app *helmwave.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "log-format",
 			Usage:       "You can set: [ text | json | pad ]",
-			Value:       "text",
+			Value:       "emoji",
 			EnvVars:     []string{"HELMWAVE_LOG_FORMAT"},
 			Destination: &app.Logger.Format,
 		},

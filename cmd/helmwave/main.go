@@ -9,17 +9,17 @@ import (
 
 func main() {
 	app = helmwave.New()
-	c := &cli.App{
-		Before:          before,
-		CommandNotFound: command404,
-		Name:            "🌊 HelmWave",
-		Usage:           "composer for helm",
-		Version:         app.Version,
-		Authors:         authors(),
-		Flags:           flags(app),
-		Commands:        commands(),
-		Description:     "🏖 This tool helps you compose your helm releases!",
-	}
+	c := cli.NewApp()
+	c.EnableBashCompletion = true
+	c.Before = before
+	//c.CommandNotFound = command404
+
+	c.Usage = "composer for helm"
+	c.Version = app.Version
+	c.Authors = authors()
+	c.Flags = flags(app)
+	c.Commands = commands()
+	c.Description = "🏖 This tool helps you compose your helm releases!"
 
 	err := c.Run(os.Args)
 	if err != nil {

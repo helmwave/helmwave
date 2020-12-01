@@ -10,7 +10,10 @@ import (
 )
 
 func Tpl2yml(tpl string, yml string, data interface{}) error {
-	log.Infof("📄 Render %s -> %s", tpl, yml)
+	log.WithFields(log.Fields{
+		"from": tpl,
+		"to":   yml,
+	}).Info("📄 Render file")
 	if data == nil {
 		data = map[string]interface{}{}
 	}
@@ -28,7 +31,7 @@ func Tpl2yml(tpl string, yml string, data interface{}) error {
 		return err
 	}
 
-	log.Debugf("Content of %s:\n %+v\n", yml, buf.String())
+	log.Debug(yml, " contents\n", buf.String())
 
 	f, err := helper.CreateFile(yml)
 	if err != nil {

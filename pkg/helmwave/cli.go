@@ -18,6 +18,7 @@ func (c *Config) Render(ctx *cli.Context) error {
 
 func (c *Config) Planfile(ctx *cli.Context) error {
 	err := c.Render(ctx)
+
 	if err != nil {
 		return err
 	}
@@ -36,7 +37,7 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 	for _, v := range c.Plan.Body.Releases {
 		names = append(names, v.Name)
 	}
-	log.Infof("🛠 -> 🛥 %+v", names)
+	log.WithField("releases", names).Info("🛠 -> 🛥")
 
 	// Repos
 	c.PlanRepos()
@@ -44,7 +45,7 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 	for _, v := range c.Plan.Body.Repositories {
 		names = append(names, v.Name)
 	}
-	log.Infof("🛠 -> 🗄 %+v", names)
+	log.WithField("repositories", names).Info("🛠 -> 🗄")
 
 	return yml.Save(c.Plan.File, c.Plan.Body)
 }
@@ -62,8 +63,12 @@ func (c *Config) SyncRepos(ctx *cli.Context) error {
 
 	log.Info("🗄 Sync repositories")
 	for _, r := range c.Plan.Body.Repositories {
-		r.Sync(c.Helm)
+		err := r.Sync(c.Helm)
+		if err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
 

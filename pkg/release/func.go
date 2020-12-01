@@ -1,8 +1,6 @@
 package release
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/helper"
 	"github.com/zhilyaev/helmwave/pkg/template"
@@ -35,12 +33,13 @@ func (rel *Config) PlanValues() {
 func (rel *Config) RenderValues(dir string) {
 	rel.PlanValues()
 
-	h := sha256.New()
+	//h := sha256.New()
 
 	for i, v := range rel.Values {
 
-		h.Write([]byte(rel.Name + "->" + rel.Options.Namespace))
-		s := v + "." + hex.EncodeToString(h.Sum(nil))[:16] + ".plan"
+		//h.Write([]byte(rel.Name + "->" + rel.Options.Namespace))
+		//s := v + "." + hex.EncodeToString(h.Sum(nil))[:16] + ".plan"
+		s := v + "." + rel.Name + "@" + rel.Options.Namespace + ".plan"
 
 		p := dir + s
 		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})
@@ -48,7 +47,7 @@ func (rel *Config) RenderValues(dir string) {
 			log.Warn(err)
 		}
 
-		rel.Values[i] = s
+		rel.Values[i] = p
 	}
 
 }
