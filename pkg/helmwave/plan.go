@@ -14,10 +14,14 @@ func (c *Config) PlanReleases() {
 	c.Plan.Body.Releases = release.Plan(c.Tags.Value(), c.Yml.Body.Releases)
 }
 
-func (c *Config) RenderValues() {
+func (c *Config) RenderValues() error {
 	for i, rel := range c.Plan.Body.Releases {
-		rel.RenderValues()
+		if err := rel.RenderValues(); err != nil {
+			return err
+		}
 		c.Plan.Body.Releases[i].Values = rel.Values
 		log.Debugf("🐞 Values of %s : %+v", rel.Name, c.Plan.Body.Releases[i].Values)
 	}
+
+	return nil
 }

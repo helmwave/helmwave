@@ -29,7 +29,10 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 
 	// Releases
 	c.PlanReleases()
-	c.RenderValues()
+	if err := c.RenderValues(); err != nil {
+		return err
+	}
+
 	names := make([]string, 0)
 	for _, v := range c.Plan.Body.Releases {
 		names = append(names, v.Name)

@@ -30,18 +30,20 @@ func (rel *Config) PlanValues() {
 
 }
 
-func (rel *Config) RenderValues() {
+func (rel *Config) RenderValues() error {
 	rel.PlanValues()
 
 	for i, v := range rel.Values {
 		p := v + ".plan"
 		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})
 		if err != nil {
-			log.Warn(err)
+			log.Error(err)
+			return err
 		}
 
 		rel.Values[i] = p
 	}
+	return nil
 
 }
 
