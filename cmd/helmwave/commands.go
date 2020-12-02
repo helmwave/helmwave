@@ -7,15 +7,14 @@ import (
 func commands() []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:    "render",
-			Aliases: []string{"r"},
-			Usage:   "📄 Render tpl -> yml",
-			Action:  app.Render,
+			Name:   "render",
+			Usage:  "📄 Render tpl -> yml",
+			Action: app.Render,
 		},
 		{
 			Name:    "planfile",
-			Aliases: []string{"p", "plan"},
-			Usage:   "📜 Generate planfile",
+			Aliases: []string{"plan"},
+			Usage:   "📜 Generate planfile to plandir",
 			Action:  app.Planfile,
 		},
 		{
@@ -26,16 +25,20 @@ func commands() []*cli.Command {
 		},
 		{
 			Name:    "deploy",
-			Aliases: []string{"d", "apply", "sync", "release"},
+			Aliases: []string{"apply", "sync", "release"},
 			Usage:   "🛥 Deploy your helmwave!",
 			Action:  app.SyncReleases,
 		},
 		{
 			Name:      "help",
 			Usage:     "🚑 Help me!",
-			Aliases:   []string{"h"},
 			ArgsUsage: "[command]",
 			Action:    help,
+		},
+		{
+			Name:   "useplan",
+			Usage:  "📜 -> 🛥 Deploy your helmwave from planfile!",
+			Action: app.UsePlan,
 		},
 	}
 

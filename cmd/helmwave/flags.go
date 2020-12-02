@@ -25,6 +25,7 @@ func flags(app *helmwave.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "plan-dir",
 			Value:       ".helmwave/",
+			Usage:       "It keeps your state via planfile",
 			EnvVars:     []string{"HELMWAVE_PLAN_DIR"},
 			Destination: &app.PlanDir,
 		},
@@ -37,14 +38,17 @@ func flags(app *helmwave.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "parallel",
-			Usage:       "it allows you call `helm install` in parallel mode ",
+			Usage:       "It allows you call `helm install` in parallel mode ",
 			Value:       true,
 			EnvVars:     []string{"HELMWAVE_PARALLEL"},
 			Destination: &app.Parallel,
 		},
+		//
+		//		LOGGER
+		//
 		&cli.StringFlag{
 			Name:        "log-format",
-			Usage:       "You can set: [ text | json | pad ]",
+			Usage:       "You can set: [ text | json | pad | emoji ]",
 			Value:       "emoji",
 			EnvVars:     []string{"HELMWAVE_LOG_FORMAT"},
 			Destination: &app.Logger.Format,
@@ -55,6 +59,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Value:       "info",
 			EnvVars:     []string{"HELMWAVE_LOG_LEVEL", "HELMWAVE_LOG_LVL"},
 			Destination: &app.Logger.Level,
+		},
+		&cli.BoolFlag{
+			Name:        "log-color",
+			Usage:       "Force color",
+			Value:       true,
+			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
+			Destination: &app.Logger.Color,
 		},
 	}
 }

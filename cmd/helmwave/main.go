@@ -12,7 +12,7 @@ func main() {
 	c := cli.NewApp()
 	c.EnableBashCompletion = true
 	c.Before = before
-	//c.CommandNotFound = command404
+	c.CommandNotFound = command404
 
 	c.Usage = "composer for helm"
 	c.Version = app.Version
@@ -28,7 +28,7 @@ func main() {
 }
 
 func command404(c *cli.Context, s string) {
-	log.Errorf("👻 Command '%v' not found \n", s)
+	log.Errorf("👻 Command %q not found \n", s)
 	os.Exit(127)
 }
 

@@ -12,6 +12,31 @@ import (
 	"os"
 )
 
+/*
+
+## Render
+
+$ helmwave render: 				tpl2yml($HELMWAVE_TPL_FILE, $HELMWAVE_YML_FILE)
+$ helmwave render $tpl $yml: 	tpl2yml($tpl, $yml)
+$ helmwave render $tpl: 		tpl2yml($tpl)
+
+## Planfile
+
+$ helmwave plan: 				planfile($HELMWAVE_PLAN_DIR)->$(helmwave render)
+$ helmwave plan $dir:			planfile($dir)->$(helmwave render)
+
+## Sync
+
+$ helmwave sync:				syncAll()->$(helmwave plan)
+$ helmwave sync plan:			readPlanfile()->syncAll()
+$ helmwave sync plan repos:  	syncRepo()->$(helmwave plan)
+$ helmwave sync plan releases: 	syncReleases()->$(helmwave plan)
+$ helmwave sync repos:
+
+*/
+
+const planfile = "planfile"
+
 func (c *Config) Render(ctx *cli.Context) error {
 	return template.Tpl2yml(c.Tpl.File, c.Yml.File, nil)
 }
@@ -23,7 +48,7 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 		return err
 	}
 
-	c.Plan.File = c.PlanDir + "planfile"
+	c.Plan.File = c.PlanDir + planfile
 	log.Info("🛠 Your planfile is ", c.Plan.File)
 	c.ReadHelmWaveYml()
 
@@ -50,10 +75,16 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 	return yml.Save(c.Plan.File, c.Plan.Body)
 }
 
-//func (c *Config) LogHelper(format string, v ...interface{}) {
-//	format = fmt.Sprintf("🐞 %s\n", format)
-//	log.Output(2, fmt.Sprintf(format, v...))
-//}
+func (c *Config) UsePlan(ctx *cli.Context) error {
+	c.Plan.File = c.PlanDir + planfile
+	log.Info("🛠 Looking ", c.Plan.File)
+	err := yml.Read(c.Plan.File, &c.Plan.Body)
+	if err != nil {
+		return err
+	}
+
+	return c.SyncReleases(ctx)
+}
 
 func (c *Config) SyncRepos(ctx *cli.Context) error {
 	err := c.Planfile(ctx)

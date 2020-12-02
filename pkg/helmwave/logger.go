@@ -9,6 +9,7 @@ type Log struct {
 	//Engine *log.Logger
 	Level  string
 	Format string
+	Color  bool
 }
 
 func (c *Config) InitLogger() error {
@@ -36,11 +37,14 @@ func (c *Config) InitLoggerFormat() {
 	case "pad":
 		log.SetFormatter(&log.TextFormatter{
 			PadLevelText: true,
+			ForceColors:  c.Logger.Color,
 		})
 	case "emoji":
 		log.SetFormatter(&formatter.Config{})
 	case "text":
-		log.SetFormatter(&log.TextFormatter{})
+		log.SetFormatter(&log.TextFormatter{
+			ForceColors: c.Logger.Color,
+		})
 	}
 
 }
