@@ -134,7 +134,7 @@ func (c *Config) SyncReleases(ctx *cli.Context) error {
 	log.Infof("Success %d / %d", n-k, n)
 	if k > 0 {
 		for _, rel := range fails {
-			log.Errorf("%q was not deploy to %q", rel.Name, rel.Options.Namespace)
+			log.Errorf("%q was not deployed to %q", rel.Name, rel.Options.Namespace)
 		}
 
 		return errors.New("deploy failed")

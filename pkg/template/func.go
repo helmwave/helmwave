@@ -51,6 +51,7 @@ func FuncMap() template.FuncMap {
 
 	aliases := map[string]string{
 		"get": "sprigGet",
+		"hasKey": "sprigHasKey",
 	}
 
 	funcMap := sprig.TxtFuncMap()
@@ -67,6 +68,7 @@ func FuncMap() template.FuncMap {
 	funcMap["required"] = Required
 	funcMap["readFile"] = ReadFile
 	funcMap["get"] = Get
+	funcMap["hasKey"] = HasKey
 
 	for name, f := range aliased {
 		funcMap[name] = f

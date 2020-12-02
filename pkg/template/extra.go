@@ -242,3 +242,57 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	}
 	return Get(strings.Join(keys[1:], "."), v)
 }
+
+func HasKey(path string, varArgs ...interface{}) (bool, error) {
+	var defSet bool
+	var def interface{}
+	var obj interface{}
+	switch len(varArgs) {
+	case 1:
+		defSet = false
+		def = nil
+		obj = varArgs[0]
+	case 2:
+		defSet = true
+		def = varArgs[0]
+		obj = varArgs[1]
+	default:
+		return false, fmt.Errorf("unexpected number of args pased to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
+	}
+
+	if path == "" {
+		return true, nil
+	}
+	keys := strings.Split(path, ".")
+	var v interface{}
+	var ok bool
+	switch typedObj := obj.(type) {
+	case map[string]interface{}:
+		v, ok = typedObj[keys[0]]
+		if !ok {
+			return defSet, nil
+		}
+	case map[interface{}]interface{}:
+		v, ok = typedObj[keys[0]]
+		if !ok {
+			return defSet, nil
+		}
+	default:
+		maybeStruct := reflect.ValueOf(typedObj)
+		if maybeStruct.Kind() != reflect.Struct {
+			return false, &noValueError{fmt.Sprintf("unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct", reflect.TypeOf(obj), keys[0])}
+		} else if maybeStruct.NumField() < 1 {
+			return false, &noValueError{fmt.Sprintf("no accessible struct fields for key \"%s\"", keys[0])}
+		}
+		f := maybeStruct.FieldByName(keys[0])
+		if !f.IsValid() {
+			return defSet, nil
+		}
+		v = f.Interface()
+	}
+
+	if defSet {
+		return HasKey(strings.Join(keys[1:], "."), def, v)
+	}
+	return HasKey(strings.Join(keys[1:], "."), v)
+}
