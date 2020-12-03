@@ -10,10 +10,13 @@
 
 ```
 
+
+
 ```yaml
 {% include_relative helmwave.yml.tpl %}
 ```
 
 ```yaml
-{% include_relative values.yml %}
+{% capture my_include %}{% include values.yml %}{% endcapture %}
+{{ my_include | markdownify }}
 ```
