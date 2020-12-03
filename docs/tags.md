@@ -52,17 +52,23 @@ releases:
 ```
 
 This command will deploy only `redis-a` & `memcached-a`
+
 ```shell script
 $ helmwave -t a deploy
 ```
 
+
+
 This command will deploy only `redis-a` & `redis-b`
+
 ```shell script
 $ helmwave -t redis deploy
 ```
 
 
+
 This command will deploy only `redis-b`
+
 ```shell script
 $ helmwave -t redis,b deploy
 ```
