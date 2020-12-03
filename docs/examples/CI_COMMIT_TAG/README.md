@@ -17,7 +17,6 @@ Project Structure
 ```
 
 ```yaml
-{% capture my_include %}{% include values.yml %}{% endcapture %}
-{{ my_include | markdownify }}
+{% include_relative values.yml | markdownify %}
 ```
 
