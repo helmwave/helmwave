@@ -14,6 +14,7 @@ func Tpl2yml(tpl string, yml string, data interface{}) error {
 		"from": tpl,
 		"to":   yml,
 	}).Info("📄 Render file")
+
 	if data == nil {
 		data = map[string]interface{}{}
 	}
@@ -50,7 +51,7 @@ func FuncMap() template.FuncMap {
 	aliased := template.FuncMap{}
 
 	aliases := map[string]string{
-		"get": "sprigGet",
+		"get":    "sprigGet",
 		"hasKey": "sprigHasKey",
 	}
 

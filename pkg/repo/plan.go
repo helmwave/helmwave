@@ -17,7 +17,7 @@ func Plan(releases []release.Config, repositories []Config) []Config {
 
 			if (name == rep.Name || helper.Contains(rep.Name, deps)) && !rep.In(plan) {
 				plan = append(plan, rep)
-				//release.RemoveIndex(releases, i)
+				//release.RemoveIndex(releases, i) // Optimise deleter
 				break
 			}
 

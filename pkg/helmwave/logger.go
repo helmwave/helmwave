@@ -22,7 +22,6 @@ func (c *Config) InitLoggerLevel() error {
 	if err != nil {
 		return err
 	}
-	//c.Logger.Engine.SetLevel(level)
 	log.SetLevel(level)
 
 	return nil

@@ -5,7 +5,6 @@ import (
 )
 
 const (
-	// Default log format will output [INFO]: 2006-01-02T15:04:05Z07:00 - Log message
 	defaultLogFormat       = "[%emoji% aka %lvl%]: %msg%"
 	defaultTimestampFormat = time.RFC3339
 )
@@ -18,4 +17,5 @@ type Config struct {
 	// Also can include custom fields but limited to strings.
 	// All of fields need to be wrapped inside %% i.e %time% %msg%
 	LogFormat string
+	//Color bool Maybe latter
 }
