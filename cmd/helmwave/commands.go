@@ -9,25 +9,25 @@ func commands() []*cli.Command {
 		{
 			Name:   "render",
 			Usage:  "📄 Render tpl -> yml",
-			Action: app.Render,
+			Action: app.CliRender,
 		},
 		{
 			Name:    "planfile",
 			Aliases: []string{"plan"},
 			Usage:   "📜 Generate planfile to plandir",
-			Action:  app.Planfile,
+			Action:  app.CliPlanfile,
 		},
 		{
 			Name:    "repos",
 			Aliases: []string{"rep", "repo"},
 			Usage:   "🗄 Sync repositories",
-			Action:  app.SyncRepos,
+			Action:  app.CliRepos,
 		},
 		{
 			Name:    "deploy",
 			Aliases: []string{"apply", "sync", "release"},
 			Usage:   "🛥 Deploy your helmwave!",
-			Action:  app.SyncReleases,
+			Action:  app.CliDeploy,
 		},
 		{
 			Name:      "help",
@@ -38,7 +38,7 @@ func commands() []*cli.Command {
 		{
 			Name:   "useplan",
 			Usage:  "📜 -> 🛥 Deploy your helmwave from planfile!",
-			Action: app.UsePlan,
+			Action: app.CliUsePlan,
 		},
 	}
 

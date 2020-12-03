@@ -4,11 +4,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func (c *Config) Render(ctx *cli.Context) error {
+func (c *Config) CliRender(ctx *cli.Context) error {
 	return c.RenderHelmWaveYml()
 }
 
-func (c *Config) Planfile(ctx *cli.Context) error {
+func (c *Config) CliPlanfile(ctx *cli.Context) error {
 	err := c.RenderHelmWaveYml()
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func (c *Config) Planfile(ctx *cli.Context) error {
 	return c.GenPlanfile()
 }
 
-func (c *Config) Repos(ctx *cli.Context) error {
+func (c *Config) CliRepos(ctx *cli.Context) error {
 	err := c.RenderHelmWaveYml()
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (c *Config) Repos(ctx *cli.Context) error {
 	return c.SyncPlanRepos()
 }
 
-func (c *Config) Deploy(ctx *cli.Context) error {
+func (c *Config) CliDeploy(ctx *cli.Context) error {
 	err := c.RenderHelmWaveYml()
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (c *Config) Deploy(ctx *cli.Context) error {
 	return c.SyncPlan()
 }
 
-func (c *Config) UsePlan(ctx *cli.Context) error {
+func (c *Config) CliUsePlan(ctx *cli.Context) error {
 	c.InitPlanDirFile()
 
 	err := c.ReadHelmWavePlan()
