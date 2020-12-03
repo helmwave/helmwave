@@ -3,3 +3,4 @@ all:
 
 tests:
 	go test
+

@@ -14,6 +14,7 @@ type Config struct {
 	Tpl      template.Tpl
 	Yml      yml.Config
 	Plan     yml.Config
+	PlanDir  string
 	Logger   *Log
 	Parallel bool
 }

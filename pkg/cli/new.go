@@ -7,7 +7,7 @@ import (
 
 func New() *helmwave.Config {
 	return &helmwave.Config{
-		Version: "0.4.0",
+		Version: "0.5.0",
 		Helm:    cli.New(),
 		Logger:  &helmwave.Log{},
 		//Logger: &helmwave.Log{Engine: logrus.New()},

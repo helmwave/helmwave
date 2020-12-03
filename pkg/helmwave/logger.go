@@ -1,11 +1,15 @@
 package helmwave
 
-import log "github.com/sirupsen/logrus"
+import (
+	log "github.com/sirupsen/logrus"
+	"github.com/zhilyaev/helmwave/pkg/formatter"
+)
 
 type Log struct {
 	//Engine *log.Logger
 	Level  string
 	Format string
+	Color  bool
 }
 
 func (c *Config) InitLogger() error {
@@ -18,7 +22,6 @@ func (c *Config) InitLoggerLevel() error {
 	if err != nil {
 		return err
 	}
-	//c.Logger.Engine.SetLevel(level)
 	log.SetLevel(level)
 
 	return nil
@@ -27,11 +30,20 @@ func (c *Config) InitLoggerLevel() error {
 func (c *Config) InitLoggerFormat() {
 	switch c.Logger.Format {
 	case "json":
-		log.SetFormatter(&log.JSONFormatter{})
-		//c.Logger.Engine.SetFormatter(&log.JSONFormatter{})
+		log.SetFormatter(&log.JSONFormatter{
+			PrettyPrint: true,
+		})
 	case "pad":
 		log.SetFormatter(&log.TextFormatter{
 			PadLevelText: true,
+			ForceColors:  c.Logger.Color,
+		})
+	case "emoji":
+		log.SetFormatter(&formatter.Config{})
+	case "text":
+		log.SetFormatter(&log.TextFormatter{
+			ForceColors: c.Logger.Color,
 		})
 	}
+
 }

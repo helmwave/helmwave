@@ -4,13 +4,17 @@ import (
 	"bytes"
 	"github.com/Masterminds/sprig/v3"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhilyaev/helmwave/pkg/helper"
 	"io/ioutil"
-	"os"
 	"text/template"
 )
 
 func Tpl2yml(tpl string, yml string, data interface{}) error {
-	log.Infof("📄 Render %s -> %s", tpl, yml)
+	log.WithFields(log.Fields{
+		"from": tpl,
+		"to":   yml,
+	}).Info("📄 Render file")
+
 	if data == nil {
 		data = map[string]interface{}{}
 	}
@@ -28,9 +32,9 @@ func Tpl2yml(tpl string, yml string, data interface{}) error {
 		return err
 	}
 
-	log.Debugf("Content of %s:\n %+v\n", yml, buf.String())
+	log.Debug(yml, " contents\n", buf.String())
 
-	f, err := os.Create(yml)
+	f, err := helper.CreateFile(yml)
 	if err != nil {
 		return err
 	}
@@ -47,7 +51,8 @@ func FuncMap() template.FuncMap {
 	aliased := template.FuncMap{}
 
 	aliases := map[string]string{
-		"get": "sprigGet",
+		"get":    "sprigGet",
+		"hasKey": "sprigHasKey",
 	}
 
 	funcMap := sprig.TxtFuncMap()
@@ -64,6 +69,7 @@ func FuncMap() template.FuncMap {
 	funcMap["required"] = Required
 	funcMap["readFile"] = ReadFile
 	funcMap["get"] = Get
+	funcMap["hasKey"] = HasKey
 
 	for name, f := range aliased {
 		funcMap[name] = f

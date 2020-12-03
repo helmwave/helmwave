@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 	"github.com/gofrs/flock"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
@@ -13,16 +13,16 @@ import (
 	"time"
 )
 
-func (rep *Config) Sync(settings *helm.EnvSettings) {
-	Write(settings.RepositoryConfig, &rep.Entry, settings)
+func (rep *Config) Sync(settings *helm.EnvSettings) error {
+	return Write(settings.RepositoryConfig, &rep.Entry, settings)
 }
 
 // TODO it better later
-func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) {
+func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 	//Ensure the file directory exists as it is required for file locking
 	err := os.MkdirAll(filepath.Dir(repofile), os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		panic(err)
+		return err
 	}
 
 	// Acquire a file lock for process synchronization
@@ -37,7 +37,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) {
 
 	f, err := repo.LoadFile(repofile)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if f.Has(o.Name) {
@@ -45,7 +45,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) {
 	} else {
 		chartRepo, err := repo.NewChartRepository(o, getter.All(helm))
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		_, err = chartRepo.DownloadIndexFile()
@@ -56,9 +56,11 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) {
 		f.Update(o)
 
 		if err := f.WriteFile(repofile, 0644); err != nil {
-			panic(err)
+			return err
 		}
 
 		log.Infof("✅ %q has been added to your repositories\n", o.Name)
 	}
+
+	return nil
 }
