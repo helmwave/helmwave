@@ -17,6 +17,7 @@ Project Structure
 ```
 
 ```yaml
-{% include_relative.content values.yml %}
+{%- capture debugging-doc -%}{% include_relative values.yml %}{%- endcapture -%}
+{{ debugging-doc | markdownify }}
 ```
 
