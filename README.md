@@ -15,6 +15,12 @@
 > Inspired by the [helmfile](https://github.com/roboll/helmfile)
 
 
+- Keep a directory of chart value files and maintain changes in version control.
+- Apply CI/CD to configuration changes
+- Template values
+- Aggregate your application
+
+
 ## Comparison
  🚀 Features  | 🌊 HelmWave   | helmfile 
 -------------| :------------:|:-----------:
@@ -257,7 +263,8 @@ GLOBAL OPTIONS:
    --version, -v            print the version (default: false)
 ```
 
-### Render, r
+### render
+
 Transform helmwave.yml.tpl to helmwave.yml
 
 Suppose the `helmwave.yml.tpl` looks like:
@@ -316,7 +323,7 @@ releases:
       <<: *options
 ```
 
-### Planfile, plan
+### planfile, plan
 
 This command will generate helmwave.plan.
 
@@ -502,71 +509,3 @@ $ helmwave render
 </details>
 
 
-
-## 🛸 Coming soon...
-- [x] Dependencies helm release
-- [ ] OCI, testing...
-- [ ] Force Update repositories
-- [x] Formatting output
-- [ ] Applying from planfile
-- [ ] Dependencies helmwave
-- [x] More templating functions
-
-
-## 🧬 Full Configuration
-
-### 🗄 Repository
-
-```yaml
-- name: bitnami
-  url: https://charts.bitnami.com/bitnami
-  username: ""
-  password: ""
-  certfile: ""
-  keyfile: ""
-  cafile: ""
-  insecureskiptlsverify: false
-  force: false
-```
-
-
-### 🛥 Release
-
-```yaml
-- name: redis
-  chart: bitnami/redis
-  tags: []
-  values: []
-  store: 
-  options:
-    install: true
-    devel: false
-    namespace: b
-    skipcrds: false
-    timeout: 0s
-    wait: false
-    disablehooks: false
-    dryrun: false
-    force: false
-    resetvalues: false
-    reusevalues: false
-    recreate: false
-    maxhistory: 0
-    atomic: false
-    cleanuponfail: false
-    subnotes: false
-    description: ""
-    postrenderer: null
-    disableopenapivalidation: false
-    chartpathoptions:
-      cafile: ""
-      certfile: ""
-      keyfile: ""
-      insecureskiptlsverify: false
-      keyring: ""
-      password: ""
-      repourl: ""
-      username: ""
-      verify: false
-      version: ""
-```
