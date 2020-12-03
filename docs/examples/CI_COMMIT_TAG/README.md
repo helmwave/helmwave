@@ -11,21 +11,9 @@
 ```
 
 ```yaml
-project: my-project # Имя проекта
-version: 0.1.6 # Версия helmwave
-
-releases:
-  - name: my-release
-    chart: my-chart-repo/my-app
-    values:
-      - values.yml
-    options:
-      install: true
-      namespace: my-namespace
-
+{% include_relative helmwave.yml.tpl %}
 ```
 
 ```yaml
-image:
-  tag: {{ env "CI_COMMIT_TAG" }}
+{% include_relative values.yml %}
 ```
