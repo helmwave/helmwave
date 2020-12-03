@@ -1,15 +1,5 @@
-plugins:
-  - jekyll-relative-links
-relative_links:
-  enabled: true
-  collections: true
-include:
-  - CONTRIBUTING.md
-  - ../README.md
-  - LICENSE
-  - COPYING.md
-  - CODE_OF_CONDUCT.md
-  - CONTRIBUTING.md
-  - ISSUE_TEMPLATE.md
-  - PULL_REQUEST_TEMPLATE.md
+title: 🌊 HelmWave
+logo: https://github.com/zhilyaev/helmwave/raw/main/img/logo.png
+description: GitOps tool for Helm Chart
+show_downloads: true
 theme: jekyll-theme-minimal
