@@ -17,6 +17,6 @@ Project Structure
 ```
 
 ```yaml
-{% include_relative values.yml | markdownify %}
+{% include_relative.content values.yml %}
 ```
 
