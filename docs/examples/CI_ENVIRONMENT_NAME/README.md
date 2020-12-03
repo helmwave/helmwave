@@ -1,4 +1,6 @@
-# CI_ENVIRONMENT_NAME
+# CI_ENVIRONMENT_NAME [ [source] ](https://github.com/zhilyaev/helmwave/tree/main/docs/examples/CI_ENVIRONMENT_NAME)
+
+#### Project structure
 
 ```
 .
@@ -8,6 +10,8 @@
     ├── prod.yml
     └── stage.yml
 ```
+
+#### `helmwave.yml.tpl`
 
 ```yaml
 project: my-project
@@ -26,7 +30,7 @@ releases:
       namespace: {{ env "CI_ENVIRONMENT_NAME" }}
 ```
 
-`_.yml`
+#### `_.yml`
 ```yaml
 image:
   tag: {{ env "CI_COMMIT_TAG" }}
@@ -36,12 +40,12 @@ podAnnotations:
 ```
 
 
-`prod.yml`
+#### `prod.yml`
 ```yaml
 replicaCount: 6
 ```
 
-`stage.yml`
+#### `stage.yml`
 ```yaml
 replicaCount: 2
 ```

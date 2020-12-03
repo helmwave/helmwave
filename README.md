@@ -115,115 +115,23 @@ redis-b-slave-0    1/1     Running   0          32s
 redis-b-slave-1    1/1     Running   0          51s
 ```
 
-## 🔰 Tags
-
-Suppose the `helmwave.yml.tpl` looks like:
-
-```yaml
-project: my-project
-version: 0.5.0
+## [Documentation](https://zhilyaev.github.io/helmwave/)
 
 
-repositories:
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
+### Examples
+  - [How to pass `image.tag` to release?](examples/CI_COMMIT_TAG/README.md)
+  - [How to pass `podAnnotations.gitCommit` to release?](examples/CI_COMMIT_SHORT_SHA/README.md)
+  - [How to use environments for your release?](examples/CI_ENVIRONMENT_NAME/README.md)
 
-
-.options: &options
-  install: true
-  namespace: my-namespace
-
-
-releases:
-  - name: redis-a
-    chart: bitnami/redis
-    tags:
-      - a
-      - redis
-    options:
-      <<: *options
-
-  - name: redis-b
-    chart: bitnami/redis
-    tags:
-      - b
-      - redis
-    options:
-      <<: *options
-
-  - name: memcached-a
-    chart: bitnami/memcached
-    tags:
-      - a
-      - memcached
-    options:
-      <<: *options
-
-  - name: memcached-b
-    chart: bitnami/memcached
-    tags:
-      - b
-      - memcached
-    options:
-      <<: *options
-```
-
-This command will deploy only `redis-a` & `memcached-a`
-```shell script
-$ helmwave -t a deploy
-```
-
-This command will deploy only `redis-a` & `redis-b`
-```shell script
-$ helmwave -t redis deploy
-```
-
-
-This command will deploy only `redis-b`
-```shell script
-$ helmwave -t redis,b deploy
-```
-
-
-## 🔰 Store 
+### [🔰 Store](store.md)
 It allows pass you custom values to render release. 
 
-`helmwave.yml`:
+### [🔰 Tags](tags.md)
+Use tags for choose specific releases
 
-```yaml 
-project: my-project
-version: 0.5.0
+### [🧬 Full `helmwave.yml` config](helmwave.yml.md)
+All Options
 
-releases:
-  - name: backend
-    chart: my/backend
-    options:
-      install: true
-    store:
-      secret:
-        type: vault
-        path: secret/my/frontend
-    values:
-      - my-custom-values.yml
-
-  - name: frontend
-    chart: my/frontend
-    options:
-      install: true
-    store:
-      secret:
-        type: vault
-        path: secret/my/frontend
-    values:
-      - my-custom-values.yml
-```
-
-`my-custom-values.yml`:
-```yaml
-secretForApp:
-  kind: {{ .Release.Store.secret.type }}
-  path: {{ .Release.Store.secret.path | quote }}
-```
 
 ## 🛠 CLI Reference
 
