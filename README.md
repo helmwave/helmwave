@@ -119,17 +119,17 @@ redis-b-slave-1    1/1     Running   0          51s
 
 
 ### Examples
-  - [How to pass `image.tag` to release?](examples/CI_COMMIT_TAG/README.md)
-  - [How to pass `podAnnotations.gitCommit` to release?](examples/CI_COMMIT_SHORT_SHA/README.md)
-  - [How to use environments for your release?](examples/CI_ENVIRONMENT_NAME/README.md)
+  - [How to pass `image.tag` to release?](docs/examples/CI_COMMIT_TAG/README.md)
+  - [How to pass `podAnnotations.gitCommit` to release?](docs/examples/CI_COMMIT_SHORT_SHA/README.md)
+  - [How to use environments for your release?](docs/examples/CI_ENVIRONMENT_NAME/README.md)
 
-### [🔰 Store](store.md)
+### [🔰 Store](docs/store.md)
 It allows pass you custom values to render release. 
 
-### [🔰 Tags](tags.md)
+### [🔰 Tags](docs/tags.md)
 Use tags for choose specific releases
 
-### [🧬 Full `helmwave.yml` config](helmwave.yml.md)
+### [🧬 Full `helmwave.yml` config](docs/helmwave.yml.md)
 All Options
 
 
