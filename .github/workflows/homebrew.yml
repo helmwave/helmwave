@@ -1,0 +1,19 @@
+name: homebrew
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  homebrew:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Bump Homebrew
+      uses: dawidd6/action-homebrew-bump-formula@v3
+      with:
+        token: ${{secrets.TOKEN}}
+        formula: helmwave
