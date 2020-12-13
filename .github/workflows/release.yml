@@ -21,8 +21,3 @@ jobs:
           goos: ${{ matrix.goos }}
           project_path: "./cmd/helmwave"
           goarch: ${{ matrix.goarch }}
-      - name: Bump Homebrew
-        uses: dawidd6/action-homebrew-bump-formula@v3
-        with:
-          token: ${{secrets.TOKEN}}
-          formula: helmwave
