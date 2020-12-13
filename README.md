@@ -5,7 +5,7 @@
 <h1 align="center"> HelmWave </h1>
 
 <p align="center">
-  <a href="https://github.com/zhilyaev/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/zhilyaev/helmwave/workflows/.github/workflows/release.yml/badge.svg" /></a>
+  <a href="https://github.com/zhilyaev/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/zhilyaev/helmwave/workflows/release/badge.svg" /></a>
   <a href="https://t.me/helmwave" ><img src="https://img.shields.io/badge/telegram-chat-179cde.svg?logo=telegram" /></a>
 </p>
 
