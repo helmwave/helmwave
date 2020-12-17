@@ -40,6 +40,12 @@ func commands() []*cli.Command {
 			Usage:  "📜 -> 🛥 Deploy your helmwave from planfile!",
 			Action: app.CliUsePlan,
 		},
+		{
+			Name:    "manifests",
+			Aliases: []string{"templates"},
+			Usage:   "📜 -> 🛥 Show manifests from planfile!",
+			Action:  app.CliManifest,
+		},
 	}
 
 }

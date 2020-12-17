@@ -9,6 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
 	"os"
 	"path/filepath"
@@ -32,7 +33,7 @@ func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
 	return man.Update()
 }
 
-func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) error {
+func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
 	err := rel.DependencyUpdate(settings)
 	if err != nil {
 		log.Debug(err)
@@ -41,28 +42,29 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 	client := action.NewUpgrade(cfg)
 	err = mergo.Merge(client, rel.Options)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	chart, err := client.ChartPathOptions.LocateChart(rel.Chart, settings)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	valOpts := &values.Options{ValueFiles: rel.Values}
 	vals, err := valOpts.MergeValues(getter.All(settings))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	ch, err := loader.Load(chart)
 	if err != nil {
 		log.Fatal(err)
+		return nil, err
 	}
 
 	if req := ch.Metadata.Dependencies; req != nil {
 		if err := action.CheckDependencies(ch, req); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -84,13 +86,14 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 
 			instClient := action.NewInstall(cfg)
 
+			instClient.DryRun = client.DryRun
+
 			instClient.CreateNamespace = true
 			instClient.ReleaseName = rel.Name
 			instClient.Namespace = client.Namespace
 
 			// Mmm... Nice.
 			instClient.ChartPathOptions = client.ChartPathOptions
-			instClient.DryRun = client.DryRun
 			instClient.DisableHooks = client.DisableHooks
 			instClient.SkipCRDs = client.SkipCRDs
 			instClient.Timeout = client.Timeout
@@ -102,17 +105,19 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 			instClient.SubNotes = client.SubNotes
 			instClient.Description = client.Description
 
-			_, err := instClient.Run(ch, vals)
-			return err
+			if instClient.DryRun {
+				instClient.ReleaseName = "RELEASE-NAME"
+				instClient.Replace = true
+			}
+
+			return instClient.Run(ch, vals)
 
 		} else if err != nil {
-			return err
+			return nil, err
 		}
+
 	}
 
-	_, err = client.Run(rel.Name, ch, vals)
-	if err != nil {
-		return err
-	}
-	return nil
+	return client.Run(rel.Name, ch, vals)
+
 }
