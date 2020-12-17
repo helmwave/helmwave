@@ -1,6 +1,10 @@
-all:
-	go build github.com/zhilyaev/helmwave/cmd/helmwave
+all: build
+	@echo "Finish"
 
-tests:
-	go test
+build: test
+	go build github.com/zhilyaev/helmwave/cmd/helmwave
+	cp -f helmwave /usr/local/bin/helmwave
+
+test:
+	go test github.com/zhilyaev/helmwave/cmd/helmwave
 

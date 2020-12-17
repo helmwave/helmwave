@@ -70,3 +70,18 @@ func (c *Config) CliUsePlan(ctx *cli.Context) error {
 
 	return c.SyncPlan()
 }
+
+func (c *Config) CliManifest(ctx *cli.Context) error {
+	c.InitPlanDirFile()
+	err := c.ReadHelmWavePlan()
+	if err != nil {
+		return err
+	}
+
+	for i, _ := range c.Plan.Body.Releases {
+		c.Plan.Body.Releases[i].Options.DryRun = true
+
+	}
+
+	return c.SyncPlan()
+}

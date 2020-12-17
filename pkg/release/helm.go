@@ -84,13 +84,14 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 
 			instClient := action.NewInstall(cfg)
 
+			instClient.DryRun = client.DryRun
+
 			instClient.CreateNamespace = true
 			instClient.ReleaseName = rel.Name
 			instClient.Namespace = client.Namespace
 
 			// Mmm... Nice.
 			instClient.ChartPathOptions = client.ChartPathOptions
-			instClient.DryRun = client.DryRun
 			instClient.DisableHooks = client.DisableHooks
 			instClient.SkipCRDs = client.SkipCRDs
 			instClient.Timeout = client.Timeout
@@ -102,12 +103,24 @@ func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) e
 			instClient.SubNotes = client.SubNotes
 			instClient.Description = client.Description
 
-			_, err := instClient.Run(ch, vals)
+			if instClient.DryRun {
+				instClient.ReleaseName = "RELEASE-NAME"
+				instClient.Replace = true
+			}
+
+			release, err := instClient.Run(ch, vals)
+			if instClient.DryRun {
+				log.Debug(release.Manifest)
+			} else {
+				log.Info(release.Manifest)
+			}
+
 			return err
 
 		} else if err != nil {
 			return err
 		}
+
 	}
 
 	_, err = client.Run(rel.Name, ch, vals)
