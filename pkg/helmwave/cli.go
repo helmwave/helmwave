@@ -80,7 +80,6 @@ func (c *Config) CliManifest(ctx *cli.Context) error {
 
 	for i, _ := range c.Plan.Body.Releases {
 		c.Plan.Body.Releases[i].Options.DryRun = true
-
 	}
 
 	return c.SyncPlan()

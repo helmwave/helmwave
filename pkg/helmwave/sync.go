@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wayt/parallel"
 	"github.com/zhilyaev/helmwave/pkg/release"
+	"github.com/zhilyaev/helmwave/pkg/yml"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"os"
 )
@@ -75,12 +76,19 @@ func (c *Config) DoRelease(r *release.Config, fails *[]*release.Config) {
 		log.Fatal("❌ ", err)
 	}
 
-	err = r.Sync(cfg, settings)
+	rel, err := r.Sync(cfg, settings)
 	if err != nil {
 		log.Error("❌ ", err)
 		*fails = append(*fails, r)
 
 	} else {
-		log.Infof("✅ %s -> %s\n", r.Name, r.Options.Namespace)
+		log.Infof("✅ %s -> %s\n", rel.Name, rel.Namespace)
+	}
+
+	log.Debug(rel.Manifest)
+	m := c.PlanDir + ".manifests/" + rel.Name + "@" + rel.Namespace + ".yaml"
+	err = yml.Save(m, rel.Manifest)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
