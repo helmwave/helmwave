@@ -9,43 +9,20 @@ func commands() []*cli.Command {
 		{
 			Name:   "render",
 			Usage:  "📄 Render tpl -> yml",
-			Action: app.CliRender,
+			Action: app.CliYml,
 		},
 		{
 			Name:    "planfile",
 			Aliases: []string{"plan"},
 			Usage:   "📜 Generate planfile to plandir",
-			Action:  app.CliPlanfile,
+			Action:  app.CliPlan,
 		},
-		{
-			Name:    "repos",
-			Aliases: []string{"rep", "repo"},
-			Usage:   "🗄 Install repositories",
-			Action:  app.CliRepos,
-		},
-		{
-			Name:    "deploy",
-			Aliases: []string{"apply", "sync", "release"},
-			Usage:   "🛥 Deploy your helmwave!",
-			Action:  app.CliDeploy,
-		},
-		{
-			Name:      "help",
-			Usage:     "🚑 Help me!",
-			ArgsUsage: "[command]",
-			Action:    help,
-		},
-		{
-			Name:   "useplan",
-			Usage:  "📜 -> 🛥 Deploy your helmwave from planfile!",
-			Action: app.CliUsePlan,
-		},
-		{
-			Name:    "manifests",
-			Aliases: []string{"templates"},
-			Usage:   "📜 -> 🛥 Show manifests from planfile!",
-			Action:  app.CliManifest,
-		},
+		//{
+		//	Name:    "deploy",
+		//	Aliases: []string{"apply", "sync", "release"},
+		//	Usage:   "🛥 Deploy your helmwave!",
+		//	Action:  app.C,
+		//},
 	}
 
 }

@@ -29,7 +29,7 @@ func (rel *Config) Sync(manifestPath string) error {
 	}
 
 	log.Debug(install.Manifest)
-	m := manifestPath + install.Name + "@" + install.Namespace + ".yml"
+	m := manifestPath + rel.UniqName() + ".yml"
 
 	return yml.Save(m, install.Manifest)
 }

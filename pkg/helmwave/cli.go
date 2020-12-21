@@ -2,85 +2,27 @@ package helmwave
 
 import (
 	"github.com/urfave/cli/v2"
+	"github.com/zhilyaev/helmwave/pkg/yml"
 )
 
-func (c *Config) CliRender(ctx *cli.Context) error {
-	return c.RenderHelmWaveYml()
+func (c *Config) CliYml(ctx *cli.Context) error {
+	return c.Tpl.Render()
 }
 
-func (c *Config) CliPlanfile(ctx *cli.Context) error {
-	err := c.RenderHelmWaveYml()
-	if err != nil {
+func (c *Config) CliPlan(ctx *cli.Context) error {
+	err := yml.Read(c.Tpl.To, &c.Plan.Body)
+	if err != err {
 		return err
 	}
 
-	err = c.ReadHelmWaveYml()
-	if err != nil {
-		return err
-	}
-
-	return c.GenPlanfile()
-}
-
-func (c *Config) CliRepos(ctx *cli.Context) error {
-	err := c.RenderHelmWaveYml()
-	if err != nil {
-		return err
-	}
-
-	err = c.ReadHelmWaveYml()
-	if err != nil {
-		return err
-	}
-
-	err = c.GenPlanfile()
-	if err != nil {
-		return err
-	}
-
-	return c.SyncPlanRepos()
+	return c.Plan.Plan(c.Tags.Value(), c.PlanPath)
 }
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {
-	err := c.RenderHelmWaveYml()
-	if err != nil {
+	err := yml.Read(c.Tpl.To, &c.Plan.Body)
+	if err != err {
 		return err
 	}
 
-	err = c.ReadHelmWaveYml()
-	if err != nil {
-		return err
-	}
-
-	err = c.GenPlanfile()
-	if err != nil {
-		return err
-	}
-
-	return c.SyncPlan()
-}
-
-func (c *Config) CliUsePlan(ctx *cli.Context) error {
-	c.InitPlan()
-
-	err := c.ReadHelmWavePlan()
-	if err != nil {
-		return err
-	}
-
-	return c.SyncPlan()
-}
-
-func (c *Config) CliManifest(ctx *cli.Context) error {
-	c.InitPlan()
-	err := c.ReadHelmWavePlan()
-	if err != nil {
-		return err
-	}
-
-	for i, _ := range c.Plan.Body.Releases {
-		c.Plan.Body.Releases[i].Options.DryRun = true
-	}
-
-	return c.SyncPlan()
+	return c.Plan.Plan(c.Tags.Value(), c.PlanPath)
 }

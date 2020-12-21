@@ -12,9 +12,9 @@ type Config struct {
 	Helm     *helm.EnvSettings
 	Tags     cli.StringSlice
 	Tpl      template.Tpl
-	Yml      yml.Config
 	Plan     yml.Config
-	PlanDir  string
+	PlanPath string
 	Logger   *Log
 	Parallel bool
+	Force    bool
 }
