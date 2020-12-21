@@ -22,7 +22,7 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 		return err
 	}
 
-	return c.Plan()
+	return c.Yml.SavePlan(c.PlanPath+PLANFILE, c.Tags.Value(), c.PlanPath)
 }
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {

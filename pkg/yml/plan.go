@@ -6,7 +6,7 @@ import (
 	"github.com/zhilyaev/helmwave/pkg/repo"
 )
 
-func (c *Config) Save(file string, tags []string, dir string) error {
+func (c *Config) SavePlan(file string, tags []string, dir string) error {
 	err := c.Plan(tags, dir)
 	if err != nil {
 		return err

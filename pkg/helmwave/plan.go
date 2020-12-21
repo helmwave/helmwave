@@ -13,7 +13,3 @@ func (c *Config) InitPlan() {
 	}
 	log.Info("🛠 Your planfile is ", c.PlanPath+PLANFILE)
 }
-
-func (c *Config) Plan() error {
-	return c.Yml.Plan(c.Tags.Value(), c.PlanPath)
-}
