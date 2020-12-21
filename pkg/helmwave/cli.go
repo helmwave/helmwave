@@ -61,7 +61,7 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 }
 
 func (c *Config) CliUsePlan(ctx *cli.Context) error {
-	c.InitPlanDirFile()
+	c.InitPlan()
 
 	err := c.ReadHelmWavePlan()
 	if err != nil {
@@ -72,7 +72,7 @@ func (c *Config) CliUsePlan(ctx *cli.Context) error {
 }
 
 func (c *Config) CliManifest(ctx *cli.Context) error {
-	c.InitPlanDirFile()
+	c.InitPlan()
 	err := c.ReadHelmWavePlan()
 	if err != nil {
 		return err

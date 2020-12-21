@@ -9,7 +9,7 @@ const (
 	defaultTimestampFormat = time.RFC3339
 )
 
-// Formatter implements logrus.Formatter interface.
+// Formatter implements logrus. Formatter interface.
 type Config struct {
 	// Timestamp format
 	TimestampFormat string

@@ -1,6 +1,7 @@
 package release
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/helper"
 	"os"
 	"sort"
@@ -56,4 +57,22 @@ func (rel *Config) PlanValues() {
 		}
 	}
 
+}
+
+func PlanValues(releases []Config, dir string) error {
+	for i, rel := range releases {
+		err := rel.RenderValues(dir)
+		if err != nil {
+			return err
+		}
+
+		releases[i].Values = rel.Values
+		log.WithFields(log.Fields{
+			"release":   rel.Name,
+			"namespace": rel.Options.Namespace,
+			"values":    releases[i].Values,
+		}).Debug("🐞 Render Values")
+	}
+
+	return nil
 }

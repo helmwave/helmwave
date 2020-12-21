@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+func (rel *Config) UniqName() string {
+	return rel.Name + "@" + rel.Options.Namespace
+}
+
 func (rel *Config) In(a []Config) bool {
 	for _, r := range a {
 		if rel == &r {
@@ -21,7 +25,7 @@ func (rel *Config) RenderValues(dir string) error {
 
 	for i, v := range rel.Values {
 
-		s := v + "." + rel.Name + "@" + rel.Options.Namespace + ".plan"
+		s := v + "." + rel.UniqName() + ".plan"
 
 		p := dir + s
 		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})

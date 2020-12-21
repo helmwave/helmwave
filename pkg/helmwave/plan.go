@@ -9,68 +9,60 @@ import (
 
 func (c *Config) PlanRepos() (err error) {
 	c.Plan.Body.Repositories, err = repo.Plan(c.Plan.Body.Releases, c.Yml.Body.Repositories)
-	return err
-}
-
-func (c *Config) PlanReleases() {
-	c.Plan.Body.Releases = release.Plan(c.Tags.Value(), c.Yml.Body.Releases)
-}
-
-func (c *Config) PlanValues() error {
-	for i, rel := range c.Plan.Body.Releases {
-		err := rel.RenderValues(c.PlanDir)
-		if err != nil {
-			return err
-		}
-
-		c.Plan.Body.Releases[i].Values = rel.Values
-		log.WithFields(log.Fields{
-			"release":   rel.Name,
-			"namespace": rel.Options.Namespace,
-			"values":    c.Plan.Body.Releases[i].Values,
-		}).Debug("🐞 Render Values")
+	if err != nil {
+		return err
 	}
-
+	names := make([]string, 0)
+	for _, v := range c.Plan.Body.Repositories {
+		names = append(names, v.Name)
+	}
+	log.WithField("repositories", names).Info("🛠 -> 🗄")
 	return nil
 }
-
-func (c *Config) InitPlanDirFile() {
-	if c.PlanDir[len(c.PlanDir)-1:] != "/" {
-		c.PlanDir += "/"
+func (c *Config) PlanReleases() {
+	c.Plan.Body.Releases = release.Plan(c.Tags.Value(), c.Yml.Body.Releases)
+	names := make([]string, 0)
+	for _, v := range c.Plan.Body.Releases {
+		names = append(names, v.UniqName())
 	}
-	c.Plan.File = c.PlanDir + "planfile"
-	log.Info("🛠 Your planfile is ", c.Plan.File)
+	log.WithField("releases", names).Info("🛠 -> 🛥")
+}
+func (c *Config) PlanReleasesValues() error {
+	return release.PlanValues(c.Plan.Body.Releases, c.PlanDir)
 }
 
-func (c *Config) GenPlanfile() error {
-	c.InitPlanDirFile()
+func (c *Config) Planfile() error {
+	c.InitPlan()
 	err := c.ReadHelmWaveYml()
 	if err != nil {
 		return err
 	}
 
+	// General
 	c.Plan.Body.Project = c.Yml.Body.Project
 	c.Plan.Body.Version = c.Yml.Body.Version
 
 	// Releases
 	c.PlanReleases()
-	if err := c.PlanValues(); err != nil {
+
+	// Values
+	if err := c.PlanReleasesValues(); err != nil {
 		return err
 	}
 
-	names := make([]string, 0)
-	for _, v := range c.Plan.Body.Releases {
-		names = append(names, v.Name)
-	}
-	log.WithField("releases", names).Info("🛠 -> 🛥")
-
 	// Repos
-	c.PlanRepos()
-	names = make([]string, 0)
-	for _, v := range c.Plan.Body.Repositories {
-		names = append(names, v.Name)
+	if err := c.PlanRepos(); err != nil {
+		return err
 	}
-	log.WithField("repositories", names).Info("🛠 -> 🗄")
 
+	// Save Plan
 	return yml.Save(c.Plan.File, c.Plan.Body)
+}
+
+func (c *Config) InitPlan() {
+	if c.PlanDir[len(c.PlanDir)-1:] != "/" {
+		c.PlanDir += "/"
+	}
+	c.Plan.File = c.PlanDir + "planfile"
+	log.Info("🛠 Your planfile is ", c.Plan.File)
 }
