@@ -5,7 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wayt/parallel"
 	"github.com/zhilyaev/helmwave/pkg/helper"
-	"github.com/zhilyaev/helmwave/pkg/yml"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"os"
 )
@@ -31,7 +30,17 @@ func (rel *Config) Sync(manifestPath string) error {
 	log.Debug(install.Manifest)
 	m := manifestPath + rel.UniqName() + ".yml"
 
-	return yml.Save(m, install.Manifest)
+	f, err := helper.CreateFile(m)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.WriteString(install.Manifest)
+	if err != nil {
+		return err
+	}
+
+	return f.Close()
 }
 
 func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
