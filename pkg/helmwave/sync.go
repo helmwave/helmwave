@@ -5,9 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wayt/parallel"
 	"github.com/zhilyaev/helmwave/pkg/release"
-	"github.com/zhilyaev/helmwave/pkg/yml"
-	helm "helm.sh/helm/v3/pkg/cli"
-	"os"
 )
 
 func (c *Config) SyncPlan() error {
@@ -20,9 +17,9 @@ func (c *Config) SyncPlan() error {
 }
 
 func (c *Config) SyncPlanRepos() error {
-	log.Info("🗄 Sync repositories")
+	log.Info("🗄 Install repositories")
 	for _, r := range c.Plan.Body.Repositories {
-		err := r.Sync(c.Helm)
+		err := r.Install(c.Helm)
 		if err != nil {
 			return err
 		}
@@ -32,14 +29,14 @@ func (c *Config) SyncPlanRepos() error {
 }
 
 func (c *Config) SyncPlanReleases() error {
-	log.Info("🛥 Sync releases")
+	log.Info("🛥 Install releases")
 	var fails []*release.Config
 
 	if c.Parallel {
 		g := &parallel.Group{}
 		log.Debug("🐞 Run in parallel mode")
 		for i, _ := range c.Plan.Body.Releases {
-			g.Go(c.DoRelease, &c.Plan.Body.Releases[i], &fails)
+			g.Go(c.SyncRelease, &c.Plan.Body.Releases[i], &fails)
 		}
 		err := g.Wait()
 		if err != nil {
@@ -47,7 +44,7 @@ func (c *Config) SyncPlanReleases() error {
 		}
 	} else {
 		for _, r := range c.Plan.Body.Releases {
-			c.DoRelease(&r, &fails)
+			c.SyncRelease(&r, &fails)
 		}
 	}
 
@@ -65,30 +62,10 @@ func (c *Config) SyncPlanReleases() error {
 	return nil
 }
 
-func (c *Config) DoRelease(r *release.Config, fails *[]*release.Config) {
-	log.Infof("🛥 %s -> %s\n", r.Name, r.Options.Namespace)
-
-	// I hate Private
-	_ = os.Setenv("HELM_NAMESPACE", r.Options.Namespace)
-	settings := helm.New()
-	cfg, err := c.ActionCfg(r.Options.Namespace, settings)
-	if err != nil {
-		log.Fatal("❌ ", err)
-	}
-
-	rel, err := r.Sync(cfg, settings)
+func (c *Config) SyncRelease(r *release.Config, fails *[]*release.Config) {
+	err := r.Sync(c.PlanDir + ".manifest")
 	if err != nil {
 		log.Error("❌ ", err)
 		*fails = append(*fails, r)
-
-	} else {
-		log.Infof("✅ %s -> %s\n", rel.Name, rel.Namespace)
-	}
-
-	log.Debug(rel.Manifest)
-	m := c.PlanDir + ".manifests/" + rel.Name + "@" + rel.Namespace + ".yaml"
-	err = yml.Save(m, rel.Manifest)
-	if err != nil {
-		log.Fatal(err)
 	}
 }

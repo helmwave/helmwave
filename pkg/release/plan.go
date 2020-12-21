@@ -2,6 +2,7 @@ package release
 
 import (
 	"github.com/zhilyaev/helmwave/pkg/helper"
+	"os"
 	"sort"
 	"strings"
 )
@@ -43,4 +44,16 @@ func Plan(tags []string, releases []Config) (plan []Config) {
 	}
 
 	return plan
+}
+
+func (rel *Config) PlanValues() {
+
+	for i := len(rel.Values) - 1; i >= 0; i-- {
+		if _, err := os.Stat(rel.Values[i]); err != nil {
+			if os.IsNotExist(err) {
+				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+			}
+		}
+	}
+
 }

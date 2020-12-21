@@ -20,7 +20,7 @@ func commands() []*cli.Command {
 		{
 			Name:    "repos",
 			Aliases: []string{"rep", "repo"},
-			Usage:   "🗄 Sync repositories",
+			Usage:   "🗄 Install repositories",
 			Action:  app.CliRepos,
 		},
 		{

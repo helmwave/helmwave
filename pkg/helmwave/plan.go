@@ -7,8 +7,9 @@ import (
 	"github.com/zhilyaev/helmwave/pkg/yml"
 )
 
-func (c *Config) PlanRepos() {
-	c.Plan.Body.Repositories = repo.Plan(c.Plan.Body.Releases, c.Yml.Body.Repositories)
+func (c *Config) PlanRepos() (err error) {
+	c.Plan.Body.Repositories, err = repo.Plan(c.Plan.Body.Releases, c.Yml.Body.Repositories)
+	return err
 }
 
 func (c *Config) PlanReleases() {

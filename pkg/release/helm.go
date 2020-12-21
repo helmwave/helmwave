@@ -3,6 +3,8 @@ package release
 import (
 	"github.com/imdario/mergo"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhilyaev/helmwave/pkg/helper"
+	"github.com/zhilyaev/helmwave/pkg/yml"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	helm "helm.sh/helm/v3/pkg/cli"
@@ -14,6 +16,30 @@ import (
 	"os"
 	"path/filepath"
 )
+
+func (rel *Config) Sync(manifestPath string) error {
+	log.Infof("🛥 %s -> %s\n", rel.Name, rel.Options.Namespace)
+
+	// I hate Private
+	_ = os.Setenv("HELM_NAMESPACE", rel.Options.Namespace)
+	settings := helm.New()
+	cfg, err := helper.ActionCfg(rel.Options.Namespace, settings)
+	if err != nil {
+		return err
+	}
+
+	install, err := rel.Install(cfg, settings)
+	if err != nil {
+		return err
+	} else {
+		log.Infof("✅ %s -> %s\n", install.Name, install.Namespace)
+	}
+
+	log.Debug(install.Manifest)
+	m := manifestPath + install.Name + "@" + install.Namespace + ".yml"
+
+	return yml.Save(m, install.Manifest)
+}
 
 func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
 	client := action.NewDependency()
@@ -33,7 +59,7 @@ func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
 	return man.Update()
 }
 
-func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
+func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
 	err := rel.DependencyUpdate(settings)
 	if err != nil {
 		log.Debug(err)

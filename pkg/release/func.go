@@ -4,7 +4,6 @@ import (
 	"github.com/zhilyaev/helmwave/pkg/helper"
 	"github.com/zhilyaev/helmwave/pkg/template"
 	"helm.sh/helm/v3/pkg/chart/loader"
-	"os"
 	"strings"
 )
 
@@ -15,18 +14,6 @@ func (rel *Config) In(a []Config) bool {
 		}
 	}
 	return false
-}
-
-func (rel *Config) PlanValues() {
-
-	for i := len(rel.Values) - 1; i >= 0; i-- {
-		if _, err := os.Stat(rel.Values[i]); err != nil {
-			if os.IsNotExist(err) {
-				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
-			}
-		}
-	}
-
 }
 
 func (rel *Config) RenderValues(dir string) error {
