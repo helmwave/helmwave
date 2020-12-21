@@ -29,15 +29,12 @@ func (c *Body) Plan(tags []string, dir string) (err error) {
 }
 
 func (c *Body) PlanRepos() (err error) {
-	c.Repositories, err = repo.Plan(c.Releases, c.Repositories)
-	if err != nil {
-		return err
-	}
+	c.Repositories = repo.Plan(c.Releases, c.Repositories)
 	names := make([]string, 0)
 	for _, v := range c.Repositories {
 		names = append(names, v.Name)
 	}
-	log.WithField("repositories", names).Info("🛠 -> 🗄")
+	log.WithField("repositories", names).Info("🛠 Plan -> 🗄 repositories")
 	return nil
 }
 
@@ -47,7 +44,7 @@ func (c *Body) PlanReleases(tags []string) {
 	for _, v := range c.Releases {
 		names = append(names, v.UniqName())
 	}
-	log.WithField("releases", names).Info("🛠 -> 🛥")
+	log.WithField("releases", names).Info("🛠 Plan -> 🛥 releases")
 }
 
 func (c *Body) PlanReleasesValues(dir string) error {

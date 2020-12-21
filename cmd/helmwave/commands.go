@@ -7,7 +7,7 @@ import (
 func commands() []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:   "render",
+			Name:   "yml",
 			Usage:  "📄 Render tpl -> yml",
 			Action: app.CliYml,
 		},

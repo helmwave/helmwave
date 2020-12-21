@@ -1,32 +1,54 @@
 package repo
 
 import (
-	"errors"
+	log "github.com/sirupsen/logrus"
+	"github.com/zhilyaev/helmwave/pkg/helper"
 	"github.com/zhilyaev/helmwave/pkg/release"
+	"os"
 	"strings"
 )
 
-func Plan(releases []release.Config, repositories []Config) (plan []Config, err error) {
-	for j := len(releases) - 1; j >= 0; j-- {
-		// bitnami/redis -> bitnami
-		chart := strings.Split(releases[j].Chart, "/")[0]
-		deps, _ := releases[j].ReposDeps()
-		reps := append(deps, chart)
+func Plan(releases []release.Config, repositories []Config) (plan []Config) {
+	all := All(releases)
 
-		for i := len(reps) - 1; i >= 0; i-- {
-			for k := len(repositories) - 1; k >= 0; k-- {
-				if reps[i] == repositories[k].Name {
-					if !repositories[i].In(plan) {
-						plan = append(plan, repositories[i])
-						repositories = append(repositories[:i], repositories[i:]...)
-					}
-					continue
+	for _, a := range all {
+		found := false
+		for _, b := range repositories {
+			if a == b.Name {
+				found = true
+				if !b.In(plan) {
+					plan = append(plan, b)
+					log.Infof("🗄 %q has been added to the plan", a)
 				}
 			}
-			err = errors.New(reps[i] + " not found in the repositories")
-			return plan, err
+		}
+
+		if !found {
+			if _, err := os.Stat(a); !os.IsNotExist(err) {
+				found = true
+				log.Infof("🗄 %q is local repo", a)
+			} else {
+				log.Errorf("🗄 %q not found ", a)
+			}
+		}
+
+	}
+
+	return plan
+}
+
+func All(releases []release.Config) (repos []string) {
+	for _, rel := range releases {
+		chart := strings.Split(rel.Chart, "/")[0]
+		deps, _ := rel.ReposDeps()
+
+		all := append(deps, chart)
+		for _, r := range all {
+			if !helper.Contains(r, repos) {
+				repos = append(repos, r)
+			}
 		}
 	}
 
-	return plan, nil
+	return repos
 }
