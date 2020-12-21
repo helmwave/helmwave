@@ -5,7 +5,7 @@ import (
 )
 
 func TestString(t *testing.T) {
-	b := &Body{
+	b := &Config{
 		Project: "my-project",
 		Version: "0.7.0",
 	}

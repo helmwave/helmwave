@@ -6,15 +6,15 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 )
 
-func (c *Body) SyncRepos(settings *helm.EnvSettings) error {
+func (c *Config) SyncRepos(settings *helm.EnvSettings) error {
 	return repo.Sync(c.Repositories, settings)
 }
 
-func (c *Body) SyncReleases(manifestPath string, async bool) error {
+func (c *Config) SyncReleases(manifestPath string, async bool) error {
 	return release.Sync(c.Releases, manifestPath, async)
 }
 
-func (c *Body) Sync(manifestPath string, async bool, settings *helm.EnvSettings) (err error) {
+func (c *Config) Sync(manifestPath string, async bool, settings *helm.EnvSettings) (err error) {
 	err = c.SyncRepos(settings)
 	if err != nil {
 		return err

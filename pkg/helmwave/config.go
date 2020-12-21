@@ -12,7 +12,7 @@ type Config struct {
 	Helm     *helm.EnvSettings
 	Tags     cli.StringSlice
 	Tpl      template.Tpl
-	Plan     yml.Config
+	Yml      yml.Config
 	PlanPath string
 	Logger   *Log
 	Parallel bool

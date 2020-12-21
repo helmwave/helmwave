@@ -10,19 +10,26 @@ func (c *Config) CliYml(ctx *cli.Context) error {
 }
 
 func (c *Config) CliPlan(ctx *cli.Context) error {
-	err := yml.Read(c.Tpl.To, &c.Plan.Body)
+	if c.Force {
+		err := c.Tpl.Render()
+		if err != err {
+			return err
+		}
+	}
+
+	err := yml.Read(c.Tpl.To, &c.Yml)
 	if err != err {
 		return err
 	}
 
-	return c.Plan.Plan(c.Tags.Value(), c.PlanPath)
+	return c.Plan()
 }
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {
-	err := yml.Read(c.Tpl.To, &c.Plan.Body)
+	err := c.CliPlan(ctx)
 	if err != err {
 		return err
 	}
 
-	return c.Plan.Plan(c.Tags.Value(), c.PlanPath)
+	return c.Yml.Sync(".manifest/", c.Parallel, c.Helm)
 }

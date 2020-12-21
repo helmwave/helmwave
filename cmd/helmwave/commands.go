@@ -8,7 +8,7 @@ func commands() []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:   "yml",
-			Usage:  "📄 Render tpl -> yml",
+			Usage:  "📄 Render helmwave.yml.tpl -> helmwave.yml",
 			Action: app.CliYml,
 		},
 		{
@@ -17,12 +17,12 @@ func commands() []*cli.Command {
 			Usage:   "📜 Generate planfile to plandir",
 			Action:  app.CliPlan,
 		},
-		//{
-		//	Name:    "deploy",
-		//	Aliases: []string{"apply", "sync", "release"},
-		//	Usage:   "🛥 Deploy your helmwave!",
-		//	Action:  app.C,
-		//},
+		{
+			Name:    "deploy",
+			Aliases: []string{"apply", "sync", "release"},
+			Usage:   "🛥 Deploy your helmwave!",
+			Action:  app.CliDeploy,
+		},
 	}
 
 }

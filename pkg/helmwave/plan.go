@@ -11,6 +11,9 @@ func (c *Config) InitPlan() {
 	if c.PlanPath[len(c.PlanPath)-1:] != "/" {
 		c.PlanPath += "/"
 	}
-	c.Plan.File = c.PlanPath + PLANFILE
-	log.Info("🛠 Your planfile is ", c.Plan.File)
+	log.Info("🛠 Your planfile is ", c.PlanPath+PLANFILE)
+}
+
+func (c *Config) Plan() error {
+	return c.Yml.Plan(c.Tags.Value(), c.PlanPath)
 }

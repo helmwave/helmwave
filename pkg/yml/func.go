@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 )
 
-func Read(file string, yml *Body) error {
+func Read(file string, yml *Config) error {
 	src, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
