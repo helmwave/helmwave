@@ -6,23 +6,19 @@ import (
 	"strings"
 )
 
-func Plan(releases []release.Config, repositories []Config) []Config {
-	var plan []Config
-
-	for _, rep := range repositories {
-		for _, rel := range releases {
+func Plan(releases []release.Config, repositories []Config) (plan []Config) {
+	for i := len(repositories) - 1; i >= 0; i-- {
+		for j := len(releases) - 1; j >= 0; j-- {
 			// bitnami/redis -> bitnami
-			name := strings.Split(rel.Chart, "/")[0]
-			deps, _ := rel.ReposDeps()
+			name := strings.Split(releases[j].Chart, "/")[0]
+			deps, _ := releases[j].ReposDeps()
 
-			if (name == rep.Name || helper.Contains(rep.Name, deps)) && !rep.In(plan) {
-				plan = append(plan, rep)
-				//release.RemoveIndex(releases, i) // Optimise deleter
+			if (name == repositories[i].Name || helper.Contains(repositories[i].Name, deps)) && !repositories[i].In(plan) {
+				plan = append(plan, repositories[i])
+				releases = append(releases[:j], releases[j+1:]...)
 				break
 			}
-
 		}
 	}
-
 	return plan
 }
