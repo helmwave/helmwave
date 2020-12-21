@@ -45,10 +45,10 @@ Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 ## 📥 Installation
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.5.0/helmwave-0.5.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.6.0/helmwave-0.6.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.5.0`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.5.0`
+    - `$ docker run diamon/helmwave:0.6.0`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.6.0`
 
 ### Build
 
@@ -70,7 +70,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.5.0
+version: 0.6.0
 
 
 repositories:
@@ -144,7 +144,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.5.0
+   0.6.0
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -180,7 +180,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.5.0
+version: 0.6.0
 
 
 repositories:
@@ -212,7 +212,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.5.0
+version: 0.6.0
 
 
 repositories:
@@ -243,7 +243,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.5.0
+  version: 0.6.0
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -361,7 +361,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.5.0
+  version: 0.6.0
   
   
   repositories:
@@ -395,7 +395,7 @@ $ helmwave render
   
   ```yaml
   project: my
-  version: 0.5.0
+  version: 0.6.0
   
   repositories:
     - name: bitnami
@@ -416,5 +416,6 @@ $ helmwave render
   ``` 
   
 </details>
+
 
 
