@@ -31,9 +31,13 @@ func (f *Config) Format(entry *logrus.Entry) ([]byte, error) {
 	level := strings.ToUpper(entry.Level.String())
 
 	i, _ := logrus.ParseLevel(level)
-	color := colors[i]
+	l := level
+	if f.Color {
+		color := colors[i]
+		l = Start + color + level + End
+	}
 
-	output = strings.Replace(output, "%lvl%", Start+color+level+End, 1)
+	output = strings.Replace(output, "%lvl%", l, 1)
 
 	emoji := emojisLevel[i]
 	output = strings.Replace(output, "%emoji%", emoji, 1)

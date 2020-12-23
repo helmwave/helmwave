@@ -18,4 +18,5 @@ type Config struct {
 	// All of fields need to be wrapped inside %% i.e %time% %msg%
 	LogFormat string
 	//Color bool Maybe latter
+	Color bool
 }
