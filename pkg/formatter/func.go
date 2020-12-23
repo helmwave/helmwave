@@ -7,6 +7,10 @@ import (
 )
 
 var emojisLevel = [7]string{"💀", "🤬", "💩", "🙈", "🙃", "🤷", "🤮"}
+var colors = [7]string{"[44;1m", "[41;1m", "[31;1m", "[33m", "[36m", "[37;1m", "[35;1m"}
+
+const Start = "\033"
+const End = "\033[0m"
 
 // Format building log message.
 func (f *Config) Format(entry *logrus.Entry) ([]byte, error) {
@@ -26,9 +30,11 @@ func (f *Config) Format(entry *logrus.Entry) ([]byte, error) {
 
 	level := strings.ToUpper(entry.Level.String())
 
-	output = strings.Replace(output, "%lvl%", level, 1)
-
 	i, _ := logrus.ParseLevel(level)
+	color := colors[i]
+
+	output = strings.Replace(output, "%lvl%", Start+color+level+End, 1)
+
 	emoji := emojisLevel[i]
 	output = strings.Replace(output, "%emoji%", emoji, 1)
 

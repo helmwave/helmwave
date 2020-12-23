@@ -9,15 +9,13 @@ func (c *Config) CliYml(ctx *cli.Context) error {
 	return c.Tpl.Render()
 }
 
-func (c *Config) CliPlan(ctx *cli.Context) error {
-	if c.Force {
-		err := c.Tpl.Render()
-		if err != err {
-			return err
-		}
+func (c *Config) CliPlan(ctx *cli.Context) (err error) {
+	err = c.Tpl.Render()
+	if err != err {
+		return err
 	}
 
-	err := yml.Read(c.Tpl.To, &c.Yml)
+	err = yml.Read(c.Tpl.To, &c.Yml)
 	if err != err {
 		return err
 	}

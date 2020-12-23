@@ -43,13 +43,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_PARALLEL"},
 			Destination: &app.Parallel,
 		},
-		&cli.BoolFlag{
-			Name:        "force",
-			Usage:       "It allows you call `helm install` in parallel mode ",
-			Value:       true,
-			EnvVars:     []string{"HELMWAVE_FORCE"},
-			Destination: &app.Force,
-		},
+		//&cli.BoolFlag{
+		//	Name:        "force",
+		//	Usage:       "It allows you call `helm install` in parallel mode ",
+		//	Value:       true,
+		//	EnvVars:     []string{"HELMWAVE_FORCE"},
+		//	Destination: &app.Force,
+		//},
 		//
 		//		LOGGER
 		//
