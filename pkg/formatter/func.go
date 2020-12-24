@@ -7,7 +7,7 @@ import (
 )
 
 var emojisLevel = [7]string{"💀", "🤬", "💩", "🙈", "🙃", "🤷", "🤮"}
-var colors = [7]string{"[44;1m", "[41;1m", "[31;1m", "[33m", "[36m", "[37;1m", "[35;1m"}
+var colors = [7]string{"[44;1m", "[31;1m", "[31;1m", "[33m", "[36m", "[37;1m", "[35;1m"}
 
 const Start = "\033"
 const End = "\033[0m"
@@ -24,22 +24,21 @@ func (f *Config) Format(entry *logrus.Entry) ([]byte, error) {
 		timestampFormat = defaultTimestampFormat
 	}
 
-	output = strings.Replace(output, "%time%", entry.Time.Format(timestampFormat), 1)
-
-	output = strings.Replace(output, "%msg%", entry.Message, 1)
-
 	level := strings.ToUpper(entry.Level.String())
 
 	i, _ := logrus.ParseLevel(level)
+	emoji := emojisLevel[i]
 	l := level
+	m := entry.Message
 	if f.Color {
 		color := colors[i]
 		l = Start + color + level + End
+		m = Start + color + entry.Message + End
 	}
 
+	output = strings.Replace(output, "%time%", entry.Time.Format(timestampFormat), 1)
+	output = strings.Replace(output, "%msg%", m, 1)
 	output = strings.Replace(output, "%lvl%", l, 1)
-
-	emoji := emojisLevel[i]
 	output = strings.Replace(output, "%emoji%", emoji, 1)
 
 	for k, val := range entry.Data {
