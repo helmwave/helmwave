@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+var emptyReleases = errors.New("releases are empty")
+
 func (rel *Config) Sync(manifestPath string) error {
 	log.Infof("🛥 %s -> %s\n", rel.Name, rel.Options.Namespace)
 
@@ -52,6 +54,10 @@ func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
 }
 
 func Sync(releases []Config, manifestPath string, async bool) (err error) {
+	if len(releases) == 0 {
+		return emptyReleases
+	}
+
 	log.Info("🛥 Sync releases")
 	var fails []*Config
 
