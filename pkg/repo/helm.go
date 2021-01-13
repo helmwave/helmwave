@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func (rep *Config) Sync(settings *helm.EnvSettings) error {
+func (rep *Config) Install(settings *helm.EnvSettings) error {
 	return Write(settings.RepositoryConfig, &rep.Entry, settings)
 }
 

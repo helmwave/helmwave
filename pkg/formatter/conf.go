@@ -9,7 +9,7 @@ const (
 	defaultTimestampFormat = time.RFC3339
 )
 
-// Formatter implements logrus.Formatter interface.
+// Formatter implements logrus. Formatter interface.
 type Config struct {
 	// Timestamp format
 	TimestampFormat string
@@ -18,4 +18,5 @@ type Config struct {
 	// All of fields need to be wrapped inside %% i.e %time% %msg%
 	LogFormat string
 	//Color bool Maybe latter
+	Color bool
 }

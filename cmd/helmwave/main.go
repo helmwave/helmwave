@@ -33,5 +33,11 @@ func command404(c *cli.Context, s string) {
 }
 
 func before(c *cli.Context) error {
-	return app.InitLogger()
+	err := app.InitLogger()
+	if err != err {
+		return err
+	}
+
+	app.InitPlan()
+	return nil
 }

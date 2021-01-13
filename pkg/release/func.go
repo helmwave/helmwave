@@ -4,9 +4,12 @@ import (
 	"github.com/zhilyaev/helmwave/pkg/helper"
 	"github.com/zhilyaev/helmwave/pkg/template"
 	"helm.sh/helm/v3/pkg/chart/loader"
-	"os"
 	"strings"
 )
+
+func (rel *Config) UniqName() string {
+	return rel.Name + "@" + rel.Options.Namespace
+}
 
 func (rel *Config) In(a []Config) bool {
 	for _, r := range a {
@@ -17,24 +20,12 @@ func (rel *Config) In(a []Config) bool {
 	return false
 }
 
-func (rel *Config) PlanValues() {
-
-	for i := len(rel.Values) - 1; i >= 0; i-- {
-		if _, err := os.Stat(rel.Values[i]); err != nil {
-			if os.IsNotExist(err) {
-				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
-			}
-		}
-	}
-
-}
-
 func (rel *Config) RenderValues(dir string) error {
 	rel.PlanValues()
 
 	for i, v := range rel.Values {
 
-		s := v + "." + rel.Name + "@" + rel.Options.Namespace + ".plan"
+		s := v + "." + rel.UniqName() + ".plan"
 
 		p := dir + s
 		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})

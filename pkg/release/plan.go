@@ -1,7 +1,9 @@
 package release
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/helper"
+	"os"
 	"sort"
 	"strings"
 )
@@ -43,4 +45,34 @@ func Plan(tags []string, releases []Config) (plan []Config) {
 	}
 
 	return plan
+}
+
+func (rel *Config) PlanValues() {
+
+	for i := len(rel.Values) - 1; i >= 0; i-- {
+		if _, err := os.Stat(rel.Values[i]); err != nil {
+			if os.IsNotExist(err) {
+				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+			}
+		}
+	}
+
+}
+
+func PlanValues(releases []Config, dir string) error {
+	for i, rel := range releases {
+		err := rel.RenderValues(dir)
+		if err != nil {
+			return err
+		}
+
+		releases[i].Values = rel.Values
+		log.WithFields(log.Fields{
+			"release":   rel.Name,
+			"namespace": rel.Options.Namespace,
+			"values":    releases[i].Values,
+		}).Debug("🐞 Render Values")
+	}
+
+	return nil
 }

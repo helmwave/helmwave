@@ -33,7 +33,7 @@ func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
 	return man.Update()
 }
 
-func (rel *Config) Sync(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
+func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
 	err := rel.DependencyUpdate(settings)
 	if err != nil {
 		log.Debug(err)

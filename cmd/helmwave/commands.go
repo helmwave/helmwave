@@ -7,44 +7,21 @@ import (
 func commands() []*cli.Command {
 	return []*cli.Command{
 		{
-			Name:   "render",
-			Usage:  "📄 Render tpl -> yml",
-			Action: app.CliRender,
+			Name:   "yml",
+			Usage:  "📄 Render helmwave.yml.tpl -> helmwave.yml",
+			Action: app.CliYml,
 		},
 		{
 			Name:    "planfile",
 			Aliases: []string{"plan"},
 			Usage:   "📜 Generate planfile to plandir",
-			Action:  app.CliPlanfile,
-		},
-		{
-			Name:    "repos",
-			Aliases: []string{"rep", "repo"},
-			Usage:   "🗄 Sync repositories",
-			Action:  app.CliRepos,
+			Action:  app.CliPlan,
 		},
 		{
 			Name:    "deploy",
 			Aliases: []string{"apply", "sync", "release"},
 			Usage:   "🛥 Deploy your helmwave!",
 			Action:  app.CliDeploy,
-		},
-		{
-			Name:      "help",
-			Usage:     "🚑 Help me!",
-			ArgsUsage: "[command]",
-			Action:    help,
-		},
-		{
-			Name:   "useplan",
-			Usage:  "📜 -> 🛥 Deploy your helmwave from planfile!",
-			Action: app.CliUsePlan,
-		},
-		{
-			Name:    "manifests",
-			Aliases: []string{"templates"},
-			Usage:   "📜 -> 🛥 Show manifests from planfile!",
-			Action:  app.CliManifest,
 		},
 	}
 

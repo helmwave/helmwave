@@ -39,7 +39,9 @@ func (c *Config) InitLoggerFormat() {
 			ForceColors:  c.Logger.Color,
 		})
 	case "emoji":
-		log.SetFormatter(&formatter.Config{})
+		log.SetFormatter(&formatter.Config{
+			Color: c.Logger.Color,
+		})
 	case "text":
 		log.SetFormatter(&log.TextFormatter{
 			ForceColors: c.Logger.Color,

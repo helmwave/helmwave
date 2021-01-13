@@ -6,5 +6,5 @@ build: test
 	cp -f helmwave /usr/local/bin/helmwave
 
 test:
-	go test github.com/zhilyaev/helmwave/cmd/helmwave
+	go test github.com/zhilyaev/helmwave/pkg/yml
 
