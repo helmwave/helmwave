@@ -16,7 +16,7 @@ func Plan(releases []release.Config, repositories []Config) (plan []Config) {
 		for _, b := range repositories {
 			if a == b.Name {
 				found = true
-				if !b.In(plan) {
+				if !b.InByName(plan) {
 					plan = append(plan, b)
 					log.Infof("🗄 %q has been added to the plan", a)
 				}
