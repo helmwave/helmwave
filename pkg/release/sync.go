@@ -12,7 +12,7 @@ import (
 var emptyReleases = errors.New("releases are empty")
 
 func (rel *Config) Sync(manifestPath string) error {
-	log.Infof("🛥 %s -> %s\n", rel.Name, rel.Options.Namespace)
+	log.Infof("🛥 %s -> %s", rel.Name, rel.Options.Namespace)
 
 	// I hate Private
 	_ = os.Setenv("HELM_NAMESPACE", rel.Options.Namespace)
@@ -26,7 +26,7 @@ func (rel *Config) Sync(manifestPath string) error {
 	if err != nil {
 		return err
 	} else {
-		log.Infof("✅ %s -> %s\n", install.Name, install.Namespace)
+		log.Infof("✅ %s -> %s", install.Name, install.Namespace)
 	}
 
 	log.Debug(install.Manifest)
