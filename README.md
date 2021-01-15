@@ -45,10 +45,10 @@ Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 ## 📥 Installation
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.6.1/helmwave-0.6.1-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.7.1/helmwave-0.7.1-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.6.1`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.6.1`
+    - `$ docker run diamon/helmwave:0.7.1`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.7.1`
 
 ### Build
 
@@ -70,7 +70,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.6.1
+version: 0.7.1
 
 
 repositories:
@@ -136,7 +136,7 @@ All Options
 
 ## 🛠 CLI Reference
 
-```console
+```console                                                                                                                                     (k8s-sbs/stage)
 NAME:
    helmwave - composer for helm
 
@@ -144,7 +144,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.6.1
+   0.7.1
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -153,12 +153,10 @@ AUTHOR:
    💎 Dmitriy Zhilyaev <helmwave+zhilyaev.dmitriy@gmail.com>
 
 COMMANDS:
-   render                        📄 Render tpl -> yml
+   yml                           📄 Render helmwave.yml.tpl -> helmwave.yml
    planfile, plan                📜 Generate planfile to plandir
-   repos, rep, repo              🗄 Sync repositories
    deploy, apply, sync, release  🛥 Deploy your helmwave!
-   help                          🚑 Help me!
-   useplan                       📜 -> 🛥 Deploy your helmwave from planfile!
+   help, h                       Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --tpl value              Main tpl file (default: "helmwave.yml.tpl") [$HELMWAVE_TPL_FILE]
@@ -169,6 +167,7 @@ GLOBAL OPTIONS:
    --log-format value       You can set: [ text | json | pad | emoji ] (default: "emoji") [$HELMWAVE_LOG_FORMAT]
    --log-level value        You can set: [ debug | info | warn | panic | fatal | trace ] (default: "info") [$HELMWAVE_LOG_LEVEL, $HELMWAVE_LOG_LVL]
    --log-color              Force color (default: true) [$HELMWAVE_LOG_COLOR]
+   --help, -h               show help (default: false)
    --version, -v            print the version (default: false)
 ```
 
@@ -180,7 +179,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.6.1
+version: 0.7.1
 
 
 repositories:
@@ -212,7 +211,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.6.1
+version: 0.7.1
 
 
 repositories:
@@ -243,7 +242,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.6.1
+  version: 0.7.1
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -361,7 +360,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.6.1
+  version: 0.7.1
   
   
   repositories:
@@ -395,7 +394,7 @@ $ helmwave render
   
   ```yaml
   project: my
-  version: 0.6.1
+  version: 0.7.1
   
   repositories:
     - name: bitnami
