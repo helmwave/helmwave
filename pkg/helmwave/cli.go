@@ -29,5 +29,5 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 		return err
 	}
 
-	return c.Yml.Sync(".manifest/", c.Parallel, c.Helm)
+	return c.Yml.Sync(c.PlanPath+".manifest/", c.Parallel, c.Helm)
 }
