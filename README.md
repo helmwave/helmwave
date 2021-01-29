@@ -171,7 +171,7 @@ GLOBAL OPTIONS:
    --version, -v            print the version (default: false)
 ```
 
-### render
+### yml
 
 Transform helmwave.yml.tpl to helmwave.yml
 
@@ -204,7 +204,7 @@ This command will render `helmwave.yml.tpl` to `helmwave.yml`
 $ export NS=stage
 $ export CI_PROJECT_NAME=my-project
 $ export GITHUB_TOKEN=my-secret-token
-$ helmwave render
+$ helmwave yml
 ```
 
 Once applied, your `helmwave.yml` will look like:
@@ -386,7 +386,7 @@ releases:
 </details>
 
 ```bash
-$ helmwave render
+$ helmwave yml
 ```
 
 <details>
