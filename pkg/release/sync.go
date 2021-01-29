@@ -29,7 +29,7 @@ func (rel *Config) Sync(manifestPath string) error {
 		log.Infof("✅ %s -> %s", install.Name, install.Namespace)
 	}
 
-	log.Debug(install.Manifest)
+	log.Trace(install.Manifest)
 	m := manifestPath + rel.UniqName() + ".yml"
 
 	f, err := helper.CreateFile(m)
