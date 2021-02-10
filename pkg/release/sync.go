@@ -22,27 +22,9 @@ func (rel *Config) Sync(manifestPath string) error {
 		return err
 	}
 
-	install, err := rel.Install(cfg, settings)
-	if err != nil {
-		return err
-	} else {
-		log.Infof("✅ %s -> %s", install.Name, install.Namespace)
-	}
+	_, err = rel.Install(cfg, settings)
 
-	log.Trace(install.Manifest)
-	m := manifestPath + rel.UniqName() + ".yml"
-
-	f, err := helper.CreateFile(m)
-	if err != nil {
-		return err
-	}
-
-	_, err = f.WriteString(install.Manifest)
-	if err != nil {
-		return err
-	}
-
-	return f.Close()
+	return err
 }
 
 func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
@@ -50,6 +32,8 @@ func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
 	if err != nil {
 		log.Error("❌ ", err)
 		*fails = append(*fails, rel)
+	} else {
+		log.Infof("✅ %s -> %s", rel.Name, rel.Options.Namespace)
 	}
 }
 
