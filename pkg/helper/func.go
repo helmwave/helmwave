@@ -23,3 +23,17 @@ func CreateFile(p string) (*os.File, error) {
 	}
 	return os.Create(p)
 }
+
+func Save2File(p string, c string) error {
+	f, err := CreateFile(p)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.WriteString(c)
+	if err != nil {
+		return err
+	}
+
+	return f.Close()
+}
