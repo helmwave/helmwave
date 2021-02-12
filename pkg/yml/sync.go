@@ -22,3 +22,12 @@ func (c *Config) Sync(manifestPath string, async bool, settings *helm.EnvSetting
 
 	return c.SyncReleases(manifestPath, async)
 }
+
+func (c *Config) SyncFake(manifestPath string, async bool, settings *helm.EnvSettings) error {
+
+	for _, v := range c.Releases {
+		v.Options.DryRun = true
+	}
+
+	return c.Sync(manifestPath, async, settings)
+}
