@@ -16,5 +16,5 @@ type Config struct {
 	PlanPath string
 	Logger   *Log
 	Parallel bool
-	//Force    bool
+	Kubedog  bool
 }
