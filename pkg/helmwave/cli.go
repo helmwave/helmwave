@@ -9,8 +9,8 @@ func (c *Config) CliYml(ctx *cli.Context) error {
 	return c.Tpl.Render()
 }
 
-func (c *Config) CliPlan(ctx *cli.Context) (err error) {
-	err = c.Tpl.Render()
+func (c *Config) CliPlan(ctx *cli.Context) error {
+	err := c.Tpl.Render()
 	if err != err {
 		return err
 	}
@@ -30,4 +30,13 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 	}
 
 	return c.Yml.Sync(c.PlanPath+".manifest/", c.Parallel, c.Helm)
+}
+
+func (c *Config) CliManifests(ctx *cli.Context) error {
+	err := c.CliPlan(ctx)
+	if err != err {
+		return err
+	}
+
+	return c.Yml.SyncFake(c.PlanPath+".manifest/", c.Parallel, c.Helm)
 }
