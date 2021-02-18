@@ -45,7 +45,7 @@ Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 
 ## 📥 Installation ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total) ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
-- ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total)Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
+- Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
     - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.0/helmwave-0.8.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
     - `$ docker run diamon/helmwave:0.8.0`
