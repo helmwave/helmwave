@@ -11,9 +11,9 @@ func (rel *Config) UniqName() string {
 	return rel.Name + "@" + rel.Options.Namespace
 }
 
-func (rel *Config) In(a []Config) bool {
+func (rel *Config) In(a []*Config) bool {
 	for _, r := range a {
-		if rel == &r {
+		if rel == r {
 			return true
 		}
 	}

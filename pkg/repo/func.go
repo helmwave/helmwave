@@ -1,8 +1,8 @@
 package repo
 
-func (rep *Config) In(a []Config) bool {
+func (rep *Config) In(a []*Config) bool {
 	for _, r := range a {
-		if rep == &r {
+		if rep == r {
 			return true
 		}
 	}
@@ -10,7 +10,7 @@ func (rep *Config) In(a []Config) bool {
 	return false
 }
 
-func (rep *Config) InByName(a []Config) bool {
+func (rep *Config) InByName(a []*Config) bool {
 	for _, r := range a {
 		if rep.Name == r.Name {
 			return true

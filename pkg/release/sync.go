@@ -54,7 +54,7 @@ func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
 	}
 }
 
-func Sync(releases []Config, manifestPath string, async bool) (err error) {
+func Sync(releases []*Config, manifestPath string, async bool) (err error) {
 	if len(releases) == 0 {
 		return emptyReleases
 	}
