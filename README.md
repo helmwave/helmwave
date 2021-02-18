@@ -39,9 +39,6 @@ Store|✅| You can use labels
 Planfile|✅|❌
 Sprig | ✅|✅
 Call helm | via Golang Module | Shell Executor
-Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
-
-`*` - WIP
 
 ## Todo:
 - buy a domain
@@ -130,6 +127,59 @@ redis-b-slave-1    1/1     Running   0          51s
 
 ## [Documentation](https://zhilyaev.github.io/helmwave/)
 
+### Annotations
+
+> inspired by [werf annotations](https://werf.io/documentation/reference/deploy_annotations.html)
+
+```yaml
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        helmwave.dev/show-service-messages: "true"
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+```
+
+#### `helmwave.dev/track-termination-mode`
+
+Defines a condition when helmwave should stop tracking of the resource:
+
+- `WaitUntilResourceReady` (default) — the entire deployment process would monitor and wait for the readiness of the resource having this annotation. Since this mode is enabled by default, the deployment process would wait for all resources to be ready. 
+- `NonBlocking` — the resource is tracked only if there are other resources that are not yet ready.
+
+#### helmwave.dev/fail-mode
+
+Defines how werf will handle a resource failure condition which occured after failures threshold has been reached for the resource during deploy process:
+
+- `FailWholeDeployProcessImmediately` (default) — the entire deploy process will fail with an error if an error occurs for some resource.
+- `HopeUntilEndOfDeployProcess` — when an error occurred for the resource, set this resource into the “hope” mode, and continue tracking other resources. If all remained resources are ready or in the “hope” mode, transit the resource back to “normal” and fail the whole deploy process if an error for this resource occurs once again.
+- `IgnoreAndContinueDeployProcess` — resource errors do not affect the deployment process.
+
+
+#### helmwave.dev/failures-allowed-per-replica
+
+By default, one error per replica is allowed before considering the whole deployment process unsuccessful. This setting defines a threshold of failures after which resource will be considered as failed and werf will handle this situation using fail mode.
+
+- NUMBER
+
+#### helmwave.dev/log-regex
+
+Defines a Re2 regex template that applies to all logs of all containers of all Pods owned by a resource with this annotation. werf would show only those log lines that fit the specified regex template. By default, werf shows all log lines.
+
+- RE2_REGEX
+
+#### helmwave.dev/skip-logs
+
+Set to "true" to turn off printing logs of all containers of all Pods owned by a resource with this annotation. This annotation is disabled by default.
+
+- "true"|"false"
+
+#### helmwave.dev/show-service-messages
+
+Set to "true" to enable additional real-time debugging info (including Kubernetes events) for a resource during tracking. By default, werf would show these service messages only if the resource has failed the entire deploy process.
+
+- "true"|"false"
 
 ### Examples
   - [How to pass `image.tag` to release?](docs/examples/CI_COMMIT_TAG/README.md)
