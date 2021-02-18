@@ -29,7 +29,7 @@ func MakeMapSpecs(releases []*Config, manifestPath string) (map[string]*multitra
 			"Jobs":         len(relSpecs.Jobs),
 			"DaemonSets":   len(relSpecs.DaemonSets),
 			"StatefulSets": len(relSpecs.StatefulSets),
-		}).Debug("Spec's count of ", rel.UniqName())
+		}).Trace("Specs count of ", rel.UniqName())
 
 		nsSpec, found := mapSpecs[rel.Options.Namespace]
 		if found {

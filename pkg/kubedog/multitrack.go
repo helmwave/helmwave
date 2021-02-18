@@ -2,18 +2,16 @@ package kubedog
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-func MakeSpecs(m []*Resource, ns string) (*multitrack.MultitrackSpecs, error) {
+func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
 	for _, r := range m {
-		log.Debug(r.Kind, " ", ns)
 		switch r.Kind {
 		case "Deployment":
 			s, err := r.MakeMultiTrackSpec(ns)
