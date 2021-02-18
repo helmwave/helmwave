@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Plan(tags []string, releases []Config) (plan []Config) {
+func Plan(tags []string, releases []*Config) (plan []*Config) {
 	if len(tags) == 0 {
 		return releases
 	}
@@ -59,7 +59,7 @@ func (rel *Config) PlanValues() {
 
 }
 
-func PlanValues(releases []Config, dir string) error {
+func PlanValues(releases []*Config, dir string) error {
 	for i, rel := range releases {
 		err := rel.RenderValues(dir)
 		if err != nil {

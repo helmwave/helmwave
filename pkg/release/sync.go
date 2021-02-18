@@ -12,7 +12,7 @@ import (
 var emptyReleases = errors.New("releases are empty")
 
 func (rel *Config) Sync(manifestPath string) error {
-	log.Infof("🛥 %s -> %s", rel.Name, rel.Options.Namespace)
+	log.Infof("🛥 %s", rel.UniqName())
 
 	// I hate Private
 	_ = os.Setenv("HELM_NAMESPACE", rel.Options.Namespace)
@@ -23,20 +23,19 @@ func (rel *Config) Sync(manifestPath string) error {
 	}
 
 	install, err := rel.Install(cfg, settings)
-	if err != nil {
-		return err
-	} else {
-		log.Infof("✅ %s -> %s", install.Name, install.Namespace)
+	if install != nil {
+		log.Trace(install.Manifest)
 	}
 
-	log.Trace(install.Manifest)
-	m := manifestPath + rel.UniqName() + ".yml"
+	if err != nil {
+		return err
+	}
 
+	m := manifestPath + rel.UniqName() + ".yml"
 	f, err := helper.CreateFile(m)
 	if err != nil {
 		return err
 	}
-
 	_, err = f.WriteString(install.Manifest)
 	if err != nil {
 		return err
@@ -50,10 +49,12 @@ func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
 	if err != nil {
 		log.Error("❌ ", err)
 		*fails = append(*fails, rel)
+	} else {
+		log.Infof("✅ %s", rel.UniqName())
 	}
 }
 
-func Sync(releases []Config, manifestPath string, async bool) (err error) {
+func Sync(releases []*Config, manifestPath string, async bool) (err error) {
 	if len(releases) == 0 {
 		return emptyReleases
 	}

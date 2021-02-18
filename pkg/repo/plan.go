@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Plan(releases []release.Config, repositories []Config) (plan []Config) {
+func Plan(releases []*release.Config, repositories []*Config) (plan []*Config) {
 	all := All(releases)
 
 	for _, a := range all {
@@ -37,7 +37,7 @@ func Plan(releases []release.Config, repositories []Config) (plan []Config) {
 	return plan
 }
 
-func All(releases []release.Config) (repos []string) {
+func All(releases []*release.Config) (repos []string) {
 	for _, rel := range releases {
 		chart := strings.Split(rel.Chart, "/")[0]
 		deps, _ := rel.ReposDeps()

@@ -23,6 +23,12 @@ func commands() []*cli.Command {
 			Usage:   "🛥 Deploy your helmwave!",
 			Action:  app.CliDeploy,
 		},
+		{
+			Name:    "manifest",
+			Aliases: []string{"manifest"},
+			Usage:   "🛥 Fake Deploy",
+			Action:  app.CliManifests,
+		},
 	}
 
 }

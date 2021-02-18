@@ -2,18 +2,18 @@
   <img  src="https://raw.githubusercontent.com/zhilyaev/helmwave/main/img/logo.png" style="max-height:100%;" height="220px" />
 </p>
 
-<h1 align="center"> HelmWave </h1>
+<h1 align="center"> HelmWave</h1>
 
 <p align="center">
   <a href="https://github.com/zhilyaev/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/zhilyaev/helmwave/workflows/release/badge.svg" /></a>
   <a href="https://t.me/helmwave" ><img src="https://img.shields.io/badge/telegram-chat-179cde.svg?logo=telegram" /></a>
+  <img alt="GitHub" src="https://img.shields.io/github/license/zhilyaev/helmwave">
+  <img alt="GitHub tag (latest SemVer)" src="https://img.shields.io/github/v/tag/zhilyaev/helmwave?label=latest">
 </p>
 
 
-🌊 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**.
+🌊 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**. HelmWave is like docker-compose for helm.
 
-
-> Inspired by the [helmfile](https://github.com/roboll/helmfile)
 
 
 - Keep a directory of chart value files and maintain changes in version control.
@@ -25,7 +25,8 @@
 ## Comparison
  🚀 Features  | 🌊 HelmWave   | helmfile 
 -------------| :------------:|:-----------:
-Docker image | 23 mb | 190 mb
+Docker | ![Docker Image Size helmwave (latest by date)](https://img.shields.io/docker/image-size/diamon/helmwave) | ![Docker Image Size helmfile (latest by date)](https://img.shields.io/docker/image-size/chatwork/helmfile)
+[Kubedog](https://github.com/werf/kubedog) |✅|❌
 Without helm binary |✅|❌
 All options helm|✅|partially
 Helm 3 |✅|✅
@@ -40,19 +41,21 @@ Sprig | ✅|✅
 Call helm | via Golang Module | Shell Executor
 Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 
-`*` - WIP 
+`*` - WIP
 
-## 📥 Installation
+## Todo:
+- buy a domain
+- make docs
+
+## 📥 Installation ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total) ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.7.2/helmwave-0.7.2-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.0/helmwave-0.8.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.7.2`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.7.2`
+    - `$ docker run diamon/helmwave:0.8.0`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.0`
 
-### Build
-
-> golang:1.15
+### Build ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
 $ export GO111MODULE=on
@@ -70,7 +73,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.7.2
+version: 0.8.0
 
 
 repositories:
@@ -116,6 +119,15 @@ redis-b-slave-0    1/1     Running   0          32s
 redis-b-slave-1    1/1     Running   0          51s
 ```
 
+## Articles
+
+### RU
+- [HelmWave v0.5.0 – GitOps для твоего Kubernetes](https://habr.com/ru/post/532596/)
+-  HelmWave v0.8.0 – Kubedog рядом
+
+## EN
+- WIP
+
 ## [Documentation](https://zhilyaev.github.io/helmwave/)
 
 
@@ -133,7 +145,6 @@ Use tags for choose specific releases
 ### [🧬 Full `helmwave.yml` config](docs/helmwave.yml.md)
 All Options
 
-
 ## 🛠 CLI Reference
 
 ```console                                                                                                                                     (k8s-sbs/stage)
@@ -144,7 +155,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.7.2
+   0.8.0
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -167,6 +178,7 @@ GLOBAL OPTIONS:
    --log-format value       You can set: [ text | json | pad | emoji ] (default: "emoji") [$HELMWAVE_LOG_FORMAT]
    --log-level value        You can set: [ debug | info | warn | panic | fatal | trace ] (default: "info") [$HELMWAVE_LOG_LEVEL, $HELMWAVE_LOG_LVL]
    --log-color              Force color (default: true) [$HELMWAVE_LOG_COLOR]
+   --kubedog                Enable/Disable kubedog (default: true) [$HELMWAVE_KUBEDOG]
    --help, -h               show help (default: false)
    --version, -v            print the version (default: false)
 ```
@@ -179,7 +191,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.7.2
+version: 0.8.0
 
 
 repositories:
@@ -211,7 +223,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.7.2
+version: 0.8.0
 
 
 repositories:
@@ -242,7 +254,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.7.2
+  version: 0.8.0
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -327,8 +339,6 @@ This command will generate helmwave.plan.
   ```
 </details>
 
-
-
 ## 📄 Templating
 HelmWave uses [Go templates](https://godoc.org/text/template) for templating.
 
@@ -336,6 +346,7 @@ Helmwave supports all built-in functions, [Sprig library](https://godoc.org/gith
 - `toYaml` marshals a map into a string
 - `fromYaml` reads a golang string and generates a map
 - `readFile` get file as string
+- `hasKey` get true if field is exists
 - `get` (Sprig's original `get` is available as `sprigGet`)
 - `setValueAtPath` PATH NEW_VALUE traverses a golang map, replaces the value at the PATH with NEW_VALUE
 - `requiredEnv` The requiredEnv function allows you to declare a particular environment variable as required for template rendering. If the environment variable is unset or empty, the template rendering will fail with an error message.
@@ -360,7 +371,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.7.2
+  version: 0.8.0
   
   
   repositories:
@@ -394,7 +405,7 @@ $ helmwave yml
   
   ```yaml
   project: my
-  version: 0.7.2
+  version: 0.8.0
   
   repositories:
     - name: bitnami
@@ -415,6 +426,10 @@ $ helmwave yml
   ``` 
   
 </details>
+
+
+
+
 
 
 

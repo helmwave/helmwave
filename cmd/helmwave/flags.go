@@ -62,7 +62,7 @@ func flags(app *helmwave.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "log-level",
-			Usage:       "You can set: [ debug | info | warn | panic | fatal | trace ]",
+			Usage:       "You can set: [ debug | info | warn  | fatal | panic | trace ]",
 			Value:       "info",
 			EnvVars:     []string{"HELMWAVE_LOG_LEVEL", "HELMWAVE_LOG_LVL"},
 			Destination: &app.Logger.Level,
@@ -73,6 +73,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Value:       true,
 			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
 			Destination: &app.Logger.Color,
+		},
+		&cli.BoolFlag{
+			Name:        "kubedog",
+			Usage:       "Enable/Disable kubedog",
+			Value:       true,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG"},
+			Destination: &app.Kubedog,
 		},
 	}
 }

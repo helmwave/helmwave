@@ -5,7 +5,7 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 )
 
-func Sync(repos []Config, settings *helm.EnvSettings) (err error) {
+func Sync(repos []*Config, settings *helm.EnvSettings) (err error) {
 	log.Info("🗄 Sync repositories")
 	for _, r := range repos {
 		err := r.Install(settings)
