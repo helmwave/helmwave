@@ -6,11 +6,10 @@ import (
 	"github.com/werf/kubedog/pkg/kube"
 	"github.com/werf/kubedog/pkg/tracker"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
-	"github.com/zhilyaev/helmwave/pkg/kubedog"
 	"github.com/zhilyaev/helmwave/pkg/release"
 	"github.com/zhilyaev/helmwave/pkg/repo"
 	helm "helm.sh/helm/v3/pkg/cli"
-	"io/ioutil"
+	"k8s.io/client-go/kubernetes"
 	"time"
 )
 
@@ -32,8 +31,9 @@ func (c *Config) Sync(manifestPath string, async bool, settings *helm.EnvSetting
 }
 
 func (c *Config) SyncFake(manifestPath string, async bool, settings *helm.EnvSettings) error {
-	for _, v := range c.Releases {
-		v.Options.DryRun = true
+	log.Info("🛫 Fake deploy")
+	for i, _ := range c.Releases {
+		c.Releases[i].Options.DryRun = true
 	}
 	return c.Sync(manifestPath, async, settings)
 }
@@ -43,58 +43,48 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 	if err != nil {
 		return err
 	}
+	log.Debug("🛫 Fake deploy has been finished")
 
-	var specs multitrack.MultitrackSpecs
-
-	for _, rel := range c.Releases {
-		// Todo mv to "copy"
-		rel.Options.DryRun = false
-		src, err := ioutil.ReadFile(manifestPath + rel.UniqName() + ".yml")
-		if err != nil {
-			return err
-		}
-		manifest := kubedog.MakeManifest(src)
-		relSpecs, err := kubedog.MakeSpecs(manifest)
-		log.WithFields(log.Fields{
-			"Deployments":  relSpecs.Deployments,
-			"Jobs":         relSpecs.Jobs,
-			"DaemonSets":   relSpecs.DaemonSets,
-			"StatefulSets": relSpecs.StatefulSets,
-		}).Debug("Kubedog of ", rel.UniqName())
-		if err != nil {
-			return err
-		}
-
-		// Merge specs
-		specs.DaemonSets = append(specs.DaemonSets, relSpecs.DaemonSets...)
-		specs.Deployments = append(specs.Deployments, relSpecs.Deployments...)
-		specs.StatefulSets = append(specs.StatefulSets, relSpecs.StatefulSets...)
-		specs.Jobs = append(specs.Jobs, relSpecs.Jobs...)
+	mapSpecs, err := release.MakeMapSpecs(c.Releases, manifestPath)
+	if err != nil {
+		return err
 	}
 
 	progress, _ := time.ParseDuration("5s")
 	timeout, _ := time.ParseDuration("5m")
+	opts := multitrack.MultitrackOptions{
+		StatusProgressPeriod: progress,
+		Options: tracker.Options{
+			Timeout:      timeout,
+			LogsFromTime: time.Now(),
+		},
+	}
 
-	err = kube.Init(kube.InitOptions{})
+	//err = kube.Init(kube.InitOptions{})
+
+	kubeConfig, err := kube.GetKubeConfig(kube.InitOptions{}.KubeConfigOptions)
 	if err != nil {
 		return err
 	}
 
-	err = multitrack.Multitrack(kube.Kubernetes,
-		specs,
-		multitrack.MultitrackOptions{
-			StatusProgressPeriod: progress,
-			Options: tracker.Options{
-				Timeout:      timeout,
-				LogsFromTime: time.Now(),
-			},
-		})
-	if err != nil {
+	goSpecs := &parallel.Group{}
+	for ns, specs := range mapSpecs {
+		log.Info("🐶 kubedog for ", ns)
+		kubeConfig.DefaultNamespace = ns
+		client, err := kubernetes.NewForConfig(kubeConfig.Config)
+		if err != nil {
+			return err
+		}
+		//multitrack.Multitrack(client, *specs, opts)
+
+		goSpecs.Go(multitrack.Multitrack, client, *specs, opts)
+	}
+
+	if err != goSpecs.Wait() {
 		return err
 	}
 
 	g := &parallel.Group{}
-	log.Debug("🐞 Run sync with kubedog")
 	g.Go(c.SyncReleases, manifestPath, async)
 	return g.Wait()
 }

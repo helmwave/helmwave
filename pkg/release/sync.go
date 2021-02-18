@@ -12,7 +12,7 @@ import (
 var emptyReleases = errors.New("releases are empty")
 
 func (rel *Config) Sync(manifestPath string) error {
-	log.Infof("🛥 %s -> %s", rel.Name, rel.Options.Namespace)
+	log.Infof("🛥 %s", rel.UniqName())
 
 	// I hate Private
 	_ = os.Setenv("HELM_NAMESPACE", rel.Options.Namespace)
@@ -23,7 +23,9 @@ func (rel *Config) Sync(manifestPath string) error {
 	}
 
 	install, err := rel.Install(cfg, settings)
-	log.Trace(install.Manifest)
+	if install != nil {
+		log.Trace(install.Manifest)
+	}
 
 	if err != nil {
 		return err
@@ -48,7 +50,7 @@ func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
 		log.Error("❌ ", err)
 		*fails = append(*fails, rel)
 	} else {
-		log.Infof("✅ %s -> %s", rel.Name, rel.Options.Namespace)
+		log.Infof("✅ %s", rel.UniqName())
 	}
 }
 

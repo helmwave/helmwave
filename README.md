@@ -43,6 +43,10 @@ Speed of deploy <sup>[*]</sup> | 10 sec | 2 min
 
 `*` - WIP
 
+## Todo:
+- buy a domain
+- make docs
+
 ## 📥 Installation ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total) ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)

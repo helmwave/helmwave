@@ -82,7 +82,7 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 		histClient.Max = 1
 		_, err := histClient.Run(rel.Name)
 		if err == driver.ErrReleaseNotFound {
-			log.Debugf("🧐 Release %q in %q does not exist. Installing it now.\n", rel.Name, rel.Options.Namespace)
+			log.Debugf("🧐 Release %q in %q does not exist. Installing it now.", rel.Name, rel.Options.Namespace)
 
 			instClient := action.NewInstall(cfg)
 
@@ -106,7 +106,7 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 			instClient.Description = client.Description
 
 			if instClient.DryRun {
-				instClient.ReleaseName = "RELEASE-NAME"
+				//instClient.ReleaseName = "RELEASE-NAME"
 				instClient.Replace = true
 			}
 

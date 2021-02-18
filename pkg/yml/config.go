@@ -8,6 +8,6 @@ import (
 type Config struct {
 	Project      string
 	Version      string
-	Repositories []repo.Config
-	Releases     []release.Config
+	Repositories []*repo.Config
+	Releases     []*release.Config
 }

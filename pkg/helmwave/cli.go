@@ -31,7 +31,7 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 	}
 
 	if c.Kubedog {
-		log.Info("Kubedog init")
+		log.Info("🐶 Kubedog enabled")
 		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm)
 	}
 
