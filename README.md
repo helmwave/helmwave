@@ -2,7 +2,7 @@
   <img  src="https://raw.githubusercontent.com/zhilyaev/helmwave/main/img/logo.png" style="max-height:100%;" height="220px" />
 </p>
 
-<h1 align="center"> HelmWave ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave) </h1>
+<h1 align="center"> HelmWave</h1>
 
 <p align="center">
   <a href="https://github.com/zhilyaev/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/zhilyaev/helmwave/workflows/release/badge.svg" /></a>
