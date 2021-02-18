@@ -16,15 +16,19 @@ type Spec struct {
 	Replicas *uint32 `json:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
 }
 
-func MakeManifest(yamlFile []byte) []Resource {
-	var manifest []Resource
+func MakeManifest(yamlFile []byte) []*Resource {
+	var manifest []*Resource
+	var a []Resource
 
 	r := bytes.NewReader(yamlFile)
 	dec := yaml.NewDecoder(r)
 
 	var t Resource
+	i := 0
 	for dec.Decode(&t) == nil {
-		manifest = append(manifest, t)
+		a = append(a, t)
+		manifest = append(manifest, &a[i])
+		i++
 	}
 
 	return manifest

@@ -9,7 +9,6 @@ import (
 	"github.com/zhilyaev/helmwave/pkg/release"
 	"github.com/zhilyaev/helmwave/pkg/repo"
 	helm "helm.sh/helm/v3/pkg/cli"
-	"k8s.io/client-go/kubernetes"
 	"time"
 )
 
@@ -60,31 +59,27 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 		},
 	}
 
-	//err = kube.Init(kube.InitOptions{})
-
-	kubeConfig, err := kube.GetKubeConfig(kube.InitOptions{}.KubeConfigOptions)
-	if err != nil {
-		return err
-	}
-
 	goSpecs := &parallel.Group{}
 	for ns, specs := range mapSpecs {
 		log.Info("🐶 kubedog for ", ns)
-		kubeConfig.DefaultNamespace = ns
-		client, err := kubernetes.NewForConfig(kubeConfig.Config)
+		err := kube.Init(kube.InitOptions{})
 		if err != nil {
 			return err
 		}
+		kube.Context = settings.KubeContext
+		kube.DefaultNamespace = ns
+
 		//multitrack.Multitrack(client, *specs, opts)
 
-		goSpecs.Go(multitrack.Multitrack, client, *specs, opts)
-	}
-
-	if err != goSpecs.Wait() {
-		return err
+		goSpecs.Go(multitrack.Multitrack, kube.Kubernetes, *specs, opts)
 	}
 
 	g := &parallel.Group{}
 	g.Go(c.SyncReleases, manifestPath, async)
-	return g.Wait()
+	err = g.Wait()
+	if err != nil {
+		return err
+	}
+
+	return goSpecs.Wait()
 }

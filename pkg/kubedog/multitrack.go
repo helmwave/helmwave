@@ -2,37 +2,39 @@ package kubedog
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-func MakeSpecs(m []Resource) (*multitrack.MultitrackSpecs, error) {
+func MakeSpecs(m []*Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
 	for _, r := range m {
+		log.Debug(r.Kind, " ", ns)
 		switch r.Kind {
 		case "Deployment":
-			s, err := r.MakeMultiTrackSpec()
+			s, err := r.MakeMultiTrackSpec(ns)
 			if err != nil {
 				return nil, err
 			}
 			specs.Deployments = append(specs.Deployments, *s)
 		case "StatefulSet":
-			s, err := r.MakeMultiTrackSpec()
+			s, err := r.MakeMultiTrackSpec(ns)
 			if err != nil {
 				return nil, err
 			}
 			specs.StatefulSets = append(specs.StatefulSets, *s)
 		case "Job":
-			s, err := r.MakeMultiTrackSpec()
+			s, err := r.MakeMultiTrackSpec(ns)
 			if err != nil {
 				return nil, err
 			}
 			specs.Jobs = append(specs.Jobs, *s)
 		case "DaemonSet":
-			s, err := r.MakeMultiTrackSpec()
+			s, err := r.MakeMultiTrackSpec(ns)
 			if err != nil {
 				return nil, err
 			}
@@ -45,11 +47,12 @@ func MakeSpecs(m []Resource) (*multitrack.MultitrackSpecs, error) {
 }
 
 // BolgenOS on max
-func (r *Resource) MakeMultiTrackSpec() (*multitrack.MultitrackSpec, error) {
+func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, error) {
 	// Default spec
 	spec := &multitrack.MultitrackSpec{
-		ResourceName:            r.Name,
-		Namespace:               r.Namespace,
+		ResourceName: r.Name,
+		//Namespace:               r.Namespace,
+		Namespace:               ns,
 		LogRegexByContainerName: map[string]*regexp.Regexp{},
 		TrackTerminationMode:    multitrack.WaitUntilResourceReady,
 		FailMode:                multitrack.FailWholeDeployProcessImmediately,
