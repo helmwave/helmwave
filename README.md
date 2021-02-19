@@ -26,7 +26,7 @@
  🚀 Features  | 🌊 HelmWave   | helmfile 
 -------------| :------------:|:-----------:
 Docker | ![Docker Image Size helmwave (latest by date)](https://img.shields.io/docker/image-size/diamon/helmwave) | ![Docker Image Size helmfile (latest by date)](https://img.shields.io/docker/image-size/chatwork/helmfile)
-[Kubedog](https://github.com/werf/kubedog) |✅|❌
+[Kubedog](https://github.com/helmwave/kubedog) |✅|❌
 Without helm binary |✅|❌
 All options helm|✅|partially
 Helm 3 |✅|✅
@@ -129,14 +129,14 @@ redis-b-slave-1    1/1     Running   0          51s
 
 ### Annotations
 
-> inspired by [werf annotations](https://werf.io/documentation/reference/deploy_annotations.html)
+> inspired by [helmwave annotations](https://helmwave.io/documentation/reference/deploy_annotations.html)
 
 ```yaml
   template:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
-        helmwave.dev/show-service-messages: "true"
+        helmwave.dev/show-service-messages: true
       {{- toYaml . | nindent 8 }}
       {{- end }}
 ```
@@ -150,7 +150,7 @@ Defines a condition when helmwave should stop tracking of the resource:
 
 #### helmwave.dev/fail-mode
 
-Defines how werf will handle a resource failure condition which occured after failures threshold has been reached for the resource during deploy process:
+Defines how helmwave will handle a resource failure condition which occured after failures threshold has been reached for the resource during deploy process:
 
 - `FailWholeDeployProcessImmediately` (default) — the entire deploy process will fail with an error if an error occurs for some resource.
 - `HopeUntilEndOfDeployProcess` — when an error occurred for the resource, set this resource into the “hope” mode, and continue tracking other resources. If all remained resources are ready or in the “hope” mode, transit the resource back to “normal” and fail the whole deploy process if an error for this resource occurs once again.
@@ -159,13 +159,13 @@ Defines how werf will handle a resource failure condition which occured after fa
 
 #### helmwave.dev/failures-allowed-per-replica
 
-By default, one error per replica is allowed before considering the whole deployment process unsuccessful. This setting defines a threshold of failures after which resource will be considered as failed and werf will handle this situation using fail mode.
+By default, one error per replica is allowed before considering the whole deployment process unsuccessful. This setting defines a threshold of failures after which resource will be considered as failed and helmwave will handle this situation using fail mode.
 
 - NUMBER
 
 #### helmwave.dev/log-regex
 
-Defines a Re2 regex template that applies to all logs of all containers of all Pods owned by a resource with this annotation. werf would show only those log lines that fit the specified regex template. By default, werf shows all log lines.
+Defines a Re2 regex template that applies to all logs of all containers of all Pods owned by a resource with this annotation. helmwave would show only those log lines that fit the specified regex template. By default, helmwave shows all log lines.
 
 - RE2_REGEX
 
@@ -177,7 +177,7 @@ Set to "true" to turn off printing logs of all containers of all Pods owned by a
 
 #### helmwave.dev/show-service-messages
 
-Set to "true" to enable additional real-time debugging info (including Kubernetes events) for a resource during tracking. By default, werf would show these service messages only if the resource has failed the entire deploy process.
+Set to "true" to enable additional real-time debugging info (including Kubernetes events) for a resource during tracking. By default, helmwave would show these service messages only if the resource has failed the entire deploy process.
 
 - "true"|"false"
 
@@ -224,7 +224,7 @@ GLOBAL OPTIONS:
    --file value, -f value   Main yml file (default: "helmwave.yml") [$HELMWAVE_FILE, $HELMWAVE_YAML_FILE, $HELMWAVE_YML_FILE]
    --plan-dir value         It keeps your state via planfile (default: ".helmwave/") [$HELMWAVE_PLAN_DIR]
    --tags value, -t value   It allows you choose releases for sync. Example: -t tag1 -t tag3,tag4 [$HELMWAVE_TAGS]
-   --parallel helm install  It allows you call helm install in parallel mode  (default: true) [$HELMWAVE_PARALLEL]
+   --parallel helm install  It allows you cacdll helm install in parallel mode  (default: true) [$HELMWAVE_PARALLEL]
    --log-format value       You can set: [ text | json | pad | emoji ] (default: "emoji") [$HELMWAVE_LOG_FORMAT]
    --log-level value        You can set: [ debug | info | warn | panic | fatal | trace ] (default: "info") [$HELMWAVE_LOG_LEVEL, $HELMWAVE_LOG_LVL]
    --log-color              Force color (default: true) [$HELMWAVE_LOG_COLOR]
