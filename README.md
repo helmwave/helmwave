@@ -229,6 +229,7 @@ GLOBAL OPTIONS:
    --log-level value        You can set: [ debug | info | warn | panic | fatal | trace ] (default: "info") [$HELMWAVE_LOG_LEVEL, $HELMWAVE_LOG_LVL]
    --log-color              Force color (default: true) [$HELMWAVE_LOG_COLOR]
    --kubedog                Enable/Disable kubedog (default: true) [$HELMWAVE_KUBEDOG]
+   --kubedog-status-interval value  Interval of kubedog status messages (default: 5s) [$HELMWAVE_KUBEDOG_STATUS_INTERVAL]
    --help, -h               show help (default: false)
    --version, -v            print the version (default: false)
 ```
