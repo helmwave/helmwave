@@ -12,12 +12,12 @@ func (c *Config) CliYml(ctx *cli.Context) error {
 
 func (c *Config) CliPlan(ctx *cli.Context) error {
 	err := c.Tpl.Render()
-	if err != err {
+	if err != nil {
 		return err
 	}
 
 	err = yml.Read(c.Tpl.To, &c.Yml)
-	if err != err {
+	if err != nil {
 		return err
 	}
 
@@ -26,7 +26,7 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {
 	err := c.CliPlan(ctx)
-	if err != err {
+	if err != nil {
 		return err
 	}
 
@@ -40,7 +40,7 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 
 func (c *Config) CliManifests(ctx *cli.Context) error {
 	err := c.CliPlan(ctx)
-	if err != err {
+	if err != nil {
 		return err
 	}
 
