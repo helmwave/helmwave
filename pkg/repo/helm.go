@@ -34,7 +34,9 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 	if err == nil && locked {
 		defer func(fileLock *flock.Flock) {
 			err := fileLock.Unlock()
-			log.Errorf("Failed to release flock: %v", err.Error())
+			if err != nil {
+				log.Errorf("Failed to release flock: %v", err.Error())
+			}
 		}(fileLock)
 	}
 
