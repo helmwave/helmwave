@@ -47,10 +47,10 @@ Call helm | via Golang Module | Shell Executor
 ## 📥 Installation ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total) ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
 - Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.0/helmwave-0.8.0-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
+    - `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.1/helmwave-0.8.1-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
 - Run as a container
-    - `$ docker run diamon/helmwave:0.8.0`
-    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.0`
+    - `$ docker run diamon/helmwave:0.8.1`
+    - `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.1`
 
 ### Build ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
@@ -70,7 +70,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.8.0
+version: 0.8.1
 
 
 repositories:
@@ -120,7 +120,7 @@ redis-b-slave-1    1/1     Running   0          51s
 
 ### RU
 - [HelmWave v0.5.0 – GitOps для твоего Kubernetes](https://habr.com/ru/post/532596/)
--  HelmWave v0.8.0 – Kubedog рядом
+-  HelmWave v0.8.1 – Kubedog рядом
 
 ## EN
 - WIP
@@ -205,7 +205,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.8.0
+   0.8.1
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -241,7 +241,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.8.0
+version: 0.8.1
 
 
 repositories:
@@ -273,7 +273,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.8.0
+version: 0.8.1
 
 
 repositories:
@@ -304,7 +304,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.8.0
+  version: 0.8.1
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -421,7 +421,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.8.0
+  version: 0.8.1
   
   
   repositories:
@@ -455,7 +455,7 @@ $ helmwave yml
   
   ```yaml
   project: my
-  version: 0.8.0
+  version: 0.8.1
   
   repositories:
     - name: bitnami

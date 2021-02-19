@@ -75,11 +75,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
 			Destination: &app.Logger.Color,
 		},
+
+		// Kubedog
 		&cli.BoolFlag{
 			Name:        "kubedog",
 			Usage:       "Enable/Disable kubedog",
 			Value:       true,
-			EnvVars:     []string{"HELMWAVE_KUBEDOG"},
+			EnvVars:     []string{"HELMWAVE_KUBEDOG", "HELMWAVE_KUBEDOG_ENABLED"},
 			Destination: &app.Kubedog.Enabled,
 		},
 		&cli.DurationFlag{
