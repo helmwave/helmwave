@@ -22,5 +22,5 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: v1.29
-          args: --timeout=5m
+          args: --timeout=5m --disable=gosimple,deadcode,unused
 
