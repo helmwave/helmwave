@@ -37,7 +37,7 @@ func (c *Config) SyncFake(manifestPath string, async bool, settings *helm.EnvSet
 	return c.Sync(manifestPath, async, settings)
 }
 
-func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm.EnvSettings, kubedogStatusPeriod time.Duration) error {
+func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm.EnvSettings, kubedogStatusPeriod time.Duration, kubedogTimeout time.Duration) error {
 	err := c.SyncFake(manifestPath, async, settings)
 	if err != nil {
 		return err
@@ -49,11 +49,10 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 		return err
 	}
 
-	timeout, _ := time.ParseDuration("5m")
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogStatusPeriod,
 		Options: tracker.Options{
-			Timeout:      timeout,
+			Timeout:      kubedogTimeout,
 			LogsFromTime: time.Now(),
 		},
 	}
@@ -61,6 +60,7 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 	goSpecs := &parallel.Group{}
 	for ns, specs := range mapSpecs {
 		log.Info("🐶 kubedog for ", ns)
+		// Needs to testing with several  ns
 		err := kube.Init(kube.InitOptions{})
 		if err != nil {
 			return err
