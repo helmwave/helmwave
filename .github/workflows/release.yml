@@ -21,3 +21,5 @@ jobs:
           goos: ${{ matrix.goos }}
           project_path: "./cmd/helmwave"
           goarch: ${{ matrix.goarch }}
+          goversion: "1.15.8"
+
