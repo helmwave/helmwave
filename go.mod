@@ -3,7 +3,7 @@ module github.com/zhilyaev/helmwave
 go 1.15
 
 require (
-	github.com/Masterminds/sprig/v3 v3.2.0
+	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/gofrs/flock v0.8.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11
@@ -16,6 +16,5 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 	helm.sh/helm/v3 v3.5.0
 	k8s.io/apimachinery v0.20.1
-	k8s.io/client-go v0.20.1
 	rsc.io/letsencrypt v0.0.3 // indirect
 )
