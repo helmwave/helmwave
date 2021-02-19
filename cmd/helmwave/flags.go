@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 	"github.com/zhilyaev/helmwave/pkg/helmwave"
+	"time"
 )
 
 func flags(app *helmwave.Config) []cli.Flag {
@@ -80,6 +81,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Value:       true,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG"},
 			Destination: &app.Kubedog,
+		},
+		&cli.DurationFlag{
+			Name:        "kubedog-status-interval",
+			Usage:       "Interval of kubedog status messages",
+			Value:       5 * time.Second,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
+			Destination: &app.KubedogStatusInterval,
 		},
 	}
 }

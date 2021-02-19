@@ -32,7 +32,7 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 
 	if c.Kubedog {
 		log.Info("🐶 Kubedog enabled")
-		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm)
+		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm, c.KubedogStatusInterval)
 	}
 
 	return c.Yml.Sync(c.PlanPath+".manifest/", c.Parallel, c.Helm)
