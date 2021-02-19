@@ -37,7 +37,7 @@ func (c *Config) SyncFake(manifestPath string, async bool, settings *helm.EnvSet
 	return c.Sync(manifestPath, async, settings)
 }
 
-func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm.EnvSettings) error {
+func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm.EnvSettings, kubedogStatusPeriod time.Duration) error {
 	err := c.SyncFake(manifestPath, async, settings)
 	if err != nil {
 		return err
@@ -49,10 +49,9 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 		return err
 	}
 
-	progress, _ := time.ParseDuration("5s")
 	timeout, _ := time.ParseDuration("5m")
 	opts := multitrack.MultitrackOptions{
-		StatusProgressPeriod: progress,
+		StatusProgressPeriod: kubedogStatusPeriod,
 		Options: tracker.Options{
 			Timeout:      timeout,
 			LogsFromTime: time.Now(),

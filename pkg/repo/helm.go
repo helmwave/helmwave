@@ -32,7 +32,10 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
 	if err == nil && locked {
-		defer fileLock.Unlock()
+		defer func(fileLock *flock.Flock) {
+			err := fileLock.Unlock()
+			log.Errorf("Failed to release flock: %v", err.Error())
+		}(fileLock)
 	}
 
 	f, err := repo.LoadFile(repofile)
@@ -50,7 +53,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 
 		_, err = chartRepo.DownloadIndexFile()
 		if err != nil {
-			log.Warn("⚠️ looks like %v is not a valid chart repository or cannot be reached", o.URL)
+			log.Warnf("⚠️ looks like %v is not a valid chart repository or cannot be reached", o.URL)
 		}
 
 		f.Update(o)

@@ -12,12 +12,12 @@ func (c *Config) CliYml(ctx *cli.Context) error {
 
 func (c *Config) CliPlan(ctx *cli.Context) error {
 	err := c.Tpl.Render()
-	if err != err {
+	if err != nil {
 		return err
 	}
 
 	err = yml.Read(c.Tpl.To, &c.Yml)
-	if err != err {
+	if err != nil {
 		return err
 	}
 
@@ -26,13 +26,13 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {
 	err := c.CliPlan(ctx)
-	if err != err {
+	if err != nil {
 		return err
 	}
 
-	if c.Kubedog {
+	if c.Kubedog.Enabled {
 		log.Info("🐶 Kubedog enabled")
-		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm)
+		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm, c.Kubedog.StatusInterval)
 	}
 
 	return c.Yml.Sync(c.PlanPath+".manifest/", c.Parallel, c.Helm)
@@ -40,7 +40,7 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 
 func (c *Config) CliManifests(ctx *cli.Context) error {
 	err := c.CliPlan(ctx)
-	if err != err {
+	if err != nil {
 		return err
 	}
 

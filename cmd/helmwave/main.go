@@ -34,7 +34,7 @@ func command404(c *cli.Context, s string) {
 
 func before(c *cli.Context) error {
 	err := app.InitLogger()
-	if err != err {
+	if err != nil {
 		return err
 	}
 
