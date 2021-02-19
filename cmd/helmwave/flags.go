@@ -75,8 +75,8 @@ func flags(app *helmwave.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
 			Destination: &app.Logger.Color,
 		},
-
-		// Kubedog
+		//
+		// Kubedog Config
 		&cli.BoolFlag{
 			Name:        "kubedog",
 			Usage:       "Enable/Disable kubedog",
@@ -90,6 +90,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Value:       5 * time.Second,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
 			Destination: &app.Kubedog.StatusInterval,
+		},
+		&cli.DurationFlag{
+			Name:        "kubedog-timeout",
+			Usage:       "Timout of kubedog multitrackers",
+			Value:       5 * time.Minute,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
+			Destination: &app.Kubedog.Timeout,
 		},
 	}
 }
