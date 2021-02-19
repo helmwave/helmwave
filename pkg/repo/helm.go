@@ -50,7 +50,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 
 		_, err = chartRepo.DownloadIndexFile()
 		if err != nil {
-			log.Warn("⚠️ looks like %v is not a valid chart repository or cannot be reached", o.URL)
+			log.Warnf("⚠️ looks like %v is not a valid chart repository or cannot be reached", o.URL)
 		}
 
 		f.Update(o)
