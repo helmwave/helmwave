@@ -26,11 +26,16 @@ func Save(file string, in interface{}) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
 	data := Byte(in)
 
-	f.Write(data)
-	return f.Close()
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return f.Sync()
 
 }
 
