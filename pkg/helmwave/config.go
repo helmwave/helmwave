@@ -17,8 +17,11 @@ type Config struct {
 	PlanPath string
 	Logger   *Log
 	Parallel bool
-	Kubedog  struct {
-		Enabled        bool
-		StatusInterval time.Duration
-	}
+	Kubedog  *KubedogConfig
+}
+
+type KubedogConfig struct {
+	Enabled        bool
+	StatusInterval time.Duration
+	Timeout        time.Duration
 }
