@@ -9,14 +9,16 @@ import (
 )
 
 type Config struct {
-	Version               string
-	Helm                  *helm.EnvSettings
-	Tags                  cli.StringSlice
-	Tpl                   template.Tpl
-	Yml                   yml.Config
-	PlanPath              string
-	Logger                *Log
-	Parallel              bool
-	Kubedog               bool
-	KubedogStatusInterval time.Duration
+	Version  string
+	Helm     *helm.EnvSettings
+	Tags     cli.StringSlice
+	Tpl      template.Tpl
+	Yml      yml.Config
+	PlanPath string
+	Logger   *Log
+	Parallel bool
+	Kubedog  struct {
+		Enabled        bool
+		StatusInterval time.Duration
+	}
 }

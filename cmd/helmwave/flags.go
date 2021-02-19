@@ -80,14 +80,14 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Usage:       "Enable/Disable kubedog",
 			Value:       true,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG"},
-			Destination: &app.Kubedog,
+			Destination: &app.Kubedog.Enabled,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-status-interval",
 			Usage:       "Interval of kubedog status messages",
 			Value:       5 * time.Second,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
-			Destination: &app.KubedogStatusInterval,
+			Destination: &app.Kubedog.StatusInterval,
 		},
 	}
 }
