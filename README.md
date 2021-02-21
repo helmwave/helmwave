@@ -44,17 +44,28 @@ Call helm | via Golang Module | Shell Executor
 - buy a domain
 - make docs
 
-## 📥 Installation ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total) ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
+## 📥 Installation
 
-- Download one of [releases](https://github.com/zhilyaev/helmwave/releases)
-  `$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.2/helmwave-0.8.2-linux-amd64.tar.gz -O - | tar -xz && cp -f helmwave /usr/local/bin/`
-- Compile with go
-  `$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.8.2`
-- Run as a container
-  `$ docker run diamon/helmwave:0.8.2`
-  `$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.2`
+### Download one of [releases](https://github.com/zhilyaev/helmwave/releases) ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total)
 
-### Build ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
+```bash
+$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.2/helmwave-0.8.2-linux-amd64.tar.gz -O - | tar -xz
+$ mv helmwave /usr/local/bin/
+```
+### Install with go ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
+
+```bash
+$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.8.2
+```
+
+### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
+
+```
+$ docker run diamon/helmwave:0.8.2
+$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.2
+```
+
+## Build ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
 $ git clone git@github.com:zhilyaev/helmwave.git
