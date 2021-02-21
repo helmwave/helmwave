@@ -65,7 +65,7 @@ $ docker run diamon/helmwave:0.8.2
 $ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.2
 ```
 
-## Build ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
+### Build with ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
 $ git clone git@github.com:zhilyaev/helmwave.git
@@ -74,7 +74,7 @@ $ go build ./cmd/helmwave
 $ mv helmwave /usr/local/bin/
 ```
 
-## 🔰 Getting Started 
+## 🔰 Getting Started
 
 Let's start with a simple **helmwave** and gradually improve it to fit your use-case!
 
