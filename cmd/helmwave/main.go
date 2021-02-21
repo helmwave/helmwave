@@ -3,8 +3,8 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/zhilyaev/helmwave/pkg/helmwave"
 	helmwaveCli "github.com/zhilyaev/helmwave/pkg/cli"
+	"github.com/zhilyaev/helmwave/pkg/helmwave"
 	"os"
 )
 
@@ -26,4 +26,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-

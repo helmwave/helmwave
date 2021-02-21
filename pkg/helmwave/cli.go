@@ -1,11 +1,11 @@
 package helmwave
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/zhilyaev/helmwave/pkg/yml"
 	"os"
-	"fmt"
 )
 
 func (c *Config) InitApp(ctx *cli.Context) error {
@@ -29,17 +29,17 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 	}
 
 	opts := &yml.SavePlanOptions{}
-	opts.File(c.PlanPath+PLANFILE).Dir(c.PlanPath)
+	opts.File(c.PlanPath + PLANFILE).Dir(c.PlanPath)
 
 	switch ctx.Command.Name {
-		case "repos":
-			opts.PlanRepos()
-		case "releases":
-			opts.PlanReleases()
-		case "values":
-			opts.PlanValues()
-		default:
-			opts.PlanRepos().PlanReleases().PlanValues()
+	case "repos":
+		opts.PlanRepos()
+	case "releases":
+		opts.PlanReleases()
+	case "values":
+		opts.PlanValues()
+	default:
+		opts.PlanRepos().PlanReleases().PlanValues()
 	}
 
 	err := c.Tpl.Render()

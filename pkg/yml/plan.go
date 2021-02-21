@@ -9,11 +9,11 @@ import (
 type SavePlanOptions struct {
 	file string
 	tags []string
-	dir string
+	dir  string
 
 	planReleases bool
-	planRepos bool
-	planValues bool
+	planRepos    bool
+	planValues   bool
 }
 
 func (o *SavePlanOptions) File(file string) *SavePlanOptions {

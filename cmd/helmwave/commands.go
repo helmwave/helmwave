@@ -10,7 +10,7 @@ func commands() []*cli.Command {
 			Name:   "yml",
 			Usage:  "📄 Render helmwave.yml.tpl -> helmwave.yml",
 			Action: app.CliYml,
-			Before:  app.InitApp,
+			Before: app.InitApp,
 		},
 		planCommand(),
 		{
@@ -28,8 +28,8 @@ func commands() []*cli.Command {
 			Before:  app.InitApp,
 		},
 		{
-			Name: "version",
-			Usage: "Print helmwave version",
+			Name:   "version",
+			Usage:  "Print helmwave version",
 			Action: app.CliVersion,
 		},
 	}
@@ -38,22 +38,22 @@ func commands() []*cli.Command {
 
 func planCommand() *cli.Command {
 	return &cli.Command{
-		Name: "planfile",
+		Name:    "planfile",
 		Aliases: []string{"plan"},
 		Usage:   "📜 Generate planfile to plandir",
-		Action: app.CliPlan,
+		Action:  app.CliPlan,
 		Before:  app.InitApp,
 		Subcommands: []*cli.Command{
 			{
-				Name: "repos",
+				Name:   "repos",
 				Action: app.CliPlan,
 			},
 			{
-				Name: "releases",
+				Name:   "releases",
 				Action: app.CliPlan,
 			},
 			{
-				Name: "values",
+				Name:   "values",
 				Action: app.CliPlan,
 			},
 		},
