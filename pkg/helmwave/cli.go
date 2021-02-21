@@ -4,13 +4,38 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/zhilyaev/helmwave/pkg/yml"
+	"os"
 )
+
+func (c *Config) InitApp(ctx *cli.Context) error {
+	err := c.InitLogger()
+	if err != nil {
+		return err
+	}
+
+	c.InitPlan()
+	return nil
+}
 
 func (c *Config) CliYml(ctx *cli.Context) error {
 	return c.Tpl.Render()
 }
 
 func (c *Config) CliPlan(ctx *cli.Context) error {
+	opts := &yml.SavePlanOptions{}
+	opts.File(c.PlanPath+PLANFILE).Dir(c.PlanPath)
+
+	switch ctx.Command.Name {
+		case "repo":
+			opts.PlanRepos()
+		case "releases":
+			opts.PlanReleases()
+		case "values":
+			opts.PlanValues()
+		default:
+			opts.PlanRepos().PlanReleases().PlanValues()
+	}
+
 	err := c.Tpl.Render()
 	if err != nil {
 		return err
@@ -21,7 +46,9 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 		return err
 	}
 
-	return c.Yml.SavePlan(c.PlanPath+PLANFILE, c.Tags.Value(), c.PlanPath)
+	opts.Tags(c.Tags.Value())
+
+	return c.Yml.SavePlan(opts)
 }
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {
@@ -45,4 +72,14 @@ func (c *Config) CliManifests(ctx *cli.Context) error {
 	}
 
 	return c.Yml.SyncFake(c.PlanPath+".manifest/", c.Parallel, c.Helm)
+}
+
+func (c *Config) CliVersion(ctx *cli.Context) error {
+	cli.ShowVersion(ctx)
+	return nil
+}
+
+func Command404(c *cli.Context, s string) {
+	log.Errorf("👻 Command %q not found \n", s)
+	os.Exit(127)
 }

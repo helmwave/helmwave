@@ -6,22 +6,68 @@ import (
 	"github.com/zhilyaev/helmwave/pkg/repo"
 )
 
-func (c *Config) SavePlan(file string, tags []string, dir string) error {
-	err := c.Plan(tags, dir)
+type SavePlanOptions struct {
+	file string
+	tags []string
+	dir string
+
+	planReleases bool
+	planRepos bool
+	planValues bool
+}
+
+func (o *SavePlanOptions) File(file string) *SavePlanOptions {
+	o.file = file
+	return o
+}
+
+func (o *SavePlanOptions) Tags(tags []string) *SavePlanOptions {
+	o.tags = tags
+	return o
+}
+
+func (o *SavePlanOptions) Dir(dir string) *SavePlanOptions {
+	o.dir = dir
+	return o
+}
+
+func (o *SavePlanOptions) PlanReleases() *SavePlanOptions {
+	o.planReleases = true
+	return o
+}
+
+func (o *SavePlanOptions) PlanRepos() *SavePlanOptions {
+	o.planRepos = true
+	return o
+}
+
+func (o *SavePlanOptions) PlanValues() *SavePlanOptions {
+	o.planValues = true
+	return o
+}
+
+func (c *Config) SavePlan(o *SavePlanOptions) error {
+	err := c.Plan(o)
 	if err != nil {
 		return err
 	}
-	return Save(file, &c)
+	return Save(o.file, &c)
 }
 
-func (c *Config) Plan(tags []string, dir string) (err error) {
-	c.PlanReleases(tags)
-
-	if err = c.PlanReleasesValues(dir); err != nil {
-		return err
+func (c *Config) Plan(o *SavePlanOptions) error {
+	if o.planReleases {
+		c.PlanReleases(o.tags)
 	}
 
-	c.PlanRepos()
+	if o.planValues {
+		if err := c.PlanReleasesValues(o.dir); err != nil {
+			return err
+		}
+	}
+
+	if o.planRepos {
+		c.PlanRepos()
+	}
 
 	return nil
 }
