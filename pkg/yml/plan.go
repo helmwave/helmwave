@@ -57,6 +57,8 @@ func (c *Config) SavePlan(o *SavePlanOptions) error {
 func (c *Config) Plan(o *SavePlanOptions) error {
 	if o.planReleases {
 		c.PlanReleases(o.tags)
+	} else {
+		c.Releases = release.Plan(o.tags, c.Releases)
 	}
 
 	if o.planValues {
