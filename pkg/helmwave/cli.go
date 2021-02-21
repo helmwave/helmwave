@@ -31,7 +31,7 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 	opts.File(c.PlanPath+PLANFILE).Dir(c.PlanPath)
 
 	switch ctx.Command.Name {
-		case "repo":
+		case "repos":
 			opts.PlanRepos()
 		case "releases":
 			opts.PlanReleases()
