@@ -26,7 +26,7 @@
  🚀 Features  | 🌊 HelmWave   | helmfile 
 -------------| :------------:|:-----------:
 Docker | ![Docker Image Size helmwave (latest by date)](https://img.shields.io/docker/image-size/diamon/helmwave) | ![Docker Image Size helmfile (latest by date)](https://img.shields.io/docker/image-size/chatwork/helmfile)
-[Kubedog](https://github.com/helmwave/kubedog) |✅|❌
+[Kubedog](https://github.com/werf/kubedog) |✅|❌
 Without helm binary |✅|❌
 All options helm|✅|partially
 Helm 3 |✅|✅
@@ -55,11 +55,7 @@ Call helm | via Golang Module | Shell Executor
 ### Build ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
-$ export GO111MODULE=on
-$ git clone git@github.com:zhilyaev/helmwave.git $GOPATH/src/github.com/zhilyaev/helmwave
-$ cd $GOPATH/src/github.com/zhilyaev/helmwave
-$ go build github.com/zhilyaev/helmwave/cmd/helmwave
-$ mv helmwave /usr/local/bin 
+$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.8.2
 ```
 
 ## 🔰 Getting Started 
