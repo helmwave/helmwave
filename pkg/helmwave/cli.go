@@ -22,6 +22,11 @@ func (c *Config) CliYml(ctx *cli.Context) error {
 }
 
 func (c *Config) CliPlan(ctx *cli.Context) error {
+	// We do not want any non-existing subcommands
+	if ctx.Args().Present() {
+		return cli.Exit("Subcommand not found", 123)
+	}
+
 	opts := &yml.SavePlanOptions{}
 	opts.File(c.PlanPath+PLANFILE).Dir(c.PlanPath)
 

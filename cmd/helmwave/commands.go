@@ -41,10 +41,11 @@ func planCommand() *cli.Command {
 		Name: "planfile",
 		Aliases: []string{"plan"},
 		Usage:   "📜 Generate planfile to plandir",
+		Action: app.CliPlan,
 		Before:  app.InitApp,
 		Subcommands: []*cli.Command{
 			{
-				Name: "repo",
+				Name: "repos",
 				Action: app.CliPlan,
 			},
 			{
@@ -53,10 +54,6 @@ func planCommand() *cli.Command {
 			},
 			{
 				Name: "values",
-				Action: app.CliPlan,
-			},
-			{
-				Name: "all",
 				Action: app.CliPlan,
 			},
 		},
