@@ -5,6 +5,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"github.com/zhilyaev/helmwave/pkg/yml"
 	"os"
+	"fmt"
 )
 
 func (c *Config) InitApp(ctx *cli.Context) error {
@@ -24,7 +25,7 @@ func (c *Config) CliYml(ctx *cli.Context) error {
 func (c *Config) CliPlan(ctx *cli.Context) error {
 	// We do not want any non-existing subcommands
 	if ctx.Args().Present() {
-		return cli.Exit("Subcommand not found", 123)
+		return cli.Exit(fmt.Sprintf("Subcommand %s not found", ctx.Args().First()), 127)
 	}
 
 	opts := &yml.SavePlanOptions{}
