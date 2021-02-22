@@ -33,7 +33,7 @@ func (o *SavePlanOptions) Dir(dir string) *SavePlanOptions {
 
 func (o *SavePlanOptions) PlanReleases() *SavePlanOptions {
 	o.planReleases = true
-	return o
+	return o.PlanValues()
 }
 
 func (o *SavePlanOptions) PlanRepos() *SavePlanOptions {
@@ -55,14 +55,16 @@ func (c *Config) SavePlan(o *SavePlanOptions) error {
 }
 
 func (c *Config) Plan(o *SavePlanOptions) error {
-	if o.planReleases {
-		c.PlanReleases(o.tags)
-	} else {
-		c.Releases = release.Plan(o.tags, c.Releases)
-	}
+	c.PlanReleases(o.tags)
 
 	if o.planValues {
 		if err := c.PlanReleasesValues(o.dir); err != nil {
+			return err
+		}
+	}
+
+	if o.planReleases {
+		if err := c.PlanManifests(o.dir); err != nil {
 			return err
 		}
 	}
@@ -94,4 +96,12 @@ func (c *Config) PlanReleases(tags []string) {
 
 func (c *Config) PlanReleasesValues(dir string) error {
 	return release.PlanValues(c.Releases, dir)
+}
+
+func (c *Config) PlanManifests(dir string) error {
+	for i, _ := range c.Releases {
+		c.Releases[i].Options.DryRun = true
+	}
+
+	return c.SyncReleases(dir+".manifest/", false)
 }
