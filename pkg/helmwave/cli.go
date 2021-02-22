@@ -29,7 +29,6 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 	}
 
 	opts := &yml.SavePlanOptions{}
-	opts.File(c.PlanPath + PLANFILE).Dir(c.PlanPath)
 
 	switch ctx.Command.Name {
 	case "repos":
@@ -41,6 +40,16 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 	default:
 		opts.PlanRepos().PlanReleases().PlanValues()
 	}
+
+	return c.plan(opts)
+}
+
+func (c *Config) plan(opts *yml.SavePlanOptions) error {
+	if opts == nil {
+		opts = &yml.SavePlanOptions{}
+	}
+
+	opts.File(c.PlanPath + PLANFILE).Dir(c.PlanPath)
 
 	err := c.Tpl.Render()
 	if err != nil {
@@ -58,7 +67,9 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 }
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {
-	err := c.CliPlan(ctx)
+	opts := &yml.SavePlanOptions{}
+	opts.PlanValues().PlanRepos().PlanValues()
+	err := c.plan(opts)
 	if err != nil {
 		return err
 	}
