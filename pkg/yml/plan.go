@@ -103,5 +103,11 @@ func (c *Config) PlanManifests(dir string) error {
 		c.Releases[i].Options.DryRun = true
 	}
 
-	return c.SyncReleases(dir+".manifest/", false)
+	err := c.SyncReleases(dir+".manifest/", false)
+
+	for i, _ := range c.Releases {
+		c.Releases[i].Options.DryRun = false
+	}
+	
+	return err
 }
