@@ -92,6 +92,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Destination: &app.Kubedog.StatusInterval,
 		},
 		&cli.DurationFlag{
+			Name:        "kubedog-start-delay",
+			Usage:       "Delay kubedog start, don't make it too late",
+			Value:       time.Second,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_START_DELAY"},
+			Destination: &app.Kubedog.StartDelay,
+		},
+		&cli.DurationFlag{
 			Name:        "kubedog-timeout",
 			Usage:       "Timout of kubedog multitrackers",
 			Value:       5 * time.Minute,
