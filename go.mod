@@ -4,7 +4,9 @@ go 1.15
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.0
+	github.com/bombsimon/logrusr v1.0.0
 	github.com/fatih/color v1.9.0 // indirect
+	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gofrs/flock v0.8.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11
@@ -17,5 +19,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	helm.sh/helm/v3 v3.5.0
 	k8s.io/apimachinery v0.20.4
+	k8s.io/klog/v2 v2.4.0
 	rsc.io/letsencrypt v0.0.3 // indirect
 )

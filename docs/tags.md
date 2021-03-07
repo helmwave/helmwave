@@ -57,15 +57,11 @@ This command will deploy only `redis-a` & `memcached-a`
 $ helmwave -t a deploy
 ```
 
-
-
 This command will deploy only `redis-a` & `redis-b`
 
 ```shell script
 $ helmwave -t redis deploy
 ```
-
-
 
 This command will deploy only `redis-b`
 
