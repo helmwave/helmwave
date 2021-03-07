@@ -51,12 +51,15 @@ func (rel *Config) waitForDependency(ch <-chan pubsub.ReleaseStatus, name string
 	ticker := time.NewTicker(5 * time.Second)
 	var status pubsub.ReleaseStatus
 
-	select {
-	case status = <-ch:
-		ticker.Stop()
-		break
-	case <-ticker.C:
-		log.Infof("release %s is waiting for dependency %s", rel.Name, name)
+F:
+	for {
+		select {
+		case status = <-ch:
+			ticker.Stop()
+			break F
+		case <-ticker.C:
+			log.Infof("release %s is waiting for dependency %s", rel.Name, name)
+		}
 	}
 	log.Infof("dependency %s of release %s done", name, rel.Name)
 	return status
