@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/pubsub"
 	"sort"
+	"time"
 )
 
 var releasePubSub = pubsub.NewReleasePubSub()
@@ -38,8 +39,14 @@ func (rel *Config) waitForDependencies() (err error) {
 	}
 
 	for name, ch := range rel.dependencies {
-		log.Infof("release %s is waiting for dependency %s", rel.Name, name)
-		status := <-ch
+		ticker := time.NewTicker(5 * time.Second)
+		var status pubsub.ReleaseStatus
+		select {
+		case status = <-ch:
+			ticker.Stop()
+		case <-ticker.C:
+			log.Infof("release %s is waiting for dependency %s", rel.Name, name)
+		}
 		log.Infof("dependency %s of release %s done", name, rel.Name)
 		if status == pubsub.ReleaseFailed {
 			err = DependencyFailedError
