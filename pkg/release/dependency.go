@@ -11,11 +11,15 @@ var releasePubSub = pubsub.NewReleasePubSub()
 var DependencyFailedError = errors.New("dependency failed")
 
 func (rel *Config) NotifySuccess() {
-	releasePubSub.PublishSuccess(rel.Name)
+	if !rel.Options.DryRun {
+		releasePubSub.PublishSuccess(rel.Name)
+	}
 }
 
 func (rel *Config) NotifyFailed() {
-	releasePubSub.PublishFailed(rel.Name)
+	if !rel.Options.DryRun {
+		releasePubSub.PublishFailed(rel.Name)
+	}
 }
 
 func (rel *Config) addDependency(name string) {
@@ -29,6 +33,10 @@ func (rel *Config) addDependency(name string) {
 }
 
 func (rel *Config) waitForDependencies() (err error) {
+	if rel.Options.DryRun {
+		return nil
+	}
+
 	for name, ch := range rel.dependencies {
 		log.Infof("release %s is waiting for dependency %s", rel.Name, name)
 		status := <-ch
