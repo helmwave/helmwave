@@ -8,6 +8,7 @@ require (
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gofrs/flock v0.8.0
+	github.com/hashicorp/go-multierror v1.0.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11
 	github.com/sirupsen/logrus v1.8.0
@@ -20,5 +21,6 @@ require (
 	helm.sh/helm/v3 v3.5.0
 	k8s.io/apimachinery v0.20.4
 	k8s.io/klog/v2 v2.4.0
+	k8s.io/client-go v0.20.2
 	rsc.io/letsencrypt v0.0.3 // indirect
 )
