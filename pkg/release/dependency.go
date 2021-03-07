@@ -39,20 +39,27 @@ func (rel *Config) waitForDependencies() (err error) {
 	}
 
 	for name, ch := range rel.dependencies {
-		ticker := time.NewTicker(5 * time.Second)
-		var status pubsub.ReleaseStatus
-		select {
-		case status = <-ch:
-			ticker.Stop()
-		case <-ticker.C:
-			log.Infof("release %s is waiting for dependency %s", rel.Name, name)
-		}
-		log.Infof("dependency %s of release %s done", name, rel.Name)
+		status := rel.waitForDependency(ch, name)
 		if status == pubsub.ReleaseFailed {
 			err = DependencyFailedError
 		}
 	}
 	return
+}
+
+func (rel *Config) waitForDependency(ch <-chan pubsub.ReleaseStatus, name string) pubsub.ReleaseStatus {
+	ticker := time.NewTicker(5 * time.Second)
+	var status pubsub.ReleaseStatus
+
+	select {
+	case status = <-ch:
+		ticker.Stop()
+		break
+	case <-ticker.C:
+		log.Infof("release %s is waiting for dependency %s", rel.Name, name)
+	}
+	log.Infof("dependency %s of release %s done", name, rel.Name)
+	return status
 }
 
 func (rel *Config) HandleDependencies(releases []*Config) {
