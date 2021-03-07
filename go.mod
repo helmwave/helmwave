@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.0
 	github.com/bombsimon/logrusr v1.0.0
 	github.com/fatih/color v1.9.0 // indirect
+	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gofrs/flock v0.8.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11
