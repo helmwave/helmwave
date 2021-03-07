@@ -58,11 +58,11 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 		return err
 	}
 
-	go func(c *Config, manifestPath string, async bool) {
-		wg.Add(1)
+	wg.Add(1)
+	go func(c *Config, manifestPath string, async bool, wg *parallel.WaitGroup) {
 		defer wg.Done()
 		wg.ErrChan() <- c.SyncReleases(manifestPath, async)
-	}(c, manifestPath, async)
+	}(c, manifestPath, async, wg)
 
 	return wg.Wait()
 }
@@ -87,9 +87,9 @@ func (c *Config) runMultitracks(mapSpecs map[string]*multitrack.MultitrackSpecs,
 		kube.DefaultNamespace = ns
 
 		kubeClient := kube.Client
+		wg.Add(1)
 
 		go func(delay time.Duration, kubeClient kubernetes.Interface, specs multitrack.MultitrackSpecs, opts multitrack.MultitrackOptions, wg *parallel.WaitGroup) {
-			wg.Add(1)
 			defer wg.Done()
 			time.Sleep(delay)
 

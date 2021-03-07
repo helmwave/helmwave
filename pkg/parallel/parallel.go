@@ -8,6 +8,7 @@ import (
 type WaitGroup struct {
 	syncWG  *sync.WaitGroup
 	errChan chan error
+	err     *multierror.Error
 }
 
 func (wg *WaitGroup) ErrChan() chan<- error {
@@ -18,21 +19,24 @@ func NewWaitGroup() *WaitGroup {
 	return &WaitGroup{
 		syncWG:  &sync.WaitGroup{},
 		errChan: make(chan error),
+		err:     &multierror.Error{},
+	}
+}
+
+func (wg *WaitGroup) gatherErrors() {
+	for err := range wg.errChan {
+		if err != nil {
+			wg.err = multierror.Append(wg.err, err)
+		}
 	}
 }
 
 func (wg *WaitGroup) Wait() error {
+	go wg.gatherErrors()
 	wg.syncWG.Wait()
+	close(wg.errChan)
 
-	result := &multierror.Error{}
-
-	for err := range wg.errChan {
-		if err != nil {
-			result = multierror.Append(result, err)
-		}
-	}
-
-	return result.ErrorOrNil()
+	return wg.err.ErrorOrNil()
 }
 
 func (wg *WaitGroup) Add(i int) {
