@@ -12,18 +12,17 @@
 </p>
 
 
-🌊 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**. HelmWave is like docker-compose for helm.
-
-
+🌊 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**.
+HelmWave is like docker-compose for helm.
 
 - Keep a directory of chart value files and maintain changes in version control.
 - Apply CI/CD to configuration changes
 - Template values
 - Aggregate your application
 
-
 ## Comparison
- 🚀 Features  | 🌊 HelmWave   | helmfile 
+
+🚀 Features  | 🌊 HelmWave   | helmfile
 -------------| :------------:|:-----------:
 Docker | ![Docker Image Size helmwave (latest by date)](https://img.shields.io/docker/image-size/diamon/helmwave) | ![Docker Image Size helmfile (latest by date)](https://img.shields.io/docker/image-size/chatwork/helmfile)
 [Kubedog](https://github.com/werf/kubedog) |✅|❌
@@ -41,6 +40,7 @@ Sprig | ✅|✅
 Call helm | via Golang Module | Shell Executor
 
 ## Todo:
+
 - buy a domain
 - make docs
 
@@ -52,6 +52,7 @@ Call helm | via Golang Module | Shell Executor
 $ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.3/helmwave-0.8.3-linux-amd64.tar.gz -O - | tar -xz
 $ mv helmwave /usr/local/bin/
 ```
+
 ### Install with go ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
@@ -111,7 +112,8 @@ releases:
 $ helmwave deploy
 ```
 
-Congratulations! 
+Congratulations!
+
 ```shell script
 $ helm list -n my-namespace
 NAME                    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
@@ -131,10 +133,12 @@ redis-b-slave-1    1/1     Running   0          51s
 ## Articles
 
 ### RU
+
 - [HelmWave v0.5.0 – GitOps для твоего Kubernetes](https://habr.com/ru/post/532596/)
--  HelmWave v0.8.3 – Kubedog рядом
+- HelmWave v0.8.3 – Kubedog рядом
 
 ## EN
+
 - WIP
 
 ## [Documentation](https://zhilyaev.github.io/helmwave/)
@@ -157,17 +161,22 @@ redis-b-slave-1    1/1     Running   0          51s
 
 Defines a condition when helmwave should stop tracking of the resource:
 
-- `WaitUntilResourceReady` (default) — the entire deployment process would monitor and wait for the readiness of the resource having this annotation. Since this mode is enabled by default, the deployment process would wait for all resources to be ready. 
+- `WaitUntilResourceReady` (default) — the entire deployment process would monitor and wait for the readiness of the
+  resource having this annotation. Since this mode is enabled by default, the deployment process would wait for all
+  resources to be ready.
 - `NonBlocking` — the resource is tracked only if there are other resources that are not yet ready.
 
 #### helmwave.dev/fail-mode
 
-Defines how helmwave will handle a resource failure condition which occured after failures threshold has been reached for the resource during deploy process:
+Defines how helmwave will handle a resource failure condition which occured after failures threshold has been reached
+for the resource during deploy process:
 
-- `FailWholeDeployProcessImmediately` (default) — the entire deploy process will fail with an error if an error occurs for some resource.
-- `HopeUntilEndOfDeployProcess` — when an error occurred for the resource, set this resource into the “hope” mode, and continue tracking other resources. If all remained resources are ready or in the “hope” mode, transit the resource back to “normal” and fail the whole deploy process if an error for this resource occurs once again.
+- `FailWholeDeployProcessImmediately` (default) — the entire deploy process will fail with an error if an error occurs
+  for some resource.
+- `HopeUntilEndOfDeployProcess` — when an error occurred for the resource, set this resource into the “hope” mode, and
+  continue tracking other resources. If all remained resources are ready or in the “hope” mode, transit the resource
+  back to “normal” and fail the whole deploy process if an error for this resource occurs once again.
 - `IgnoreAndContinueDeployProcess` — resource errors do not affect the deployment process.
-
 
 #### helmwave.dev/failures-allowed-per-replica
 
@@ -310,6 +319,7 @@ releases:
 ```
 
 This command will render `helmwave.yml.tpl` to `helmwave.yml`
+
 ```shell script
 $ export NS=stage
 $ export CI_PROJECT_NAME=my-project
@@ -349,7 +359,7 @@ This command will generate helmwave.plan.
 
 <details>
   <summary>helmwave.plan looks like</summary>
-  
+
   ```yaml
   project: my-project
   version: 0.8.3
@@ -435,26 +445,31 @@ This command will generate helmwave.plan.
       postrenderer: null
       disableopenapivalidation: false
   ```
+
 </details>
 
 ## 📄 Templating
+
 HelmWave uses [Go templates](https://godoc.org/text/template) for templating.
 
-Helmwave supports all built-in functions, [Sprig library](https://godoc.org/github.com/Masterminds/sprig), and several advanced functions:
+Helmwave supports all built-in functions, [Sprig library](https://godoc.org/github.com/Masterminds/sprig), and several
+advanced functions:
+
 - `toYaml` marshals a map into a string
 - `fromYaml` reads a golang string and generates a map
 - `readFile` get file as string
 - `hasKey` get true if field is exists
 - `get` (Sprig's original `get` is available as `sprigGet`)
 - `setValueAtPath` PATH NEW_VALUE traverses a golang map, replaces the value at the PATH with NEW_VALUE
-- `requiredEnv` The requiredEnv function allows you to declare a particular environment variable as required for template rendering. If the environment variable is unset or empty, the template rendering will fail with an error message.
-
+- `requiredEnv` The requiredEnv function allows you to declare a particular environment variable as required for
+  template rendering. If the environment variable is unset or empty, the template rendering will fail with an error
+  message.
 
 #### readFile
 
 <details>
   <summary>my-releases.yml</summary>
-  
+
   ```yaml
 releases:
   - name: redis
@@ -462,11 +477,12 @@ releases:
   - name: memcached
     repo: bitnami
   ```
+
 </details>
 
 <details>
   <summary>helmwave.yml.tpl</summary>
-  
+
   ```yaml
   project: my
   version: 0.8.3
@@ -491,7 +507,7 @@ releases:
     {{- end }}
   {{- end }}
   ``` 
-  
+
 </details>
 
 ```bash
@@ -500,7 +516,7 @@ $ helmwave yml
 
 <details>
   <summary>helmwave.yml</summary>
-  
+
   ```yaml
   project: my
   version: 0.8.3
@@ -522,7 +538,7 @@ $ helmwave yml
       options:
         <<: *global
   ``` 
-  
+
 </details>
 
 

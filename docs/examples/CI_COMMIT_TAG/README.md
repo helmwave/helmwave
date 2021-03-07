@@ -10,8 +10,6 @@ Project Structure
 
 ```
 
-
-
 ```yaml
 {% include_relative helmwave.yml.tpl %}
 ```
