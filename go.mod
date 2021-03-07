@@ -13,7 +13,6 @@ require (
 	github.com/imdario/mergo v0.3.11
 	github.com/sirupsen/logrus v1.8.0
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/wayt/parallel v0.0.0-20161122220654-0890dde4af08
 	github.com/werf/kubedog v0.4.1-0.20210219085634-2984d94c2a5f
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
