@@ -87,11 +87,11 @@ func (c *Config) runMultitracks(mapSpecs map[string]*multitrack.MultitrackSpecs,
 		kube.DefaultNamespace = ns
 
 		kubeClient := kube.Client
-		wg.Add(1)
 
 		go func(delay time.Duration, kubeClient kubernetes.Interface, specs multitrack.MultitrackSpecs, opts multitrack.MultitrackOptions, wg *parallel.WaitGroup) {
 			defer wg.Done()
 			time.Sleep(delay)
+			wg.Add(1)
 
 			wg.ErrChan() <- multitrack.Multitrack(kubeClient, specs, opts)
 		}(kubedogConfig.StartDelay, kubeClient, *specs, opts, wg)
