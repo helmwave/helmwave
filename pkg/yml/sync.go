@@ -32,7 +32,7 @@ func (c *Config) Sync(manifestPath string, async bool, settings *helm.EnvSetting
 
 func (c *Config) SyncFake(manifestPath string, async bool, settings *helm.EnvSettings) error {
 	log.Info("🛫 Fake deploy")
-	for i, _ := range c.Releases {
+	for i := range c.Releases {
 		c.Releases[i].Options.DryRun = true
 	}
 	return c.Sync(manifestPath, async, settings)

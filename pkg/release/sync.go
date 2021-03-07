@@ -65,7 +65,7 @@ func Sync(releases []*Config, manifestPath string, async bool) (err error) {
 	if async {
 		g := &parallel.Group{}
 		log.Debug("🐞 Run in parallel mode")
-		for i, _ := range releases {
+		for i := range releases {
 			g.Go(releases[i].SyncWithFails, &fails, manifestPath)
 		}
 		err := g.Wait()
