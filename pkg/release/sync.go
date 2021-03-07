@@ -14,6 +14,10 @@ var emptyReleases = errors.New("releases are empty")
 func (rel *Config) Sync(manifestPath string) error {
 	log.Infof("🛥 %s", rel.UniqName())
 
+	if err := rel.waitForDependencies(); err != nil {
+		return err
+	}
+
 	// I hate Private
 	_ = os.Setenv("HELM_NAMESPACE", rel.Options.Namespace)
 	settings := helm.New()
@@ -48,8 +52,10 @@ func (rel *Config) SyncWithFails(fails *[]*Config, manifestPath string) {
 	err := rel.Sync(manifestPath)
 	if err != nil {
 		log.Error("❌ ", err)
+		rel.NotifyFailed()
 		*fails = append(*fails, rel)
 	} else {
+		rel.NotifySuccess()
 		log.Infof("✅ %s", rel.UniqName())
 	}
 }

@@ -105,5 +105,12 @@ func flags(app *helmwave.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &app.Kubedog.Timeout,
 		},
+		&cli.BoolFlag{
+			Name:        "enable-dependencies",
+			Usage:       "Enable dependencies",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_ENABLE_DEPENDENCIES"},
+			Destination: &app.EnableDependencies,
+		},
 	}
 }
