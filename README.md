@@ -141,7 +141,7 @@ redis-b-slave-1    1/1     Running   0          51s
 
 ### Annotations
 
-> inspired by [helmwave annotations](https://helmwave.io/documentation/reference/deploy_annotations.html)
+> inspired by [werf annotations](https://werf.io/documentation/reference/deploy_annotations.html)
 
 ```yaml
   template:
@@ -171,40 +171,73 @@ Defines how helmwave will handle a resource failure condition which occured afte
 
 #### helmwave.dev/failures-allowed-per-replica
 
-By default, one error per replica is allowed before considering the whole deployment process unsuccessful. This setting defines a threshold of failures after which resource will be considered as failed and helmwave will handle this situation using fail mode.
+By default, one error per replica is allowed before considering the whole deployment process unsuccessful. This setting
+defines a threshold of failures after which resource will be considered as failed and helmwave will handle this
+situation using fail mode.
 
 - NUMBER
 
 #### helmwave.dev/log-regex
 
-Defines a Re2 regex template that applies to all logs of all containers of all Pods owned by a resource with this annotation. helmwave would show only those log lines that fit the specified regex template. By default, helmwave shows all log lines.
+Defines a Re2 regex template that applies to all logs of all containers of all Pods owned by a resource with this
+annotation. helmwave would show only those log lines that fit the specified regex template. By default, helmwave shows
+all log lines.
+
+- RE2_REGEX
+
+#### helmwave.dev/log-regex-for-{container}
+
+Defines a Re2 regex template that applies to all logs of specified container of all Pods owned by a resource with this
+annotation. helmwave would show only those log lines that fit the specified regex template. By default, helmwave shows
+all log lines.
 
 - RE2_REGEX
 
 #### helmwave.dev/skip-logs
 
-Set to "true" to turn off printing logs of all containers of all Pods owned by a resource with this annotation. This annotation is disabled by default.
+Set to "true" to turn off printing logs of all containers of all Pods owned by a resource with this annotation. This
+annotation is disabled by default.
 
 - "true"|"false"
 
+#### helmwave.dev/skip-logs-for-containers
+
+Turn off printing logs of specified containers of all Pods owned by a resource with this annotation. This annotation is
+disabled by default.
+
+- string with `,` as a separator
+
+#### helmwave.dev/show-logs-only-for-containers
+
+Turn off printing logs of all containers except specified of all Pods owned by a resource with this annotation. This
+annotation is disabled by default.
+
+- string with `,` as a separator
+
 #### helmwave.dev/show-service-messages
 
-Set to "true" to enable additional real-time debugging info (including Kubernetes events) for a resource during tracking. By default, helmwave would show these service messages only if the resource has failed the entire deploy process.
+Set to "true" to enable additional real-time debugging info (including Kubernetes events) for a resource during
+tracking. By default, helmwave would show these service messages only if the resource has failed the entire deploy
+process.
 
 - "true"|"false"
 
 ### Examples
-  - [How to pass `image.tag` to release?](docs/examples/CI_COMMIT_TAG/README.md)
-  - [How to pass `podAnnotations.gitCommit` to release?](docs/examples/CI_COMMIT_SHORT_SHA/README.md)
+
+- [How to pass `image.tag` to release?](docs/examples/CI_COMMIT_TAG/README.md)
+- [How to pass `podAnnotations.gitCommit` to release?](docs/examples/CI_COMMIT_SHORT_SHA/README.md)
   - [How to use environments for your release?](docs/examples/CI_ENVIRONMENT_NAME/README.md)
 
 ### [🔰 Store](docs/store.md)
-It allows pass you custom values to render release. 
+
+It allows pass you custom values to render release.
 
 ### [🔰 Tags](docs/tags.md)
+
 Use tags for choose specific releases
 
 ### [🧬 Full `helmwave.yml` config](docs/helmwave.yml.md)
+
 All Options
 
 ## 🛠 CLI Reference
