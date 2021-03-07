@@ -1,9 +1,11 @@
 package helmwave
 
 import (
+	"github.com/bombsimon/logrusr"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/formatter"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/klog/v2"
 )
 
 type Log struct {
@@ -19,6 +21,7 @@ func (c *Config) InitLogger() error {
 	utilruntime.ErrorHandlers = []func(error){
 		logKubernetesClientError,
 	}
+	klog.SetLogger(logrusr.NewLogger(log.StandardLogger()))
 
 	c.InitLoggerFormat()
 	return c.InitLoggerLevel()
