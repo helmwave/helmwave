@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
+// Plan generates repo config out of planned releases and available repositories
 func Plan(releases []*release.Config, repositories []*Config) (plan []*Config) {
-	all := All(releases)
+	all := getRepositories(releases)
 
 	for _, a := range all {
 		found := false
@@ -24,25 +25,26 @@ func Plan(releases []*release.Config, repositories []*Config) (plan []*Config) {
 		}
 
 		if !found {
-			if _, err := os.Stat(a); !os.IsNotExist(err) {
-				found = true
-				log.Infof("🗄 %q is local repo", a)
-			} else {
-				log.Errorf("🗄 %q not found ", a)
-			}
+			log.Errorf("🗄 %q not found ", a)
 		}
-
 	}
 
 	return plan
 }
 
-func All(releases []*release.Config) (repos []string) {
+// Get repositories for releases
+func getRepositories(releases []*release.Config) (repos []string) {
 	for _, rel := range releases {
-		chart := strings.Split(rel.Chart, "/")[0]
+		repo := strings.Split(rel.Chart, "/")[0]
 		deps, _ := rel.ReposDeps()
 
-		all := append(deps, chart)
+		all := deps
+		if repoIsLocal(repo) {
+			log.Infof("🗄 %q is local repo", repo)
+		} else {
+			all = append(all, repo)
+		}
+
 		for _, r := range all {
 			if !helper.Contains(r, repos) {
 				repos = append(repos, r)
@@ -51,4 +53,17 @@ func All(releases []*release.Config) (repos []string) {
 	}
 
 	return repos
+}
+
+func repoIsLocal(repo string) bool {
+	if repo == "" {
+		return true
+	}
+
+	stat, err := os.Stat(repo)
+	if (err == nil || !os.IsNotExist(err)) && stat.IsDir() {
+		return true
+	}
+
+	return false
 }
