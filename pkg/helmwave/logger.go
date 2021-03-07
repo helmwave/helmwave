@@ -4,7 +4,6 @@ import (
 	"github.com/bombsimon/logrusr"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/formatter"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
 )
 
@@ -16,11 +15,7 @@ type Log struct {
 }
 
 func (c *Config) InitLogger() error {
-	// Skip various low-level k8s client errors
-	// There are a lot of context deadline errors being logged
-	utilruntime.ErrorHandlers = []func(error){
-		logKubernetesClientError,
-	}
+	// Override klog base logger to handle correctly log levels
 	klog.SetLogger(logrusr.NewLogger(log.StandardLogger()))
 
 	c.InitLoggerFormat()
