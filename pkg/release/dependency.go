@@ -30,9 +30,9 @@ func (rel *Config) addDependency(name string) {
 
 func (rel *Config) waitForDependencies() (err error) {
 	for name, ch := range rel.dependencies {
-		log.Debugf("release %s is waiting for dependency %s", rel.Name, name)
+		log.Infof("release %s is waiting for dependency %s", rel.Name, name)
 		status := <-ch
-		log.Debugf("dependency %s of release %s done", name, rel.Name)
+		log.Infof("dependency %s of release %s done", name, rel.Name)
 		if status == pubsub.ReleaseFailed {
 			err = DependencyFailedError
 		}

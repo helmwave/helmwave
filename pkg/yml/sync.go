@@ -31,6 +31,14 @@ func (c *Config) Sync(manifestPath string, async bool, settings *helm.EnvSetting
 }
 
 func (c *Config) SyncFake(manifestPath string, async bool, settings *helm.EnvSettings) error {
+	// Force disable dependencies during fake deploy
+	// and restore setting later
+	deps := c.EnableDependencies
+	c.EnableDependencies = false
+	defer func(c *Config, deps bool) {
+		c.EnableDependencies = deps
+	}(c, deps)
+
 	log.Info("🛫 Fake deploy")
 	for i, _ := range c.Releases {
 		c.Releases[i].Options.DryRun = true
