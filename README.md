@@ -49,20 +49,20 @@ Call helm | via Golang Module | Shell Executor
 ### Download one of [releases](https://github.com/zhilyaev/helmwave/releases) ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total)
 
 ```bash
-$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.2/helmwave-0.8.2-linux-amd64.tar.gz -O - | tar -xz
+$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.3/helmwave-0.8.3-linux-amd64.tar.gz -O - | tar -xz
 $ mv helmwave /usr/local/bin/
 ```
 ### Install with go ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
-$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.8.2
+$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.8.3
 ```
 
 ### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
 ```
-$ docker run diamon/helmwave:0.8.2
-$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.2
+$ docker run diamon/helmwave:0.8.3
+$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.3
 ```
 
 ### Build with ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
@@ -82,7 +82,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.8.2
+version: 0.8.3
 
 
 repositories:
@@ -132,7 +132,7 @@ redis-b-slave-1    1/1     Running   0          51s
 
 ### RU
 - [HelmWave v0.5.0 – GitOps для твоего Kubernetes](https://habr.com/ru/post/532596/)
--  HelmWave v0.8.2 – Kubedog рядом
+-  HelmWave v0.8.3 – Kubedog рядом
 
 ## EN
 - WIP
@@ -217,7 +217,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.8.2
+   0.8.3
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -232,18 +232,20 @@ COMMANDS:
    help, h                       Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --tpl value              Main tpl file (default: "helmwave.yml.tpl") [$HELMWAVE_TPL_FILE]
-   --file value, -f value   Main yml file (default: "helmwave.yml") [$HELMWAVE_FILE, $HELMWAVE_YAML_FILE, $HELMWAVE_YML_FILE]
-   --plan-dir value         It keeps your state via planfile (default: ".helmwave/") [$HELMWAVE_PLAN_DIR]
-   --tags value, -t value   It allows you choose releases for sync. Example: -t tag1 -t tag3,tag4 [$HELMWAVE_TAGS]
-   --parallel helm install  It allows you cacdll helm install in parallel mode  (default: true) [$HELMWAVE_PARALLEL]
-   --log-format value       You can set: [ text | json | pad | emoji ] (default: "emoji") [$HELMWAVE_LOG_FORMAT]
-   --log-level value        You can set: [ debug | info | warn | panic | fatal | trace ] (default: "info") [$HELMWAVE_LOG_LEVEL, $HELMWAVE_LOG_LVL]
-   --log-color              Force color (default: true) [$HELMWAVE_LOG_COLOR]
-   --kubedog                Enable/Disable kubedog (default: true) [$HELMWAVE_KUBEDOG]
+   --tpl value                      Main tpl file (default: "helmwave.yml.tpl") [$HELMWAVE_TPL_FILE]
+   --file value, -f value           Main yml file (default: "helmwave.yml") [$HELMWAVE_FILE, $HELMWAVE_YAML_FILE, $HELMWAVE_YML_FILE]
+   --plan-dir value                 It keeps your state via planfile (default: ".helmwave/") [$HELMWAVE_PLAN_DIR]
+   --tags value, -t value           It allows you choose releases for sync. Example: -t tag1 -t tag3,tag4 [$HELMWAVE_TAGS]
+   --parallel helm install          It allows you call helm install in parallel mode  (default: true) [$HELMWAVE_PARALLEL]
+   --log-format value               You can set: [ text | json | pad | emoji ] (default: "emoji") [$HELMWAVE_LOG_FORMAT]
+   --log-level value                You can set: [ debug | info | warn  | fatal | panic | trace ] (default: "info") [$HELMWAVE_LOG_LEVEL, $HELMWAVE_LOG_LVL]
+   --log-color                      Force color (default: true) [$HELMWAVE_LOG_COLOR]
+   --kubedog                        Enable/Disable kubedog (default: true) [$HELMWAVE_KUBEDOG, $HELMWAVE_KUBEDOG_ENABLED]
    --kubedog-status-interval value  Interval of kubedog status messages (default: 5s) [$HELMWAVE_KUBEDOG_STATUS_INTERVAL]
-   --help, -h               show help (default: false)
-   --version, -v            print the version (default: false)
+   --kubedog-start-delay value      Delay kubedog start (default: 1s) [$HELMWAVE_KUBEDOG_START_DELAY]
+   --kubedog-timeout value          Timout of kubedog multitrackers (default: 5m0s) [$HELMWAVE_KUBEDOG_TIMEOUT]
+   --help, -h                       show help (default: false)
+   --version, -v                    print the version (default: false)
 ```
 
 ### yml
@@ -254,7 +256,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.8.2
+version: 0.8.3
 
 
 repositories:
@@ -286,7 +288,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.8.2
+version: 0.8.3
 
 
 repositories:
@@ -317,7 +319,7 @@ This command will generate helmwave.plan.
   
   ```yaml
   project: my-project
-  version: 0.8.2
+  version: 0.8.3
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -434,7 +436,7 @@ releases:
   
   ```yaml
   project: my
-  version: 0.8.2
+  version: 0.8.3
   
   
   repositories:
@@ -468,7 +470,7 @@ $ helmwave yml
   
   ```yaml
   project: my
-  version: 0.8.2
+  version: 0.8.3
   
   repositories:
     - name: bitnami

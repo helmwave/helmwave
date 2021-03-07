@@ -76,7 +76,7 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 
 	if c.Kubedog.Enabled {
 		log.Info("🐶 Kubedog enabled")
-		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm, c.Kubedog.StatusInterval, c.Kubedog.Timeout)
+		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm, c.Kubedog)
 	}
 
 	return c.Yml.Sync(c.PlanPath+".manifest/", c.Parallel, c.Helm)
