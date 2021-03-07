@@ -4,6 +4,7 @@ import (
 	"errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/pubsub"
+	"sort"
 )
 
 var releasePubSub = pubsub.NewReleasePubSub()
@@ -39,8 +40,12 @@ func (rel *Config) waitForDependencies() (err error) {
 	return
 }
 
-func (rel *Config) HandleDependencies() {
-	for _, dep := range rel.DependsOn {
-		rel.addDependency(dep)
+func (rel *Config) HandleDependencies(releases []*Config) {
+	sort.Strings(rel.DependsOn)
+
+	for _, r := range releases {
+		if i := sort.SearchStrings(rel.DependsOn, r.Name); i < len(releases) {
+			rel.addDependency(r.Name)
+		}
 	}
 }

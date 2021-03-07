@@ -12,6 +12,6 @@ type Config struct {
 	Store        map[string]interface{}
 	Values       []string
 	Options      action.Upgrade
-	DependsOn    []string `json:"depends_on"`
+	DependsOn    []string `yaml:"depends_on"`
 	dependencies map[string]<-chan pubsub.ReleaseStatus
 }

@@ -90,7 +90,7 @@ func (c *Config) PlanReleases(tags []string) {
 	names := make([]string, 0)
 	for _, v := range c.Releases {
 		if c.EnableDependencies {
-			v.HandleDependencies()
+			v.HandleDependencies(c.Releases)
 		}
 		names = append(names, v.UniqName())
 	}
