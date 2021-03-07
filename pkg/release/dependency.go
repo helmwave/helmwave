@@ -2,6 +2,7 @@ package release
 
 import (
 	"errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/pubsub"
 )
 
@@ -18,12 +19,19 @@ func (rel *Config) NotifyFailed() {
 
 func (rel *Config) addDependency(name string) {
 	ch := releasePubSub.Subscribe(name)
-	rel.dependencies = append(rel.dependencies, ch)
+
+	if rel.dependencies == nil {
+		rel.dependencies = make(map[string]<-chan pubsub.ReleaseStatus)
+	}
+
+	rel.dependencies[name] = ch
 }
 
 func (rel *Config) waitForDependencies() (err error) {
-	for _, ch := range rel.dependencies {
+	for name, ch := range rel.dependencies {
+		log.Debugf("release %s is waiting for dependency %s", rel.Name, name)
 		status := <-ch
+		log.Debugf("dependency %s of release %s done", name, rel.Name)
 		if status == pubsub.ReleaseFailed {
 			err = DependencyFailedError
 		}

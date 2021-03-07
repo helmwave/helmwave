@@ -13,5 +13,5 @@ type Config struct {
 	Values       []string
 	Options      action.Upgrade
 	DependsOn    []string `json:"depends_on"`
-	dependencies []<-chan pubsub.ReleaseStatus
+	dependencies map[string]<-chan pubsub.ReleaseStatus
 }
