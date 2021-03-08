@@ -33,7 +33,7 @@ jobs:
         with:
           version: v3.4.0
 
-      - run: helm env
+      - run: helm repo update
 
       - name: Run integration tests
         run: go test -v ./tests/integration
