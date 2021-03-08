@@ -25,6 +25,19 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 		return err
 	}
 
+	if _, err := os.Stat(repofile); os.IsNotExist(err) {
+		f, err := os.Create(repofile)
+		if err != nil {
+			return err
+		}
+		err = f.Close()
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+
 	// Acquire a file lock for process synchronization
 	fileLock := flock.New(strings.Replace(repofile, filepath.Ext(repofile), ".lock", 1))
 	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
