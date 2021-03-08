@@ -26,5 +26,9 @@ jobs:
       - name: Install go modules
         run: go mod download
 
+# TODO: remove this hack (see issue #70)
+      - name: Create helm dir
+        run: mkdir ~/.helm
+
       - name: Run integration tests
         run: go test -v ./tests/integration
