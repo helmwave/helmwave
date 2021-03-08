@@ -28,7 +28,7 @@ jobs:
 
 # TODO: remove this hack (see issue #70)
       - name: Create helm dir
-        run: mkdir ~/.helm
+        run: mkdir -p ~/.helm/repository
 
       - name: Run integration tests
         run: go test -v ./tests/integration
