@@ -1,0 +1,12 @@
+name: Run tests against KinD cluster
+
+on: pull_request
+
+jobs:
+  create-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create KinD cluster
+        uses: container-tools/kind-action@v1
+        with:
+          registry: false
