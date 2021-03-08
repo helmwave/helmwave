@@ -63,8 +63,6 @@ func (c *Config) plan(opts *yml.SavePlanOptions) error {
 
 	opts.Tags(c.Tags.Value())
 
-	c.Yml.EnableDependencies = c.EnableDependencies
-
 	return c.Yml.SavePlan(opts)
 }
 

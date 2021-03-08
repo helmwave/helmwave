@@ -8,7 +8,7 @@ import (
 type Config struct {
 	Project            string
 	Version            string
-	EnableDependencies bool
+	EnableDependencies bool `yaml:","`
 	Repositories       []*repo.Config
 	Releases           []*release.Config
 }

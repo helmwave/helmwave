@@ -110,7 +110,7 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Usage:       "Enable dependencies",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_ENABLE_DEPENDENCIES"},
-			Destination: &app.EnableDependencies,
+			Destination: &app.Yml.EnableDependencies,
 		},
 	}
 }
