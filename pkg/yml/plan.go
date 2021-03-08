@@ -78,18 +78,21 @@ func (c *Config) Plan(o *SavePlanOptions) error {
 
 func (c *Config) PlanRepos() {
 	c.Repositories = repo.Plan(c.Releases, c.Repositories)
-	names := make([]string, 0)
-	for _, v := range c.Repositories {
-		names = append(names, v.Name)
+	names := make([]string, len(c.Repositories))
+	for i, v := range c.Repositories {
+		names[i] = v.Name
 	}
 	log.WithField("repositories", names).Info("🛠 Yml -> 🗄 repositories")
 }
 
 func (c *Config) PlanReleases(tags []string) {
 	c.Releases = release.Plan(tags, c.Releases)
-	names := make([]string, 0)
-	for _, v := range c.Releases {
-		names = append(names, v.UniqName())
+	names := make([]string, len(c.Releases))
+	for i, v := range c.Releases {
+		if c.EnableDependencies {
+			v.HandleDependencies(c.Releases)
+		}
+		names[i] = v.UniqName()
 	}
 	log.WithField("releases", names).Info("🛠 Yml -> 🛥 releases")
 }

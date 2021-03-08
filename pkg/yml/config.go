@@ -6,8 +6,9 @@ import (
 )
 
 type Config struct {
-	Project      string
-	Version      string
-	Repositories []*repo.Config
-	Releases     []*release.Config
+	Project            string
+	Version            string
+	EnableDependencies bool `yaml:"-"`
+	Repositories       []*repo.Config
+	Releases           []*release.Config
 }
