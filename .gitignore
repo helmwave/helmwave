@@ -1,12 +1,9 @@
 .idea/
 
 /helmwave
-/helmwave.yml
 /helmwave.yml.tpl
-
-./helmwave
-./helmwave.yml
-./helmwave.yml.tpl
+helmwave.yml
+.helmwave
 
 ### macOS ###
 # General
