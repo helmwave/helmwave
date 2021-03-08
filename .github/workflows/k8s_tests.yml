@@ -31,5 +31,7 @@ jobs:
         with:
           version: v3.4.0
 
+      - run: helm env
+
       - name: Run integration tests
         run: go test -v ./tests/integration
