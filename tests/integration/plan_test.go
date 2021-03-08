@@ -53,7 +53,6 @@ func (s *PlanTestSuite) TestPlanReleases() {
 
 	opts.File(s.app.PlanPath + PlanFile).Dir(s.app.PlanPath)
 
-	opts.PlanRepos()
 	opts.PlanReleases()
 	opts.Tags(s.app.Tags.Value())
 

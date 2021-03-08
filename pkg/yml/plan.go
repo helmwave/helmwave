@@ -34,7 +34,7 @@ func (o *SavePlanOptions) Dir(dir string) *SavePlanOptions {
 
 func (o *SavePlanOptions) PlanReleases() *SavePlanOptions {
 	o.planReleases = true
-	return o.PlanValues()
+	return o.PlanValues().PlanRepos()
 }
 
 func (o *SavePlanOptions) PlanRepos() *SavePlanOptions {

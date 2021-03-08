@@ -34,7 +34,7 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 	case "repos":
 		opts.PlanRepos()
 	case "releases":
-		opts.PlanRepos().PlanReleases()
+		opts.PlanRepos()
 	case "values":
 		opts.PlanValues()
 	default:
