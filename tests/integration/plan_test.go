@@ -57,7 +57,7 @@ func (s *PlanTestSuite) TestPlanReleases() {
 	opts.PlanReleases()
 	opts.Tags(s.app.Tags.Value())
 
-	err := s.app.Yml.Plan(opts)
+	err := s.app.Yml.Plan(opts, s.app.Helm)
 	s.Require().NoError(err)
 
 	s.FileExists(PlanPath + ".manifest/nginx@test-nginx.yml")
