@@ -5,6 +5,8 @@ on: pull_request
 jobs:
   create-cluster:
     runs-on: ubuntu-latest
+    env:
+      HELM_DEBUG: "true"
     steps:
       - name: Create KinD cluster
         uses: container-tools/kind-action@v1
