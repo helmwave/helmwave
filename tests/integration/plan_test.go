@@ -22,19 +22,26 @@ type PlanTestSuite struct {
 
 func (s *PlanTestSuite) SetupTest() {
 	s.app = &helmwave.Config{
-		Helm:     &helm.EnvSettings{},
-		Tpl:      template.Tpl{
+		Helm: &helm.EnvSettings{},
+		Tpl: template.Tpl{
 			From: "../fixtures/helmwave.yml.tpl",
-			To: "helmwave.yml",
+			To:   "helmwave.yml",
 		},
 		Yml:      yml.Config{},
 		PlanPath: PlanPath,
-		Logger:   nil,
+		Logger: &helmwave.Log{
+			Level:  "DEBUG",
+			Format: "flat",
+			Color:  false,
+		},
 		Parallel: false,
 		Kubedog:  &kubedog.Config{},
 	}
 
-	err := s.app.Tpl.Render()
+	err := s.app.InitLogger()
+	s.Require().NoError(err)
+
+	err = s.app.Tpl.Render()
 	s.Require().NoError(err)
 
 	err = yml.Read(s.app.Tpl.To, &s.app.Yml)
