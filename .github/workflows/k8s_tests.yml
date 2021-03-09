@@ -36,4 +36,9 @@ jobs:
       - run: helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Run integration tests
-        run: go test -v ./tests/integration
+        run: go test -race -coverpkg=./... -coverprofile=coverage/integration.cov -v --tags=integration -covermode=atomic ./...
+
+      - uses: codecov/codecov-action@v1
+        with:
+          directory: ./coverage
+          flags: integration
