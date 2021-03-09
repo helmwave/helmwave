@@ -8,6 +8,8 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 )
 
+var Version = "dev"
+
 type Config struct {
 	Version  string
 	Helm     *helm.EnvSettings
