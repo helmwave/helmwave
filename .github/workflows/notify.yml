@@ -1,0 +1,17 @@
+name: Notify
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-telegram:
+    runs-on: ubuntu-latest
+    steps:
+    - name: telegram
+      uses: yanzay/notify-telegram@v0.1.0
+      if: always()
+      with:
+        chat: "@helmwave"
+        token: ${{ secrets.BOT_TOKEN }}
+        status: ${{ job.status }}
