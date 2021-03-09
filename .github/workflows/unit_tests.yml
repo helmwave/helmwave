@@ -1,6 +1,13 @@
 name: Run unit tests
 
-on: pull_request
+on:
+  push:
+    branches:
+      - master
+      - main
+      - release*
+  pull_request:
+
 
 jobs:
   unit-tests:
