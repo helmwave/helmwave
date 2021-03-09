@@ -30,6 +30,6 @@ jobs:
         if: always()
         with:
           chat: "@helmwave"
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.BOT_TOKEN }}
           status: ${{ job.status }}
 
