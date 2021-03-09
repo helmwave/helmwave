@@ -22,7 +22,7 @@ type PlanTestSuite struct {
 
 func (s *PlanTestSuite) SetupTest() {
 	s.app = &helmwave.Config{
-		Helm: &helm.EnvSettings{},
+		Helm: helm.New(),
 		Tpl: template.Tpl{
 			From: "../fixtures/helmwave.yml.tpl",
 			To:   "helmwave.yml",
