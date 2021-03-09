@@ -15,5 +15,5 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
           registry: docker.pkg.github.com
-          repository: zhilyaev/helmwave
+          repository: zhilyaev/helmwave/helmwave
           tag_with_ref: true
