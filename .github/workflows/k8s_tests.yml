@@ -3,7 +3,7 @@ name: Run integration tests against KinD cluster
 on: pull_request
 
 jobs:
-  create-cluster:
+  integration-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Create KinD cluster
@@ -11,9 +11,6 @@ jobs:
         with:
           registry: false
 
-  integration-tests:
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
