@@ -34,7 +34,7 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 	case "repos":
 		opts.PlanRepos()
 	case "releases":
-		opts.PlanReleases()
+		opts.PlanRepos()
 	case "values":
 		opts.PlanValues()
 	default:
@@ -63,7 +63,7 @@ func (c *Config) plan(opts *yml.SavePlanOptions) error {
 
 	opts.Tags(c.Tags.Value())
 
-	return c.Yml.SavePlan(opts)
+	return c.Yml.SavePlan(opts, c.Helm)
 }
 
 func (c *Config) CliDeploy(ctx *cli.Context) error {

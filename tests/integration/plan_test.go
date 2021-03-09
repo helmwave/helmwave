@@ -24,7 +24,7 @@ type PlanTestSuite struct {
 
 func (s *PlanTestSuite) SetupTest() {
 	s.app = &helmwave.Config{
-		Helm: &helm.EnvSettings{},
+		Helm: helm.New(),
 		Tpl: template.Tpl{
 			From: "../fixtures/helmwave.yml.tpl",
 			To:   "helmwave.yml",
@@ -55,11 +55,10 @@ func (s *PlanTestSuite) TestPlanReleases() {
 
 	opts.File(s.app.PlanPath + PlanFile).Dir(s.app.PlanPath)
 
-	opts.PlanRepos()
 	opts.PlanReleases()
 	opts.Tags(s.app.Tags.Value())
 
-	err := s.app.Yml.Plan(opts)
+	err := s.app.Yml.Plan(opts, s.app.Helm)
 	s.Require().NoError(err)
 
 	s.FileExists(PlanPath + ".manifest/nginx@test-nginx.yml")

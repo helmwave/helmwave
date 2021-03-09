@@ -4,6 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/release"
 	"github.com/zhilyaev/helmwave/pkg/repo"
+	helm "helm.sh/helm/v3/pkg/cli"
 )
 
 type SavePlanOptions struct {
@@ -33,7 +34,7 @@ func (o *SavePlanOptions) Dir(dir string) *SavePlanOptions {
 
 func (o *SavePlanOptions) PlanReleases() *SavePlanOptions {
 	o.planReleases = true
-	return o.PlanValues()
+	return o.PlanValues().PlanRepos()
 }
 
 func (o *SavePlanOptions) PlanRepos() *SavePlanOptions {
@@ -46,15 +47,15 @@ func (o *SavePlanOptions) PlanValues() *SavePlanOptions {
 	return o
 }
 
-func (c *Config) SavePlan(o *SavePlanOptions) error {
-	err := c.Plan(o)
+func (c *Config) SavePlan(o *SavePlanOptions, helmSettings *helm.EnvSettings) error {
+	err := c.Plan(o, helmSettings)
 	if err != nil {
 		return err
 	}
 	return Save(o.file, &c)
 }
 
-func (c *Config) Plan(o *SavePlanOptions) error {
+func (c *Config) Plan(o *SavePlanOptions, helmSettings *helm.EnvSettings) error {
 	c.PlanReleases(o.tags)
 
 	if o.planValues {
@@ -63,14 +64,14 @@ func (c *Config) Plan(o *SavePlanOptions) error {
 		}
 	}
 
-	if o.planReleases {
-		if err := c.PlanManifests(o.dir); err != nil {
-			return err
-		}
-	}
-
 	if o.planRepos {
 		c.PlanRepos()
+	}
+
+	if o.planReleases {
+		if err := c.PlanManifests(o.dir, helmSettings); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -101,16 +102,21 @@ func (c *Config) PlanReleasesValues(dir string) error {
 	return release.PlanValues(c.Releases, dir)
 }
 
-func (c *Config) PlanManifests(dir string) error {
+func (c *Config) PlanManifests(dir string, helmSettings *helm.EnvSettings) error {
+	err := repo.Sync(c.Repositories, helmSettings)
+	if err != nil {
+		return err
+	}
+
 	for i, _ := range c.Releases {
 		c.Releases[i].Options.DryRun = true
 	}
 
-	err := c.SyncReleases(dir+".manifest/", false)
+	err = c.SyncReleases(dir+".manifest/", false)
 
 	for i, _ := range c.Releases {
 		c.Releases[i].Options.DryRun = false
 	}
-	
+
 	return err
 }
