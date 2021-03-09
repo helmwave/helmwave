@@ -61,9 +61,17 @@ $ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.9.1
 
 ### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
-```
+#### Docker Hub
+```bash
 $ docker run diamon/helmwave:0.9.1
 $ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.9.1
+```
+
+#### Github Packages
+
+```bash
+$ docker login docker.pkg.github.com
+$ docker run docker.pkg.github.com/zhilyaev/helmwave/helmwave:0.9.1
 ```
 
 ### Build with ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
@@ -135,7 +143,7 @@ redis-b-slave-1    1/1     Running   0          51s
 ### RU
 
 - [HelmWave v0.5.0 – GitOps для твоего Kubernetes](https://habr.com/ru/post/532596/)
-- HelmWave v0.8.3 – Kubedog рядом
+- HelmWave v0.8.3 – Kubedog is ready
 
 ## EN
 
