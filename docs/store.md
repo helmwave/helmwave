@@ -1,5 +1,6 @@
-# 🔰 Store 
-It allows pass you custom values to render release. 
+# 🔰 Store
+
+It allows pass you custom values to render release.
 
 #### `helmwave.yml`:
 

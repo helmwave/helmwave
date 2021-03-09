@@ -31,6 +31,7 @@ releases:
 ```
 
 #### `_.yml`
+
 ```yaml
 image:
   tag: {{ env "CI_COMMIT_TAG" }}
@@ -39,13 +40,14 @@ podAnnotations:
   gitCommit: {{ requiredEnv "CI_COMMIT_SHORT_SHA" | quote }}
 ```
 
-
 #### `prod.yml`
+
 ```yaml
 replicaCount: 6
 ```
 
 #### `stage.yml`
+
 ```yaml
 replicaCount: 2
 ```

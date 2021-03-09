@@ -13,32 +13,45 @@ import (
 	"time"
 )
 
+const (
+	//flockTimeout is timeout for repo flock
+	flockTimeout = 30 * time.Second
+)
+
 func (rep *Config) Install(settings *helm.EnvSettings) error {
 	return Write(settings.RepositoryConfig, &rep.Entry, settings)
 }
 
+// Write updates given repository name if it exists in helm repository
 // TODO it better later
 func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 	//Ensure the file directory exists as it is required for file locking
-	err := os.MkdirAll(filepath.Dir(repofile), os.ModePerm)
+	err := os.MkdirAll(filepath.Dir(repofile), 0755)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
 
+	flockPath := strings.Replace(repofile, filepath.Ext(repofile), ".lock", 1)
 	// Acquire a file lock for process synchronization
-	fileLock := flock.New(strings.Replace(repofile, filepath.Ext(repofile), ".lock", 1))
-	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	fileLock := flock.New(flockPath)
+	lockCtx, cancel := context.WithTimeout(context.Background(), flockTimeout)
 	defer cancel()
 
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
-	if err == nil && locked {
-		defer func(fileLock *flock.Flock) {
-			err := fileLock.Unlock()
-			if err != nil {
-				log.Errorf("Failed to release flock: %v", err.Error())
-			}
-		}(fileLock)
+	if err != nil {
+		log.Errorf("Failed to get flock: %v", err.Error())
+		return err
 	}
+	if !locked {
+		log.Errorf("Flock is not locked")
+	}
+
+	defer func(fileLock *flock.Flock) {
+		err := fileLock.Unlock()
+		if err != nil {
+			log.Errorf("Failed to release flock: %v", err.Error())
+		}
+	}(fileLock)
 
 	f, err := repo.LoadFile(repofile)
 	if err != nil {
