@@ -1,0 +1,41 @@
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+      - GO386=softfloat
+    goos:
+      - linux
+        #- windows
+        #- darwin
+    ignore:
+      - goos: darwin
+        goarch: 386
+    main: ./cmd/helmwave
+    ldflags:
+      - -s -w -X github.com/zhilyaev/helmwave/pkg/helmwave.Version={{.Version}}
+
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+release:
+  name_template: "Release v{{.Version}}"
+  draft: true
+  prerelease: auto
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

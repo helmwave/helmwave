@@ -1,0 +1,52 @@
+name: Run integration tests against KinD cluster
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - release*
+  pull_request:
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create KinD cluster
+        uses: container-tools/kind-action@v1
+        with:
+          registry: false
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install go modules
+        run: go mod download
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - run: helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Run integration tests
+        run: go test -coverpkg=./... -coverprofile=./integration.cov -v --tags=integration -covermode=atomic ./...
+
+      - uses: codecov/codecov-action@v1
+        with:
+          files: ./integration.cov
+          flags: integration
+          fail_ci_if_error: true

@@ -1,15 +1,17 @@
 name: golangci-lint
+
 on:
   push:
-    tags:
-      - v*
     branches:
       - master
       - main
+      - release*
   pull_request:
+
 jobs:
   golangci:
     strategy:
+      fail-fast: false
       matrix:
         go-version:
           - 1.15.x

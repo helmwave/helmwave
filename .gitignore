@@ -1,12 +1,9 @@
 .idea/
 
 /helmwave
-/helmwave.yml
 /helmwave.yml.tpl
-
-./helmwave
-./helmwave.yml
-./helmwave.yml.tpl
+helmwave.yml
+.helmwave
 
 ### macOS ###
 # General
@@ -17,3 +14,4 @@
 # Icon must end with two \r
 Icon
 Icon
+dist/

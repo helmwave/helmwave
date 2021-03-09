@@ -1,3 +1,5 @@
+// +build ignore unit
+
 package yml
 
 import (
@@ -11,7 +13,7 @@ func TestString(t *testing.T) {
 	}
 
 	s := String(b)
-	const c = "project: my-project\nversion: 0.7.0\nrepositories: []\nreleases: []\n"
+	const c = "project: my-project\nversion: 0.7.0\nenabledependencies: false\nrepositories: []\nreleases: []\n"
 	if s != c {
 		t.Error("Failed yml.String")
 	}

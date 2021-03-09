@@ -8,7 +8,7 @@ import (
 
 func New() *helmwave.Config {
 	return &helmwave.Config{
-		Version: "0.8.4",
+		Version: helmwave.Version,
 		Helm:    cli.New(),
 		Logger:  &helmwave.Log{},
 		Kubedog: &kubedog.Config{},
