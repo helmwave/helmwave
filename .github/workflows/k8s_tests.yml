@@ -43,3 +43,4 @@ jobs:
         with:
           files: ./integration.cov
           flags: integration
+          fail_ci_if_error: true

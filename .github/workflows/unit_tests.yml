@@ -31,3 +31,4 @@ jobs:
         with:
           files: ./unit.cov
           flags: unit
+          fail_ci_if_error: true
