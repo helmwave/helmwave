@@ -1,6 +1,12 @@
 name: Run integration tests against KinD cluster
 
-on: pull_request
+on:
+  push:
+    branches:
+      - master
+      - main
+      - release*
+  pull_request:
 
 jobs:
   integration-tests:
