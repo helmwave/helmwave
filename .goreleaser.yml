@@ -8,8 +8,8 @@ builds:
       - GO386=softfloat
     goos:
       - linux
-        #- windows
-        #- darwin
+      - windows
+      - darwin
     ignore:
       - goos: darwin
         goarch: 386
