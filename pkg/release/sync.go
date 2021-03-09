@@ -3,8 +3,8 @@ package release
 import (
 	"errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/wayt/parallel"
 	"github.com/zhilyaev/helmwave/pkg/helper"
+	"github.com/zhilyaev/helmwave/pkg/parallel"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"os"
 )
@@ -69,12 +69,16 @@ func Sync(releases []*Config, manifestPath string, async bool) (err error) {
 	var fails []*Config
 
 	if async {
-		g := &parallel.Group{}
+		wg := parallel.NewWaitGroup()
 		log.Debug("🐞 Run in parallel mode")
-		for i, _ := range releases {
-			g.Go(releases[i].SyncWithFails, &fails, manifestPath)
+		wg.Add(len(releases))
+		for i := range releases {
+			go func(wg *parallel.WaitGroup, release *Config, fails []*Config, manifestPath string) {
+				defer wg.Done()
+				release.SyncWithFails(&fails, manifestPath)
+			}(wg, releases[i], fails, manifestPath)
 		}
-		err := g.Wait()
+		err := wg.Wait()
 		if err != nil {
 			return err
 		}

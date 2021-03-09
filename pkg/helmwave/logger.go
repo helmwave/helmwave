@@ -1,8 +1,11 @@
 package helmwave
 
 import (
+	"github.com/bombsimon/logrusr"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhilyaev/helmwave/pkg/formatter"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/klog/v2"
 )
 
 type Log struct {
@@ -13,6 +16,13 @@ type Log struct {
 }
 
 func (c *Config) InitLogger() error {
+	// Skip various low-level k8s client errors
+	// There are a lot of context deadline errors being logged
+	utilruntime.ErrorHandlers = []func(error){
+		logKubernetesClientError,
+	}
+	klog.SetLogger(logrusr.NewLogger(log.StandardLogger()))
+
 	c.InitLoggerFormat()
 	return c.InitLoggerLevel()
 }
@@ -48,4 +58,8 @@ func (c *Config) InitLoggerFormat() {
 		})
 	}
 
+}
+
+func logKubernetesClientError(err error) {
+	log.Debugf("kubernetes client error %q", err.Error())
 }

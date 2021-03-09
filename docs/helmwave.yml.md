@@ -1,6 +1,7 @@
 # 🧬 Full Configuration
 
 ## General
+
 ```yaml
 project: my-project
 version: 0.5.0
@@ -23,7 +24,6 @@ repositories:
   insecureskiptlsverify: false
   force: false
 ```
-
 
 ## 🛥 Release
 
