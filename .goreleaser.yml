@@ -30,6 +30,8 @@ snapshot:
 
 release:
   name_template: "Release v{{.Version}}"
+  draft: true
+  prerelease: auto
 
 changelog:
   sort: asc
