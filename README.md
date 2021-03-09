@@ -49,21 +49,21 @@ Call helm | via Golang Module | Shell Executor
 ### Download one of [releases](https://github.com/zhilyaev/helmwave/releases) ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total)
 
 ```bash
-$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.8.3/helmwave-0.8.3-linux-amd64.tar.gz -O - | tar -xz
+$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.9.1/helmwave_0.9.1_linux_amd64.tar.gz -O - | tar -xz
 $ mv helmwave /usr/local/bin/
 ```
 
 ### Install with go ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
-$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.8.3
+$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.9.1
 ```
 
 ### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
 ```
-$ docker run diamon/helmwave:0.8.3
-$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.8.3
+$ docker run diamon/helmwave:0.9.1
+$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.9.1
 ```
 
 ### Build with ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
@@ -83,7 +83,7 @@ Suppose the `helmwave.yml.tpl` representing the desired state of your helm relea
 
 ```yaml
 project: my-project
-version: 0.8.3
+version: 0.9.1
 
 
 repositories:
@@ -259,7 +259,7 @@ USAGE:
    helmwave [global options] command [command options] [arguments...]
 
 VERSION:
-   0.8.3
+   0.9.1
 
 DESCRIPTION:
    🏖 This tool helps you compose your helm releases!
@@ -298,7 +298,7 @@ Suppose the `helmwave.yml.tpl` looks like:
 
 ```yaml
 project: {{ env "CI_PROJECT_NAME" }}
-version: 0.8.3
+version: 0.9.1
 
 
 repositories:
@@ -331,7 +331,7 @@ Once applied, your `helmwave.yml` will look like:
 
 ```yaml
 project: my-project
-version: 0.8.3
+version: 0.9.1
 
 
 repositories:
@@ -362,7 +362,7 @@ This command will generate helmwave.plan.
 
   ```yaml
   project: my-project
-  version: 0.8.3
+  version: 0.9.1
   repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
@@ -485,7 +485,7 @@ releases:
 
   ```yaml
   project: my
-  version: 0.8.3
+  version: 0.9.1
   
   
   repositories:
@@ -519,7 +519,7 @@ $ helmwave yml
 
   ```yaml
   project: my
-  version: 0.8.3
+  version: 0.9.1
   
   repositories:
     - name: bitnami
