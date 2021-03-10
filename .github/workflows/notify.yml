@@ -8,10 +8,26 @@ jobs:
   notify-telegram:
     runs-on: ubuntu-latest
     steps:
-    - name: telegram
-      uses: yanzay/notify-telegram@v0.1.0
-      if: always()
+#    - name: telegram1
+#      uses: yanzay/notify-telegram@v0.1.0
+#      if: always()
+#      with:
+#        chat: "@helmwave"
+#        token: ${{ secrets.BOT_TOKEN }}
+#        status: ${{ job.status }}
+
+    - name: Set GITHUB_TAG
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+    - name: Telegram
+      uses: appleboy/telegram-action@master
+      env:
+        GITHUB_TAG: ${{ steps.vars.outputs.tag }}
       with:
-        chat: "@helmwave"
+        to: ${{ secrets.CHAT }}
         token: ${{ secrets.BOT_TOKEN }}
-        status: ${{ job.status }}
+        format: markdown
+        message: |
+          Helmwave *v${{ env.GITHUB_TAG }}* is ready!
+          See more: https://github.com/zhilyaev/helmwave/releases/tag/${{ env.GITHUB_TAG }}
