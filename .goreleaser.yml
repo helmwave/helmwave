@@ -39,3 +39,22 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+
+dockers:
+  - image_templates:
+      - "zhilyaev/helmwave/helmwave:{{ .Tag }}"
+      - "zhilyaev/helmwave/helmwave:latest"
+    goos: linux
+    goarch: amd64
+    use_buildx: true
+
+brews:
+  - tap:
+      owner: zhilyaev
+      name: helmwave
+    folder: formula
+    description: "Software to create fast and easy drum rolls."
+    license: "MIT"
+
+
