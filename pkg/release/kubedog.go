@@ -1,9 +1,9 @@
 package release
 
 import (
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
-	"github.com/zhilyaev/helmwave/pkg/kubedog"
 	"io/ioutil"
 )
 

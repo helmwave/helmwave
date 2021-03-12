@@ -1,8 +1,8 @@
 package yml
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhilyaev/helmwave/pkg/helper"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )

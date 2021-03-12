@@ -1,8 +1,8 @@
 package release
 
 import (
-	"github.com/zhilyaev/helmwave/pkg/helper"
-	"github.com/zhilyaev/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/template"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"strings"
 )

@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/helmwave/helmwave/pkg/helmwave"
 	"github.com/urfave/cli/v2"
-	"github.com/zhilyaev/helmwave/pkg/helmwave"
 	"time"
 )
 

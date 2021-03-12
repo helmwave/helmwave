@@ -1,10 +1,10 @@
 package helmwave
 
 import (
+	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/yml"
 	"github.com/urfave/cli/v2"
-	"github.com/zhilyaev/helmwave/pkg/kubedog"
-	"github.com/zhilyaev/helmwave/pkg/template"
-	"github.com/zhilyaev/helmwave/pkg/yml"
 	helm "helm.sh/helm/v3/pkg/cli"
 )
 

@@ -1,10 +1,10 @@
 package main
 
 import (
+	helmwaveCli "github.com/helmwave/helmwave/pkg/cli"
+	"github.com/helmwave/helmwave/pkg/helmwave"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	helmwaveCli "github.com/zhilyaev/helmwave/pkg/cli"
-	"github.com/zhilyaev/helmwave/pkg/helmwave"
 	"os"
 )
 

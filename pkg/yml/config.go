@@ -1,8 +1,8 @@
 package yml
 
 import (
-	"github.com/zhilyaev/helmwave/pkg/release"
-	"github.com/zhilyaev/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/repo"
 )
 
 type Config struct {

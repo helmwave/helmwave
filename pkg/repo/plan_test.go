@@ -3,7 +3,7 @@
 package repo
 
 import (
-	"github.com/zhilyaev/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"testing"
 )
 

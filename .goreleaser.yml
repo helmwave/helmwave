@@ -5,17 +5,17 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
-#      - GO386=softfloat
+      - GO386=softfloat
     goos:
       - linux
-#      - windows
+      - windows
       - darwin
     ignore:
       - goos: darwin
         goarch: 386
     main: ./cmd/helmwave
     ldflags:
-      - -s -w -X github.com/zhilyaev/helmwave/pkg/helmwave.Version={{.Version}}
+      - -s -w -X github.com/helmwave/helmwave/pkg/helmwave.Version={{.Version}}
 
 archives:
   - format_overrides:
@@ -44,8 +44,8 @@ changelog:
 dockers:
   - dockerfile: Dockerfile
     image_templates:
-      - "docker.pkg.github.com/zhilyaev/helmwave/helmwave:{{ .Version }}"
-      - "docker.pkg.github.com/zhilyaev/helmwave/helmwave:latest"
+      - "docker.pkg.github.com/helmwave/helmwave:{{ .Version }}"
+      - "docker.pkg.github.com/helmwave/helmwave:latest"
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"

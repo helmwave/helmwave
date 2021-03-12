@@ -2,9 +2,9 @@ package helmwave
 
 import (
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/yml"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/zhilyaev/helmwave/pkg/yml"
 	"os"
 )
 

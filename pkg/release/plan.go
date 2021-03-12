@@ -1,8 +1,8 @@
 package release
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhilyaev/helmwave/pkg/helper"
 	"os"
 	"sort"
 	"strings"

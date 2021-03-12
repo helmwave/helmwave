@@ -3,8 +3,8 @@ package template
 import (
 	"bytes"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhilyaev/helmwave/pkg/helper"
 	"io/ioutil"
 	"text/template"
 )
