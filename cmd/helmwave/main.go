@@ -16,7 +16,6 @@ func main() {
 
 	c.Usage = "composer for helm"
 	c.Version = app.Version
-	c.Authors = authors()
 	c.Flags = flags(app)
 	c.Commands = commands()
 	c.Description = "🏖 This tool helps you compose your helm releases!"
