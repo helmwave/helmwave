@@ -5,10 +5,10 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
-      - GO386=softfloat
+#      - GO386=softfloat
     goos:
       - linux
-      - windows
+#      - windows
       - darwin
     ignore:
       - goos: darwin
@@ -29,7 +29,7 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 
 release:
-  name_template: "Release v{{.Version}}"
+  name_template: "v{{.Version}}"
   draft: true
   prerelease: auto
 
@@ -42,19 +42,26 @@ changelog:
 
 
 dockers:
-  - image_templates:
-      - "zhilyaev/helmwave/helmwave:{{ .Tag }}"
-      - "zhilyaev/helmwave/helmwave:latest"
+  - dockerfile: Dockerfile
+    image_templates:
+      - "docker.pkg.github.com/zhilyaev/helmwave/helmwave:{{ .Version }}"
+      - "docker.pkg.github.com/zhilyaev/helmwave/helmwave:latest"
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: amd64
     use_buildx: true
 
 brews:
   - tap:
-      owner: zhilyaev
-      name: helmwave
-    folder: formula
-    description: "Software to create fast and easy drum rolls."
+      owner: helmwave
+      name: homebrew-tap
+    description: "HelmWave is like docker-compose for helm"
     license: "MIT"
+    folder: formula
 
 
