@@ -1,6 +1,10 @@
-FROM golang:1.15-alpine3.13 AS builder
+ARG GOLANG_VERSION=1.15
+ARG ALPINE_VERSION=3.13
+
+FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 LABEL maintainer="helmwave+zhilyaev.dmitriy@gmail.com"
+MAINTAINER "helmwave+zhilyaev.dmitriy@gmail.com"
 LABEL name="helmwave"
 
 # enable Go modules support
@@ -12,11 +16,20 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy src code from the host and compile it
-COPY cmd cmd
-COPY pkg pkg
-RUN CGO_ENABLED=0 GOOS=linux go build -a -o /helmwave ./cmd/helmwave
+COPY . .
+RUN CGO_ENABLED=0 go build -a -o /helmwave ./cmd/helmwave
 
-FROM alpine:3.13
+###
+FROM alpine:${ALPINE_VERSION} as base-release
 RUN apk --no-cache add ca-certificates
-COPY --from=builder /helmwave /bin
 ENTRYPOINT ["/bin/helmwave"]
+
+###
+FROM base-release as goreleaser
+
+COPY helmwave /bin/
+
+###
+FROM base-release
+
+COPY --from=builder /helmwave /bin/
