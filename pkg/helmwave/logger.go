@@ -2,8 +2,8 @@ package helmwave
 
 import (
 	"github.com/bombsimon/logrusr"
+	"github.com/helmwave/helmwave/pkg/formatter"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhilyaev/helmwave/pkg/formatter"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
 )

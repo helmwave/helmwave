@@ -2,9 +2,9 @@ package release
 
 import (
 	"errors"
+	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/parallel"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhilyaev/helmwave/pkg/helper"
-	"github.com/zhilyaev/helmwave/pkg/parallel"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"os"
 )

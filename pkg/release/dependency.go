@@ -2,8 +2,8 @@ package release
 
 import (
 	"errors"
+	"github.com/helmwave/helmwave/pkg/pubsub"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhilyaev/helmwave/pkg/pubsub"
 	"sort"
 	"time"
 )

@@ -1,5 +1,5 @@
 package main
 
-import "github.com/zhilyaev/helmwave/pkg/helmwave"
+import "github.com/helmwave/helmwave/pkg/helmwave"
 
 var app *helmwave.Config

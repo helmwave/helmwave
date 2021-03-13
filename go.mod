@@ -1,6 +1,6 @@
-module github.com/zhilyaev/helmwave
+module github.com/helmwave/helmwave
 
-go 1.15
+go 1.16
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.0

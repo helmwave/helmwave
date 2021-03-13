@@ -1,10 +1,10 @@
 package main
 
 import (
+	helmwaveCli "github.com/helmwave/helmwave/pkg/cli"
+	"github.com/helmwave/helmwave/pkg/helmwave"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	helmwaveCli "github.com/zhilyaev/helmwave/pkg/cli"
-	"github.com/zhilyaev/helmwave/pkg/helmwave"
 	"os"
 )
 
@@ -16,7 +16,6 @@ func main() {
 
 	c.Usage = "composer for helm"
 	c.Version = app.Version
-	c.Authors = authors()
 	c.Flags = flags(app)
 	c.Commands = commands()
 	c.Description = "🏖 This tool helps you compose your helm releases!"

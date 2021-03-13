@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"github.com/zhilyaev/helmwave/pkg/helmwave"
-	"github.com/zhilyaev/helmwave/pkg/kubedog"
+	"github.com/helmwave/helmwave/pkg/helmwave"
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	"helm.sh/helm/v3/pkg/cli"
 )
 

@@ -1,9 +1,9 @@
 package repo
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhilyaev/helmwave/pkg/helper"
-	"github.com/zhilyaev/helmwave/pkg/release"
 	"os"
 	"strings"
 )

@@ -1,7 +1,7 @@
 package release
 
 import (
-	"github.com/zhilyaev/helmwave/pkg/pubsub"
+	"github.com/helmwave/helmwave/pkg/pubsub"
 	"helm.sh/helm/v3/pkg/action"
 )
 

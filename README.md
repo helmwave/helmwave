@@ -5,7 +5,7 @@
 <h1 align="center"> HelmWave</h1>
 
 <p align="center">
-  <a href="https://github.com/zhilyaev/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/zhilyaev/helmwave/workflows/release/badge.svg" /></a>
+  <a href="https://github.com/helmwave/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/helmwave/helmwave/workflows/release/badge.svg" /></a>
   <a href="https://t.me/helmwave" ><img src="https://img.shields.io/badge/telegram-chat-179cde.svg?logo=telegram" /></a>
   <img alt="GitHub" src="https://img.shields.io/github/license/zhilyaev/helmwave">
   <img alt="GitHub tag (latest SemVer)" src="https://img.shields.io/github/v/tag/zhilyaev/helmwave?label=latest">
@@ -46,32 +46,24 @@ Call helm | via Golang Module | Shell Executor
 
 ## 📥 Installation
 
-### Download one of [releases](https://github.com/zhilyaev/helmwave/releases) ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total)
+### Download one of [releases](https://github.com/helmwave/helmwave/releases) ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total)
 
 ```bash
-$ wget -c https://github.com/zhilyaev/helmwave/releases/download/0.9.1/helmwave_0.9.1_linux_amd64.tar.gz -O - | tar -xz
+$ wget -c https://github.com/helmwave/helmwave/releases/download/0.9.1/helmwave_0.9.1_linux_amd64.tar.gz -O - | tar -xz
 $ mv helmwave /usr/local/bin/
 ```
 
 ### Install with go ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
 
 ```bash
-$ GO111MODULE=on go get github.com/zhilyaev/helmwave/cmd/helmwave@0.9.1
+$ GO111MODULE=on go get github.com/helmwave/helmwave/cmd/helmwave@0.9.1
 ```
 
 ### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
-#### Docker Hub
-```bash
+```
 $ docker run diamon/helmwave:0.9.1
 $ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave:0.9.1
-```
-
-#### Github Packages
-
-```bash
-$ docker login docker.pkg.github.com
-$ docker run docker.pkg.github.com/zhilyaev/helmwave/helmwave:0.9.1
 ```
 
 ### Build with ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zhilyaev/helmwave)
@@ -143,7 +135,7 @@ redis-b-slave-1    1/1     Running   0          51s
 ### RU
 
 - [HelmWave v0.5.0 – GitOps для твоего Kubernetes](https://habr.com/ru/post/532596/)
-- HelmWave v0.8.3 – Kubedog is ready
+- HelmWave v0.8.3 – Kubedog рядом
 
 ## EN
 

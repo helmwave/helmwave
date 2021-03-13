@@ -15,7 +15,7 @@ builds:
         goarch: 386
     main: ./cmd/helmwave
     ldflags:
-      - -s -w -X github.com/zhilyaev/helmwave/pkg/helmwave.Version={{.Version}}
+      - -s -w -X github.com/helmwave/helmwave/pkg/helmwave.Version={{.Version}}
 
 archives:
   - format_overrides:
@@ -29,7 +29,7 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 
 release:
-  name_template: "Release v{{.Version}}"
+  name_template: "v{{.Version}}"
   draft: true
   prerelease: auto
 
@@ -39,3 +39,33 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+
+dockers:
+  - dockerfile: Dockerfile
+    image_templates:
+      - "docker.pkg.github.com/helmwave/helmwave/helmwave:{{ .Version }}"
+      - "docker.pkg.github.com/helmwave/helmwave/helmwave:latest"
+      - "ghcr.io/helmwave/helmwave:{{ .Version }}"
+      - "ghcr.io/helmwave/helmwave:latest"
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+      - "--platform=linux/amd64"
+    goos: linux
+    goarch: amd64
+    use_buildx: true
+
+brews:
+  - tap:
+      owner: helmwave
+      name: homebrew-tap
+    description: "HelmWave is like docker-compose for helm"
+    license: "MIT"
+    folder: formula
+
+
