@@ -30,7 +30,7 @@ snapshot:
 
 release:
   name_template: "v{{.Version}}"
-  draft: true
+#  draft: true
   prerelease: auto
 
 changelog:
