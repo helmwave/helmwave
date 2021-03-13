@@ -55,6 +55,7 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.licenses=MIT"
+      - "--platform=linux/amd64"
     goos: linux
     goarch: amd64
     use_buildx: true
