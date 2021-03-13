@@ -39,6 +39,9 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+      - Merge pull request
+      - Merge branch
+      - go mod tidy
 
 
 dockers:
@@ -46,8 +49,12 @@ dockers:
     image_templates:
       - "docker.pkg.github.com/helmwave/helmwave/helmwave:{{ .Version }}"
       - "docker.pkg.github.com/helmwave/helmwave/helmwave:latest"
+
       - "ghcr.io/helmwave/helmwave:{{ .Version }}"
       - "ghcr.io/helmwave/helmwave:latest"
+
+      - "diamon/helmwave:{{ .Version }}"
+      - "diamon/helmwave:latest"
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -55,6 +62,7 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.licenses=MIT"
+
       - "--platform=linux/amd64"
       - "--target=goreleaser"
     goos: linux
