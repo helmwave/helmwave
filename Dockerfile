@@ -16,7 +16,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy src code from the host and compile it
-COPY . .
+COPY cmd cmd
+COPY pkg pkg
 RUN CGO_ENABLED=0 go build -a -o /helmwave ./cmd/helmwave
 
 ###
