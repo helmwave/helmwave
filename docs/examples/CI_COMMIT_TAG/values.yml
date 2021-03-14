@@ -1,2 +1,0 @@
-image:
-  tag: {{ env "CI_COMMIT_TAG" }}
