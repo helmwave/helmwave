@@ -1,6 +1,7 @@
 package yml
 
 import (
+	"context"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -61,26 +62,31 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 
 	wg := parallel.NewWaitGroup()
 
-	err = c.runMultitracks(mapSpecs, settings, kubedogConfig, wg)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = c.runMultitracks(ctx, mapSpecs, settings, kubedogConfig, wg)
 	if err != nil {
 		return err
 	}
 
 	wg.Add(1)
-	go func(c *Config, manifestPath string, async bool, wg *parallel.WaitGroup) {
+	go func(c *Config, manifestPath string, async bool, wg *parallel.WaitGroup, cancel context.CancelFunc) {
 		defer wg.Done()
 		wg.ErrChan() <- c.SyncReleases(manifestPath, async)
-	}(c, manifestPath, async, wg)
+		cancel()
+	}(c, manifestPath, async, wg, cancel)
 
 	return wg.Wait()
 }
 
-func (c *Config) runMultitracks(mapSpecs map[string]*multitrack.MultitrackSpecs, settings *helm.EnvSettings, kubedogConfig *kubedog.Config, wg *parallel.WaitGroup) error {
+func (c *Config) runMultitracks(parentContext context.Context, mapSpecs map[string]*multitrack.MultitrackSpecs, settings *helm.EnvSettings, kubedogConfig *kubedog.Config, wg *parallel.WaitGroup) error {
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogConfig.StatusInterval,
 		Options: tracker.Options{
-			Timeout:      kubedogConfig.Timeout,
-			LogsFromTime: time.Now(),
+			ParentContext: parentContext,
+			Timeout:       kubedogConfig.Timeout,
+			LogsFromTime:  time.Now(),
 		},
 	}
 
