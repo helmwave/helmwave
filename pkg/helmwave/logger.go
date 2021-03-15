@@ -2,7 +2,7 @@ package helmwave
 
 import (
 	"github.com/bombsimon/logrusr"
-	"github.com/helmwave/helmwave/pkg/formatter"
+	"github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
