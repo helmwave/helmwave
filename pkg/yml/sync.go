@@ -73,8 +73,8 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 	wg.Add(1)
 	go func(c *Config, manifestPath string, async bool, wg *parallel.WaitGroup, cancel context.CancelFunc) {
 		defer wg.Done()
+		defer cancel()
 		wg.ErrChan() <- c.SyncReleases(manifestPath, async)
-		cancel()
 	}(c, manifestPath, async, wg, cancel)
 
 	return wg.Wait()
