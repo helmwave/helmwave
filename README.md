@@ -59,4 +59,5 @@ $ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave
 
 ## 📖 [Documentation](https://helmwave.github.io/)
 
+Documentation is hosted live at https://helmwave.github.io
 
