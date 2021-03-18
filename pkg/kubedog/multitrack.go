@@ -91,7 +91,7 @@ loop:
 				return nil, fmt.Errorf("%s does not support for job", name)
 			}
 
-			v, err := strconv.ParseUint(value, 10, 64)
+			v, err := strconv.ParseUint(value, 10, 32)
 			if err != nil {
 				return nil, err
 			}
