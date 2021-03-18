@@ -105,6 +105,13 @@ func flags(app *helmwave.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &app.Kubedog.Timeout,
 		},
+		&cli.IntFlag{
+			Name:        "kubedog-log-width",
+			Usage:       "Set kubedog max log line width",
+			Value:       140,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
+			Destination: &app.Logger.Width,
+		},
 		&cli.BoolFlag{
 			Name:        "enable-dependencies",
 			Usage:       "Enable dependencies",
