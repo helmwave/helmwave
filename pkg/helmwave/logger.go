@@ -4,6 +4,7 @@ import (
 	"github.com/bombsimon/logrusr"
 	"github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
+	"github.com/werf/logboek"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
 )
@@ -13,6 +14,7 @@ type Log struct {
 	Level  string
 	Format string
 	Color  bool
+	Width  int
 }
 
 func (c *Config) InitLogger() error {
@@ -22,6 +24,10 @@ func (c *Config) InitLogger() error {
 		logKubernetesClientError,
 	}
 	klog.SetLogger(logrusr.NewLogger(log.StandardLogger()))
+
+	if c.Logger.Width > 0 {
+		logboek.DefaultLogger().Streams().SetWidth(c.Logger.Width)
+	}
 
 	c.InitLoggerFormat()
 	return c.InitLoggerLevel()
