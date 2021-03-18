@@ -24,7 +24,7 @@ func (ps *ReleasePubSub) Subscribe(release string) <-chan ReleaseStatus {
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 
-	ch := make(chan ReleaseStatus)
+	ch := make(chan ReleaseStatus, 1)
 	ps.subs[release] = append(ps.subs[release], ch)
 	return ch
 }

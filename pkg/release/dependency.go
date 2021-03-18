@@ -69,8 +69,9 @@ func (rel *Config) HandleDependencies(releases []*Config) {
 	sort.Strings(rel.DependsOn)
 
 	for _, r := range releases {
-		if i := sort.SearchStrings(rel.DependsOn, r.Name); i < len(rel.DependsOn) && rel.DependsOn[i] == r.Name {
-			rel.addDependency(r.Name)
+		name := r.UniqName()
+		if i := sort.SearchStrings(rel.DependsOn, name); i < len(rel.DependsOn) && rel.DependsOn[i] == name {
+			rel.addDependency(name)
 		}
 	}
 }
