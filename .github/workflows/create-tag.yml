@@ -3,7 +3,7 @@ name: Create tag
 on:
   pull_request:
     branches:
-      - release-.*
+      - main
     types:
       - closed
 
@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Create tag
         uses: actions/github-script@v3
-        if: github.event.pull_request.merged == true
+        if: github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release-')
         with:
           github-token: ${{ github.token }}
           script: |
@@ -24,3 +24,4 @@ jobs:
               ref: "refs/tags/" + tag,
               sha: context.payload.pull_request.merge_commit_sha
             })
+
