@@ -13,13 +13,13 @@ var DependencyFailedError = errors.New("dependency failed")
 
 func (rel *Config) NotifySuccess() {
 	if !rel.Options.DryRun {
-		releasePubSub.PublishSuccess(rel.Name)
+		releasePubSub.PublishSuccess(rel.UniqName())
 	}
 }
 
 func (rel *Config) NotifyFailed() {
 	if !rel.Options.DryRun {
-		releasePubSub.PublishFailed(rel.Name)
+		releasePubSub.PublishFailed(rel.UniqName())
 	}
 }
 
