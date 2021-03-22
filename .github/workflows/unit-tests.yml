@@ -1,13 +1,10 @@
 name: Unit tests
 
 on:
-  push:
+  pull_request:
     branches:
-      - master
       - main
       - release*
-  pull_request:
-
 
 jobs:
   unit-tests:
