@@ -21,7 +21,7 @@ jobs:
         with:
           github-token: ${{ github.token }}
           script: |
-            const tag = context.payload.pull_request.head.ref.replace("release-", "")
+            const tag = context.payload.pull_request.head.ref.replace("release-", "v")
             github.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
