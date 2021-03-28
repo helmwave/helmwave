@@ -73,10 +73,10 @@ func Sync(releases []*Config, manifestPath string, async bool) (err error) {
 		log.Debug("🐞 Run in parallel mode")
 		wg.Add(len(releases))
 		for i := range releases {
-			go func(wg *parallel.WaitGroup, release *Config, fails []*Config, manifestPath string) {
+			go func(wg *parallel.WaitGroup, release *Config, fails *[]*Config, manifestPath string) {
 				defer wg.Done()
-				release.SyncWithFails(&fails, manifestPath)
-			}(wg, releases[i], fails, manifestPath)
+				release.SyncWithFails(fails, manifestPath)
+			}(wg, releases[i], &fails, manifestPath)
 		}
 		err := wg.Wait()
 		if err != nil {
