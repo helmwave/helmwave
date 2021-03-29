@@ -1,16 +1,75 @@
 name: Make release
 
 on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
   push:
     tags: ['*']
 
 jobs:
+  tagger:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Create tag
+        id: tag
+        uses: actions/github-script@v3
+        if: github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release-')
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const tag = context.payload.pull_request.head.ref.replace("release-", "v")
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/" + tag,
+              sha: context.payload.pull_request.merge_commit_sha
+            })
+            return tag
+          result-encoding: string
+    outputs:
+      tag: ${{ steps.tag.outputs.result }}
+
+  get-tag:
+    runs-on: ubuntu-latest
+    if: success() || needs.tagger.result == 'skipped'
+    needs:
+      - tagger
+    steps:
+      - name: get pushed tag
+        id: pushed
+        if: needs.tagger.result != 'success'
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
+      - name: get created tag
+        id: created
+        run: echo "::set-output name=tag::$TAG"
+        if: needs.tagger.result == 'success'
+        env:
+          TAG: "${{ needs.tagger.outputs.tag }}"
+
+      - name: combine tags
+        id: combined
+        run: echo "::set-output name=tag::$CREATED$PUSHED"
+        env:
+          CREATED: ${{ steps.created.outputs.tag }}
+          PUSHED: ${{ steps.pushed.outputs.tag }}
+    outputs:
+      tag: ${{ steps.combined.outputs.tag }}
+
   goreleaser:
     runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - get-tag
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          ref: ${{ needs.get-tag.outputs.tag }}
 
       - name: Login to GitHub Packages Docker Registry
         uses: docker/login-action@v1
