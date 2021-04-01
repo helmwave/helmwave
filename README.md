@@ -40,21 +40,13 @@ Sprig | ✅|✅
 Call helm | via Golang Module | Shell Executor
 
 
-## 📥 Installation
-
-### Download one of [releases](https://github.com/helmwave/helmwave/releases) ![GitHub all releases](https://img.shields.io/github/downloads/zhilyaev/helmwave/total)
-
-```bash
-$ wget -c https://github.com/helmwave/helmwave/releases/download/0.9.1/helmwave_0.9.1_linux_amd64.tar.gz -O - | tar -xz
-$ mv helmwave /usr/local/bin/
-```
-
-
 ### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
 ```
-$ docker run diamon/helmwave
-$ docker run --entrypoint=ash -it --rm --name helmwave diamon/helmwave
+$ docker run diamon/helmwave version
+helmwave version 0.9.2
+$ docker run --entrypoint=ash -it --rm diamon/helmwave
+/ # 
 ```
 
 ## 📖 [Documentation](https://helmwave.github.io/)
