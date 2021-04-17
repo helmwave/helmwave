@@ -18,21 +18,21 @@ func Test_normalizeTagList(t *testing.T) {
 	}{
 		{
 			name: "idempotent",
-			args: {
+			args: args{
 				tags: []string{"1", "2", "3"},
 			},
 			want: []string{"1", "2", "3"},
 		},
 		{
 			name: "sort",
-			args: {
+			args: args{
 				tags: []string{"3", "2", "1"},
 			},
 			want: []string{"1", "2", "3"},
 		},
 		{
 			name: "trim",
-			args: {
+			args: args{
 				tags: []string{" 1", "2 ", " 3 "},
 			},
 			want: []string{"1", "2", "3"},
@@ -59,7 +59,7 @@ func Test_checkTagInclusion(t *testing.T) {
 	}{
 		{
 			name: "no target tags",
-			args: {
+			args: args{
 				targetTags:  []string{},
 				releaseTags: []string{"1"},
 			},
@@ -67,7 +67,7 @@ func Test_checkTagInclusion(t *testing.T) {
 		},
 		{
 			name: "no release tags",
-			args: {
+			args: args{
 				targetTags:  []string{"1"},
 				releaseTags: []string{},
 			},
@@ -75,7 +75,7 @@ func Test_checkTagInclusion(t *testing.T) {
 		},
 		{
 			name: "equal tags",
-			args: {
+			args: args{
 				targetTags:  []string{"1"},
 				releaseTags: []string{"1"},
 			},
@@ -83,7 +83,7 @@ func Test_checkTagInclusion(t *testing.T) {
 		},
 		{
 			name: "contains",
-			args: {
+			args: args{
 				targetTags:  []string{"1", "2", "3"},
 				releaseTags: []string{"1", "4", "20"},
 			},
@@ -91,7 +91,7 @@ func Test_checkTagInclusion(t *testing.T) {
 		},
 		{
 			name: "doesn't contain",
-			args: {
+			args: args{
 				targetTags:  []string{"1", "2", "3"},
 				releaseTags: []string{"4", "5", "6"},
 			},
