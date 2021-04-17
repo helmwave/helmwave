@@ -87,7 +87,7 @@ func (c *Config) PlanRepos() {
 }
 
 func (c *Config) PlanReleases(tags []string) {
-	c.Releases = release.Plan(tags, c.Releases)
+	c.Releases = release.Plan(tags, c.Releases, c.EnableDependencies)
 	names := make([]string, len(c.Releases))
 	for i, v := range c.Releases {
 		if c.EnableDependencies {
