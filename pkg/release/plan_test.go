@@ -3,6 +3,7 @@
 package release
 
 import (
+	"helm.sh/helm/v3/pkg/action"
 	"reflect"
 	"testing"
 )
@@ -102,6 +103,74 @@ func Test_checkTagInclusion(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := checkTagInclusion(tt.args.targetTags, tt.args.releaseTags); got != tt.want {
 				t.Errorf("checkTagInclusion() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPlan(t *testing.T) {
+	type args struct {
+		tags               []string
+		enableDependencies bool
+	}
+
+	releases := []*Config{
+		{
+			Name: "release1",
+			Tags: []string{"1"},
+			Options: action.Upgrade{
+				Namespace: "ns",
+			},
+			DependsOn: []string{"release2@ns"},
+		},
+		{
+			Name: "release2",
+			Tags: []string{"2"},
+			Options: action.Upgrade{
+				Namespace: "ns",
+			},
+		},
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantPlan []*Config
+	}{
+		{
+			name: "empty tags",
+			args: args{
+				tags: []string{},
+			},
+			want: releases,
+		},
+		{
+			name: "tag filter",
+			args: args{
+				tags:               releases[0].Tags,
+				enableDependencies: false,
+			},
+			want: []*Config{releases[0]},
+		},
+		{
+			name: "nonexistent tag",
+			args: args{
+				tags: []string{"1231231"},
+			},
+			want: []*Config{},
+		},
+		{
+			name: "add dependency",
+			args: args{
+				tags:               releases[0].Tags,
+				enableDependencies: true,
+			},
+			want: releases,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotPlan := Plan(tt.args.tags, releases, tt.args.enableDependencies); !reflect.DeepEqual(gotPlan, tt.wantPlan) {
+				t.Errorf("Plan() = %v, want %v", gotPlan, tt.wantPlan)
 			}
 		})
 	}
