@@ -64,7 +64,7 @@ func Test_checkTagInclusion(t *testing.T) {
 				targetTags:  []string{},
 				releaseTags: []string{"1"},
 			},
-			want: false,
+			want: true,
 		},
 		{
 			name: "no release tags",
@@ -83,9 +83,17 @@ func Test_checkTagInclusion(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "contains",
+			name: "contains partially",
 			args: args{
 				targetTags:  []string{"1", "2", "3"},
+				releaseTags: []string{"1", "4", "20"},
+			},
+			want: false,
+		},
+		{
+			name: "contains completely",
+			args: args{
+				targetTags:  []string{"1", "4"},
 				releaseTags: []string{"1", "4", "20"},
 			},
 			want: true,
