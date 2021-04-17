@@ -152,6 +152,14 @@ func TestPlan(t *testing.T) {
 			wantPlan: []*Config{releases[0]},
 		},
 		{
+			name: "global tag (check release duplication)",
+			args: args{
+				tags:               []string{"3"},
+				enableDependencies: true,
+			},
+			wantPlan: releases,
+		},
+		{
 			name: "multiple tags",
 			args: args{
 				tags:               []string{"1", "2"},
