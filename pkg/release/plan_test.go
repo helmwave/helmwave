@@ -169,7 +169,11 @@ func TestPlan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotPlan := Plan(tt.args.tags, releases, tt.args.enableDependencies); !reflect.DeepEqual(gotPlan, tt.wantPlan) {
+			gotPlan := Plan(tt.args.tags, releases, tt.args.enableDependencies)
+			if len(gotPlan) == 0 && len(tt.wantPlan) == 0 {
+				return
+			}
+			if !reflect.DeepEqual(gotPlan, tt.wantPlan) {
 				t.Errorf("Plan() = %v, want %v", gotPlan, tt.wantPlan)
 			}
 		})
