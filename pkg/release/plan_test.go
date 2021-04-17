@@ -117,7 +117,7 @@ func TestPlan(t *testing.T) {
 	releases := []*Config{
 		{
 			Name: "release1",
-			Tags: []string{"1"},
+			Tags: []string{"1", "3"},
 			Options: action.Upgrade{
 				Namespace: "ns",
 			},
@@ -125,7 +125,7 @@ func TestPlan(t *testing.T) {
 		},
 		{
 			Name: "release2",
-			Tags: []string{"2"},
+			Tags: []string{"2", "3"},
 			Options: action.Upgrade{
 				Namespace: "ns",
 			},
@@ -147,6 +147,22 @@ func TestPlan(t *testing.T) {
 			name: "tag filter",
 			args: args{
 				tags:               releases[0].Tags,
+				enableDependencies: false,
+			},
+			wantPlan: []*Config{releases[0]},
+		},
+		{
+			name: "multiple tags",
+			args: args{
+				tags:               []string{"1", "2"},
+				enableDependencies: false,
+			},
+			wantPlan: []*Config{},
+		},
+		{
+			name: "multiple tags",
+			args: args{
+				tags:               []string{"1", "3"},
 				enableDependencies: false,
 			},
 			wantPlan: []*Config{releases[0]},
