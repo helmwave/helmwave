@@ -21,3 +21,7 @@ comment:
   layout: "reach,diff,flags,files,footer"
   behavior: default
   require_changes: false
+
+flags:
+  integration:
+    carryforward: true
