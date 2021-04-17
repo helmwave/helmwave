@@ -141,7 +141,7 @@ func TestPlan(t *testing.T) {
 			args: args{
 				tags: []string{},
 			},
-			want: releases,
+			wantPlan: releases,
 		},
 		{
 			name: "tag filter",
@@ -149,14 +149,14 @@ func TestPlan(t *testing.T) {
 				tags:               releases[0].Tags,
 				enableDependencies: false,
 			},
-			want: []*Config{releases[0]},
+			wantPlan: []*Config{releases[0]},
 		},
 		{
 			name: "nonexistent tag",
 			args: args{
 				tags: []string{"1231231"},
 			},
-			want: []*Config{},
+			wantPlan: []*Config{},
 		},
 		{
 			name: "add dependency",
@@ -164,7 +164,7 @@ func TestPlan(t *testing.T) {
 				tags:               releases[0].Tags,
 				enableDependencies: true,
 			},
-			want: releases,
+			wantPlan: releases,
 		},
 	}
 	for _, tt := range tests {
