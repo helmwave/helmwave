@@ -8,43 +8,64 @@ import (
 	"strings"
 )
 
-func Plan(tags []string, releases []*Config) (plan []*Config) {
+func Plan(tags []string, releases []*Config, enableDependencies bool) (plan []*Config) {
 	if len(tags) == 0 {
 		return releases
 	}
 
-	for _, t := range tags {
-		// "c, b , a " -> "c,b,a"
-		t := strings.Replace(t, " ", "", -1)
-		// "c,b,a" -> ["c", "b", "a"]
-		m := strings.Split(t, ",")
+	m := normalizeTagList(tags)
 
+	releasesMap := make(map[string]*Config)
+	if enableDependencies {
 		for _, r := range releases {
-			sort.Strings(r.Tags)
-			if len(m) > 1 {
-				// ["c", "b", "a"] -> ["a", "b", "c"]
-				sort.Strings(m)
-				sort.Strings(r.Tags)
+			releasesMap[r.UniqName()] = r
+		}
+	}
 
-				// ["a", "b", "c"] -> "a,b,c"
-				s1 := strings.Join(m, ",")
-				s2 := strings.Join(r.Tags, ",")
-
-				// "myTag,myTag2" == "myTag,myTag2"
-				if s1 == s2 && !r.In(plan) {
-					plan = append(plan, r)
-				}
-
-			} else {
-				// if myTag in [myTag2, myTag, myTag1]
-				if helper.Contains(t, r.Tags) && !r.In(plan) {
-					plan = append(plan, r)
-				}
-			}
+	for _, r := range releases {
+		if checkTagInclusion(m, r.Tags) {
+			plan = addToPlan(plan, r, releasesMap)
 		}
 	}
 
 	return plan
+}
+
+func addToPlan(plan []*Config, release *Config, releases map[string]*Config) []*Config {
+	if release.In(plan) {
+		return plan
+	}
+
+	r := append(plan, release)
+
+	for _, depName := range release.DependsOn {
+		if dep, ok := releases[depName]; ok {
+			r = addToPlan(r, dep, releases)
+		}
+	}
+
+	return r
+}
+
+//normalizeTagList normalizes and splits comma-separated tag list
+// ["c", " b ", "a "] -> ["a", "b", "c"]
+func normalizeTagList(tags []string) []string {
+	m := make([]string, len(tags))
+	for i, t := range tags {
+		m[i] = strings.TrimSpace(t)
+	}
+	sort.Strings(m)
+	return m
+}
+
+func checkTagInclusion(targetTags []string, releaseTags []string) bool {
+	for _, t := range targetTags {
+		if helper.Contains(t, releaseTags) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (rel *Config) PlanValues() {
