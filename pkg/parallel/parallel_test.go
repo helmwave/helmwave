@@ -34,7 +34,7 @@ func (s *ParallelTestSuite) TestErrors() {
 	s.Equal(err, e.(*multierror.Error).Unwrap())
 }
 
-func TestPlanTestSuite(t *testing.T) {
+func TestParallelTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(ParallelTestSuite))
 }

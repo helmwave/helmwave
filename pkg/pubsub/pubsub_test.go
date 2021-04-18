@@ -48,7 +48,7 @@ func (s *PubSubTestSuite) TestSubscribe() {
 	s.EqualValues(ch2, (<-chan ReleaseStatus)(s.ps.subs[release][1]))
 }
 
-func TestPlanTestSuite(t *testing.T) {
+func TestPubSubTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(PubSubTestSuite))
 }
