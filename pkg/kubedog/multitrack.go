@@ -38,7 +38,6 @@ func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 			}
 			specs.DaemonSets = append(specs.DaemonSets, *s)
 		}
-
 	}
 
 	return specs, nil
@@ -54,10 +53,10 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 		LogRegexByContainerName: map[string]*regexp.Regexp{},
 		TrackTerminationMode:    multitrack.WaitUntilResourceReady,
 		FailMode:                multitrack.FailWholeDeployProcessImmediately,
+		AllowFailuresCount:      new(int),
+		FailureThresholdSeconds: new(int),
 	}
-	spec.AllowFailuresCount = new(int)
 	*spec.AllowFailuresCount = 1
-	spec.FailureThresholdSeconds = new(int)
 	*spec.FailureThresholdSeconds = 0
 
 	// Override by annotations
@@ -66,7 +65,6 @@ loop:
 		// invalid := fmt.Errorf("%s/%s annotation %s with invalid value %s", r.Name, r.Kind, name, value)
 
 		switch name {
-
 		// Parse Value
 		case SkipLogsAnnoName:
 			v, err := strconv.ParseBool(value)
@@ -96,11 +94,12 @@ loop:
 				return nil, err
 			}
 
-			if r.Spec.Replicas == nil {
-				*r.Spec.Replicas = 1
+			replicas := 1
+			if r.Spec.Replicas != nil {
+				replicas = int(*r.Spec.Replicas)
 			}
 
-			*spec.AllowFailuresCount = int(v) * int(*r.Spec.Replicas)
+			*spec.AllowFailuresCount = int(v) * replicas
 
 		// Chose value
 		case TrackTerminationModeAnnoName:
@@ -115,6 +114,8 @@ loop:
 					continue loop
 				}
 			}
+
+			return nil, fmt.Errorf("%s not found", v)
 		case FailModeAnnoName:
 			v := multitrack.FailMode(value)
 			values := []multitrack.FailMode{
@@ -138,7 +139,7 @@ loop:
 				return nil, err
 			}
 			spec.SkipLogsForContainers = containers
-		case ShowLogsOnlyForContainers:
+		case ShowLogsOnlyForContainersAnnoName:
 			containers, err := splitContainers(value)
 			if err != nil {
 				return nil, err
