@@ -21,7 +21,7 @@ func (rel *Config) In(a []*Config) bool {
 }
 
 func (rel *Config) RenderValues(dir string) error {
-	rel.PlanValues()
+	rel.filterValuesFiles()
 
 	for i, v := range rel.Values {
 

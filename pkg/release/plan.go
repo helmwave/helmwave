@@ -47,18 +47,19 @@ func addToPlan(plan []*Config, release *Config, releases map[string]*Config) []*
 	return r
 }
 
-//normalizeTagList normalizes and splits comma-separated tag list
-// ["c", " b ", "a "] -> ["a", "b", "c"]
+// normalizeTagList normalizes and splits comma-separated tag list.
+// ["c", " b ", "a "] -> ["a", "b", "c"].
 func normalizeTagList(tags []string) []string {
 	m := make([]string, len(tags))
 	for i, t := range tags {
 		m[i] = strings.TrimSpace(t)
 	}
 	sort.Strings(m)
+
 	return m
 }
 
-//checkTagInclusion checks where any of release tags are included in target tags
+// checkTagInclusion checks where any of release tags are included in target tags.
 func checkTagInclusion(targetTags []string, releaseTags []string) bool {
 	for _, t := range targetTags {
 		if helper.Contains(t, releaseTags) {
@@ -69,16 +70,14 @@ func checkTagInclusion(targetTags []string, releaseTags []string) bool {
 	return false
 }
 
-func (rel *Config) PlanValues() {
-
+// filterValuesFiles filters non-existent values files.
+func (rel *Config) filterValuesFiles() {
 	for i := len(rel.Values) - 1; i >= 0; i-- {
-		if _, err := os.Stat(rel.Values[i]); err != nil {
-			if os.IsNotExist(err) {
-				rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
-			}
+		stat, err := os.Stat(rel.Values[i])
+		if os.IsNotExist(err) || stat.IsDir() {
+			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
 		}
 	}
-
 }
 
 func PlanValues(releases []*Config, dir string) error {
