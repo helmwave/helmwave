@@ -39,7 +39,7 @@ func (wg *WaitGroup) Wait() error {
 	wg.syncWG.Wait()
 	close(wg.errChan)
 	wg.closeMutex.Lock()
-	wg.closeMutex.Unlock()
+	defer wg.closeMutex.Unlock()
 
 	return wg.err.ErrorOrNil()
 }
