@@ -1,7 +1,6 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/template"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"strings"
@@ -48,9 +47,7 @@ func (rel *Config) ReposDeps() (repos []string, err error) {
 	deps := chart.Metadata.Dependencies
 
 	for _, d := range deps {
-		if strings.HasPrefix(d.Repository, "@") {
-			d.Repository = helper.TrimFirstRune(d.Repository)
-		}
+		d.Repository = strings.TrimPrefix(d.Repository, "@")
 		repos = append(repos, d.Repository)
 	}
 
