@@ -64,7 +64,7 @@ func Test_checkTagInclusion(t *testing.T) {
 				targetTags:  []string{},
 				releaseTags: []string{"1"},
 			},
-			want: false,
+			want: true,
 		},
 		{
 			name: "no release tags",
@@ -83,9 +83,17 @@ func Test_checkTagInclusion(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "contains",
+			name: "contains partially",
 			args: args{
 				targetTags:  []string{"1", "2", "3"},
+				releaseTags: []string{"1", "4", "20"},
+			},
+			want: false,
+		},
+		{
+			name: "contains completely",
+			args: args{
+				targetTags:  []string{"1", "4"},
 				releaseTags: []string{"1", "4", "20"},
 			},
 			want: true,
@@ -117,7 +125,7 @@ func TestPlan(t *testing.T) {
 	releases := []*Config{
 		{
 			Name: "release1",
-			Tags: []string{"1"},
+			Tags: []string{"1", "3"},
 			Options: action.Upgrade{
 				Namespace: "ns",
 			},
@@ -125,7 +133,7 @@ func TestPlan(t *testing.T) {
 		},
 		{
 			Name: "release2",
-			Tags: []string{"2"},
+			Tags: []string{"2", "3"},
 			Options: action.Upgrade{
 				Namespace: "ns",
 			},
@@ -147,6 +155,30 @@ func TestPlan(t *testing.T) {
 			name: "tag filter",
 			args: args{
 				tags:               releases[0].Tags,
+				enableDependencies: false,
+			},
+			wantPlan: []*Config{releases[0]},
+		},
+		{
+			name: "global tag (check release duplication)",
+			args: args{
+				tags:               []string{"3"},
+				enableDependencies: true,
+			},
+			wantPlan: releases,
+		},
+		{
+			name: "multiple tags",
+			args: args{
+				tags:               []string{"1", "2"},
+				enableDependencies: false,
+			},
+			wantPlan: []*Config{},
+		},
+		{
+			name: "multiple tags",
+			args: args{
+				tags:               []string{"1", "3"},
 				enableDependencies: false,
 			},
 			wantPlan: []*Config{releases[0]},

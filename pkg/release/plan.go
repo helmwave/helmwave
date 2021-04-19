@@ -62,12 +62,12 @@ func normalizeTagList(tags []string) []string {
 // checkTagInclusion checks where any of release tags are included in target tags.
 func checkTagInclusion(targetTags []string, releaseTags []string) bool {
 	for _, t := range targetTags {
-		if helper.Contains(t, releaseTags) {
-			return true
+		if !helper.Contains(t, releaseTags) {
+			return false
 		}
 	}
 
-	return false
+	return true
 }
 
 // filterValuesFiles filters non-existent values files.
