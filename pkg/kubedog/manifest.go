@@ -28,5 +28,4 @@ func MakeManifest(yamlFile []byte) []Resource {
 	}
 
 	return a
-
 }

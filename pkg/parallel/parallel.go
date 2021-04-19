@@ -6,9 +6,10 @@ import (
 )
 
 type WaitGroup struct {
-	syncWG  *sync.WaitGroup
-	errChan chan error
-	err     *multierror.Error
+	syncWG     *sync.WaitGroup
+	errChan    chan error
+	err        *multierror.Error
+	closeMutex sync.Mutex
 }
 
 func (wg *WaitGroup) ErrChan() chan<- error {
@@ -16,25 +17,29 @@ func (wg *WaitGroup) ErrChan() chan<- error {
 }
 
 func NewWaitGroup() *WaitGroup {
-	return &WaitGroup{
+	wg := &WaitGroup{
 		syncWG:  &sync.WaitGroup{},
 		errChan: make(chan error),
 		err:     &multierror.Error{},
 	}
+	go wg.gatherErrors()
+	return wg
 }
 
 func (wg *WaitGroup) gatherErrors() {
+	wg.closeMutex.Lock()
+	defer wg.closeMutex.Unlock()
+
 	for err := range wg.errChan {
-		if err != nil {
-			wg.err = multierror.Append(wg.err, err)
-		}
+		wg.err = multierror.Append(wg.err, err)
 	}
 }
 
 func (wg *WaitGroup) Wait() error {
-	go wg.gatherErrors()
 	wg.syncWG.Wait()
 	close(wg.errChan)
+	wg.closeMutex.Lock()
+	defer wg.closeMutex.Unlock()
 
 	return wg.err.ErrorOrNil()
 }
