@@ -1,3 +1,5 @@
+// +build ignore unit
+
 package template
 
 import (
