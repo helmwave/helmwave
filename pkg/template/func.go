@@ -9,6 +9,25 @@ import (
 	"text/template"
 )
 
+var (
+	sprigAliases = map[string]string{
+		"get":    "sprigGet",
+		"hasKey": "sprigHasKey",
+	}
+
+	customFuncs = map[string]interface{}{
+		"toYaml":         ToYaml,
+		"fromYaml":       FromYaml,
+		"exec":           Exec,
+		"setValueAtPath": SetValueAtPath,
+		"requiredEnv":    RequiredEnv,
+		"required":       Required,
+		"readFile":       ReadFile,
+		"get":            Get,
+		"hasKey":         HasKey,
+	}
+)
+
 func Tpl2yml(tpl string, yml string, data interface{}) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
@@ -48,30 +67,13 @@ func Tpl2yml(tpl string, yml string, data interface{}) error {
 }
 
 func FuncMap() template.FuncMap {
-	aliased := template.FuncMap{}
-
-	aliases := map[string]string{
-		"get":    "sprigGet",
-		"hasKey": "sprigHasKey",
-	}
-
 	funcMap := sprig.TxtFuncMap()
 
-	for orig, alias := range aliases {
-		aliased[alias] = funcMap[orig]
+	for orig, alias := range sprigAliases {
+		funcMap[alias] = funcMap[orig]
 	}
 
-	funcMap["toYaml"] = ToYaml
-	funcMap["fromYaml"] = FromYaml
-	funcMap["exec"] = Exec
-	funcMap["setValueAtPath"] = SetValueAtPath
-	funcMap["requiredEnv"] = RequiredEnv
-	funcMap["required"] = Required
-	funcMap["readFile"] = ReadFile
-	funcMap["get"] = Get
-	funcMap["hasKey"] = HasKey
-
-	for name, f := range aliased {
+	for name, f := range customFuncs {
 		funcMap[name] = f
 	}
 
