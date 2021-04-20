@@ -1,6 +1,7 @@
 package yml
 
 import (
+	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
@@ -87,10 +88,10 @@ func (c *Config) PlanRepos() {
 }
 
 func (c *Config) PlanReleases(tags []string) {
-	c.Releases = release.Plan(tags, c.Releases, c.EnableDependencies)
+	c.Releases = release.Plan(tags, c.Releases)
 	names := make([]string, len(c.Releases))
 	for i, v := range c.Releases {
-		if c.EnableDependencies {
+		if feature.Dependencies {
 			v.HandleDependencies(c.Releases)
 		}
 		names[i] = v.UniqName()
@@ -112,7 +113,12 @@ func (c *Config) PlanManifests(dir string, helmSettings *helm.EnvSettings) error
 		c.Releases[i].Options.DryRun = true
 	}
 
-	err = c.SyncReleases(dir+".manifest/", false)
+	parallel := feature.Parallel
+	feature.Parallel = false
+
+	err = c.SyncReleases(dir + ".manifest/")
+
+	feature.Parallel = parallel
 
 	for i, _ := range c.Releases {
 		c.Releases[i].Options.DryRun = false

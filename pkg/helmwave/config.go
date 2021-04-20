@@ -18,6 +18,5 @@ type Config struct {
 	Yml      yml.Config
 	PlanPath string
 	Logger   *Log
-	Parallel bool
 	Kubedog  *kubedog.Config
 }

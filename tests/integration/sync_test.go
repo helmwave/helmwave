@@ -35,8 +35,7 @@ func (s *SyncTestSuite) SetupTest() {
 			Format: "flat",
 			Color:  false,
 		},
-		Parallel: false,
-		Kubedog:  &kubedog.Config{},
+		Kubedog: &kubedog.Config{},
 	}
 
 	err := s.app.InitLogger()
@@ -60,7 +59,7 @@ func (s *SyncTestSuite) TestSync() {
 
 	_ = os.Setenv("HELM_NAMESPACE", "test-nginx")
 
-	err = s.app.Yml.Sync(s.app.PlanPath+PlanFile, s.app.Parallel, s.app.Helm)
+	err = s.app.Yml.Sync(s.app.PlanPath+PlanFile, s.app.Helm)
 	s.Require().NoError(err)
 
 	cfg, err := helper.ActionCfg("test-nginx", s.app.Helm)
