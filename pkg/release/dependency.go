@@ -68,10 +68,18 @@ F:
 func (rel *Config) HandleDependencies(releases []*Config) {
 	sort.Strings(rel.DependsOn)
 
+	depsAdded := make(map[string]bool)
 	for _, r := range releases {
 		name := r.UniqName()
 		if i := sort.SearchStrings(rel.DependsOn, name); i < len(rel.DependsOn) && rel.DependsOn[i] == name {
 			rel.addDependency(name)
+			depsAdded[name] = true
+		}
+	}
+
+	for _, dep := range rel.DependsOn {
+		if !depsAdded[dep] {
+			log.Warnf("cannot find dependency %s in plan, skipping it", dep)
 		}
 	}
 }

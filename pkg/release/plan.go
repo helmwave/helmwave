@@ -43,6 +43,8 @@ func addToPlan(plan []*Config, release *Config, releases map[string]*Config) []*
 		for _, depName := range release.DependsOn {
 			if dep, ok := releases[depName]; ok {
 				r = addToPlan(r, dep, releases)
+			} else {
+				log.Warnf("cannot find dependency %s in available releases, skipping it", depName)
 			}
 		}
 	}
