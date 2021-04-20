@@ -39,9 +39,11 @@ func addToPlan(plan []*Config, release *Config, releases map[string]*Config) []*
 
 	r := append(plan, release)
 
-	for _, depName := range release.DependsOn {
-		if dep, ok := releases[depName]; ok {
-			r = addToPlan(r, dep, releases)
+	if feature.PlanDependencies {
+		for _, depName := range release.DependsOn {
+			if dep, ok := releases[depName]; ok {
+				r = addToPlan(r, dep, releases)
+			}
 		}
 	}
 

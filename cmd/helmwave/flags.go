@@ -120,5 +120,12 @@ func flags(app *helmwave.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_ENABLE_DEPENDENCIES"},
 			Destination: &feature.Dependencies,
 		},
+		&cli.BoolFlag{
+			Name:        "plan-dependencies",
+			Usage:       "Automatically add dependencies to plan",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_PLAN_DEPENDENCIES"},
+			Destination: &feature.PlanDependencies,
+		},
 	}
 }
