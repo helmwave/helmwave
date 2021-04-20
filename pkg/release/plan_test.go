@@ -201,7 +201,7 @@ func TestPlan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotPlan := Plan(tt.args.tags, releases, tt.args.enableDependencies)
+			gotPlan := Plan(tt.args.tags, releases)
 			if len(gotPlan) == 0 && len(tt.wantPlan) == 0 {
 				return
 			}

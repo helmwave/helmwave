@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/helmwave"
 	"github.com/urfave/cli/v2"
 	"time"
@@ -42,7 +43,7 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Usage:       "It allows you call `helm install` in parallel mode ",
 			Value:       true,
 			EnvVars:     []string{"HELMWAVE_PARALLEL"},
-			Destination: &app.Parallel,
+			Destination: &feature.Parallel,
 		},
 		//&cli.BoolFlag{
 		//	Name:        "force",
@@ -82,7 +83,7 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Usage:       "Enable/Disable kubedog",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG", "HELMWAVE_KUBEDOG_ENABLED"},
-			Destination: &app.Kubedog.Enabled,
+			Destination: &feature.Kubedog,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-status-interval",
@@ -117,7 +118,7 @@ func flags(app *helmwave.Config) []cli.Flag {
 			Usage:       "Enable dependencies",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_ENABLE_DEPENDENCIES"},
-			Destination: &app.Yml.EnableDependencies,
+			Destination: &feature.Dependencies,
 		},
 	}
 }

@@ -2,6 +2,7 @@ package yml
 
 import (
 	"context"
+	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -19,37 +20,37 @@ func (c *Config) SyncRepos(settings *helm.EnvSettings) error {
 	return repo.Sync(c.Repositories, settings)
 }
 
-func (c *Config) SyncReleases(manifestPath string, async bool) error {
-	return release.Sync(c.Releases, manifestPath, async)
+func (c *Config) SyncReleases(manifestPath string) error {
+	return release.Sync(c.Releases, manifestPath)
 }
 
-func (c *Config) Sync(manifestPath string, async bool, settings *helm.EnvSettings) (err error) {
+func (c *Config) Sync(manifestPath string, settings *helm.EnvSettings) (err error) {
 	err = c.SyncRepos(settings)
 	if err != nil {
 		return err
 	}
 
-	return c.SyncReleases(manifestPath, async)
+	return c.SyncReleases(manifestPath)
 }
 
-func (c *Config) SyncFake(manifestPath string, async bool, settings *helm.EnvSettings) error {
+func (c *Config) SyncFake(manifestPath string, settings *helm.EnvSettings) error {
 	// Force disable dependencies during fake deploy
 	// and restore setting later
-	deps := c.EnableDependencies
-	c.EnableDependencies = false
-	defer func(c *Config, deps bool) {
-		c.EnableDependencies = deps
-	}(c, deps)
+	deps := feature.Dependencies
+	feature.Dependencies = false
+	defer func(deps bool) {
+		feature.Dependencies = deps
+	}(deps)
 
 	log.Info("🛫 Fake deploy")
 	for i := range c.Releases {
 		c.Releases[i].Options.DryRun = true
 	}
-	return c.Sync(manifestPath, async, settings)
+	return c.Sync(manifestPath, settings)
 }
 
-func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm.EnvSettings, kubedogConfig *kubedog.Config) error {
-	err := c.SyncFake(manifestPath, async, settings)
+func (c *Config) SyncWithKubedog(manifestPath string, settings *helm.EnvSettings, kubedogConfig *kubedog.Config) error {
+	err := c.SyncFake(manifestPath, settings)
 	if err != nil {
 		return err
 	}
@@ -71,11 +72,11 @@ func (c *Config) SyncWithKubedog(manifestPath string, async bool, settings *helm
 	}
 
 	wg.Add(1)
-	go func(c *Config, manifestPath string, async bool, wg *parallel.WaitGroup, cancel context.CancelFunc) {
+	go func(c *Config, manifestPath string, wg *parallel.WaitGroup, cancel context.CancelFunc) {
 		defer wg.Done()
 		defer cancel()
-		wg.ErrChan() <- c.SyncReleases(manifestPath, async)
-	}(c, manifestPath, async, wg, cancel)
+		wg.ErrChan() <- c.SyncReleases(manifestPath)
+	}(c, manifestPath, wg, cancel)
 
 	return wg.Wait()
 }

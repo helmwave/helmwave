@@ -1,6 +1,7 @@
 package release
 
 import (
+	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -8,7 +9,7 @@ import (
 	"strings"
 )
 
-func Plan(tags []string, releases []*Config, enableDependencies bool) (plan []*Config) {
+func Plan(tags []string, releases []*Config) (plan []*Config) {
 	if len(tags) == 0 {
 		return releases
 	}
@@ -16,7 +17,7 @@ func Plan(tags []string, releases []*Config, enableDependencies bool) (plan []*C
 	m := normalizeTagList(tags)
 
 	releasesMap := make(map[string]*Config)
-	if enableDependencies {
+	if feature.Dependencies {
 		for _, r := range releases {
 			releasesMap[r.UniqName()] = r
 		}
