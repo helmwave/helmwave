@@ -3,6 +3,7 @@
 package release
 
 import (
+	"github.com/helmwave/helmwave/pkg/feature"
 	"helm.sh/helm/v3/pkg/action"
 	"reflect"
 	"testing"
@@ -120,6 +121,7 @@ func TestPlan(t *testing.T) {
 	type args struct {
 		tags               []string
 		enableDependencies bool
+		planDependencies   bool
 	}
 
 	releases := []*Config{
@@ -163,7 +165,7 @@ func TestPlan(t *testing.T) {
 			name: "global tag (check release duplication)",
 			args: args{
 				tags:               []string{"3"},
-				enableDependencies: true,
+				enableDependencies: false,
 			},
 			wantPlan: releases,
 		},
@@ -195,12 +197,16 @@ func TestPlan(t *testing.T) {
 			args: args{
 				tags:               releases[0].Tags,
 				enableDependencies: true,
+				planDependencies:   true,
 			},
 			wantPlan: releases,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			feature.Dependencies = tt.args.enableDependencies
+			feature.PlanDependencies = tt.args.planDependencies
+
 			gotPlan := Plan(tt.args.tags, releases)
 			if len(gotPlan) == 0 && len(tt.wantPlan) == 0 {
 				return
