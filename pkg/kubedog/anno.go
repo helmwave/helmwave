@@ -11,7 +11,7 @@ const (
 	LogRegexForAnnoPrefix             = RootAnnoName + "log-regex-for-"
 	SkipLogsAnnoName                  = RootAnnoName + "skip-logs"
 	SkipLogsForContainersAnnoName     = RootAnnoName + "skip-logs-for-containers"
-	ShowLogsOnlyForContainers         = RootAnnoName + "show-logs-only-for-containers"
+	ShowLogsOnlyForContainersAnnoName = RootAnnoName + "show-logs-only-for-containers"
 	// ShowLogsUntilAnnoName         	= RootAnnoName+"show-logs-until"
 	ShowEventsAnnoName = RootAnnoName + "show-service-messages"
 	// ReplicasOnCreationAnnoName 		= RootAnnoName+"replicas-on-creation"

@@ -2,6 +2,7 @@ package helmwave
 
 import (
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/yml"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -34,7 +35,7 @@ func (c *Config) CliPlan(ctx *cli.Context) error {
 	case "repos":
 		opts.PlanRepos()
 	case "releases":
-		opts.PlanRepos()
+		opts.PlanReleases()
 	case "values":
 		opts.PlanValues()
 	default:
@@ -74,12 +75,12 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 		return err
 	}
 
-	if c.Kubedog.Enabled {
+	if feature.Kubedog {
 		log.Info("🐶 Kubedog enabled")
-		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Parallel, c.Helm, c.Kubedog)
+		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Helm, c.Kubedog)
 	}
 
-	return c.Yml.Sync(c.PlanPath+".manifest/", c.Parallel, c.Helm)
+	return c.Yml.Sync(c.PlanPath+".manifest/", c.Helm)
 }
 
 func (c *Config) CliManifests(ctx *cli.Context) error {
@@ -88,7 +89,7 @@ func (c *Config) CliManifests(ctx *cli.Context) error {
 		return err
 	}
 
-	return c.Yml.SyncFake(c.PlanPath+".manifest/", c.Parallel, c.Helm)
+	return c.Yml.SyncFake(c.PlanPath+".manifest/", c.Helm)
 }
 
 func (c *Config) CliVersion(ctx *cli.Context) error {

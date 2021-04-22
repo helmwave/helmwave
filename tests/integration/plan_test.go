@@ -36,8 +36,7 @@ func (s *PlanTestSuite) SetupTest() {
 			Format: "flat",
 			Color:  false,
 		},
-		Parallel: false,
-		Kubedog:  &kubedog.Config{},
+		Kubedog: &kubedog.Config{},
 	}
 
 	err := s.app.InitLogger()

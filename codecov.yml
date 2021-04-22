@@ -1,6 +1,8 @@
 codecov:
   require_ci_to_pass: true
   branch: main
+  allow_pseudo_compare: true
+  allow_coverage_offsets: true
 
 coverage:
   precision: 2
@@ -19,3 +21,11 @@ comment:
   layout: "reach,diff,flags,files,footer"
   behavior: default
   require_changes: false
+
+flag_management:
+  default_rules:
+    carryforward: true
+
+flags:
+  integration:
+    carryforward: true
