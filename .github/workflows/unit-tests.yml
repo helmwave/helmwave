@@ -29,7 +29,7 @@ jobs:
         run: go mod download
 
       - name: Run unit tests
-        run: go test -race -coverpkg=./... -coverprofile=./unit.cov -v --tags=unit -covermode=atomic ./...
+        run: go test -race -coverpkg=./pkg/... -coverprofile=./unit.cov -v --tags=unit -covermode=atomic ./...
 
       - uses: codecov/codecov-action@v1
         with:
