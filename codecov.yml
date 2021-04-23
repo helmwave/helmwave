@@ -5,7 +5,7 @@ codecov:
   allow_coverage_offsets: true
 
 ignore:
-  - "cmd/**/*.go"
+  - cmd
 
 coverage:
   precision: 2
