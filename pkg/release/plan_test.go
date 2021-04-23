@@ -121,6 +121,7 @@ func TestPlan(t *testing.T) {
 	type args struct {
 		tags               []string
 		enableDependencies bool
+		matchAll           bool
 		planDependencies   bool
 	}
 
@@ -178,12 +179,22 @@ func TestPlan(t *testing.T) {
 			wantPlan: []*Config{},
 		},
 		{
-			name: "multiple tags",
+			name: "multiple tags (with match all)",
 			args: args{
 				tags:               []string{"1", "3"},
 				enableDependencies: false,
+				matchAll:           true,
 			},
 			wantPlan: []*Config{releases[0]},
+		},
+		{
+			name: "multiple tags (without match all)",
+			args: args{
+				tags:               []string{"1", "3"},
+				enableDependencies: false,
+				matchAll:           false,
+			},
+			wantPlan: releases,
 		},
 		{
 			name: "nonexistent tag",
@@ -206,6 +217,7 @@ func TestPlan(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			feature.Dependencies = tt.args.enableDependencies
 			feature.PlanDependencies = tt.args.planDependencies
+			feature.MatchAllTags = tt.args.matchAll
 
 			gotPlan := Plan(tt.args.tags, releases)
 			if len(gotPlan) == 0 && len(tt.wantPlan) == 0 {
