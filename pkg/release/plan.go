@@ -66,6 +66,10 @@ func normalizeTagList(tags []string) []string {
 
 // checkTagInclusion checks where any of release tags are included in target tags.
 func checkTagInclusion(targetTags []string, releaseTags []string) bool {
+	if len(targetTags) == 0 {
+		return true
+	}
+
 	for _, t := range targetTags {
 		contains := helper.Contains(t, releaseTags)
 		if feature.MatchAllTags && !contains {
