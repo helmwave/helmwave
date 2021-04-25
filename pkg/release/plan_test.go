@@ -53,6 +53,7 @@ func Test_checkTagInclusion(t *testing.T) {
 	type args struct {
 		targetTags  []string
 		releaseTags []string
+		matchAll    bool
 	}
 	tests := []struct {
 		name string
@@ -88,6 +89,7 @@ func Test_checkTagInclusion(t *testing.T) {
 			args: args{
 				targetTags:  []string{"1", "2", "3"},
 				releaseTags: []string{"1", "4", "20"},
+				matchAll:    true,
 			},
 			want: false,
 		},
@@ -110,6 +112,7 @@ func Test_checkTagInclusion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			feature.MatchAllTags = tt.args.matchAll
 			if got := checkTagInclusion(tt.args.targetTags, tt.args.releaseTags); got != tt.want {
 				t.Errorf("checkTagInclusion() = %v, want %v", got, tt.want)
 			}
@@ -121,6 +124,7 @@ func TestPlan(t *testing.T) {
 	type args struct {
 		tags               []string
 		enableDependencies bool
+		matchAll           bool
 		planDependencies   bool
 	}
 
@@ -154,10 +158,11 @@ func TestPlan(t *testing.T) {
 			wantPlan: releases,
 		},
 		{
-			name: "tag filter",
+			name: "tag filter with matchAll",
 			args: args{
 				tags:               releases[0].Tags,
 				enableDependencies: false,
+				matchAll:           true,
 			},
 			wantPlan: []*Config{releases[0]},
 		},
@@ -170,20 +175,31 @@ func TestPlan(t *testing.T) {
 			wantPlan: releases,
 		},
 		{
-			name: "multiple tags",
+			name: "multiple tags with matchAll",
 			args: args{
 				tags:               []string{"1", "2"},
 				enableDependencies: false,
+				matchAll:           true,
 			},
 			wantPlan: []*Config{},
 		},
 		{
-			name: "multiple tags",
+			name: "multiple tags (with match all)",
 			args: args{
 				tags:               []string{"1", "3"},
 				enableDependencies: false,
+				matchAll:           true,
 			},
 			wantPlan: []*Config{releases[0]},
+		},
+		{
+			name: "multiple tags (without match all)",
+			args: args{
+				tags:               []string{"1", "3"},
+				enableDependencies: false,
+				matchAll:           false,
+			},
+			wantPlan: releases,
 		},
 		{
 			name: "nonexistent tag",
@@ -206,6 +222,7 @@ func TestPlan(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			feature.Dependencies = tt.args.enableDependencies
 			feature.PlanDependencies = tt.args.planDependencies
+			feature.MatchAllTags = tt.args.matchAll
 
 			gotPlan := Plan(tt.args.tags, releases)
 			if len(gotPlan) == 0 && len(tt.wantPlan) == 0 {

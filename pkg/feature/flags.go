@@ -5,4 +5,5 @@ var (
 	Kubedog          bool
 	Dependencies     bool
 	PlanDependencies bool
+	MatchAllTags     bool
 )
