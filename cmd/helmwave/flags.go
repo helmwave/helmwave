@@ -127,5 +127,12 @@ func flags(app *helmwave.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_PLAN_DEPENDENCIES"},
 			Destination: &feature.PlanDependencies,
 		},
+		&cli.BoolFlag{
+			Name:        "match-all-tags",
+			Usage:       "Match all provided tags",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_MATCH_ALL_TAGS"},
+			Destination: &feature.MatchAllTags,
+		},
 	}
 }

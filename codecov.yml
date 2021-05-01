@@ -4,6 +4,9 @@ codecov:
   allow_pseudo_compare: true
   allow_coverage_offsets: true
 
+ignore:
+  - cmd
+
 coverage:
   precision: 2
   round: down
