@@ -97,6 +97,18 @@ func (c *Config) CliVersion(ctx *cli.Context) error {
 	return nil
 }
 
+func (c *Config) CliList(ctx *cli.Context) error {
+	opts := &yml.SavePlanOptions{}
+	opts.PlanReleases()
+
+	err := c.plan(opts)
+	if err != nil {
+		return err
+	}
+
+	return c.Yml.ListReleases()
+}
+
 func Command404(c *cli.Context, s string) {
 	log.Errorf("👻 Command %q not found \n", s)
 	os.Exit(127)
