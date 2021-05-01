@@ -6,7 +6,6 @@ import (
 	_ "crypto/sha1"
 	"fmt"
 	"github.com/hashicorp/go-getter/v2"
-	log "github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -71,7 +70,6 @@ func (v *ValuesReference) Download() error {
 		GetMode: getter.ModeFile,
 	}
 	resp, err := getter.DefaultClient.Get(context.TODO(), req)
-	log.Debugf("Response: %+v", resp)
 	if err == nil {
 		v.SetProcessedPath(tmpPath)
 	}

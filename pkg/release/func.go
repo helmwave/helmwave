@@ -3,7 +3,6 @@ package release
 import (
 	"fmt"
 	"github.com/helmwave/helmwave/pkg/template"
-	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"path"
 	"strings"
@@ -28,7 +27,6 @@ func (rel *Config) RenderValues(dir string) error {
 	for i, v := range rel.Values {
 		s := fmt.Sprintf("%s.%s.plan", v.ManifestPath(), rel.UniqName())
 		p := path.Join(dir, s)
-		log.Debugf("Path: %v+", v)
 
 		err := template.Tpl2yml(v.GetPath(), p, struct{ Release *Config }{rel})
 		v.UnlinkProcessed()
