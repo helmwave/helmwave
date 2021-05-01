@@ -25,15 +25,15 @@ func (v *ValuesReference) GetPath() string {
 	return v.srcURI
 }
 
-func (v *ValuesReference) ManifestPath() string {
+func (v *ValuesReference) ManifestPath() (string, error) {
 	s := v.GetPath()
 	if v.IsLocal() {
-		return s
+		return s, nil
 	}
 
 	hasher := crypto.SHA1.New()
-	hasher.Write([]byte(s))
-	return fmt.Sprintf("values/%x", hasher.Sum(nil))
+	_, err := hasher.Write([]byte(s))
+	return fmt.Sprintf("values/%x", hasher.Sum(nil)), err
 }
 
 func (v *ValuesReference) IsLocal() bool {

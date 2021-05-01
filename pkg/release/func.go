@@ -25,10 +25,14 @@ func (rel *Config) RenderValues(dir string) error {
 	rel.filterValuesFiles()
 
 	for i, v := range rel.Values {
-		s := fmt.Sprintf("%s.%s.plan", v.ManifestPath(), rel.UniqName())
+		m, err := v.ManifestPath()
+		if err != nil {
+			return err
+		}
+		s := fmt.Sprintf("%s.%s.plan", m, rel.UniqName())
 		p := path.Join(dir, s)
 
-		err := template.Tpl2yml(v.GetPath(), p, struct{ Release *Config }{rel})
+		err = template.Tpl2yml(v.GetPath(), p, struct{ Release *Config }{rel})
 		v.UnlinkProcessed()
 		if err != nil {
 			return err
