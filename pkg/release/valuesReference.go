@@ -69,7 +69,7 @@ func (v *ValuesReference) Download() error {
 		Pwd:     pwd,
 		GetMode: getter.ModeFile,
 	}
-	resp, err := getter.DefaultClient.Get(context.TODO(), req)
+	_, err = getter.DefaultClient.Get(context.TODO(), req)
 	if err == nil {
 		v.SetProcessedPath(tmpPath)
 	}
