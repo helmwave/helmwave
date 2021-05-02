@@ -114,6 +114,10 @@ func (c *Config) runMultitracks(parentContext context.Context, mapSpecs map[stri
 	return nil
 }
 
+func (c *Config) Status(releases []string) error {
+	return release.Status(c.Releases, releases)
+}
+
 func (c *Config) ListReleases() error {
 	return release.List(c.Releases)
 }
