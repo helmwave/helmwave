@@ -11,6 +11,7 @@ require (
 	github.com/helmwave/logrus-emoji-formatter v1.0.1
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.12
+	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli/v2 v2.3.0
