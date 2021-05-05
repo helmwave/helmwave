@@ -13,8 +13,8 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 	"os"
-	"sort"
 	"regexp"
+	"sort"
 	"strconv"
 )
 
