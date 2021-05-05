@@ -7,6 +7,8 @@ require (
 	github.com/bombsimon/logrusr v1.0.0
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gofrs/flock v0.8.0
+	github.com/hashicorp/go-getter v1.5.3
+	github.com/hashicorp/go-getter/v2 v2.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/logrus-emoji-formatter v1.0.1
 	github.com/huandu/xstrings v1.3.2 // indirect
