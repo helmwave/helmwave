@@ -97,6 +97,16 @@ func (c *Config) CliVersion(ctx *cli.Context) error {
 	return nil
 }
 
+func (c *Config) CliStatus(ctx *cli.Context) error {
+	err := c.plan(nil)
+	if err != nil {
+		return err
+	}
+
+	releases := ctx.Args().Slice()
+	return c.Yml.Status(releases)
+}
+
 func (c *Config) CliList(ctx *cli.Context) error {
 	opts := &yml.SavePlanOptions{}
 	opts.PlanReleases()

@@ -33,6 +33,12 @@ func commands() []*cli.Command {
 			Action: app.CliVersion,
 		},
 		{
+			Name:   "status",
+			Usage:  "Show release status",
+			Action: app.CliStatus,
+			Before: app.InitApp,
+		},
+		{
 			Name:    "ls",
 			Aliases: []string{"list"},
 			Usage:   "List deployed releases",
