@@ -47,9 +47,6 @@ changelog:
 dockers:
   - dockerfile: Dockerfile
     image_templates:
-      - "docker.pkg.github.com/helmwave/helmwave/helmwave:{{ .Version }}"
-      - "docker.pkg.github.com/helmwave/helmwave/helmwave:latest"
-
       - "ghcr.io/helmwave/helmwave:{{ .Version }}"
       - "ghcr.io/helmwave/helmwave:latest"
 

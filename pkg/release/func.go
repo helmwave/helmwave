@@ -1,8 +1,10 @@
 package release
 
 import (
+	"fmt"
 	"github.com/helmwave/helmwave/pkg/template"
 	"helm.sh/helm/v3/pkg/chart/loader"
+	"path"
 	"strings"
 )
 
@@ -23,16 +25,20 @@ func (rel *Config) RenderValues(dir string) error {
 	rel.filterValuesFiles()
 
 	for i, v := range rel.Values {
+		m, err := v.ManifestPath()
+		if err != nil {
+			return err
+		}
+		s := fmt.Sprintf("%s.%s.plan", m, rel.UniqName())
+		p := path.Join(dir, s)
 
-		s := v + "." + rel.UniqName() + ".plan"
-
-		p := dir + s
-		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})
+		err = template.Tpl2yml(v.GetPath(), p, struct{ Release *Config }{rel})
+		v.UnlinkProcessed()
 		if err != nil {
 			return err
 		}
 
-		rel.Values[i] = p
+		rel.Values[i].SetProcessedPath(p)
 	}
 
 	return nil

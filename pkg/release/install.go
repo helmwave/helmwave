@@ -50,7 +50,11 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 		return nil, err
 	}
 
-	valOpts := &values.Options{ValueFiles: rel.Values}
+	v := make([]string, len(rel.Values))
+	for i := range rel.Values {
+		v[i] = rel.Values[i].GetPath()
+	}
+	valOpts := &values.Options{ValueFiles: v}
 	vals, err := valOpts.MergeValues(getter.All(settings))
 	if err != nil {
 		return nil, err

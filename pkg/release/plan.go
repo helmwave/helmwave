@@ -4,7 +4,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
-	"os"
 	"sort"
 	"strings"
 )
@@ -86,8 +85,9 @@ func checkTagInclusion(targetTags []string, releaseTags []string) bool {
 // filterValuesFiles filters non-existent values files.
 func (rel *Config) filterValuesFiles() {
 	for i := len(rel.Values) - 1; i >= 0; i-- {
-		stat, err := os.Stat(rel.Values[i])
-		if os.IsNotExist(err) || stat.IsDir() {
+		err := rel.Values[i].Download()
+		if err != nil {
+			log.Errorf("Failed to find %s, skipping: %v", rel.Values[i].GetPath(), err)
 			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
 		}
 	}

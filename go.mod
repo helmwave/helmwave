@@ -7,10 +7,13 @@ require (
 	github.com/bombsimon/logrusr v1.0.0
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gofrs/flock v0.8.0
+	github.com/hashicorp/go-getter v1.5.3
+	github.com/hashicorp/go-getter/v2 v2.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/logrus-emoji-formatter v1.0.1
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.12
+	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli/v2 v2.3.0

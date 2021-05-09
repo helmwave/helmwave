@@ -39,6 +39,9 @@ func (c *Config) InitLoggerLevel() error {
 		return err
 	}
 	log.SetLevel(level)
+	if level >= log.DebugLevel {
+		log.SetReportCaller(true)
+	}
 
 	return nil
 }

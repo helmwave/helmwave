@@ -10,7 +10,7 @@ type Config struct {
 	Chart        string
 	Tags         []string
 	Store        map[string]interface{}
-	Values       []string
+	Values       []*ValuesReference
 	Options      action.Upgrade
 	DependsOn    []string `yaml:"depends_on"`
 	dependencies map[string]<-chan pubsub.ReleaseStatus
