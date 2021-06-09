@@ -121,3 +121,7 @@ func (c *Config) Status(releases []string) error {
 func (c *Config) ListReleases() error {
 	return release.List(c.Releases)
 }
+
+func (c *Config) Uninstall() error {
+	return release.Uninstall(c.Releases)
+}

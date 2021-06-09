@@ -15,26 +15,8 @@ import (
 	"path/filepath"
 )
 
-func (rel *Config) DependencyUpdate(settings *helm.EnvSettings) error {
-	client := action.NewDependency()
-	man := &downloader.Manager{
-		Out:              os.Stdout,
-		ChartPath:        filepath.Clean(rel.Chart),
-		Keyring:          client.Keyring,
-		SkipUpdate:       client.SkipRefresh,
-		Getters:          getter.All(settings),
-		RepositoryConfig: settings.RepositoryConfig,
-		RepositoryCache:  settings.RepositoryCache,
-		Debug:            settings.Debug,
-	}
-	if client.Verify {
-		man.Verify = downloader.VerifyAlways
-	}
-	return man.Update()
-}
-
 func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
-	err := rel.DependencyUpdate(settings)
+	err := rel.chartDepsUpd(settings)
 	if err != nil {
 		log.Debug(err)
 	}
@@ -124,4 +106,22 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 
 	return client.Run(rel.Name, ch, vals)
 
+}
+
+func (rel *Config) chartDepsUpd(settings *helm.EnvSettings) error {
+	client := action.NewDependency()
+	man := &downloader.Manager{
+		Out:              os.Stdout,
+		ChartPath:        filepath.Clean(rel.Chart),
+		Keyring:          client.Keyring,
+		SkipUpdate:       client.SkipRefresh,
+		Getters:          getter.All(settings),
+		RepositoryConfig: settings.RepositoryConfig,
+		RepositoryCache:  settings.RepositoryCache,
+		Debug:            settings.Debug,
+	}
+	if client.Verify {
+		man.Verify = downloader.VerifyAlways
+	}
+	return man.Update()
 }
