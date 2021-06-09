@@ -11,12 +11,12 @@ import (
 var Version = "dev"
 
 type Config struct {
-	Version  string
-	Helm     *helm.EnvSettings
-	Tags     cli.StringSlice
-	Tpl      template.Tpl
-	Yml      yml.Config
-	PlanPath string
-	Logger   *Log
-	Kubedog  *kubedog.Config
+	Version string
+	Helm    *helm.EnvSettings
+	Tags    cli.StringSlice
+	Tpl     template.Tpl
+	Yml     yml.Config
+	Plandir string
+	Logger  *Log
+	Kubedog *kubedog.Config
 }

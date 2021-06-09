@@ -8,8 +8,8 @@ const PLANFILE = "planfile"
 const MANIFEST = ".manifest/"
 
 func (c *Config) InitPlan() {
-	if c.PlanPath[len(c.PlanPath)-1:] != "/" {
-		c.PlanPath += "/"
+	if c.Plandir[len(c.Plandir)-1:] != "/" {
+		c.Plandir += "/"
 	}
-	log.Info("🛠 Your planfile is ", c.PlanPath+PLANFILE)
+	log.Info("🛠 Your planfile is ", c.Plandir+PLANFILE)
 }

@@ -50,7 +50,7 @@ func (c *Config) plan(opts *yml.SavePlanOptions) error {
 		opts = &yml.SavePlanOptions{}
 	}
 
-	opts.File(c.PlanPath + PLANFILE).Dir(c.PlanPath)
+	opts.File(c.Plandir + PLANFILE).Dir(c.Plandir)
 
 	err := c.Tpl.Render()
 	if err != nil {
@@ -77,10 +77,10 @@ func (c *Config) CliDeploy(ctx *cli.Context) error {
 
 	if feature.Kubedog {
 		log.Info("🐶 Kubedog enabled")
-		return c.Yml.SyncWithKubedog(c.PlanPath+".manifest/", c.Helm, c.Kubedog)
+		return c.Yml.SyncWithKubedog(c.Plandir+".manifest/", c.Helm, c.Kubedog)
 	}
 
-	return c.Yml.Sync(c.PlanPath+".manifest/", c.Helm)
+	return c.Yml.Sync(c.Plandir+".manifest/", c.Helm)
 }
 
 func (c *Config) CliManifests(ctx *cli.Context) error {
@@ -89,7 +89,7 @@ func (c *Config) CliManifests(ctx *cli.Context) error {
 		return err
 	}
 
-	return c.Yml.SyncFake(c.PlanPath+".manifest/", c.Helm)
+	return c.Yml.SyncFake(c.Plandir+".manifest/", c.Helm)
 }
 
 func (c *Config) CliVersion(ctx *cli.Context) error {

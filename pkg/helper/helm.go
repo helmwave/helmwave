@@ -19,7 +19,7 @@ func ActionCfg(ns string, settings *helm.EnvSettings) (*action.Configuration, er
 	return cfg, err
 }
 
-func setNS(ns string) (*helm.EnvSettings, error) {
+func SetNS(ns string) (*helm.EnvSettings, error) {
 	env := helm.New()
 	fs := &pflag.FlagSet{}
 	env.AddFlags(fs)

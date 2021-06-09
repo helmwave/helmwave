@@ -28,8 +28,8 @@ func (s *SyncTestSuite) SetupTest() {
 			From: "../fixtures/helmwave.yml.tpl",
 			To:   "helmwave.yml",
 		},
-		Yml:      yml.Config{},
-		PlanPath: PlanPath,
+		Yml:     yml.Config{},
+		Plandir: PlanPath,
 		Logger: &helmwave.Log{
 			Level:  "DEBUG",
 			Format: "flat",
