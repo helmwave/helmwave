@@ -41,8 +41,15 @@ func commands() []*cli.Command {
 		{
 			Name:    "ls",
 			Aliases: []string{"list"},
-			Usage:   "List deployed releases",
+			Usage:   "List of deployed releases",
 			Action:  app.CliList,
+			Before:  app.InitApp,
+		},
+		{
+			Name:    "uninstall",
+			Aliases: []string{"destroy", "delete", "del", "rm", "remove"},
+			Usage:   "Delete deployed releases",
+			Action:  app.CliUninstall,
 			Before:  app.InitApp,
 		},
 	}
