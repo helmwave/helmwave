@@ -2,7 +2,6 @@ package release
 
 import (
 	"errors"
-	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	log "github.com/sirupsen/logrus"
@@ -10,7 +9,9 @@ import (
 	"os"
 )
 
-func Sync(releases []*Config, manifestPath string) (err error) {
+var emptyReleases = errors.New("releases are empty")
+
+func Sync(releases []*Config, manifestPath string, flagParallel bool) (err error) {
 	if len(releases) == 0 {
 		return emptyReleases
 	}
@@ -18,7 +19,7 @@ func Sync(releases []*Config, manifestPath string) (err error) {
 	log.Info("🛥 Sync releases")
 	var fails []*Config
 
-	if feature.Parallel {
+	if flagParallel {
 		wg := parallel.NewWaitGroup()
 		log.Debug("🐞 Run in parallel mode")
 		wg.Add(len(releases))
@@ -39,6 +40,11 @@ func Sync(releases []*Config, manifestPath string) (err error) {
 	}
 
 	n := len(releases)
+
+	return showSuccess(n, fails)
+}
+
+func showSuccess(n int, fails []*Config) error {
 	k := len(fails)
 
 	log.Infof("Success %d / %d", n-k, n)
@@ -51,8 +57,6 @@ func Sync(releases []*Config, manifestPath string) (err error) {
 	}
 	return nil
 }
-
-var emptyReleases = errors.New("releases are empty")
 
 func (rel *Config) Sync(manifestPath string) error {
 	log.Infof("🛥 %s", rel.UniqName())

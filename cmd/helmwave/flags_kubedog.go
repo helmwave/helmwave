@@ -1,11 +1,9 @@
 package main
 
 import (
-	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/urfave/cli/v2"
 	"time"
 )
-
 
 var flagsKubedog = []cli.Flag{
 	&cli.BoolFlag{
@@ -13,7 +11,7 @@ var flagsKubedog = []cli.Flag{
 		Usage:       "Enable/Disable kubedog",
 		Value:       false,
 		EnvVars:     []string{"HELMWAVE_KUBEDOG", "HELMWAVE_KUBEDOG_ENABLED"},
-		Destination: &feature.Kubedog,
+		Destination: &app.Features.Kubedog,
 	},
 	&cli.DurationFlag{
 		Name:        "kubedog-status-interval",

@@ -1,14 +1,13 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"sort"
 	"strings"
 )
 
-func Plan(tags []string, releases []*Config) (plan []*Config) {
+func Plan(tags []string, releases []*Config, deps bool) (plan []*Config) {
 	if len(tags) == 0 {
 		return releases
 	}
@@ -16,32 +15,32 @@ func Plan(tags []string, releases []*Config) (plan []*Config) {
 	m := normalizeTagList(tags)
 
 	releasesMap := make(map[string]*Config)
-	if feature.Dependencies {
+	if deps {
 		for _, r := range releases {
 			releasesMap[r.UniqName()] = r
 		}
 	}
 
 	for _, r := range releases {
-		if checkTagInclusion(m, r.Tags) {
-			plan = addToPlan(plan, r, releasesMap)
+		if checkTagInclusion(m, r.Tags, deps) {
+			plan = addToPlan(plan, r, releasesMap, deps)
 		}
 	}
 
 	return plan
 }
 
-func addToPlan(plan []*Config, release *Config, releases map[string]*Config) []*Config {
+func addToPlan(plan []*Config, release *Config, releases map[string]*Config, deps bool) []*Config {
 	if release.In(plan) {
 		return plan
 	}
 
 	r := append(plan, release)
 
-	if feature.PlanDependencies {
+	if deps {
 		for _, depName := range release.DependsOn {
 			if dep, ok := releases[depName]; ok {
-				r = addToPlan(r, dep, releases)
+				r = addToPlan(r, dep, releases, true)
 			} else {
 				log.Warnf("cannot find dependency %s in available releases, skipping it", depName)
 			}
@@ -64,22 +63,22 @@ func normalizeTagList(tags []string) []string {
 }
 
 // checkTagInclusion checks where any of release tags are included in target tags.
-func checkTagInclusion(targetTags []string, releaseTags []string) bool {
+func checkTagInclusion(targetTags []string, releaseTags []string, matchAll bool) bool {
 	if len(targetTags) == 0 {
 		return true
 	}
 
 	for _, t := range targetTags {
 		contains := helper.Contains(t, releaseTags)
-		if feature.MatchAllTags && !contains {
+		if matchAll && !contains {
 			return false
 		}
-		if !feature.MatchAllTags && contains {
+		if !matchAll && contains {
 			return true
 		}
 	}
 
-	return feature.MatchAllTags
+	return matchAll
 }
 
 // filterValuesFiles filters non-existent values files.

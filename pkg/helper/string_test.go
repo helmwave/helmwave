@@ -1,13 +1,14 @@
 // +build ignore unit
 
-package yml
+package helper
 
 import (
+	"github.com/helmwave/helmwave/pkg/yml"
 	"testing"
 )
 
 func TestString(t *testing.T) {
-	b := &Config{
+	b := &yml.Config{
 		Project: "my-project",
 		Version: "0.7.0",
 	}

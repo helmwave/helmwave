@@ -12,7 +12,7 @@ const (
 	SkipLogsAnnoName                  = RootAnnoName + "skip-logs"
 	SkipLogsForContainersAnnoName     = RootAnnoName + "skip-logs-for-containers"
 	ShowLogsOnlyForContainersAnnoName = RootAnnoName + "show-logs-only-for-containers"
-	// ShowLogsUntilAnnoName         	= RootAnnoName+"show-logs-until"
+	// ShowEventsAnnoName ShowLogsUntilAnnoName         	= RootAnnoName+"show-logs-until"
 	ShowEventsAnnoName = RootAnnoName + "show-service-messages"
 	// ReplicasOnCreationAnnoName 		= RootAnnoName+"replicas-on-creation"
 )

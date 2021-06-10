@@ -8,18 +8,9 @@ var plan = &cli.Command{
 	Usage:   "📜 Generate planfile to plandir",
 	Action:  app.CliPlan,
 	Before:  app.InitApp,
-	Subcommands: []*cli.Command{
-		{
-			Name:   "repos",
-			Action: app.CliPlan,
-		},
-		{
-			Name:   "releases",
-			Action: app.CliPlan,
-		},
-		{
-			Name:   "values",
-			Action: app.CliPlan,
-		},
+	Flags: []cli.Flag{
+		plandir,
+		file,
+		tags,
 	},
 }

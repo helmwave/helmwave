@@ -2,7 +2,6 @@ package release
 
 import (
 	"errors"
-	"github.com/helmwave/helmwave/pkg/feature"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	log "github.com/sirupsen/logrus"
@@ -23,7 +22,7 @@ func (rel *Config) Uninstall() (*release.UninstallReleaseResponse, error) {
 
 }
 
-func Uninstall(releases []*Config) (err error) {
+func Uninstall(releases []*Config, flagParallel bool) (err error) {
 	if len(releases) == 0 {
 		return emptyReleases
 	}
@@ -31,7 +30,7 @@ func Uninstall(releases []*Config) (err error) {
 	log.Info("🛥 Sync releases")
 	var fails []*Config
 
-	if feature.Parallel {
+	if flagParallel {
 		wg := parallel.NewWaitGroup()
 		log.Debug("🐞 Run in parallel mode")
 		wg.Add(len(releases))
@@ -62,7 +61,7 @@ func Uninstall(releases []*Config) (err error) {
 			log.Errorf("%q was not deleted from %q", rel.Name, rel.Options.Namespace)
 		}
 
-		return errors.New("uninstall failed")
+		return errors.New("destroy failed")
 	}
 	return nil
 }

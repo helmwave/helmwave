@@ -10,6 +10,7 @@ import (
 
 var releasePubSub = pubsub.NewReleasePubSub()
 var DependencyFailedError = errors.New("dependency failed")
+var notFound = errors.New("release not found")
 
 func (rel *Config) NotifySuccess() {
 	if !rel.Options.DryRun {
