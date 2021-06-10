@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/helmwave/helmwave/pkg/action"
 	"github.com/helmwave/helmwave/pkg/helmwave"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -10,14 +11,13 @@ import (
 var app *helmwave.Config
 
 var commands = []*cli.Command{
-	version,
-	yml,
-	install,
-	uninstall,
-	status,
-	list,
-	manifest,
+	new(action.Install).Cmd(),
+	new(action.Uninstall).Cmd(),
+	new(action.Diff).Cmd(),
+	new(action.List).Cmd(),
+	new(action.Yml).Cmd(),
 }
+
 
 func main() {
 	app = helmwave.New()
@@ -34,11 +34,5 @@ func main() {
 	err := c.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
-	}
-}
-
-func toCtx(a func() error) func(c *cli.Context) error {
-	return func(c *cli.Context) error {
-		return a()
 	}
 }
