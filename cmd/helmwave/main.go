@@ -17,7 +17,6 @@ var commands = []*cli.Command{
 	uninstall,
 	status,
 	list,
-	plan,
 	manifest,
 }
 
@@ -25,7 +24,6 @@ func main() {
 	app = helmwaveCli.New()
 	c := cli.NewApp()
 	c.EnableBashCompletion = true
-	c.CommandNotFound = helmwave.Command404
 	c.Usage = "composer for helm"
 	c.Version = app.Version
 	c.Description = "This tool helps you compose your helm releases!"
