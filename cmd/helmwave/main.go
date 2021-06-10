@@ -11,10 +11,11 @@ import (
 var app *helmwave.Config
 
 var commands = []*cli.Command{
-	new(action.Install).Cmd(),
-	new(action.Uninstall).Cmd(),
 	new(action.Diff).Cmd(),
+	new(action.Install).Cmd(),
 	new(action.List).Cmd(),
+	new(action.Status).Cmd(),
+	new(action.Uninstall).Cmd(),
 	new(action.Yml).Cmd(),
 }
 

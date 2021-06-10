@@ -6,11 +6,12 @@ import (
 )
 
 type Uninstall struct {
-	Plandir string
+	plandir  string
+	parallel bool
 }
 
 func (i *Uninstall) Run() error {
-	p := plan.New(i.Plandir)
+	p := plan.New(i.plandir)
 	return p.Apply()
 }
 
@@ -25,7 +26,14 @@ func (i *Uninstall) Cmd() *cli.Command {
 				Value:       ".helmwave/",
 				Usage:       "Path to plandir",
 				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &i.Plandir,
+				Destination: &i.plandir,
+			},
+			&cli.BoolFlag{
+				Name:        "parallel",
+				Usage:       "It allows you call `helm uninstall` in parallel mode ",
+				Value:       true,
+				EnvVars:     []string{"HELMWAVE_PARALLEL"},
+				Destination: &i.parallel,
 			},
 		},
 		Action: toCtx(i.Run),
