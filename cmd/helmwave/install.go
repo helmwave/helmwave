@@ -20,5 +20,5 @@ var install = &cli.Command{
 			Destination: &aInstall.Plandir,
 		},
 	},
-	Action: aInstall.Run,
+	Action: toCtx(aInstall.Run),
 }

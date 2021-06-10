@@ -2,7 +2,6 @@ package action
 
 import (
 	"github.com/helmwave/helmwave/pkg/template"
-	"github.com/urfave/cli/v2"
 )
 
 type Yml struct {
@@ -10,6 +9,6 @@ type Yml struct {
 	To   string
 }
 
-func (a *Yml) Run(c *cli.Context) error {
+func (a *Yml) Run() error {
 	return template.Tpl2yml(a.From, a.To, nil)
 }

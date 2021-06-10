@@ -3,7 +3,6 @@ package action
 import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/prometheus/common/log"
-	"github.com/urfave/cli/v2"
 )
 
 type Diff struct {
@@ -11,7 +10,7 @@ type Diff struct {
 	Plandir2 string
 }
 
-func (d *Diff) Run(c *cli.Context) error {
+func (d *Diff) Run() error {
 	plan1 := plan.New(d.Plandir1)
 	if err := plan1.Import(); err != nil {
 		return err

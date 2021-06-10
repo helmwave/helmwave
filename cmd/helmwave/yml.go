@@ -27,8 +27,6 @@ var yml = &cli.Command	{
 			Destination: &aYml.To,
 		},
 	},
-	Action: func(c *cli.Context) error {
-		return aYml.Run()
-	},
+	Action: toCtx(aYml.Run),
 }
 

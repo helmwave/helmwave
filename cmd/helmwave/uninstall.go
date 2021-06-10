@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/helmwave/helmwave/pkg/action"
-	planfile "github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,8 +19,5 @@ var uninstall = &cli.Command	{
 			Destination: &aUninstall.Plandir,
 		},
 	},
-	Action: func(c *cli.Context) error {
-		plan := planfile.New(aUninstall.Plandir)
-		return plan.Destroy()
-	},
+	Action: toCtx(aUninstall.Run),
 }

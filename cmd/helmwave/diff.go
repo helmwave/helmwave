@@ -25,5 +25,5 @@ var diff = &cli.Command{
 			Destination: &aDiff.Plandir1,
 		},
 	},
-	Action: aDiff.Run,
+	Action: toCtx(aDiff.Run),
 }

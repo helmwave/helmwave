@@ -1,7 +1,6 @@
 package main
 
 import (
-	helmwaveCli "github.com/helmwave/helmwave/pkg/cli"
 	"github.com/helmwave/helmwave/pkg/helmwave"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -21,7 +20,7 @@ var commands = []*cli.Command{
 }
 
 func main() {
-	app = helmwaveCli.New()
+	app = helmwave.New()
 	c := cli.NewApp()
 	c.EnableBashCompletion = true
 	c.Usage = "composer for helm"
@@ -35,5 +34,11 @@ func main() {
 	err := c.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func toCtx(a func() error) func(c *cli.Context) error {
+	return func(c *cli.Context) error {
+		return a()
 	}
 }
