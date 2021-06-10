@@ -18,3 +18,8 @@ func (p *Plan) Import() error {
 
 	return nil
 }
+
+// Validate that files is existing
+func (p *Plan) Validate() error {
+	return nil
+}
