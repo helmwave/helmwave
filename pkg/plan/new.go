@@ -21,6 +21,10 @@ type planBody struct {
 }
 
 func New(dir string) *Plan {
+	if dir[len(dir)-1:] != "/" {
+		dir += "/"
+	}
+
 	plan := &Plan{
 		dir:      dir,
 		fullPath: dir + planfile,
