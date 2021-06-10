@@ -7,10 +7,9 @@ import (
 
 func New() *Config {
 	return &Config{
-		Version:  Version,
-		Helm:     cli.New(),
-		Logger:   &Log{},
-		Kubedog:  &kubedog.Config{},
-		Features: &Features{},
+		Version: Version,
+		Helm:    cli.New(),
+		Logger:  &Log{},
+		Kubedog: &kubedog.Config{},
 	}
 }

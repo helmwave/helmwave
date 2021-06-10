@@ -16,9 +16,8 @@ func (l *Status) Run() error {
 
 func (l *Status) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:    "list",
-		Aliases: []string{"ls"},
-		Usage:   "List of deployed releases",
+		Name:  "status",
+		Usage: "Status of deployed releases",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "plandir",

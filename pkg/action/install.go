@@ -20,10 +20,11 @@ func (i *Install) Run() error {
 }
 
 func (i *Install) Cmd() *cli.Command {
+	i.dog = &kubedog.Config{}
 	return &cli.Command{
 		Name:    "install",
 		Aliases: []string{"apply", "sync", "deploy"},
-		Usage:   "🛥 Deploy!",
+		Usage:   "Apply your plan",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "plandir",

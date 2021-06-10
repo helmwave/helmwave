@@ -29,7 +29,7 @@ func main() {
 	c.Description = "This tool helps you compose your helm releases!"
 
 	// Default flags and commands
-	c.Flags = flagsLog
+	c.Flags = flagsLog()
 	c.Commands = commands
 
 	err := c.Run(os.Args)
