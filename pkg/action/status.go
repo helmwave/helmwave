@@ -5,16 +5,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type List struct {
+type Status struct {
 	plandir string
 }
 
-func (l *List) Run() error {
+func (l *Status) Run() error {
 	p := plan.New(l.plandir)
 	return p.List()
 }
 
-func (l *List) Cmd() *cli.Command {
+func (l *Status) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "list",
 		Aliases: []string{"ls"},
