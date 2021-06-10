@@ -8,19 +8,8 @@ import (
 var Version = "dev"
 
 type Config struct {
-	Version  string
-	Helm     *helm.EnvSettings
-	Logger   *Log
-	Kubedog  *kubedog.Config
-	Features *Features
-}
-
-type Features struct {
-	Kubedog      bool
-	Parallel     bool
-	OverPlan     bool
-	MatchAllTags bool
-	PlanDeps     bool
-	DependsOn    bool
-	ReTpl        bool
+	Version string
+	Helm    *helm.EnvSettings
+	Logger  *Log
+	Kubedog *kubedog.Config
 }

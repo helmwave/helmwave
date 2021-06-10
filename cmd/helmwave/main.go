@@ -11,6 +11,7 @@ import (
 var app *helmwave.Config
 
 var commands = []*cli.Command{
+	new(action.Build).Cmd(),
 	new(action.Diff).Cmd(),
 	new(action.Install).Cmd(),
 	new(action.List).Cmd(),
@@ -18,7 +19,6 @@ var commands = []*cli.Command{
 	new(action.Uninstall).Cmd(),
 	new(action.Yml).Cmd(),
 }
-
 
 func main() {
 	app = helmwave.New()

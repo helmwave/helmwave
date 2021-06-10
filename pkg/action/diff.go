@@ -9,7 +9,6 @@ import (
 type Diff struct {
 	plandir1 string
 	plandir2 string
-	action
 }
 
 func (d *Diff) Run() error {
