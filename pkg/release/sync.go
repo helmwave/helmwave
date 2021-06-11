@@ -2,11 +2,12 @@ package release
 
 import (
 	"errors"
+	"os"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
-	"os"
 )
 
 var emptyReleases = errors.New("releases are empty")

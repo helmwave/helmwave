@@ -5,8 +5,9 @@ import (
 	"crypto"
 	_ "crypto/sha1"
 	"fmt"
-	"github.com/hashicorp/go-getter/v2"
 	"os"
+
+	"github.com/hashicorp/go-getter/v2"
 )
 
 type ValuesReference struct {

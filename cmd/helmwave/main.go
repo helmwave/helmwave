@@ -1,13 +1,13 @@
 package main
 
 import (
+	"os"
+
 	"github.com/helmwave/helmwave/pkg/action"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	helmwave "github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
-
 	"github.com/urfave/cli/v2"
-	"os"
 )
 
 var commands = []*cli.Command{

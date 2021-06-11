@@ -2,11 +2,12 @@ package template
 
 import (
 	"bytes"
+	"io/ioutil"
+	"text/template"
+
 	"github.com/Masterminds/sprig/v3"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"text/template"
 )
 
 var (

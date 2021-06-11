@@ -2,15 +2,16 @@ package repo
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/gofrs/flock"
 	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 const (

@@ -3,8 +3,9 @@
 package repo
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
 	"testing"
+
+	"github.com/helmwave/helmwave/pkg/helper"
 )
 
 func TestGitlabRepo(t *testing.T) {

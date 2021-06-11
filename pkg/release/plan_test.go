@@ -3,10 +3,11 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/feature"
-	"helm.sh/helm/v3/pkg/action"
 	"reflect"
 	"testing"
+
+	"github.com/helmwave/helmwave/pkg/feature"
+	"helm.sh/helm/v3/pkg/action"
 )
 
 func Test_normalizeTagList(t *testing.T) {

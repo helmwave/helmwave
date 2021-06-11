@@ -2,10 +2,11 @@ package release
 
 import (
 	"errors"
-	"github.com/helmwave/helmwave/pkg/pubsub"
-	log "github.com/sirupsen/logrus"
 	"sort"
 	"time"
+
+	"github.com/helmwave/helmwave/pkg/pubsub"
+	log "github.com/sirupsen/logrus"
 )
 
 var releasePubSub = pubsub.NewReleasePubSub()

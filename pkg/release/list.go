@@ -3,15 +3,16 @@ package release
 import (
 	"errors"
 	"fmt"
+	"os"
+	"regexp"
+	"strconv"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
-	"os"
-	"regexp"
-	"strconv"
 )
 
 func (rel *Config) List() (*release.Release, error) {

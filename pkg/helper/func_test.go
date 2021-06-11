@@ -3,7 +3,6 @@
 package helper
 
 import (
-	"github.com/stretchr/testify/suite"
 	"os"
 	"path"
 	"sort"
@@ -11,6 +10,8 @@ import (
 	"syscall"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type HelperTestSuite struct {

@@ -1,10 +1,11 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
-	log "github.com/sirupsen/logrus"
 	"sort"
 	"strings"
+
+	"github.com/helmwave/helmwave/pkg/helper"
+	log "github.com/sirupsen/logrus"
 )
 
 func Plan(tags []string, releases []*Config, deps bool) (plan []*Config) {

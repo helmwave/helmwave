@@ -3,8 +3,9 @@
 package pubsub
 
 import (
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type PubSubTestSuite struct {

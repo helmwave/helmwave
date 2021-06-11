@@ -2,10 +2,11 @@ package kubedog
 
 import (
 	"fmt"
-	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 )
 
 func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {

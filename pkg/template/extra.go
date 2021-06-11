@@ -2,14 +2,15 @@ package template
 
 import (
 	"fmt"
-	"golang.org/x/sync/errgroup"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"reflect"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
+	"gopkg.in/yaml.v2"
 )
 
 type Values = map[string]interface{}

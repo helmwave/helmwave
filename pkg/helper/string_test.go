@@ -3,8 +3,9 @@
 package helper
 
 import (
-	"github.com/helmwave/helmwave/pkg/yml"
 	"testing"
+
+	"github.com/helmwave/helmwave/pkg/yml"
 )
 
 func TestString(t *testing.T) {
