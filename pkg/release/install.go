@@ -93,7 +93,7 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 			instClient.Description = client.Description
 
 			if instClient.DryRun {
-				//instClient.ReleaseName = "RELEASE-NAME"
+				// instClient.ReleaseName = "RELEASE-NAME"
 				instClient.Replace = true
 			}
 

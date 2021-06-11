@@ -12,7 +12,7 @@ import (
 func ActionCfg(ns string, settings *helm.EnvSettings) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER")
-	if len(ns) == 0 {
+	if ns == "" {
 		ns = settings.Namespace()
 	}
 

@@ -36,7 +36,7 @@ func addToPlan(plan []*Config, release *Config, releases map[string]*Config, dep
 		return plan
 	}
 
-	r := append(plan, release)
+	r := append(plan, release) //nolint:gocritic
 
 	if deps {
 		for _, depName := range release.DependsOn {
@@ -64,7 +64,7 @@ func normalizeTagList(tags []string) []string {
 }
 
 // checkTagInclusion checks where any of release tags are included in target tags.
-func checkTagInclusion(targetTags []string, releaseTags []string, matchAll bool) bool {
+func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
 	if len(targetTags) == 0 {
 		return true
 	}

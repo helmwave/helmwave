@@ -12,7 +12,7 @@ import (
 func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
-	for _, r := range m {
+	for _, r := range m { //nolint:gocritic
 		switch r.Kind {
 		case "Deployment":
 			s, err := r.MakeMultiTrackSpec(ns)

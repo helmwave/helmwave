@@ -49,7 +49,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 	}
 
 	cmd := exec.Command(command, strArgs...)
-	//cmd.Dir = c.basePath
+	// cmd.Dir = c.basePath
 
 	g := errgroup.Group{}
 
