@@ -33,7 +33,3 @@ func Byte(in interface{}) []byte {
 func String(in interface{}) string {
 	return string(Byte(in))
 }
-
-func Print(in interface{}) {
-	println(String(in))
-}
