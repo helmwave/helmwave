@@ -1,10 +1,11 @@
 package release
 
 import (
+	"io/ioutil"
+
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
-	"io/ioutil"
 )
 
 func MakeMapSpecs(releases []*Config, manifestPath string) (map[string]*multitrack.MultitrackSpecs, error) {
@@ -42,7 +43,6 @@ func MakeMapSpecs(releases []*Config, manifestPath string) (map[string]*multitra
 		} else {
 			mapSpecs[rel.Options.Namespace] = relSpecs
 		}
-
 	}
 
 	return mapSpecs, nil

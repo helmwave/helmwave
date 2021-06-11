@@ -1,6 +1,9 @@
 package release
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/imdario/mergo"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
@@ -11,8 +14,6 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
-	"os"
-	"path/filepath"
 )
 
 func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
@@ -97,15 +98,12 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 			}
 
 			return instClient.Run(ch, vals)
-
 		} else if err != nil {
 			return nil, err
 		}
-
 	}
 
 	return client.Run(rel.Name, ch, vals)
-
 }
 
 func (rel *Config) chartDepsUpd(settings *helm.EnvSettings) error {

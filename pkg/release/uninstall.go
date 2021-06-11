@@ -2,6 +2,7 @@ package release
 
 import (
 	"errors"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	log "github.com/sirupsen/logrus"
@@ -19,7 +20,6 @@ func (rel *Config) Uninstall() (*release.UninstallReleaseResponse, error) {
 	client := action.NewUninstall(cfg)
 
 	return client.Run(rel.Name)
-
 }
 
 func Uninstall(releases []*Config, flagParallel bool) (err error) {
@@ -45,7 +45,6 @@ func Uninstall(releases []*Config, flagParallel bool) (err error) {
 		if err != nil {
 			return err
 		}
-
 	} else {
 		for _, r := range releases {
 			r.UninstallWithFails(&fails)
