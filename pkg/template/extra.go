@@ -27,7 +27,7 @@ func FromYaml(str string) (Values, error) {
 	m := Values{}
 
 	if err := yaml.Unmarshal([]byte(str), &m); err != nil {
-		return nil, fmt.Errorf("%s, offending yaml: %s", err, str)
+		return nil, fmt.Errorf("%w, offending yaml: %s", err, str)
 	}
 	return m, nil
 }
@@ -69,7 +69,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 			for {
 				n, err := io.WriteString(stdin, input[i:])
 				if err != nil {
-					return fmt.Errorf("failed while writing %d bytes to stdin of \"%s\": %v", len(input), command, err)
+					return fmt.Errorf("failed while writing %d bytes to stdin of \"%s\": %w", len(input), command, err)
 				}
 
 				i += n
