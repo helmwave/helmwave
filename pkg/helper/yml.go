@@ -20,7 +20,6 @@ func Save(file string, in interface{}) error {
 	}
 
 	return f.Sync()
-
 }
 
 func Byte(in interface{}) []byte {
@@ -33,8 +32,4 @@ func Byte(in interface{}) []byte {
 
 func String(in interface{}) string {
 	return string(Byte(in))
-}
-
-func Print(in interface{}) {
-	println(String(in))
 }

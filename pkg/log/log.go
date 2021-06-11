@@ -103,7 +103,6 @@ func (l *Settings) setFormat() {
 			ForceColors: l.color,
 		})
 	}
-
 }
 
 func logKubernetesClientError(err error) {

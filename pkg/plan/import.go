@@ -1,8 +1,9 @@
 package plan
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 func (p *Plan) Import() error {

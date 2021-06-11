@@ -1,17 +1,18 @@
 package action
 
 import (
+	"time"
+
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
-	"time"
 )
 
 type Install struct {
+	dog      *kubedog.Config
 	plandir  string
 	parallel bool
 	kubedog  bool
-	dog      *kubedog.Config
 }
 
 func (i *Install) Run() error {

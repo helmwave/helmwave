@@ -6,9 +6,9 @@ import (
 )
 
 type Plan struct {
+	body     *planBody
 	dir      string
 	fullPath string
-	body     *planBody
 }
 
 const planfile = "planfile"

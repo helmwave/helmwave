@@ -2,10 +2,11 @@ package release
 
 import (
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/template"
-	"helm.sh/helm/v3/pkg/chart/loader"
 	"path"
 	"strings"
+
+	"github.com/helmwave/helmwave/pkg/template"
+	"helm.sh/helm/v3/pkg/chart/loader"
 )
 
 func (rel *Config) UniqName() string {

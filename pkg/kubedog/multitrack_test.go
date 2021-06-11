@@ -3,11 +3,12 @@
 package kubedog
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/stretchr/testify/suite"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strings"
-	"testing"
 )
 
 var (

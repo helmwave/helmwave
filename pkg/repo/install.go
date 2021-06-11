@@ -2,19 +2,20 @@ package repo
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/gofrs/flock"
 	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 const (
-	//flockTimeout is timeout for repo flock
+	// flockTimeout is timeout for repo flock
 	flockTimeout = 30 * time.Second
 )
 
@@ -25,8 +26,8 @@ func (rep *Config) Install(settings *helm.EnvSettings) error {
 // Write updates given repository name if it exists in helm repository
 // TODO it better later
 func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
-	//Ensure the file directory exists as it is required for file locking
-	err := os.MkdirAll(filepath.Dir(repofile), 0755)
+	// Ensure the file directory exists as it is required for file locking
+	err := os.MkdirAll(filepath.Dir(repofile), 0o755)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
@@ -86,7 +87,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 
 		f.Update(o)
 
-		if err := f.WriteFile(repofile, 0644); err != nil {
+		if err := f.WriteFile(repofile, 0o644); err != nil { //nolint:gocritic
 			return err
 		}
 

@@ -1,6 +1,10 @@
 package release
 
 import (
+	"errors"
+	"os"
+	"path/filepath"
+
 	"github.com/imdario/mergo"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
@@ -11,8 +15,6 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
-	"os"
-	"path/filepath"
 )
 
 func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings) (*release.Release, error) {
@@ -67,7 +69,7 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 		histClient := action.NewHistory(cfg)
 		histClient.Max = 1
 		_, err := histClient.Run(rel.Name)
-		if err == driver.ErrReleaseNotFound {
+		if errors.Is(err, driver.ErrReleaseNotFound) {
 			log.Debugf("🧐 Release %q in %q does not exist. Installing it now.", rel.Name, rel.Options.Namespace)
 
 			instClient := action.NewInstall(cfg)
@@ -92,20 +94,17 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 			instClient.Description = client.Description
 
 			if instClient.DryRun {
-				//instClient.ReleaseName = "RELEASE-NAME"
+				// instClient.ReleaseName = "RELEASE-NAME"
 				instClient.Replace = true
 			}
 
 			return instClient.Run(ch, vals)
-
 		} else if err != nil {
 			return nil, err
 		}
-
 	}
 
 	return client.Run(rel.Name, ch, vals)
-
 }
 
 func (rel *Config) chartDepsUpd(settings *helm.EnvSettings) error {

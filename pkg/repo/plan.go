@@ -1,11 +1,12 @@
 package repo
 
 import (
+	"os"
+	"strings"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"strings"
 )
 
 // Plan generates repo config out of planned releases and available repositories

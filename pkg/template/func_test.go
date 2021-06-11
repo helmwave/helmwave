@@ -3,9 +3,10 @@
 package template
 
 import (
+	"testing"
+
 	"github.com/Masterminds/sprig/v3"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type FuncTestSuite struct {

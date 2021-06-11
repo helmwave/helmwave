@@ -3,12 +3,13 @@ package release
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
-	"sort"
 )
 
 func (rel *Config) Status() (*release.Release, error) {
