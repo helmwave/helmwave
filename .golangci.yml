@@ -5,19 +5,19 @@ run:
 linters:
   enable-all: true
   disable:
-    - interfacer
-    - wrapcheck
-    - maligned
-    - scopelint
-    - golint
-    - nlreturn
-    - gochecknoglobals
-    - tagliatelle
     - deadcode
-    - ifshort
-    - gomnd
-    - goerr113
+    - gochecknoglobals
     - godot
+    - goerr113
+    - golint
+    - gomnd
+    - ifshort
+    - interfacer
+    - maligned
+    - nlreturn
+    - scopelint
+    - tagliatelle
+    - wrapcheck
     - wsl
 
 # all available settings of specific linters
@@ -371,13 +371,13 @@ severity:
   # Only affects out formats that support setting severity information.
   rules:
     - linters:
-        - dupl
-        - revive
-        - funlen
-        - lll
-        - godox
-        - gocognit
-        - nestif
-        - gocyclo
         - cyclop
+        - dupl
+        - funlen
+        - gocognit
+        - gocyclo
+        - godox
+        - lll
+        - nestif
+        - revive
       severity: warning
