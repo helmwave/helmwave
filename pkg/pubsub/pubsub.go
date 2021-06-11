@@ -10,8 +10,8 @@ const (
 type ReleaseStatus int
 
 type ReleasePubSub struct {
-	mu   sync.RWMutex
 	subs map[string][]chan ReleaseStatus
+	mu   sync.RWMutex
 }
 
 // NewReleasePubSub creates new PubSub structure.

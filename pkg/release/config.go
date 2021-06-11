@@ -6,12 +6,12 @@ import (
 )
 
 type Config struct {
+	dependencies map[string]<-chan pubsub.ReleaseStatus
+	Store        map[string]interface{}
+	Options      action.Upgrade
 	Name         string
 	Chart        string
 	Tags         []string
-	Store        map[string]interface{}
 	Values       []*ValuesReference
-	Options      action.Upgrade
 	DependsOn    []string `yaml:"depends_on"`
-	dependencies map[string]<-chan pubsub.ReleaseStatus
 }
