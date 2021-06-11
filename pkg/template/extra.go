@@ -40,9 +40,9 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 
 	strArgs := make([]string, len(args))
 	for i, a := range args {
-		switch a.(type) {
+		switch a := a.(type) {
 		case string:
-			strArgs[i] = a.(string)
+			strArgs[i] = a
 		default:
 			return "", fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
 		}
