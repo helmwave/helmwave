@@ -1,6 +1,7 @@
 package release
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -68,7 +69,7 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 		histClient := action.NewHistory(cfg)
 		histClient.Max = 1
 		_, err := histClient.Run(rel.Name)
-		if err == driver.ErrReleaseNotFound {
+		if errors.Is(err, driver.ErrReleaseNotFound) {
 			log.Debugf("🧐 Release %q in %q does not exist. Installing it now.", rel.Name, rel.Options.Namespace)
 
 			instClient := action.NewInstall(cfg)
