@@ -9,9 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var releasePubSub = pubsub.NewReleasePubSub()
-var DependencyFailedError = errors.New("dependency failed")
-var notFound = errors.New("release not found")
+var (
+	releasePubSub         = pubsub.NewReleasePubSub()
+	DependencyFailedError = errors.New("dependency failed")
+	notFound              = errors.New("release not found")
+)
 
 func (rel *Config) NotifySuccess() {
 	if !rel.Options.DryRun {

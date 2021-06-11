@@ -49,7 +49,7 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 	// Default spec
 	spec := &multitrack.MultitrackSpec{
 		ResourceName: r.Name,
-		//Namespace:               r.Namespace,
+		// Namespace:               r.Namespace,
 		Namespace:               ns,
 		LogRegexByContainerName: map[string]*regexp.Regexp{},
 		TrackTerminationMode:    multitrack.WaitUntilResourceReady,

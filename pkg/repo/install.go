@@ -27,7 +27,7 @@ func (rep *Config) Install(settings *helm.EnvSettings) error {
 // TODO it better later
 func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 	// Ensure the file directory exists as it is required for file locking
-	err := os.MkdirAll(filepath.Dir(repofile), 0755)
+	err := os.MkdirAll(filepath.Dir(repofile), 0o755)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
@@ -87,7 +87,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 
 		f.Update(o)
 
-		if err := f.WriteFile(repofile, 0644); err != nil { //nolint:gocritic
+		if err := f.WriteFile(repofile, 0o644); err != nil { //nolint:gocritic
 			return err
 		}
 

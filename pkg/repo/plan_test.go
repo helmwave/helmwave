@@ -46,5 +46,4 @@ releases:
 	if err != nil {
 		t.Error(err)
 	}
-
 }
