@@ -2,6 +2,7 @@ package release
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"path"
 	"strings"
 
@@ -43,6 +44,17 @@ func (rel *Config) RenderValues(dir string) error {
 	}
 
 	return nil
+}
+
+// filterValuesFiles filters non-existent values files.
+func (rel *Config) filterValuesFiles() {
+	for i := len(rel.Values) - 1; i >= 0; i-- {
+		err := rel.Values[i].Download()
+		if err != nil {
+			log.Errorf("Failed to find %s, skipping: %v", rel.Values[i].GetPath(), err)
+			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+		}
+	}
 }
 
 func (rel *Config) ReposDeps() (repos []string, err error) {

@@ -2,22 +2,41 @@ package action
 
 import (
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+	"sort"
+	"strings"
 )
 
 type Build struct {
-	plandir string
-	tags    []string
+	plandir  string
+	tags     cli.StringSlice
+	matchAll bool
 }
 
 func (i *Build) Run() error {
-	p := plan.New(i.plandir)
-	return p.Build()
+	//tags := normalizeTags(i.tags)
+	newPlan := plan.New(i.plandir)
+	newPlan.Build()
+
+	oldPlan := plan.New(i.plandir)
+	if oldPlan.IsExist() {
+		if err := oldPlan.Import(); err != nil {
+			return err
+		}
+
+		// Show difference
+		changelog, err := newPlan.Diff(oldPlan)
+		log.Info(changelog)
+		if err != nil {
+			return err
+		}
+	}
+
+	return newPlan.Export()
 }
 
 func (i *Build) Cmd() *cli.Command {
-	t := cli.StringSlice{}
-	i.tags = t.Value()
 	return &cli.Command{
 		Name:  "build",
 		Usage: "Build a plandir",
@@ -34,9 +53,28 @@ func (i *Build) Cmd() *cli.Command {
 				Aliases:     []string{"t"},
 				Usage:       "It allows you choose releases for sync. Example: -t tag1 -t tag3,tag4",
 				EnvVars:     []string{"HELMWAVE_TAGS"},
-				Destination: &t,
+				Destination: &i.tags,
+			},
+			&cli.BoolFlag{
+				Name:        "match-all-tags",
+				Usage:       "Match all provided tags",
+				Value:       false,
+				EnvVars:     []string{"HELMWAVE_MATCH_ALL_TAGS"},
+				Destination: &i.matchAll,
 			},
 		},
 		Action: toCtx(i.Run),
 	}
+}
+
+// normalizeTags normalizes and splits comma-separated tag list.
+// ["c", " b ", "a "] -> ["a", "b", "c"].
+func normalizeTags(tags []string) []string {
+	m := make([]string, len(tags))
+	for i, t := range tags {
+		m[i] = strings.TrimSpace(t)
+	}
+	sort.Strings(m)
+
+	return m
 }

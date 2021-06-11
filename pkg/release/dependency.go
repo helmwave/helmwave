@@ -12,7 +12,6 @@ import (
 var (
 	releasePubSub         = pubsub.NewReleasePubSub()
 	DependencyFailedError = errors.New("dependency failed")
-	notFound              = errors.New("release not found")
 )
 
 func (rel *Config) NotifySuccess() {
@@ -86,4 +85,22 @@ func (rel *Config) HandleDependencies(releases []*Config) {
 			log.Warnf("cannot find dependency %s in plan, skipping it", dep)
 		}
 	}
+}
+
+func (rel *Config) addToPlan(plan []*Config, releases map[string]*Config) []*Config {
+	if rel.In(plan) {
+		return plan
+	}
+
+	r := append(plan, rel)
+
+	for _, depName := range rel.DependsOn {
+		if dep, ok := releases[depName]; ok {
+			r = addToPlan(r, dep, releases)
+		} else {
+			log.Warnf("cannot find dependency %s in available releases, skipping it", depName)
+		}
+	}
+
+	return r
 }

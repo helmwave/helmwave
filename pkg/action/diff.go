@@ -28,7 +28,7 @@ func (d *Diff) Run() error {
 		return err
 	}
 
-	changelog, err := plan.Diff(plan1, plan2)
+	changelog, err := plan1.Diff(plan2)
 	log.Info(changelog)
 	return err
 }

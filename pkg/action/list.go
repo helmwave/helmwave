@@ -11,6 +11,9 @@ type List struct {
 
 func (l *List) Run() error {
 	p := plan.New(l.plandir)
+	if err := p.Import(); err != nil {
+		return err
+	}
 	return p.List()
 }
 

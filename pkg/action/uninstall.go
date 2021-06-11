@@ -12,6 +12,9 @@ type Uninstall struct {
 
 func (i *Uninstall) Run() error {
 	p := plan.New(i.plandir)
+	if err := p.Import(); err != nil {
+		return err
+	}
 	return p.Apply()
 }
 

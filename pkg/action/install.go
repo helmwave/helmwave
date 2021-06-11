@@ -17,6 +17,10 @@ type Install struct {
 
 func (i *Install) Run() error {
 	p := plan.New(i.plandir)
+	if err := p.Import(); err != nil {
+		return err
+	}
+
 	return p.Apply()
 }
 

@@ -11,6 +11,9 @@ type Status struct {
 
 func (l *Status) Run() error {
 	p := plan.New(l.plandir)
+	if err := p.Import(); err != nil {
+		return err
+	}
 	return p.List()
 }
 

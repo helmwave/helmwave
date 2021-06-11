@@ -11,6 +11,9 @@ type Manifest struct {
 
 func (i *Manifest) Run() error {
 	p := plan.New(i.plandir)
+	if err := p.Import(); err != nil {
+		return err
+	}
 	return p.Apply()
 }
 
