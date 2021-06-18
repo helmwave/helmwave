@@ -19,6 +19,7 @@ var commands = []*cli.Command{
 	new(action.Rollback).Cmd(),
 	new(action.Status).Cmd(),
 	new(action.Uninstall).Cmd(),
+	new(action.Validate).Cmd(),
 	new(action.Yml).Cmd(),
 }
 
