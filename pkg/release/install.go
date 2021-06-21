@@ -34,7 +34,7 @@ func (rel *Config) Install(cfg *action.Configuration, settings *helm.EnvSettings
 		return nil, err
 	}
 
-	valOpts := &values.Options{ValueFiles: v}
+	valOpts := &values.Options{ValueFiles: rel.Values}
 	vals, err := valOpts.MergeValues(getter.All(settings))
 	if err != nil {
 		return nil, err
