@@ -7,6 +7,7 @@ type action interface { //nolint:unused
 	Cmd() *cli.Command
 }
 
+// toCtx wrapper of urfave v2
 func toCtx(a func() error) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		return a()

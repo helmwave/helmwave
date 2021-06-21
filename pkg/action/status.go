@@ -9,27 +9,21 @@ type Status struct {
 	plandir string
 }
 
-func (l *Status) Run() error {
-	p := plan.New(l.plandir)
+func (i *Status) Run() error {
+	p := plan.New(i.plandir)
 	if err := p.Import(); err != nil {
 		return err
 	}
 	return p.List()
 }
 
-func (l *Status) Cmd() *cli.Command {
+func (i *Status) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
 		Usage: "Status of deployed releases",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir",
-				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &l.plandir,
-			},
+			flagPlandir(&i.plandir),
 		},
-		Action: toCtx(l.Run),
+		Action: toCtx(i.Run),
 	}
 }

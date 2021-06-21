@@ -12,12 +12,15 @@ type Build struct {
 	plandir  string
 	tags     cli.StringSlice
 	matchAll bool
+	yml      string
 }
 
 func (i *Build) Run() error {
-	//tags := normalizeTags(i.tags)
 	newPlan := plan.New(i.plandir)
-	newPlan.Build()
+	err := newPlan.Build(i.yml, i.normalizeTags(), i.matchAll)
+	if err != nil {
+		return err
+	}
 
 	oldPlan := plan.New(i.plandir)
 	if oldPlan.IsExist() {
@@ -41,27 +44,10 @@ func (i *Build) Cmd() *cli.Command {
 		Name:  "build",
 		Usage: "Build a plandir",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir",
-				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &i.plandir,
-			},
-			&cli.StringSliceFlag{
-				Name:        "tags",
-				Aliases:     []string{"t"},
-				Usage:       "It allows you choose releases for sync. Example: -t tag1 -t tag3,tag4",
-				EnvVars:     []string{"HELMWAVE_TAGS"},
-				Destination: &i.tags,
-			},
-			&cli.BoolFlag{
-				Name:        "match-all-tags",
-				Usage:       "Match all provided tags",
-				Value:       false,
-				EnvVars:     []string{"HELMWAVE_MATCH_ALL_TAGS"},
-				Destination: &i.matchAll,
-			},
+			flagPlandir(&i.plandir),
+			flagTags(&i.tags),
+			flagMatchAllTags(&i.matchAll),
+			flagFile(&i.yml),
 		},
 		Action: toCtx(i.Run),
 	}
@@ -69,9 +55,9 @@ func (i *Build) Cmd() *cli.Command {
 
 // normalizeTags normalizes and splits comma-separated tag list.
 // ["c", " b ", "a "] -> ["a", "b", "c"].
-func normalizeTags(tags []string) []string {
-	m := make([]string, len(tags))
-	for i, t := range tags {
+func (i *Build) normalizeTags() []string {
+	m := make([]string, len(i.tags.Value()))
+	for i, t := range i.tags.Value() {
 		m[i] = strings.TrimSpace(t)
 	}
 	sort.Strings(m)

@@ -27,20 +27,20 @@ func (rel *Config) RenderValues(dir string) error {
 	rel.filterValuesFiles()
 
 	for i, v := range rel.Values {
-		m, err := v.ManifestPath()
-		if err != nil {
-			return err
-		}
-		s := fmt.Sprintf("%s.%s.plan", m, rel.UniqName())
+		//m, err := v.ManifestPath()
+		//if err != nil {
+		//	return err
+		//}
+		//s := fmt.Sprintf("%s.%s.plan", m, rel.UniqName())
 		p := path.Join(dir, s)
 
-		err = template.Tpl2yml(v.GetPath(), p, struct{ Release *Config }{rel})
-		v.UnlinkProcessed()
+		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})
+		//v.UnlinkProcessed()
 		if err != nil {
 			return err
 		}
 
-		rel.Values[i].SetProcessedPath(p)
+		//rel.Values[i].SetProcessedPath(p)
 	}
 
 	return nil
@@ -51,7 +51,7 @@ func (rel *Config) filterValuesFiles() {
 	for i := len(rel.Values) - 1; i >= 0; i-- {
 		err := rel.Values[i].Download()
 		if err != nil {
-			log.Errorf("Failed to find %s, skipping: %v", rel.Values[i].GetPath(), err)
+			log.Errorf("Failed to find %s, skipping: %v", rel.Values[i], err)
 			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
 		}
 	}

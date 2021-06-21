@@ -9,8 +9,7 @@ import (
 )
 
 type Diff struct {
-	plandir1 string
-	plandir2 string
+	plandir1, plandir2 string
 }
 
 func (d *Diff) Run() error {

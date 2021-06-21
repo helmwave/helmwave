@@ -6,8 +6,7 @@ import (
 )
 
 type Yml struct {
-	from string
-	to   string
+	from, to string
 }
 
 func (i *Yml) Run() error {
@@ -23,17 +22,10 @@ func (i *Yml) Cmd() *cli.Command {
 				Name:        "tpl",
 				Value:       "helmwave.yml.tpl",
 				Usage:       "Main tpl file",
-				EnvVars:     []string{"HELMWAVE_TPL_FILE"},
+				EnvVars:     []string{"HELMWAVE_TPL"},
 				Destination: &i.from,
 			},
-			&cli.StringFlag{
-				Name:        "file",
-				Aliases:     []string{"f"},
-				Value:       "helmwave.yml",
-				Usage:       "Main yml file",
-				EnvVars:     []string{"HELMWAVE_FILE", "HELMWAVE_YAML_FILE", "HELMWAVE_YML_FILE"},
-				Destination: &i.to,
-			},
+			flagFile(&i.to),
 		},
 		Action: toCtx(i.Run),
 	}

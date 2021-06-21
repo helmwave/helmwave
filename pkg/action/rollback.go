@@ -23,20 +23,8 @@ func (i *Rollback) Cmd() *cli.Command {
 		Name:  "Rollback",
 		Usage: "Rollback your plandir",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir",
-				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &i.plandir,
-			},
-			&cli.BoolFlag{
-				Name:        "parallel",
-				Usage:       "It allows you call `helm uninstall` in parallel mode ",
-				Value:       true,
-				EnvVars:     []string{"HELMWAVE_PARALLEL"},
-				Destination: &i.parallel,
-			},
+			flagPlandir(&i.plandir),
+			flagParallel(&i.parallel),
 		},
 		Action: toCtx(i.Run),
 	}

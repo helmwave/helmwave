@@ -84,6 +84,6 @@ func (v *ValuesReference) SetProcessedPath(path string) {
 
 func (v *ValuesReference) UnlinkProcessed() {
 	if !v.IsLocal() && v.localPath != "" {
-		os.Remove(v.localPath)
+		_ = os.Remove(v.localPath)
 	}
 }

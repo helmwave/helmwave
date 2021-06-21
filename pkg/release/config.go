@@ -12,6 +12,6 @@ type Config struct {
 	Name         string
 	Chart        string
 	Tags         []string
-	Values       []*ValuesReference
+	Values       []string
 	DependsOn    []string `yaml:"depends_on"`
 }

@@ -3,37 +3,71 @@ package plan
 import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"strings"
 )
 
 type buildOptions int
 
 const (
-	Release buildOptions = iota
+	UniqNames buildOptions = iota
+	Release
 	Values
 	Repositories
 )
 
-func (p *Plan) Build() {
+// Build Принимает на вход ямл и опции по работе с ним.
+func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 
-}
-
-func (p *Plan) buildReleases(tags []string, matchAll bool) *Plan {
-	if len(tags) == 0 {
-		return p
+	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
+	err := buildValues(p.body.Releases, p.dir)
+	if err != nil {
+		return err
 	}
 
-	var result []*release.Config
+	p.body.Repositories = buildRepo(p.body.Releases, p.body.Repositories)
 
-	uniqMap := p.uniqReleaseNames()
+	return nil
+}
 
-	for _, r := range p.body.Releases {
+func buildReleases(tags []string, releases []*release.Config, matchAll bool) (plan []*release.Config) {
+	if len(tags) == 0 {
+		return releases
+	}
+
+	releasesMap := make(map[string]*release.Config)
+
+	for _, r := range releases {
+		releasesMap[r.UniqName()] = r
+	}
+
+	for _, r := range releases {
 		if checkTagInclusion(tags, r.Tags, matchAll) {
-
+			plan = addToPlan(plan, r, releasesMap)
 		}
 	}
 
-	return p
+	return plan
+}
+
+func addToPlan(plan []*release.Config, release *release.Config, releases map[string]*release.Config) []*release.Config {
+	if release.In(plan) {
+		return plan
+	}
+
+	r := append(plan, release)
+
+	for _, depName := range release.DependsOn {
+		if dep, ok := releases[depName]; ok {
+			r = addToPlan(r, dep, releases)
+		} else {
+			log.Warnf("cannot find dependency %s in available releases, skipping it", depName)
+		}
+	}
+
+	return r
 }
 
 // checkTagInclusion checks where any of release tags are included in target tags.
@@ -51,52 +85,80 @@ func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
 	return matchAll
 }
 
-func (p *Plan) addToPlan(rel *release.Config, m map[string]*release.Config) *Plan {
-	if rel.In(p.body.Releases) {
-		return p
-	}
-
-	p.body.Releases = append(p.body.Releases, rel)
-
-	for _, depName := range rel.DependsOn {
-		if dep, ok := m[depName]; ok {
-			p.addToPlan(dep, m)
-		} else {
-			log.Warnf("cannot find dependency %s in available releases, skipping it", depName)
-		}
-	}
-
-	return p
-}
-
-// uniqReleaseNames
-func (p *Plan) uniqReleaseNames() map[string]*release.Config {
-	m := make(map[string]*release.Config)
-	for _, r := range p.body.Releases {
-		m[r.UniqName()] = r
-	}
-	return m
-}
-
-// buildValues to planfile
-func (p *Plan) buildValues() error {
-	for _, rel := range p.body.Releases {
-		err := rel.RenderValues(p.dir)
+func buildValues(releases []*release.Config, dir string) error {
+	for i, rel := range releases {
+		err := rel.RenderValues(dir)
 		if err != nil {
 			return err
 		}
 
+		releases[i].Values = rel.Values
 		log.WithFields(log.Fields{
 			"release":   rel.Name,
 			"namespace": rel.Options.Namespace,
-			"values":    rel.Values,
+			"values":    releases[i].Values,
 		}).Debug("🐞 Render Values")
 	}
 
 	return nil
 }
 
-// buildRepositories to planfile
-func (p *Plan) buildRepositories() *Plan {
-	return p
+func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []*repo.Config) {
+	all := getRepositories(releases)
+
+	for _, a := range all {
+		found := false
+		for _, b := range repositories {
+			if a == b.Name {
+				found = true
+				if !b.InByName(plan) {
+					plan = append(plan, b)
+					log.Infof("🗄 %q has been added to the plan", a)
+				}
+			}
+		}
+
+		if !found {
+			log.Errorf("🗄 %q not found ", a)
+		}
+	}
+
+	return plan
+}
+
+// getRepositories for releases
+func getRepositories(releases []*release.Config) (repos []string) {
+	for _, rel := range releases {
+		rep := strings.Split(rel.Chart, "/")[0]
+		deps, _ := rel.ReposDeps()
+
+		all := deps
+		if repoIsLocal(rep) {
+			log.Infof("🗄 %q is local repo", rep)
+		} else {
+			all = append(all, rep)
+		}
+
+		for _, r := range all {
+			if !helper.Contains(r, repos) {
+				repos = append(repos, r)
+			}
+		}
+	}
+
+	return repos
+}
+
+// repoIsLocal
+func repoIsLocal(repo string) bool {
+	if repo == "" {
+		return true
+	}
+
+	stat, err := os.Stat(repo)
+	if (err == nil || !os.IsNotExist(err)) && stat.IsDir() {
+		return true
+	}
+
+	return false
 }

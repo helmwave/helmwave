@@ -14,7 +14,7 @@ func (l *Validate) Run() error {
 	if err := p.Import(); err != nil {
 		return err
 	}
-	return p.Validate()
+	return p.ValidateValues()
 }
 
 func (l *Validate) Cmd() *cli.Command {

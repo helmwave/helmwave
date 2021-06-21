@@ -23,13 +23,7 @@ func (l *List) Cmd() *cli.Command {
 		Aliases: []string{"ls"},
 		Usage:   "List of deployed releases",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir",
-				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &l.plandir,
-			},
+			flagPlandir(&l.plandir),
 		},
 		Action: toCtx(l.Run),
 	}

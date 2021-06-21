@@ -3,11 +3,15 @@ package plan
 import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
-	log "github.com/sirupsen/logrus"
-	"os"
+	"github.com/helmwave/helmwave/pkg/version"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
-const planfile = "planfile"
+const (
+	Planfile = "planfile"
+	Plandir  = ".helmwave/"
+)
 
 type Plan struct {
 	body     *planBody
@@ -22,17 +26,28 @@ type planBody struct {
 	Releases     []*release.Config
 }
 
-func (p *Plan) IsExist() bool {
-	if _, err := os.Stat(p.fullPath); err == nil {
-		return true
-	} else if os.IsNotExist(err) {
-		return false
-	} else {
-		// Schrodinger: file may or may not exist. See err for details.
-		// Therefore, do *NOT* use !os.IsNotExist(err) to test for file existence
-		log.Fatal(err)
-		return false
+func NewBody(file string) (*planBody, error) {
+	b := &planBody{
+		Version: version.Version,
 	}
+
+	src, err := ioutil.ReadFile(file)
+	if err != nil {
+		return b, err
+	}
+
+	err = yaml.Unmarshal(src, b)
+	if err != nil {
+		return b, err
+	}
+
+	// Setup dev version
+	//if b.Version == "" {
+	//	b.Version = version.Version
+	//}
+
+	return b, err
+
 }
 
 func New(dir string) *Plan {
@@ -42,7 +57,7 @@ func New(dir string) *Plan {
 
 	plan := &Plan{
 		dir:      dir,
-		fullPath: dir + planfile,
+		fullPath: dir + Planfile,
 	}
 
 	return plan

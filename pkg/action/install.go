@@ -31,21 +31,8 @@ func (i *Install) Cmd() *cli.Command {
 		Aliases: []string{"apply", "sync", "deploy"},
 		Usage:   "Apply your plan",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir",
-				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &i.plandir,
-			},
-			&cli.BoolFlag{
-				Name:        "parallel",
-				Usage:       "It allows you call `helm install` in parallel mode ",
-				Value:       true,
-				EnvVars:     []string{"HELMWAVE_PARALLEL"},
-				Destination: &i.parallel,
-			},
-
+			flagPlandir(&i.plandir),
+			flagParallel(&i.parallel),
 			&cli.BoolFlag{
 				Name:        "kubedog",
 				Usage:       "Enable/Disable kubedog",

@@ -18,14 +18,14 @@ func CreateFile(p string) (*os.File, error) {
 	return os.Create(p)
 }
 
-// CheckTagInclusion checks where any of release tags are included in target tags.
-func CheckTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
-	if len(targetTags) == 0 {
+// Inclusion checks where any of release tags are included in target tags.
+func Inclusion(where, that []string, matchAll bool) bool {
+	if len(where) == 0 {
 		return true
 	}
 
-	for _, t := range targetTags {
-		contains := Contains(t, releaseTags)
+	for _, t := range where {
+		contains := Contains(t, that)
 		if matchAll && !contains {
 			return false
 		}

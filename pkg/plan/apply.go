@@ -1,5 +1,7 @@
 package plan
 
+import "errors"
+
 func (p *Plan) Apply() error {
-	return nil
+	return errors.New("sorry, apply not ready yet")
 }

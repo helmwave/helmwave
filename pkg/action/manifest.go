@@ -22,13 +22,7 @@ func (i *Manifest) Cmd() *cli.Command {
 		Name:  "Manifest",
 		Usage: "Makes manifests",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir",
-				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &i.plandir,
-			},
+			flagPlandir(&i.plandir),
 		},
 		Action: toCtx(i.Run),
 	}
