@@ -2,21 +2,18 @@ package action
 
 import (
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/tests"
 	"os"
 	"testing"
 )
 
 func Test01(t *testing.T) {
-	root := "../../action/"
-	from := root + "01_helmwave.yml.tpl"
-	to := root + "01_helmwave.yml"
-	value := "test"
-
 	s := &Yml{
-		from,
-		to,
+		tests.Root + "01_helmwave.yml.tpl",
+		tests.Root + "01_helmwave.yml",
 	}
 
+	value := "test"
 	_ = os.Setenv("PROJECT_NAME", value)
 	_ = os.Setenv("NAMESPACE", value)
 
@@ -26,7 +23,7 @@ func Test01(t *testing.T) {
 		t.Error(err)
 	}
 
-	b, err := plan.NewBody(to)
+	b, err := plan.NewBody(s.to)
 	if err != nil {
 		t.Error(err)
 	}
