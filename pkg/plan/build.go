@@ -16,17 +16,28 @@ const (
 	Release
 	Values
 	Repositories
+	Manifests
 )
 
 // Build Принимает на вход ямл и опции по работе с ним.
 func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
+	// Create Body
+	body, err := NewBody(yml)
+	if err != nil {
+		return err
+	}
+	p.body = body
 
+	// Build Releases
 	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
-	err := buildValues(p.body.Releases, p.dir)
+
+	// Build Values
+	err = buildValues(p.body.Releases, p.dir)
 	if err != nil {
 		return err
 	}
 
+	// Build Repositories
 	p.body.Repositories = buildRepo(p.body.Releases, p.body.Repositories)
 
 	return nil

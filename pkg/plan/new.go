@@ -11,6 +11,7 @@ import (
 const (
 	Planfile = "planfile"
 	Plandir  = ".helmwave/"
+	Planbody = "helmwave.yml"
 )
 
 type Plan struct {

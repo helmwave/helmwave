@@ -49,7 +49,7 @@ func flagFile(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "file",
 		Aliases:     []string{"f"},
-		Value:       "helmwave.yml",
+		Value:       plan.Planbody,
 		Usage:       "Main yml file",
 		EnvVars:     []string{"HELMWAVE_YAML"},
 		Destination: v,

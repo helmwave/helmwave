@@ -9,10 +9,9 @@ import (
 )
 
 type Build struct {
-	plandir  string
-	tags     cli.StringSlice
-	matchAll bool
-	yml      string
+	plandir, yml string
+	tags         cli.StringSlice
+	matchAll     bool
 }
 
 func (i *Build) Run() error {

@@ -7,13 +7,13 @@ import (
 	"testing"
 )
 
-func Test01(t *testing.T) {
+func TestYml(t *testing.T) {
 	s := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "01_helmwave.yml",
 	}
 
-	value := "test"
+	value := "Test01"
 	_ = os.Setenv("PROJECT_NAME", value)
 	_ = os.Setenv("NAMESPACE", value)
 
