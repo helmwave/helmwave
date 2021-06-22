@@ -1,3 +1,3 @@
 package tests
 
-const Root = "../../action/"
+const Root = "../../tests/"

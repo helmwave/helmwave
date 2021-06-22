@@ -7,7 +7,9 @@ import (
 	"testing"
 )
 
-func TestYml(t *testing.T) {
+func TestRenderEnv(t *testing.T) {
+	defer clean()
+
 	s := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "01_helmwave.yml",
@@ -32,4 +34,6 @@ func TestYml(t *testing.T) {
 		t.Error("Failed Test01")
 	}
 
+	// Clean
+	_ = os.Remove(s.to)
 }

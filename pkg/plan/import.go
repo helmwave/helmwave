@@ -1,6 +1,9 @@
 package plan
 
-import "github.com/helmwave/helmwave/pkg/version"
+import (
+	"github.com/helmwave/helmwave/pkg/version"
+	"os"
+)
 
 func (p *Plan) Import() error {
 	body, err := NewBody(p.fullPath)
@@ -12,4 +15,9 @@ func (p *Plan) Import() error {
 	version.Check(p.body.Version, version.Version)
 
 	return nil
+}
+
+func (p *Plan) Clean() {
+	_ = os.RemoveAll(p.dir)
+	_ = os.RemoveAll(p.fullPath)
 }
