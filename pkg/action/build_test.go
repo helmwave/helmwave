@@ -1,7 +1,6 @@
 package action
 
 import (
-	"fmt"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/urfave/cli/v2"
@@ -32,8 +31,6 @@ func TestBuildRepositories(t *testing.T) {
 
 	if len(b.Repositories) != 1 && b.Repositories[0].Name != "bitnami" {
 		t.Error("'bitnami' not found")
-		fmt.Println(len(b.Repositories))
-		fmt.Println(b.Repositories[0].Name)
 	}
 
 }
