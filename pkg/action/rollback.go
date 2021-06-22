@@ -20,7 +20,7 @@ func (i *Rollback) Run() error {
 
 func (i *Rollback) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "Rollback",
+		Name:  "rollback",
 		Usage: "Rollback your plandir",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),

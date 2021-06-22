@@ -19,7 +19,7 @@ func (i *Manifest) Run() error {
 
 func (i *Manifest) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "Manifest",
+		Name:  "manifest",
 		Usage: "Makes manifests",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
