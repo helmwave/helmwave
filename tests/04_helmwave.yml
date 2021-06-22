@@ -1,10 +1,11 @@
-project: Test02
+project: Test04
 
 repositories:
 - name: stable
   url: https://kubernetes-charts.storage.googleapis.com
-- name: bitnami
-  url: https://charts.bitnami.com/bitnami
+- name: cetic
+  url: https://cetic.github.io/helm-charts
+
 
 
 releases:
@@ -12,4 +13,4 @@ releases:
   chart: bitnami/nginx
   options:
     install: true
-    namespace: test
+    namespace: test04

@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"errors"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -10,14 +11,6 @@ import (
 )
 
 type buildOptions int
-
-const (
-	UniqNames buildOptions = iota
-	Release
-	Values
-	Repositories
-	Manifests
-)
 
 // Build Принимает на вход ямл и опции по работе с ним.
 func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
@@ -38,7 +31,10 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	}
 
 	// Build Repositories
-	p.body.Repositories = buildRepo(p.body.Releases, p.body.Repositories)
+	p.body.Repositories, err = buildRepo(p.body.Releases, p.body.Repositories)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -114,7 +110,9 @@ func buildValues(releases []*release.Config, dir string) error {
 	return nil
 }
 
-func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []*repo.Config) {
+var RepositoryNotFound = errors.New("repository not found")
+
+func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []*repo.Config, err error) {
 	all := getRepositories(releases)
 
 	for _, a := range all {
@@ -131,10 +129,11 @@ func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []
 
 		if !found {
 			log.Errorf("🗄 %q not found ", a)
+			return plan, RepositoryNotFound
 		}
 	}
 
-	return plan
+	return plan, nil
 }
 
 // getRepositories for releases

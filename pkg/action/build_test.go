@@ -12,6 +12,23 @@ func clean() {
 	_ = os.RemoveAll(tests.Root + plan.Plandir)
 }
 
+func TestBuildRepositories404(t *testing.T) {
+	defer clean()
+
+	s := &Build{
+		plandir:  tests.Root + plan.Plandir,
+		yml:      tests.Root + "04_helmwave.yml",
+		tags:     cli.StringSlice{},
+		matchAll: true,
+	}
+
+	err := s.Run()
+	if err != plan.RepositoryNotFound && err != nil {
+		t.Error("'bitnami' must be not found")
+	}
+
+}
+
 func TestBuildRepositories(t *testing.T) {
 	defer clean()
 
