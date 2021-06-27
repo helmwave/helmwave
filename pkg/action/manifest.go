@@ -14,6 +14,9 @@ func (i *Manifest) Run() error {
 	if err := p.Import(); err != nil {
 		return err
 	}
+
+
+
 	return p.Apply()
 }
 

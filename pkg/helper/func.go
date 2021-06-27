@@ -1,6 +1,7 @@
 package helper
 
 import (
+	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"sort"
@@ -35,4 +36,18 @@ func Inclusion(where, that []string, matchAll bool) bool {
 	}
 
 	return matchAll
+}
+
+func IsExists(s string) bool {
+	if _, err := os.Stat(s); err == nil {
+		return true
+	} else if os.IsNotExist(err) {
+		return false
+	} else {
+		// Schrodinger: file may or may not exist. See err for details.
+		// Therefore, do *NOT* use !os.IsNotExist(err) to test for file existence
+		log.Fatal(err)
+		return false
+	}
+
 }

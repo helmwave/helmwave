@@ -23,13 +23,13 @@ func (i *Build) Run() error {
 
 	oldPlan := plan.New(i.plandir)
 	if oldPlan.IsExist() {
+		log.Info("Old plan exists")
 		if err := oldPlan.Import(); err != nil {
 			return err
 		}
 
-		// Show difference
-		changelog, err := newPlan.Diff(oldPlan)
-		log.Info(changelog)
+
+		err = newPlan.Diff(oldPlan)
 		if err != nil {
 			return err
 		}
@@ -52,11 +52,16 @@ func (i *Build) Cmd() *cli.Command {
 	}
 }
 
+
+func (i *Build) normalizeTags() []string {
+	return normalizeTagList(i.tags.Value())
+}
+
 // normalizeTags normalizes and splits comma-separated tag list.
 // ["c", " b ", "a "] -> ["a", "b", "c"].
-func (i *Build) normalizeTags() []string {
-	m := make([]string, len(i.tags.Value()))
-	for i, t := range i.tags.Value() {
+func normalizeTagList(tags []string) []string {
+	m := make([]string, len(tags))
+	for i, t := range tags {
 		m[i] = strings.TrimSpace(t)
 	}
 	sort.Strings(m)

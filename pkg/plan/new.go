@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	Planfile = "planfile"
 	Plandir  = ".helmwave/"
+	Planfile = "planfile"
 	Planbody = "helmwave.yml"
+	PlanManifest = ".manifest/"
 )
 
 type Plan struct {
@@ -62,13 +63,4 @@ func New(dir string) *Plan {
 	}
 
 	return plan
-}
-
-func NewTemp() (*Plan, error) {
-	dir, err := ioutil.TempDir("", "example")
-	if err != nil {
-		return nil, err
-	}
-
-	return New(dir), nil
 }

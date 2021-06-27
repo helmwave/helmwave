@@ -1,25 +1,9 @@
 package release
 
 import (
-	"os"
-	"strings"
-
 	"github.com/helmwave/helmwave/pkg/template"
-	"helm.sh/helm/v3/pkg/chart/loader"
+	"os"
 )
-
-func (rel *Config) UniqName() string {
-	return rel.Name + "@" + rel.Options.Namespace
-}
-
-func (rel *Config) In(a []*Config) bool {
-	for _, r := range a {
-		if rel == r {
-			return true
-		}
-	}
-	return false
-}
 
 func (rel *Config) RenderValues(dir string) error {
 	rel.filterValuesFiles()
@@ -48,20 +32,4 @@ func (rel *Config) filterValuesFiles() {
 			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
 		}
 	}
-}
-
-func (rel *Config) ReposDeps() (repos []string, err error) {
-	chart, err := loader.Load(rel.Chart)
-	if err != nil {
-		return nil, err
-	}
-
-	deps := chart.Metadata.Dependencies
-
-	for _, d := range deps {
-		d.Repository = strings.TrimPrefix(d.Repository, "@")
-		repos = append(repos, d.Repository)
-	}
-
-	return repos, nil
 }

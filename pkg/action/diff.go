@@ -2,9 +2,9 @@ package action
 
 import (
 	"errors"
+	"os"
 
 	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/prometheus/common/log"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,19 +17,27 @@ func (d *Diff) Run() error {
 		return errors.New("plan1 and plan2 are the same")
 	}
 
+
 	plan1 := plan.New(d.plandir1)
 	if err := plan1.Import(); err != nil {
 		return err
 	}
+	if ok := plan1.IsManifestExist(); !ok {
+		return os.ErrNotExist
+	}
+
 
 	plan2 := plan.New(d.plandir2)
 	if err := plan2.Import(); err != nil {
 		return err
 	}
+	if ok := plan2.IsManifestExist(); !ok {
+		return os.ErrNotExist
+	}
 
-	changelog, err := plan1.Diff(plan2)
-	log.Info(changelog)
-	return err
+
+	_ = plan1.Diff(plan2)
+	return nil
 }
 
 func (d *Diff) Cmd() *cli.Command {

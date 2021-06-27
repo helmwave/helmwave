@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"errors"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -101,16 +100,14 @@ func buildValues(releases []*release.Config, dir string) error {
 
 		releases[i].Values = rel.Values
 		log.WithFields(log.Fields{
-			"release":   rel.Name,
-			"namespace": rel.Options.Namespace,
+			"release":   rel.ReleaseName,
+			"namespace": rel.Namespace,
 			"values":    releases[i].Values,
-		}).Debug("🐞 Render Values")
+		}).Debug("render values")
 	}
 
 	return nil
 }
-
-var RepositoryNotFound = errors.New("repository not found")
 
 func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []*repo.Config, err error) {
 	all := getRepositories(releases)
@@ -129,7 +126,7 @@ func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []
 
 		if !found {
 			log.Errorf("🗄 %q not found ", a)
-			return plan, RepositoryNotFound
+			return plan, repo.ErrNotFound
 		}
 	}
 
@@ -140,7 +137,7 @@ func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []
 func getRepositories(releases []*release.Config) (repos []string) {
 	for _, rel := range releases {
 		rep := strings.Split(rel.Chart, "/")[0]
-		deps, _ := rel.ReposDeps()
+		deps, _ := rel.Repositories()
 
 		all := deps
 		if repoIsLocal(rep) {

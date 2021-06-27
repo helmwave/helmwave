@@ -1,0 +1,21 @@
+project: Test02
+
+repositories:
+- name: stable
+  url: https://kubernetes-charts.storage.googleapis.com
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+
+
+releases:
+- name: nginx-2
+  chart: bitnami/nginx
+  options:
+    install: true
+    namespace: test
+
+- name: nginx
+  chart: bitnami/nginx
+  options:
+    install: true
+    namespace: test
