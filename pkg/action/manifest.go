@@ -15,9 +15,7 @@ func (i *Manifest) Run() error {
 		return err
 	}
 
-
-
-	return p.Apply()
+	return nil
 }
 
 func (i *Manifest) Cmd() *cli.Command {
