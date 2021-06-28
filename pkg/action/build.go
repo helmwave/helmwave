@@ -12,6 +12,7 @@ type Build struct {
 	plandir, yml string
 	tags         cli.StringSlice
 	matchAll     bool
+	diffWide     int
 }
 
 func (i *Build) Run() error {
@@ -23,19 +24,22 @@ func (i *Build) Run() error {
 
 	oldPlan := plan.New(i.plandir)
 	if oldPlan.IsExist() {
-		log.Info("Old plan exists")
-		if err := oldPlan.Import(); err != nil {
+		log.Info("Found old plan, try get changes")
+		if err = oldPlan.Import(); err != nil {
 			return err
 		}
 
-
-		err = newPlan.Diff(oldPlan)
-		if err != nil {
-			return err
-		}
+		// Показать Diff
+		newPlan.Diff(oldPlan, i.diffWide)
 	}
 
-	return newPlan.Export()
+	err = newPlan.Export()
+	if err != nil {
+		return err
+	}
+
+	log.Info("Planfile is ready!")
+	return nil
 }
 
 func (i *Build) Cmd() *cli.Command {
@@ -47,11 +51,11 @@ func (i *Build) Cmd() *cli.Command {
 			flagTags(&i.tags),
 			flagMatchAllTags(&i.matchAll),
 			flagFile(&i.yml),
+			flagDiffWide(&i.diffWide),
 		},
 		Action: toCtx(i.Run),
 	}
 }
-
 
 func (i *Build) normalizeTags() []string {
 	return normalizeTagList(i.tags.Value())

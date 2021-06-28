@@ -12,7 +12,9 @@ func (p *Plan) Export() error {
 	}
 
 	for k, v := range p.manifests {
-		f, err := helper.CreateFile(k)
+		m := p.dir + Manifest + k
+
+		f, err := helper.CreateFile(m)
 		if err != nil {
 			return err
 		}

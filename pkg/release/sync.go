@@ -1,13 +1,14 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	protobufChart "k8s.io/helm/pkg/proto/hapi/chart"
+	protobufRelease "k8s.io/helm/pkg/proto/hapi/release"
 	"os"
 )
 
@@ -26,30 +27,16 @@ func (rel *Config) Sync() (*release.Release, error) {
 	return rel.upgrade(helmClient)
 }
 
-func (rel *Config) SyncAndSaveManifest(dir string) error {
-	r, err := rel.Sync()
-	if r != nil {
-		log.Trace(r.Manifest)
+func _newProtobufRelease(r *release.Release) *protobufRelease.Release {
+	return &protobufRelease.Release{
+		Name:     r.Name,
+		Info:     nil,
+		Chart:    &protobufChart.Chart{},
+		Config:   nil,
+		Manifest: r.Manifest,
+		Hooks:    nil,
+		Version:  int32(r.Version),
 	}
-
-	if err != nil {
-		return err
-	}
-
-	m := dir + rel.UniqName() + ".yml"
-	log.Debug("save to ", m)
-
-	f, err := helper.CreateFile(m)
-	if err != nil {
-		return err
-	}
-
-	_, err = f.WriteString(r.Manifest)
-	if err != nil {
-		return err
-	}
-
-	return f.Close()
 }
 
 func (rel *Config) newCfg() (*action.Configuration, error) {

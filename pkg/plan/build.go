@@ -62,7 +62,7 @@ func (p *Plan) buildManifest() error {
 			log.Trace(r.Manifest)
 		}
 
-		m := Dir + Manifest + rel.UniqName() + ".yml"
+		m := rel.UniqName() + ".yml"
 		p.manifests[m] = r.Manifest
 
 	}

@@ -55,3 +55,13 @@ func flagFile(v *string) *cli.StringFlag {
 		Destination: v,
 	}
 }
+
+func flagDiffWide(v *int) *cli.IntFlag {
+	return &cli.IntFlag{
+		Name:        "diff-wide",
+		Value:       10,
+		Usage:       "Show line around change",
+		EnvVars:     []string{"HELMWAVE_DIFF_WIDE"},
+		Destination: v,
+	}
+}

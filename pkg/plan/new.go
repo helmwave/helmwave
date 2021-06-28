@@ -17,7 +17,8 @@ const (
 )
 
 var (
-	ErrManifestNotFound = errors.New(Manifest + " dir not found")
+	ErrManifestDirNotFound = errors.New(Manifest + " dir not found")
+	ErrManifestDirEmpty    = errors.New(Manifest + " is empty")
 )
 
 type Plan struct {

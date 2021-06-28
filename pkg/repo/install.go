@@ -73,7 +73,7 @@ func Write(repofile string, o *repo.Entry, helm *helm.EnvSettings) error {
 	}
 
 	if f.Has(o.Name) {
-		log.Infof("❎ %q already exists with the same configuration, skipping\n", o.Name)
+		log.Infof("❎ %q already exists with the same configuration, skipping", o.Name)
 	} else {
 		chartRepo, err := repo.NewChartRepository(o, getter.All(helm))
 		if err != nil {

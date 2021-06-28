@@ -48,7 +48,12 @@ func (rel *Config) upgrade(helm *helm.EnvSettings) (*release.Release, error) {
 	}
 
 	if !rel.isInstalled() {
-		log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.UniqName())
+		if rel.dryRun {
+			log.Debugf("Templating %q ", rel.UniqName())
+		} else {
+			log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.UniqName())
+		}
+
 		return rel.newInstall().Run(ch, vals)
 	}
 

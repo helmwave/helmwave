@@ -10,13 +10,13 @@ import (
 
 type Diff struct {
 	plandir1, plandir2 string
+	diffWide           int
 }
 
 func (d *Diff) Run() error {
 	if d.plandir1 == d.plandir2 {
 		return errors.New("plan1 and plan2 are the same")
 	}
-
 
 	plan1 := plan.New(d.plandir1)
 	if err := plan1.Import(); err != nil {
@@ -26,7 +26,6 @@ func (d *Diff) Run() error {
 		return os.ErrNotExist
 	}
 
-
 	plan2 := plan.New(d.plandir2)
 	if err := plan2.Import(); err != nil {
 		return err
@@ -35,8 +34,8 @@ func (d *Diff) Run() error {
 		return os.ErrNotExist
 	}
 
+	plan1.Diff(plan2, d.diffWide)
 
-	_ = plan1.Diff(plan2)
 	return nil
 }
 
@@ -59,6 +58,7 @@ func (d *Diff) Cmd() *cli.Command {
 				EnvVars:     []string{"HELMWAVE_PLANDIR_2"},
 				Destination: &d.plandir2,
 			},
+			flagDiffWide(&d.diffWide),
 		},
 		Action: toCtx(d.Run),
 	}
