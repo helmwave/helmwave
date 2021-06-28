@@ -6,13 +6,14 @@ import (
 )
 
 func (rel *Config) Status() (*release.Release, error) {
-	cfg, err := rel.cfg()
+	var err error
+	rel.cfg, err = rel.newCfg()
 	if err != nil {
 		return nil, err
 	}
 
-	client := action.NewStatus(cfg)
+	client := action.NewStatus(rel.cfg)
 	client.ShowDescription = true
 
-	return client.Run(rel.ReleaseName)
+	return client.Run(rel.Name)
 }

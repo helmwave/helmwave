@@ -6,11 +6,9 @@ import (
 )
 
 func (rel *Config) uninstall() (*release.UninstallReleaseResponse, error) {
-	cfg, err := rel.cfg()
-	if err != nil {
-		return nil, err
-	}
+	client := action.NewUninstall(rel.cfg)
+	client.Timeout = rel.Timeout
+	client.DryRun = rel.dryRun
 
-	client := action.NewUninstall(cfg)
-	return client.Run(rel.ReleaseName)
+	return client.Run(rel.Name)
 }

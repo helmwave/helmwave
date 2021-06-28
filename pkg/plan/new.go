@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"errors"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
@@ -9,10 +10,14 @@ import (
 )
 
 const (
-	Plandir  = ".helmwave/"
-	Planfile = "planfile"
-	Planbody = "helmwave.yml"
-	PlanManifest = ".manifest/"
+	Dir      = ".helmwave/"
+	File     = "planfile"
+	Body     = "helmwave.yml"
+	Manifest = ".manifest/"
+)
+
+var (
+	ErrManifestNotFound = errors.New(Manifest + " dir not found")
 )
 
 type Plan struct {
@@ -59,7 +64,7 @@ func New(dir string) *Plan {
 
 	plan := &Plan{
 		dir:      dir,
-		fullPath: dir + Planfile,
+		fullPath: dir + File,
 	}
 
 	return plan

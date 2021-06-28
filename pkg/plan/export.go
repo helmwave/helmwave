@@ -15,10 +15,10 @@ func (p *Plan) Export() error {
 
 // IsExist returns true if planfile exists
 func (p *Plan) IsExist() bool {
-	return  helper.IsExists(p.fullPath)
+	return helper.IsExists(p.fullPath)
 }
 
 //IsManifestExist returns true if planfile exists
 func (p *Plan) IsManifestExist() bool {
-	return  helper.IsExists(p.dir + PlanManifest)
+	return helper.IsExists(p.dir + Manifest)
 }

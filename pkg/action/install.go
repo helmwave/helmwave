@@ -21,7 +21,7 @@ func (i *Install) Run() error {
 		return err
 	}
 
-	return p.Apply()
+	return p.Apply(i.parallel)
 }
 
 func (i *Install) Cmd() *cli.Command {

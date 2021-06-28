@@ -7,21 +7,20 @@ import (
 	"regexp"
 )
 
-
 func (rel *Config) List() (*release.Release, error) {
-	cfg, err := rel.cfg()
+	var err error
+	rel.cfg, err = rel.newCfg()
 	if err != nil {
 		return nil, err
 	}
 
-	client := action.NewList(cfg)
-	client.Filter = fmt.Sprintf("^%s$", regexp.QuoteMeta(rel.ReleaseName))
+	client := action.NewList(rel.cfg)
+	client.Filter = fmt.Sprintf("^%s$", regexp.QuoteMeta(rel.Name))
 
 	result, err := client.Run()
 	if err != nil {
 		return nil, err
 	}
-
 
 	switch len(result) {
 	case 0:

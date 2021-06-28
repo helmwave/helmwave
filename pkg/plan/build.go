@@ -5,6 +5,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
+	helm "helm.sh/helm/v3/pkg/cli"
 	"os"
 	"strings"
 )
@@ -24,7 +25,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
 
 	// Build Values
-	err = buildValues(p.body.Releases, p.dir)
+	err = p.buildValues()
 	if err != nil {
 		return err
 	}
@@ -35,6 +36,30 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
+	// Sync Repo
+	err = p.syncRepositories(helm.New())
+	if err != nil {
+		return err
+	}
+
+	// Build Manifest
+	err = p.buildManifest()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Plan) buildManifest() error {
+	for _, rel := range p.body.Releases {
+		rel.DryRun(true)
+		err := rel.SyncAndSaveManifest(Manifest)
+		rel.DryRun(false)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -91,18 +116,18 @@ func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
 	return matchAll
 }
 
-func buildValues(releases []*release.Config, dir string) error {
-	for i, rel := range releases {
-		err := rel.RenderValues(dir)
+func (p *Plan) buildValues() error {
+	for i, rel := range p.body.Releases {
+		err := rel.RenderValues(p.dir)
 		if err != nil {
 			return err
 		}
 
-		releases[i].Values = rel.Values
+		p.body.Releases[i].Values = rel.Values
 		log.WithFields(log.Fields{
-			"release":   rel.ReleaseName,
+			"release":   rel.Name,
 			"namespace": rel.Namespace,
-			"values":    releases[i].Values,
+			"values":    p.body.Releases[i].Values,
 		}).Debug("render values")
 	}
 
@@ -136,7 +161,7 @@ func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []
 // getRepositories for releases
 func getRepositories(releases []*release.Config) (repos []string) {
 	for _, rel := range releases {
-		rep := strings.Split(rel.Chart, "/")[0]
+		rep := strings.Split(rel.Chart.Name, "/")[0]
 		deps, _ := rel.Repositories()
 
 		all := deps

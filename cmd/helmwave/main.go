@@ -15,7 +15,6 @@ var commands = []*cli.Command{
 	new(action.Diff).Cmd(),
 	new(action.Install).Cmd(),
 	new(action.List).Cmd(),
-	new(action.Manifest).Cmd(),
 	new(action.Rollback).Cmd(),
 	new(action.Status).Cmd(),
 	new(action.Uninstall).Cmd(),

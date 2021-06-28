@@ -8,7 +8,7 @@ import (
 func flagPlandir(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "plandir",
-		Value:       plan.Plandir,
+		Value:       plan.Dir,
 		Usage:       "Path to plandir",
 		EnvVars:     []string{"HELMWAVE_PLANDIR"},
 		Destination: v,
@@ -49,7 +49,7 @@ func flagFile(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "file",
 		Aliases:     []string{"f"},
-		Value:       plan.Planbody,
+		Value:       plan.Body,
 		Usage:       "Main yml file",
 		EnvVars:     []string{"HELMWAVE_YAML"},
 		Destination: v,

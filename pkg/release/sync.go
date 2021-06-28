@@ -12,7 +12,8 @@ import (
 )
 
 func (rel *Config) Sync() (*release.Release, error) {
-	cfg, err := rel.cfg()
+	var err error
+	rel.cfg, err = rel.newCfg()
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +23,7 @@ func (rel *Config) Sync() (*release.Release, error) {
 		return nil, err
 	}
 
-	return rel.upgrade(cfg, helmClient)
+	return rel.upgrade(helmClient)
 }
 
 func (rel *Config) SyncAndSaveManifest(dir string) error {
@@ -49,7 +50,7 @@ func (rel *Config) SyncAndSaveManifest(dir string) error {
 	return f.Close()
 }
 
-func (rel *Config) cfg() (*action.Configuration, error) {
+func (rel *Config) newCfg() (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER")
 	err := cfg.Init(genericclioptions.NewConfigFlags(false), rel.Namespace, helmDriver, log.Debugf)

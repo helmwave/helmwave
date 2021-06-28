@@ -7,7 +7,7 @@ import (
 
 // Repositories returns repository for release
 func (rel *Config) Repositories() (repos []string, err error) {
-	chart, err := loader.Load(rel.Chart)
+	chart, err := loader.Load(rel.Chart.Name)
 	if err != nil {
 		return nil, err
 	}

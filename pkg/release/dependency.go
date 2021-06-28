@@ -8,17 +8,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var releasePubSub       = pubsub.NewReleasePubSub()
-
+var releasePubSub = pubsub.NewReleasePubSub()
 
 func (rel *Config) NotifySuccess() {
-	if !rel.DryRun {
+	if !rel.dryRun {
 		releasePubSub.PublishSuccess(rel.UniqName())
 	}
 }
 
 func (rel *Config) NotifyFailed() {
-	if !rel.DryRun {
+	if !rel.dryRun {
 		releasePubSub.PublishFailed(rel.UniqName())
 	}
 }
@@ -34,7 +33,7 @@ func (rel *Config) addDependency(name string) {
 }
 
 func (rel *Config) waitForDependencies() (err error) {
-	if rel.DryRun {
+	if rel.dryRun {
 		return nil
 	}
 
@@ -58,10 +57,10 @@ F:
 			ticker.Stop()
 			break F
 		case <-ticker.C:
-			log.Infof("release %s is waiting for dependency %s", rel.ReleaseName, name)
+			log.Infof("release %s is waiting for dependency %s", rel.UniqName(), name)
 		}
 	}
-	log.Infof("dependency %s of release %s done", name, rel.ReleaseName)
+	log.Infof("dependency %s of release %s done", name, rel.UniqName())
 	return status
 }
 

@@ -1,7 +1,6 @@
 package release
 
 import (
-	"github.com/imdario/mergo"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -14,26 +13,19 @@ import (
 	"path/filepath"
 )
 
-func (rel *Config) upgrade (cfg *action.Configuration, helm *helm.EnvSettings) (*release.Release, error){
-	client := action.NewUpgrade(cfg)
-	// Merge
-	err := mergo.Merge(client, rel)
+func (rel *Config) upgrade(helm *helm.EnvSettings) (*release.Release, error) {
+	client := rel.newUpgrade()
+
+	locateChart, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, helm)
 	if err != nil {
 		return nil, err
 	}
-
-	locateChart, err := client.ChartPathOptions.LocateChart(rel.Chart, helm)
-	if err != nil {
-		return nil, err
-	}
-
 
 	valOpts := &values.Options{ValueFiles: rel.Values}
 	vals, err := valOpts.MergeValues(getter.All(helm))
 	if err != nil {
 		return nil, err
 	}
-
 
 	ch, err := loader.Load(locateChart)
 	if err != nil {
@@ -55,12 +47,12 @@ func (rel *Config) upgrade (cfg *action.Configuration, helm *helm.EnvSettings) (
 		log.Warn("⚠️ This locateChart is deprecated")
 	}
 
-	if !rel.isInstalled(cfg) {
-		log.Debugf("🧐 Release %q in %q does not exist. Installing it now.", rel.ReleaseName, rel.Namespace)
-		return rel.install(cfg, ch, vals)
+	if !rel.isInstalled() {
+		log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.UniqName())
+		return rel.newInstall().Run(ch, vals)
 	}
 
-	return client.Run(rel.ReleaseName, ch, vals)
+	return client.Run(rel.Name, ch, vals)
 
 }
 
@@ -68,7 +60,7 @@ func (rel *Config) chartDepsUpd(settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              os.Stdout,
-		ChartPath:        filepath.Clean(rel.Chart),
+		ChartPath:        filepath.Clean(rel.Chart.Name),
 		Keyring:          client.Keyring,
 		SkipUpdate:       client.SkipRefresh,
 		Getters:          getter.All(settings),
@@ -81,4 +73,3 @@ func (rel *Config) chartDepsUpd(settings *helm.EnvSettings) error {
 	}
 	return man.Update()
 }
-

@@ -15,7 +15,7 @@ func (i *Uninstall) Run() error {
 	if err := p.Import(); err != nil {
 		return err
 	}
-	return p.Apply()
+	return p.Apply(i.parallel)
 }
 
 func (i *Uninstall) Cmd() *cli.Command {
