@@ -48,8 +48,8 @@ func (rel *Config) DryRun(b bool) *Config {
 }
 
 type chart struct {
-	Name string
-	action.ChartPathOptions
+	Name                    string
+	action.ChartPathOptions `yaml:",inline"`
 }
 
 func (rel *Config) newInstall() *action.Install {

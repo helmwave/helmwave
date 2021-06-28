@@ -9,7 +9,6 @@ repositories:
 
 releases:
 - name: nginx
-  chart: bitnami/nginx
-  options:
-    install: true
-    namespace: {{ requiredEnv "NAMESPACE" }}
+  chart:
+    name: bitnami/nginx
+  namespace: {{ requiredEnv "NAMESPACE" }}

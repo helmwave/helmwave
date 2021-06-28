@@ -5,40 +5,37 @@ repositories:
   url: https://charts.bitnami.com/bitnami
 
 
-.options: &options
-  install: true
-  namespace: my-namespace
-
 
 releases:
 - name: redis-a
-  chart: bitnami/redis
+  namespace: test
+  chart:
+    name: bitnami/redis
   tags:
   - a
   - redis
-  options:
-    <<: *options
 
 - name: redis-b
+  namespace: test
   chart: bitnami/redis
   tags:
   - b
   - redis
-  options:
-    <<: *options
 
 - name: memcached-a
-  chart: bitnami/memcached
+  namespace: test
+  chart:
+    name: bitnami/redis
   tags:
   - a
   - memcached
-  options:
-    <<: *options
+
 
 - name: memcached-b
-  chart: bitnami/memcached
+  namespace: test
+  chart:
+    name: bitnami/memcached
   tags:
   - b
   - memcached
-  options:
-    <<: *options
+

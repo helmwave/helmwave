@@ -9,7 +9,6 @@ repositories:
 
 releases:
 - name: nginx
-  chart: bitnami/nginx
-  options:
-    install: true
-    namespace: test
+  chart:
+    name: bitnami/nginx
+  namespace: test
