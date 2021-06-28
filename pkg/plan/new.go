@@ -21,9 +21,10 @@ var (
 )
 
 type Plan struct {
-	body     *planBody
-	dir      string
-	fullPath string
+	body      *planBody
+	dir       string
+	fullPath  string
+	manifests map[string]string
 }
 
 type planBody struct {
@@ -63,8 +64,9 @@ func New(dir string) *Plan {
 	}
 
 	plan := &Plan{
-		dir:      dir,
-		fullPath: dir + File,
+		dir:       dir,
+		fullPath:  dir + File,
+		manifests: make(map[string]string),
 	}
 
 	return plan

@@ -5,7 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func Save(file string, in interface{}) error {
+func SaveInterface(file string, in interface{}) error {
 	f, err := CreateFile(file)
 	if err != nil {
 		return err

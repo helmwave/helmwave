@@ -10,7 +10,25 @@ func (p *Plan) Export() error {
 	if err := os.RemoveAll(p.dir); err != nil {
 		return err
 	}
-	return helper.Save(p.fullPath, p.body)
+
+	for k, v := range p.manifests {
+		f, err := helper.CreateFile(k)
+		if err != nil {
+			return err
+		}
+
+		_, err = f.WriteString(v)
+		if err != nil {
+			return err
+		}
+
+		err = f.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return helper.SaveInterface(p.fullPath, p.body)
 }
 
 // IsExist returns true if planfile exists

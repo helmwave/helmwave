@@ -37,11 +37,13 @@ func (rel *Config) SyncAndSaveManifest(dir string) error {
 	}
 
 	m := dir + rel.UniqName() + ".yml"
+	log.Debug("save to ", m)
 
 	f, err := helper.CreateFile(m)
 	if err != nil {
 		return err
 	}
+
 	_, err = f.WriteString(r.Manifest)
 	if err != nil {
 		return err

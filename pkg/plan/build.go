@@ -10,8 +10,6 @@ import (
 	"strings"
 )
 
-type buildOptions int
-
 // Build Принимает на вход ямл и опции по работе с ним.
 func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	// Create Body
@@ -54,12 +52,21 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 func (p *Plan) buildManifest() error {
 	for _, rel := range p.body.Releases {
 		rel.DryRun(true)
-		err := rel.SyncAndSaveManifest(Manifest)
+		r, err := rel.Sync()
 		rel.DryRun(false)
 		if err != nil {
 			return err
 		}
+
+		if r != nil {
+			log.Trace(r.Manifest)
+		}
+
+		m := Dir + Manifest + rel.UniqName() + ".yml"
+		p.manifests[m] = r.Manifest
+
 	}
+
 	return nil
 }
 
