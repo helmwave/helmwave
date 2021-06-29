@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -44,7 +45,7 @@ func (p *Plan) importManifest() error {
 				return err
 			}
 
-			p.manifests[l.Name()] = string(c)
+			p.manifests[uniqname.UniqName(l.Name())] = string(c)
 		}
 	}
 

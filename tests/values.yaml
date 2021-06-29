@@ -1,2 +1,2 @@
 image:
-  pullPolicy: Always
+  pullPolicy: IfNotPresent

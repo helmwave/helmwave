@@ -3,6 +3,7 @@ package plan
 import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
@@ -23,7 +24,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
 
 	// Build Values
-	err = p.buildValues()
+	//err = p.buildValues()
 	if err != nil {
 		return err
 	}
@@ -75,7 +76,7 @@ func buildReleases(tags []string, releases []*release.Config, matchAll bool) (pl
 		return releases
 	}
 
-	releasesMap := make(map[string]*release.Config)
+	releasesMap := make(map[uniqname.UniqName]*release.Config)
 
 	for _, r := range releases {
 		releasesMap[r.UniqName()] = r
@@ -90,15 +91,17 @@ func buildReleases(tags []string, releases []*release.Config, matchAll bool) (pl
 	return plan
 }
 
-func addToPlan(plan []*release.Config, release *release.Config, releases map[string]*release.Config) []*release.Config {
-	if release.In(plan) {
+func addToPlan(plan []*release.Config, rel *release.Config, releases map[uniqname.UniqName]*release.Config) []*release.Config {
+	if rel.In(plan) {
 		return plan
 	}
 
-	r := append(plan, release)
+	r := append(plan, rel)
 
-	for _, depName := range release.DependsOn {
-		if dep, ok := releases[depName]; ok {
+	for _, depName := range rel.DependsOn {
+		depUN := uniqname.UniqName(depName)
+
+		if dep, ok := releases[depUN]; ok {
 			r = addToPlan(r, dep, releases)
 		} else {
 			log.Warnf("cannot find dependency %s in available releases, skipping it", depName)
@@ -121,24 +124,6 @@ func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
 	}
 
 	return matchAll
-}
-
-func (p *Plan) buildValues() error {
-	for i, rel := range p.body.Releases {
-		err := rel.RenderValues(p.dir)
-		if err != nil {
-			return err
-		}
-
-		p.body.Releases[i].Values = rel.Values
-		log.WithFields(log.Fields{
-			"release":   rel.Name,
-			"namespace": rel.Namespace,
-			"values":    p.body.Releases[i].Values,
-		}).Debug("render values")
-	}
-
-	return nil
 }
 
 func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []*repo.Config, err error) {

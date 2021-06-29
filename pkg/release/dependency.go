@@ -1,6 +1,7 @@
 package release
 
 import (
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"sort"
 	"time"
 
@@ -22,11 +23,11 @@ func (rel *Config) NotifyFailed() {
 	}
 }
 
-func (rel *Config) addDependency(name string) {
+func (rel *Config) addDependency(name uniqname.UniqName) {
 	ch := releasePubSub.Subscribe(name)
 
 	if rel.dependencies == nil {
-		rel.dependencies = make(map[string]<-chan pubsub.ReleaseStatus)
+		rel.dependencies = make(map[uniqname.UniqName]<-chan pubsub.ReleaseStatus)
 	}
 
 	rel.dependencies[name] = ch
@@ -46,7 +47,7 @@ func (rel *Config) waitForDependencies() (err error) {
 	return
 }
 
-func (rel *Config) waitForDependency(ch <-chan pubsub.ReleaseStatus, name string) pubsub.ReleaseStatus {
+func (rel *Config) waitForDependency(ch <-chan pubsub.ReleaseStatus, name uniqname.UniqName) pubsub.ReleaseStatus {
 	ticker := time.NewTicker(5 * time.Second)
 	var status pubsub.ReleaseStatus
 
@@ -70,9 +71,9 @@ func (rel *Config) HandleDependencies(releases []*Config) {
 	depsAdded := make(map[string]bool)
 	for _, r := range releases {
 		name := r.UniqName()
-		if i := sort.SearchStrings(rel.DependsOn, name); i < len(rel.DependsOn) && rel.DependsOn[i] == name {
+		if i := sort.SearchStrings(rel.DependsOn, string(name)); i < len(rel.DependsOn) && rel.DependsOn[i] == string(name) {
 			rel.addDependency(name)
-			depsAdded[name] = true
+			depsAdded[string(name)] = true
 		}
 	}
 

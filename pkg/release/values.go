@@ -1,38 +1,56 @@
 package release
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-func (rel *Config) RenderValues(dir string) error {
-	rel.filterValuesFiles()
+func (rel *Config) V(dir string) (err error) {
+	tmp := os.TempDir()
+	v := rel.VDownload(tmp)
 
-	for i, v := range rel.Values {
-
-		s := v + "." + rel.UniqName() + ".plan"
-
-		p := dir + s
-		err := template.Tpl2yml(v, p, struct{ Release *Config }{rel})
-		if err != nil {
-			return err
-		}
-
-		rel.Values[i] = p
+	v, err = rel.VTemplate(v, dir)
+	if err != nil {
+		return err
 	}
 
+	rel.Values = v
 	return nil
 }
 
-// TODO: add context
-// filterValuesFiles filters non-existent values files.
-func (rel *Config) filterValuesFiles() {
-	for i := len(rel.Values) - 1; i >= 0; i-- {
-		stat, err := os.Stat(rel.Values[i])
-		if os.IsNotExist(err) || stat.IsDir() {
-			log.Warn(rel.Values[i], " skipping")
-			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+func (rel *Config) VDownload(dir string) (values []string) {
+	for i, url := range rel.Values {
+		stat, err := os.Stat(url)
+		local := err == nil && !stat.IsDir()
+		if local {
+			values = append(values, url)
+		} else {
+			// Download
+			file := dir + string(rune(i)) + ".yml"
+			err := helper.Download(file, url)
+			if err != nil {
+				log.Warn(url, " skipping: ", err)
+			} else {
+				values = append(values, file)
+			}
 		}
 	}
+
+	return values
+}
+
+func (rel *Config) VTemplate(values []string, dir string) (vals []string, err error) {
+	for _, path := range values {
+		dst := dir + path + "." + string(rel.UniqName()) + ".plan.yml"
+		err = template.Tpl2yml(path, dst, struct{ Release *Config }{rel})
+		if err != nil {
+			return nil, err
+		}
+
+		vals = append(vals, dst)
+	}
+
+	return vals, nil
 }

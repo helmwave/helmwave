@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
 	"gopkg.in/yaml.v2"
@@ -22,10 +23,11 @@ var (
 )
 
 type Plan struct {
-	body      *planBody
-	dir       string
-	fullPath  string
-	manifests map[string]string
+	body     *planBody
+	dir      string
+	fullPath string
+
+	manifests map[uniqname.UniqName]string
 }
 
 type planBody struct {
@@ -67,7 +69,7 @@ func New(dir string) *Plan {
 	plan := &Plan{
 		dir:       dir,
 		fullPath:  dir + File,
-		manifests: make(map[string]string),
+		manifests: make(map[uniqname.UniqName]string),
 	}
 
 	return plan

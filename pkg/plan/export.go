@@ -11,8 +11,16 @@ func (p *Plan) Export() error {
 		return err
 	}
 
+	if err := p.exportManifest(); err != nil {
+		return err
+	}
+
+	return helper.SaveInterface(p.fullPath, p.body)
+}
+
+func (p *Plan) exportManifest() error {
 	for k, v := range p.manifests {
-		m := p.dir + Manifest + k
+		m := p.dir + Manifest + string(k)
 
 		f, err := helper.CreateFile(m)
 		if err != nil {
@@ -30,7 +38,7 @@ func (p *Plan) Export() error {
 		}
 	}
 
-	return helper.SaveInterface(p.fullPath, p.body)
+	return nil
 }
 
 // IsExist returns true if planfile exists

@@ -1,7 +1,10 @@
 package helper
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -50,4 +53,29 @@ func IsExists(s string) bool {
 		return false
 	}
 
+}
+
+func Download(file, url string) error {
+	f, err := CreateFile(file)
+	if err != nil {
+		return err
+	}
+
+	r, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	defer r.Body.Close()
+
+	if r.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", r.Status)
+	}
+
+	_, err = io.Copy(f, r.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

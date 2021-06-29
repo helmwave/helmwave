@@ -3,6 +3,7 @@ package release
 import (
 	"errors"
 	"github.com/helmwave/helmwave/pkg/pubsub"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/storage/driver"
 	"time"
@@ -12,6 +13,7 @@ type Config struct {
 	Chart           chart
 	Name            string
 	Namespace       string
+	uniqName        *uniqname.UniqName
 	CreateNamespace bool
 
 	Devel                    bool
@@ -33,11 +35,13 @@ type Config struct {
 	DisableOpenAPIValidation bool
 
 	// Helmwave
-	Tags         []string
-	Values       []string
+	Tags   []string
+	Values []string
+	values []string
+
 	Store        map[string]interface{}
 	DependsOn    []string `yaml:"depends_on"`
-	dependencies map[string]<-chan pubsub.ReleaseStatus
+	dependencies map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
 
 	cfg *action.Configuration
 }
@@ -114,8 +118,13 @@ var (
 )
 
 // UniqName redis@my-namespace
-func (rel *Config) UniqName() string {
-	return rel.Name + "@" + rel.Namespace
+func (rel *Config) UniqName() uniqname.UniqName {
+	if rel.uniqName == nil {
+		*rel.uniqName = uniqname.UniqName(rel.Name + "@" + rel.Namespace)
+	}
+
+	return *rel.uniqName
+
 }
 
 // In check that 'x' found in 'array'

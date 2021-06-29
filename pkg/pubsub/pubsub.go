@@ -1,6 +1,9 @@
 package pubsub
 
-import "sync"
+import (
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"sync"
+)
 
 const (
 	ReleaseSuccess ReleaseStatus = iota
@@ -10,7 +13,7 @@ const (
 type ReleaseStatus int
 
 type ReleasePubSub struct {
-	subs map[string][]chan ReleaseStatus
+	subs map[uniqname.UniqName][]chan ReleaseStatus
 	mu   sync.RWMutex
 }
 
@@ -18,12 +21,12 @@ type ReleasePubSub struct {
 func NewReleasePubSub() *ReleasePubSub {
 	return &ReleasePubSub{
 		mu:   sync.RWMutex{},
-		subs: make(map[string][]chan ReleaseStatus),
+		subs: make(map[uniqname.UniqName][]chan ReleaseStatus),
 	}
 }
 
 // Subscribe adds new subscription for defined key and returns notification channel.
-func (ps *ReleasePubSub) Subscribe(release string) <-chan ReleaseStatus {
+func (ps *ReleasePubSub) Subscribe(release uniqname.UniqName) <-chan ReleaseStatus {
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 
@@ -34,7 +37,7 @@ func (ps *ReleasePubSub) Subscribe(release string) <-chan ReleaseStatus {
 }
 
 // publish publishes notification for all subscribers.
-func (ps *ReleasePubSub) publish(release string, status ReleaseStatus) {
+func (ps *ReleasePubSub) publish(release uniqname.UniqName, status ReleaseStatus) {
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 
@@ -45,11 +48,11 @@ func (ps *ReleasePubSub) publish(release string, status ReleaseStatus) {
 }
 
 // PublishSuccess publishes success notification for all subscribers.
-func (ps *ReleasePubSub) PublishSuccess(release string) {
+func (ps *ReleasePubSub) PublishSuccess(release uniqname.UniqName) {
 	ps.publish(release, ReleaseSuccess)
 }
 
 // PublishFailed publishes failed notification for all subscribers.
-func (ps *ReleasePubSub) PublishFailed(release string) {
+func (ps *ReleasePubSub) PublishFailed(release uniqname.UniqName) {
 	ps.publish(release, ReleaseFailed)
 }
