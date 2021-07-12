@@ -21,7 +21,7 @@ func (l *List) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "list",
 		Aliases: []string{"ls"},
-		Usage:   "List of deployed releases",
+		Usage:   "👀 List of deployed releases",
 		Flags: []cli.Flag{
 			flagPlandir(&l.plandir),
 		},

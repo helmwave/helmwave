@@ -30,7 +30,7 @@ func TestBuildManifest(t *testing.T) {
 	}
 
 	if ok := helper.IsExists(tests.Root + plan.Dir + plan.Manifest); !ok {
-		t.Error(plan.ErrManifestNotFound)
+		t.Error(plan.ErrManifestDirNotFound)
 	}
 
 }

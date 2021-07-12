@@ -20,7 +20,7 @@ func (i *Status) Run() error {
 func (i *Status) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
-		Usage: "Status of deployed releases",
+		Usage: "👁 Status of deployed releases",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
 		},

@@ -20,7 +20,7 @@ func (l *Validate) Run() error {
 func (l *Validate) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:  "validate",
-		Usage: "validate your plan",
+		Usage: "🛂 Validate your plan",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "plandir",

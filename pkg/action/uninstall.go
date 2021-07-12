@@ -22,7 +22,7 @@ func (i *Uninstall) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "uninstall",
 		Aliases: []string{"destroy", "delete", "del", "rm", "remove"},
-		Usage:   "Delete all",
+		Usage:   "🔪 Delete all",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
 			flagParallel(&i.parallel),

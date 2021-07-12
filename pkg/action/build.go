@@ -45,7 +45,7 @@ func (i *Build) Run() error {
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:  "build",
-		Usage: "Build a plandir",
+		Usage: "🏗 Build a plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
 			flagTags(&i.tags),

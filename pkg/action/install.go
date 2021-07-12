@@ -29,7 +29,7 @@ func (i *Install) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "install",
 		Aliases: []string{"apply", "sync", "deploy"},
-		Usage:   "Apply your plan",
+		Usage:   "🚢 Apply your plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
 			flagParallel(&i.parallel),

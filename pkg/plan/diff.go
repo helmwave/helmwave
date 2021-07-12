@@ -30,3 +30,5 @@ func (p *Plan) Diff(b *Plan, diffWide int) {
 		}
 	}
 }
+
+// TODO: Diff with live
