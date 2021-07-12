@@ -47,11 +47,12 @@ func (rel *Config) upgrade(helm *helm.EnvSettings) (*release.Release, error) {
 		log.Warn("⚠️ This locateChart is deprecated")
 	}
 
-	if !rel.isInstalled() {
+	if !rel.isInstalled() || rel.dryRun {
+
 		if rel.dryRun {
-			log.Debugf("Templating %q ", rel.UniqName())
+			log.Debugf("Templating %q ", rel.Uniq())
 		} else {
-			log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.UniqName())
+			log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.Uniq())
 		}
 
 		return rel.newInstall().Run(ch, vals)

@@ -9,10 +9,9 @@ import (
 )
 
 type Install struct {
-	dog      *kubedog.Config
-	plandir  string
-	parallel bool
-	kubedog  bool
+	dog     *kubedog.Config
+	plandir string
+	kubedog bool
 }
 
 func (i *Install) Run() error {
@@ -21,7 +20,7 @@ func (i *Install) Run() error {
 		return err
 	}
 
-	return p.Apply(i.parallel)
+	return p.Apply()
 }
 
 func (i *Install) Cmd() *cli.Command {
@@ -32,7 +31,7 @@ func (i *Install) Cmd() *cli.Command {
 		Usage:   "🚢 Apply your plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
-			flagParallel(&i.parallel),
+			//flagParallel(&i.parallel),
 			&cli.BoolFlag{
 				Name:        "kubedog",
 				Usage:       "Enable/Disable kubedog",

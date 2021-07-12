@@ -7,8 +7,6 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	protobufChart "k8s.io/helm/pkg/proto/hapi/chart"
-	protobufRelease "k8s.io/helm/pkg/proto/hapi/release"
 	"os"
 )
 
@@ -25,18 +23,6 @@ func (rel *Config) Sync() (*release.Release, error) {
 	}
 
 	return rel.upgrade(helmClient)
-}
-
-func _newProtobufRelease(r *release.Release) *protobufRelease.Release {
-	return &protobufRelease.Release{
-		Name:     r.Name,
-		Info:     nil,
-		Chart:    &protobufChart.Chart{},
-		Config:   nil,
-		Manifest: r.Manifest,
-		Hooks:    nil,
-		Version:  int32(r.Version),
-	}
 }
 
 func (rel *Config) newCfg() (*action.Configuration, error) {

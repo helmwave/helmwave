@@ -43,7 +43,7 @@ func (rel *Config) VDownload(dir string) (values []string) {
 
 func (rel *Config) VTemplate(values []string, dir string) (vals []string, err error) {
 	for _, path := range values {
-		dst := dir + path + "." + string(rel.UniqName()) + ".plan.yml"
+		dst := dir + path + "." + string(rel.Uniq()) + ".plan.yml"
 		err = template.Tpl2yml(path, dst, struct{ Release *Config }{rel})
 		if err != nil {
 			return nil, err

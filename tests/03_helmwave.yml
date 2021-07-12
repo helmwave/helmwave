@@ -17,7 +17,8 @@ releases:
 
 - name: redis-b
   namespace: test
-  chart: bitnami/redis
+  chart:
+    name: bitnami/redis
   tags:
   - b
   - redis

@@ -13,13 +13,13 @@ var releasePubSub = pubsub.NewReleasePubSub()
 
 func (rel *Config) NotifySuccess() {
 	if !rel.dryRun {
-		releasePubSub.PublishSuccess(rel.UniqName())
+		releasePubSub.PublishSuccess(rel.Uniq())
 	}
 }
 
 func (rel *Config) NotifyFailed() {
 	if !rel.dryRun {
-		releasePubSub.PublishFailed(rel.UniqName())
+		releasePubSub.PublishFailed(rel.Uniq())
 	}
 }
 
@@ -58,10 +58,10 @@ F:
 			ticker.Stop()
 			break F
 		case <-ticker.C:
-			log.Infof("release %s is waiting for dependency %s", rel.UniqName(), name)
+			log.Infof("release %s is waiting for dependency %s", rel.Uniq(), name)
 		}
 	}
-	log.Infof("dependency %s of release %s done", name, rel.UniqName())
+	log.Infof("dependency %s of release %s done", name, rel.Uniq())
 	return status
 }
 
@@ -70,7 +70,7 @@ func (rel *Config) HandleDependencies(releases []*Config) {
 
 	depsAdded := make(map[string]bool)
 	for _, r := range releases {
-		name := r.UniqName()
+		name := r.Uniq()
 		if i := sort.SearchStrings(rel.DependsOn, string(name)); i < len(rel.DependsOn) && rel.DependsOn[i] == string(name) {
 			rel.addDependency(name)
 			depsAdded[string(name)] = true

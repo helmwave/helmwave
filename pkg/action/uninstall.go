@@ -6,8 +6,8 @@ import (
 )
 
 type Uninstall struct {
-	plandir  string
-	parallel bool
+	plandir string
+	//parallel bool
 }
 
 func (i *Uninstall) Run() error {
@@ -15,7 +15,7 @@ func (i *Uninstall) Run() error {
 	if err := p.Import(); err != nil {
 		return err
 	}
-	return p.Apply(i.parallel)
+	return p.Apply()
 }
 
 func (i *Uninstall) Cmd() *cli.Command {
@@ -25,7 +25,7 @@ func (i *Uninstall) Cmd() *cli.Command {
 		Usage:   "🔪 Delete all",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
-			flagParallel(&i.parallel),
+			//flagParallel(&i.parallel),
 		},
 		Action: toCtx(i.Run),
 	}

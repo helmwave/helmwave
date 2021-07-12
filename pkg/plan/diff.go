@@ -12,7 +12,7 @@ func (p *Plan) Diff(b *Plan, diffWide int) {
 	var visited []string
 
 	for _, rel := range p.body.Releases {
-		m := rel.UniqName() + ".yml"
+		m := rel.Uniq() + ".yml"
 		visited = append(visited, string(m))
 
 		oldSpecs := manifest.Parse(b.manifests[m], rel.Namespace)
@@ -20,13 +20,13 @@ func (p *Plan) Diff(b *Plan, diffWide int) {
 
 		change := diff.Manifests(oldSpecs, newSpecs, []string{}, true, diffWide, os.Stdout)
 		if !change {
-			log.Info(rel.UniqName(), " no changes")
+			log.Info(rel.Uniq(), " no changes")
 		}
 	}
 
 	for _, rel := range b.body.Releases {
-		if !helper.Contains(string(rel.UniqName()+".yml"), visited) {
-			log.Warn(rel.UniqName(), " was found in previous planfile but not affected in new")
+		if !helper.Contains(string(rel.Uniq()+".yml"), visited) {
+			log.Warn(rel.Uniq(), " was found in previous planfile but not affected in new")
 		}
 	}
 }

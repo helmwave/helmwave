@@ -6,7 +6,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
-	helm "helm.sh/helm/v3/pkg/cli"
 	"os"
 	"strings"
 )
@@ -25,9 +24,9 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 
 	// Build Values
 	//err = p.buildValues()
-	if err != nil {
-		return err
-	}
+	//if err != nil {
+	//	return err
+	//}
 
 	// Build Repositories
 	p.body.Repositories, err = buildRepo(p.body.Releases, p.body.Repositories)
@@ -35,8 +34,10 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
+	p.PrettyPlan()
+
 	// Sync Repo
-	err = p.syncRepositories(helm.New())
+	err = p.syncRepositories()
 	if err != nil {
 		return err
 	}
@@ -63,12 +64,29 @@ func (p *Plan) buildManifest() error {
 			log.Trace(r.Manifest)
 		}
 
-		m := rel.UniqName() + ".yml"
+		m := rel.Uniq() + ".yml"
 		p.manifests[m] = r.Manifest
 
 	}
 
 	return nil
+}
+
+func (p *Plan) PrettyPlan() {
+	var a []string
+	for _, r := range p.body.Releases {
+		a = append(a, string(r.Uniq()))
+	}
+
+	var b []string
+	for _, r := range p.body.Repositories {
+		b = append(b, r.Name)
+	}
+
+	log.WithFields(log.Fields{
+		"releases":     a,
+		"repositories": b,
+	}).Info("Plan")
 }
 
 func buildReleases(tags []string, releases []*release.Config, matchAll bool) (plan []*release.Config) {
@@ -79,7 +97,7 @@ func buildReleases(tags []string, releases []*release.Config, matchAll bool) (pl
 	releasesMap := make(map[uniqname.UniqName]*release.Config)
 
 	for _, r := range releases {
-		releasesMap[r.UniqName()] = r
+		releasesMap[r.Uniq()] = r
 	}
 
 	for _, r := range releases {

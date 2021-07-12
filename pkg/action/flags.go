@@ -35,15 +35,15 @@ func flagMatchAllTags(v *bool) *cli.BoolFlag {
 	}
 }
 
-func flagParallel(v *bool) *cli.BoolFlag {
-	return &cli.BoolFlag{
-		Name:        "parallel",
-		Usage:       "It allows you call `helm` in parallel mode ",
-		Value:       true,
-		EnvVars:     []string{"HELMWAVE_PARALLEL"},
-		Destination: v,
-	}
-}
+//func flagParallel(v *bool) *cli.BoolFlag {
+//	return &cli.BoolFlag{
+//		Name:        "parallel",
+//		Usage:       "It allows you call `helm` in parallel mode ",
+//		Value:       true,
+//		EnvVars:     []string{"HELMWAVE_PARALLEL"},
+//		Destination: v,
+//	}
+//}
 
 func flagFile(v *string) *cli.StringFlag {
 	return &cli.StringFlag{

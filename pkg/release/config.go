@@ -13,7 +13,7 @@ type Config struct {
 	Chart           chart
 	Name            string
 	Namespace       string
-	uniqName        *uniqname.UniqName
+	uniqName        uniqname.UniqName
 	CreateNamespace bool
 
 	Devel                    bool
@@ -117,13 +117,13 @@ var (
 	ErrDepFailed     = errors.New("dependency failed")
 )
 
-// UniqName redis@my-namespace
-func (rel *Config) UniqName() uniqname.UniqName {
-	if rel.uniqName == nil {
-		*rel.uniqName = uniqname.UniqName(rel.Name + "@" + rel.Namespace)
+// Uniq redis@my-namespace
+func (rel *Config) Uniq() uniqname.UniqName {
+	if rel.uniqName == "" {
+		rel.uniqName = uniqname.UniqName(rel.Name + "@" + rel.Namespace)
 	}
 
-	return *rel.uniqName
+	return rel.uniqName
 
 }
 
