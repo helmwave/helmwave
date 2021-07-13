@@ -48,6 +48,11 @@ func (p *Plan) syncRepositories() error {
 		}(wg, i)
 	}
 
+	err = wg.Wait()
+	if err != nil {
+		return err
+	}
+
 	return f.WriteFile(settings.RepositoryConfig, 0644)
 }
 
@@ -57,14 +62,15 @@ func (p *Plan) syncReleases() (err error) {
 	wg.Add(len(p.body.Releases))
 
 	for i := range p.body.Releases {
-		go func(wg *parallel.WaitGroup, i int) {
+		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
-			_, err := p.body.Releases[i].Sync()
+			log.Info(rel.Uniq(), " deploying...")
+			_, err := rel.Sync()
 			if err != nil {
 				log.Fatal(err)
 			}
-		}(wg, i)
+		}(wg, p.body.Releases[i])
 	}
 
-	return nil
+	return wg.Wait()
 }

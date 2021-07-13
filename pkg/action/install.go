@@ -20,6 +20,8 @@ func (i *Install) Run() error {
 		return err
 	}
 
+	p.PrettyPlan()
+
 	return p.Apply()
 }
 

@@ -24,21 +24,23 @@ func (p *Plan) List() error {
 		}
 
 		status := r.Info.Status
+
 		statusColor := tablewriter.Colors{tablewriter.Normal, tablewriter.FgGreenColor}
 		if status != release.StatusDeployed {
 			statusColor = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)
 		}
-		r.Chart.Name()
 
-		table.Rich([]string{
+		row := []string{
 			r.Name,
 			r.Namespace,
 			strconv.Itoa(r.Version),
 			r.Info.LastDeployed.String(),
-			r.Info.Status.String(),
+			string(r.Info.Status),
 			r.Chart.Name(),
 			r.Chart.Metadata.Version,
-		}, []tablewriter.Colors{
+		}
+
+		table.Rich(row, []tablewriter.Colors{
 			{},
 			{},
 			{},
@@ -58,7 +60,6 @@ func newListTable() *tablewriter.Table {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"name", "namespace", "revision", "updated", "status", "chart", "version"})
 	table.SetAutoFormatHeaders(true)
-	table.SetAutoMergeCellsByColumnIndex([]int{1, 4})
 	table.SetBorder(false)
 
 	return table
