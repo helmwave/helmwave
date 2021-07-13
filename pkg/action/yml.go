@@ -2,6 +2,7 @@ package action
 
 import (
 	"github.com/helmwave/helmwave/pkg/template"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -10,7 +11,17 @@ type Yml struct {
 }
 
 func (i *Yml) Run() error {
-	return template.Tpl2yml(i.from, i.to, nil)
+	err := template.Tpl2yml(i.from, i.to, nil)
+	if err != nil {
+		return err
+	}
+
+	log.WithField(
+		"build plan with next command",
+		"helmwave plan",
+	).Info("📄 YML is ready!")
+
+	return nil
 }
 
 func (i *Yml) Cmd() *cli.Command {

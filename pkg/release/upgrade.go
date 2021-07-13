@@ -50,7 +50,7 @@ func (rel *Config) upgrade(helm *helm.EnvSettings) (*release.Release, error) {
 	if !rel.isInstalled() || rel.dryRun {
 
 		if rel.dryRun {
-			log.Debugf("Templating %q ", rel.Uniq())
+			log.Debugf("📄 Templating manifest %q ", rel.Uniq())
 		} else {
 			log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.Uniq())
 		}

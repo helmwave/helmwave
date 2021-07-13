@@ -20,12 +20,13 @@ func (p *Plan) Diff(b *Plan, diffWide int) {
 
 		change := diff.Manifests(oldSpecs, newSpecs, []string{}, true, diffWide, os.Stdout)
 		if !change {
-			log.Info(rel.Uniq(), " no changes")
+			log.Info("❎  ", rel.Uniq(), " no changes")
 		}
 	}
 
 	for _, rel := range b.body.Releases {
-		if !helper.Contains(string(rel.Uniq()+".yml"), visited) {
+		m := string(rel.Uniq() + ".yml")
+		if !helper.Contains(m, visited) {
 			log.Warn(rel.Uniq(), " was found in previous planfile but not affected in new")
 		}
 	}

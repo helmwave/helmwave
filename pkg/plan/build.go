@@ -2,6 +2,7 @@ package plan
 
 import (
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -34,8 +35,6 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
-	p.PrettyPlan()
-
 	// Sync Repo
 	err = p.syncRepositories()
 	if err != nil {
@@ -52,24 +51,34 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 }
 
 func (p *Plan) buildManifest() error {
+	wg := parallel.NewWaitGroup()
+	wg.Add(len(p.body.Releases))
+
 	for _, rel := range p.body.Releases {
-		rel.DryRun(true)
-		r, err := rel.Sync()
-		rel.DryRun(false)
-		if err != nil {
-			return err
-		}
+		go func(wg *parallel.WaitGroup, rel *release.Config) {
+			defer wg.Done()
 
-		if r != nil {
-			log.Trace(r.Manifest)
-		}
+			rel.DryRun(true)
+			r, err := rel.Sync()
+			rel.DryRun(false)
+			if err != nil {
+				log.Fatal(err)
+			}
 
-		m := rel.Uniq() + ".yml"
-		p.manifests[m] = r.Manifest
+			if r != nil {
+				log.Trace(r.Manifest)
+			}
+
+			m := rel.Uniq() + ".yml"
+			p.manifests[m] = r.Manifest
+
+			//log.Debug(rel.Uniq(), "`s manifest was successfully built ")
+
+		}(wg, rel)
 
 	}
 
-	return nil
+	return wg.Wait()
 }
 
 func (p *Plan) PrettyPlan() {
@@ -86,7 +95,7 @@ func (p *Plan) PrettyPlan() {
 	log.WithFields(log.Fields{
 		"releases":     a,
 		"repositories": b,
-	}).Info("Plan")
+	}).Info("🏗 Plan")
 }
 
 func buildReleases(tags []string, releases []*release.Config, matchAll bool) (plan []*release.Config) {
@@ -154,7 +163,7 @@ func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []
 				found = true
 				if !b.InByName(plan) {
 					plan = append(plan, b)
-					log.Infof("🗄 %q has been added to the plan", a)
+					log.Debugf("🗄 %q has been added to the plan", a)
 				}
 			}
 		}

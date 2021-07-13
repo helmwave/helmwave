@@ -7,12 +7,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
 )
 
 func Contains(t string, a []string) bool {
-	i := sort.SearchStrings(a, t)
-	return i < len(a) && a[i] == t
+	for _, v := range a {
+		if v == t {
+			return true
+		}
+	}
+
+	return false
 }
 
 func CreateFile(p string) (*os.File, error) {

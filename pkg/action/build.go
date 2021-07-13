@@ -22,9 +22,12 @@ func (i *Build) Run() error {
 		return err
 	}
 
+	// Show current plan
+	newPlan.PrettyPlan()
+
 	oldPlan := plan.New(i.plandir)
 	if oldPlan.IsExist() {
-		log.Info("Found old plan, try get changes")
+		log.Info("🆚 diff with previous plan")
 		if err = oldPlan.Import(); err != nil {
 			return err
 		}
@@ -38,7 +41,11 @@ func (i *Build) Run() error {
 		return err
 	}
 
-	log.Info("Planfile is ready!")
+	log.WithField(
+		"deploy it with next command",
+		"helmwave deploy",
+	).Info("🏗 Planfile is ready!")
+
 	return nil
 }
 
