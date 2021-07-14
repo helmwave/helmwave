@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var ErrValidateFailed = errors.New("validate failed")
+
 func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
@@ -24,5 +26,5 @@ func (p *Plan) ValidateValues() error {
 		return nil
 	}
 
-	return errors.New("cannot validate")
+	return ErrValidateFailed
 }
