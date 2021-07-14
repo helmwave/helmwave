@@ -41,6 +41,28 @@ func (p *Plan) exportManifest() error {
 	return nil
 }
 
+func (p *Plan) adapterValues() error {
+	for _, rel := range p.body.Releases {
+		for _, v := range rel.ValuesMap() {
+
+		}
+	}
+
+	return nil
+}
+
+func (p *Plan) moveValuesDir() error {
+	for uniq, tmp := range p.valuesTmp {
+		err := os.Rename(tmp, p.dir)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
 // IsExist returns true if planfile exists
 func (p *Plan) IsExist() bool {
 	return helper.IsExists(p.fullPath)

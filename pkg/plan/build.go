@@ -50,6 +50,26 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	return nil
 }
 
+func (p *Plan) buildValues() error {
+
+	dir := os.TempDir()
+
+	wg := parallel.NewWaitGroup()
+	wg.Add(len(p.body.Releases))
+
+	for _, rel := range p.body.Releases {
+		go func(wg *parallel.WaitGroup, rel *release.Config) {
+			defer wg.Done()
+
+			rel.ValuesMap(dir)
+			p.values[rel.Uniq()] = dir
+
+		}(wg, rel)
+	}
+
+	return wg.Wait()
+}
+
 func (p *Plan) buildManifest() error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))

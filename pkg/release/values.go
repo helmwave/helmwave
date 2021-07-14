@@ -7,50 +7,68 @@ import (
 	"os"
 )
 
-func (rel *Config) V(dir string) (err error) {
-	tmp := os.TempDir()
-	v := rel.VDownload(tmp)
-
-	v, err = rel.VTemplate(v, dir)
-	if err != nil {
-		return err
-	}
-
-	rel.Values = v
-	return nil
+type ValuesReference struct {
+	Src   string
+	Local string
 }
 
-func (rel *Config) VDownload(dir string) (values []string) {
-	for i, url := range rel.Values {
-		stat, err := os.Stat(url)
+func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	return unmarshal(&v.Src)
+}
+
+// ValuesMap Todo: Parallel
+func (rel *Config) ValuesMap(dir string) (Map map[string]string) {
+	for i, v := range rel.Values {
+		stat, err := os.Stat(v)
 		local := err == nil && !stat.IsDir()
+
+		dst := dir + ".values/" + string(rel.Uniq()) + "/" + string(rune(i)) + ".yml"
+
+		var src string
 		if local {
-			values = append(values, url)
-		} else {
-			// Download
-			file := dir + string(rune(i)) + ".yml"
-			err := helper.Download(file, url)
+			src = v
+		} else if helper.IsUrl(v) {
+			err = helper.Download(dst, v)
 			if err != nil {
-				log.Warn(url, " skipping: ", err)
-			} else {
-				values = append(values, file)
+				log.Warn(v, " skipping: ", err)
+				continue
 			}
+
+			src = dst
+		} else {
+			log.Warn("bad values path: ", v)
+			continue
 		}
+
+		err = template.Tpl2yml(src, dst, struct{ Release *Config }{rel})
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+
+		// Create symlink for facilities
+		if local {
+			symlink := dir + v
+			err = os.Symlink(dst, symlink)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			Map[v] = symlink
+		} else {
+			Map[v] = dst
+		}
+
 	}
 
-	return values
+	return Map
+
 }
 
-func (rel *Config) VTemplate(values []string, dir string) (vals []string, err error) {
-	for _, path := range values {
-		dst := dir + path + "." + string(rel.Uniq()) + ".plan.yml"
-		err = template.Tpl2yml(path, dst, struct{ Release *Config }{rel})
-		if err != nil {
-			return nil, err
-		}
-
-		vals = append(vals, dst)
+func map2Slice(Map map[string]string, Slice []string) {
+	i := 0
+	for _, v := range Map {
+		Slice[i] = v
+		i++
 	}
-
-	return vals, nil
 }
