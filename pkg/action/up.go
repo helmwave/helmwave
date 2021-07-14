@@ -8,13 +8,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type Install struct {
+type Up struct {
 	dog     *kubedog.Config
 	plandir string
 	kubedog bool
 }
 
-func (i *Install) Run() error {
+func (i *Up) Run() error {
 	p := plan.New(i.plandir)
 	if err := p.Import(); err != nil {
 		return err
@@ -25,11 +25,11 @@ func (i *Install) Run() error {
 	return p.Apply()
 }
 
-func (i *Install) Cmd() *cli.Command {
+func (i *Up) Cmd() *cli.Command {
 	i.dog = &kubedog.Config{}
 	return &cli.Command{
-		Name:    "install",
-		Aliases: []string{"apply", "sync", "deploy"},
+		Name:    "up",
+		Aliases: []string{"install", "apply", "sync", "deploy"},
 		Usage:   "🚢 Apply your plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),

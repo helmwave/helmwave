@@ -41,8 +41,9 @@ func (d *Diff) Run() error {
 
 func (d *Diff) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "diff",
-		Usage: "🆚 Differences between plan1 and plan2",
+		Name:    "diff",
+		Usage:   "🆚 Differences between plan1 and plan2",
+		Aliases: []string{"vs"},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "plandir1",

@@ -19,16 +19,11 @@ func (l *Validate) Run() error {
 
 func (l *Validate) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "validate",
-		Usage: "🛂 Validate your plan",
+		Name:    "validate",
+		Aliases: []string{"check", "lint"},
+		Usage:   "🛂 Validate your plan",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir",
-				EnvVars:     []string{"HELMWAVE_PLANDIR"},
-				Destination: &l.plandir,
-			},
+			flagPlandir(&l.plandir),
 		},
 		Action: toCtx(l.Run),
 	}

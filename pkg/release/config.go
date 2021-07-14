@@ -59,7 +59,7 @@ type chart struct {
 func (rel *Config) newInstall() *action.Install {
 	client := action.NewInstall(rel.cfg)
 
-	// Only Install
+	// Only Up
 	client.CreateNamespace = rel.CreateNamespace
 	client.ReleaseName = rel.Name
 
