@@ -11,4 +11,4 @@ func Check(a, b string) {
 	}
 }
 
-var Version = "dev"
+var Version = "1.0.0+dev"

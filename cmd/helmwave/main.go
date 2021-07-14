@@ -19,14 +19,19 @@ var commands = []*cli.Command{
 	new(action.Uninstall).Cmd(),
 	new(action.Validate).Cmd(),
 	new(action.Yml).Cmd(),
+	completion(),
 }
 
 func main() {
 	c := cli.NewApp()
 	c.EnableBashCompletion = true
-	c.Usage = "composer for helm"
+	c.Usage = "is like docker-compose for helm"
 	c.Version = helmwave.Version
-	c.Description = "This tool helps you compose your helm releases!"
+	c.Description =
+		"This tool helps you compose your helm releases!\n" +
+			"0. $ helmwave yml\n" +
+			"1. $ helmwave build\n" +
+			"2. $ helmwave apply\n"
 
 	logSet := logSetup.Settings{}
 	c.Before = logSet.Run
