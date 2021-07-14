@@ -5,10 +5,9 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *Config) uninstall() (*release.UninstallReleaseResponse, error) {
-	client := action.NewUninstall(rel.cfg)
+func (rel *Config) Uninstall() (*release.UninstallReleaseResponse, error) {
+	client := action.NewUninstall(rel.Cfg())
 	client.Timeout = rel.Timeout
-	client.DryRun = rel.dryRun
 
 	return client.Run(rel.Name)
 }

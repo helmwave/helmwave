@@ -8,13 +8,7 @@ import (
 )
 
 func (rel *Config) List() (*release.Release, error) {
-	var err error
-	rel.cfg, err = rel.newCfg()
-	if err != nil {
-		return nil, err
-	}
-
-	client := action.NewList(rel.cfg)
+	client := action.NewList(rel.Cfg())
 	client.Filter = fmt.Sprintf("^%s$", regexp.QuoteMeta(rel.Name))
 
 	result, err := client.Run()

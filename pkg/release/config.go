@@ -57,7 +57,7 @@ type chart struct {
 }
 
 func (rel *Config) newInstall() *action.Install {
-	client := action.NewInstall(rel.cfg)
+	client := action.NewInstall(rel.Cfg())
 
 	// Only Up
 	client.CreateNamespace = rel.CreateNamespace
@@ -85,7 +85,7 @@ func (rel *Config) newInstall() *action.Install {
 }
 
 func (rel *Config) newUpgrade() *action.Upgrade {
-	client := action.NewUpgrade(rel.cfg)
+	client := action.NewUpgrade(rel.Cfg())
 	// Only Upgrade
 	client.CleanupOnFail = rel.CleanupOnFail
 	client.MaxHistory = rel.MaxHistory

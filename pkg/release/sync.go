@@ -11,12 +11,6 @@ import (
 )
 
 func (rel *Config) Sync() (*release.Release, error) {
-	var err error
-	rel.cfg, err = rel.newCfg()
-	if err != nil {
-		return nil, err
-	}
-
 	helmClient, err := rel.helm()
 	if err != nil {
 		return nil, err
@@ -34,6 +28,19 @@ func (rel *Config) newCfg() (*action.Configuration, error) {
 	}
 
 	return cfg, nil
+}
+
+func (rel *Config) Cfg() *action.Configuration {
+	if rel.cfg == nil {
+		var err error
+		rel.cfg, err = rel.newCfg()
+		if err != nil {
+			log.Fatal(err)
+			return nil
+		}
+	}
+
+	return rel.cfg
 }
 
 func (rel *Config) helm() (*helm.EnvSettings, error) {

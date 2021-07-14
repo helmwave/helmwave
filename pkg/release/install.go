@@ -7,7 +7,7 @@ import (
 )
 
 func (rel *Config) isInstalled() bool {
-	client := action.NewHistory(rel.cfg)
+	client := action.NewHistory(rel.Cfg())
 	client.Max = 1
 	_, err := client.Run(rel.Name)
 	switch err {
