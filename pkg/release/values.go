@@ -2,73 +2,59 @@ package release
 
 import (
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/template"
-	log "github.com/sirupsen/logrus"
 	"os"
 )
 
 type ValuesReference struct {
-	Src   string
-	Local string
+	Src string
+	dst string
 }
 
-func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	return unmarshal(&v.Src)
+//func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+//	return unmarshal(&v.Src)
+//}
+
+func (v ValuesReference) MarshalYAML() (interface{}, error) {
+	return struct {
+		Src string
+		Dst string
+	}{
+		Src: v.Src,
+		Dst: v.dst,
+	}, nil
 }
 
-// ValuesMap Todo: Parallel
-func (rel *Config) ValuesMap(dir string) (Map map[string]string) {
-	for i, v := range rel.Values {
-		stat, err := os.Stat(v)
-		local := err == nil && !stat.IsDir()
+func (v *ValuesReference) isURL() bool {
+	return helper.IsUrl(v.Src)
+}
 
-		dst := dir + ".values/" + string(rel.Uniq()) + "/" + string(rune(i)) + ".yml"
+func (v *ValuesReference) IsLocal() bool {
+	stat, err := os.Stat(v.Src)
+	return err == nil && !stat.IsDir()
+}
 
-		var src string
-		if local {
-			src = v
-		} else if helper.IsUrl(v) {
-			err = helper.Download(dst, v)
-			if err != nil {
-				log.Warn(v, " skipping: ", err)
-				continue
-			}
+func (v *ValuesReference) Download() error {
+	return helper.Download(v.dst, v.Src)
+}
 
-			src = dst
-		} else {
-			log.Warn("bad values path: ", v)
-			continue
-		}
+func (v *ValuesReference) Get() string {
+	return v.dst
+}
 
-		err = template.Tpl2yml(src, dst, struct{ Release *Config }{rel})
+func (v *ValuesReference) Set(dst string) error {
+	v.dst = dst
+
+	if v.isURL() {
+		err := v.Download()
 		if err != nil {
-			log.Error(err)
-			continue
+			return err
 		}
-
-		// Create symlink for facilities
-		if local {
-			symlink := dir + v
-			err = os.Symlink(dst, symlink)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			Map[v] = symlink
-		} else {
-			Map[v] = dst
-		}
-
 	}
 
-	return Map
-
+	return nil
 }
 
-func map2Slice(Map map[string]string, Slice []string) {
-	i := 0
-	for _, v := range Map {
-		Slice[i] = v
-		i++
-	}
-}
+//func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
+//	dst := dir + ".values/" + string(rel.Uniq()) + "/" + string(rune(i)) + ".yml"
+//	v.Set(dst)
+//}

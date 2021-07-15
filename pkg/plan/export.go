@@ -15,6 +15,11 @@ func (p *Plan) Export() error {
 		return err
 	}
 
+	// Todo: Rename tmpDir is faster than rebuild values
+	if err := p.buildValues(p.dir); err != nil {
+		return err
+	}
+
 	return helper.SaveInterface(p.fullPath, p.body)
 }
 
@@ -36,28 +41,6 @@ func (p *Plan) exportManifest() error {
 		if err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (p *Plan) adapterValues() error {
-	for _, rel := range p.body.Releases {
-		for _, v := range rel.ValuesMap() {
-
-		}
-	}
-
-	return nil
-}
-
-func (p *Plan) moveValuesDir() error {
-	for uniq, tmp := range p.valuesTmp {
-		err := os.Rename(tmp, p.dir)
-		if err != nil {
-			return err
-		}
-
 	}
 
 	return nil

@@ -35,9 +35,8 @@ type Config struct {
 	DisableOpenAPIValidation bool
 
 	// Helmwave
-	Tags      []string
-	Values    []string
-	valuesMap map[string]string
+	Tags   []string
+	Values []ValuesReference
 
 	Store        map[string]interface{}
 	DependsOn    []string `yaml:"depends_on"`

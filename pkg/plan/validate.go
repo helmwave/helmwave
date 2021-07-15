@@ -12,7 +12,7 @@ func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
 		for _, val := range rel.Values {
-			_, err := os.Stat(val)
+			_, err := os.Stat(val.Get())
 			if os.IsNotExist(err) {
 				log.Error(err)
 				f = true

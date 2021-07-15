@@ -6,6 +6,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
@@ -24,10 +25,10 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
 
 	// Build Values
-	//err = p.buildValues()
-	//if err != nil {
-	//	return err
-	//}
+	err = p.buildValues(os.TempDir())
+	if err != nil {
+		return err
+	}
 
 	// Build Repositories
 	p.body.Repositories, err = buildRepo(p.body.Releases, p.body.Repositories)
@@ -50,9 +51,8 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	return nil
 }
 
-func (p *Plan) buildValues() error {
-
-	dir := os.TempDir()
+// Todo: Split this function for several more KISS
+func (p *Plan) buildValues(dir string) error {
 
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
@@ -61,8 +61,22 @@ func (p *Plan) buildValues() error {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
 
-			rel.ValuesMap(dir)
-			p.values[rel.Uniq()] = dir
+			// Todo: parallel
+			for i, v := range rel.Values {
+				dst := dir + Values + string(rel.Uniq()) + "/" + string(rune(i)) + ".yml"
+				err := v.Set(dst)
+				if err != nil {
+					log.Warn(v.Src, " skipping: ", err)
+					continue
+				}
+
+				err = template.Tpl2yml(dst, dst, struct{ Release *release.Config }{rel})
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+			}
 
 		}(wg, rel)
 	}

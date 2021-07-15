@@ -21,7 +21,12 @@ func (rel *Config) upgrade(helm *helm.EnvSettings) (*release.Release, error) {
 		return nil, err
 	}
 
-	valOpts := &values.Options{ValueFiles: rel.values}
+	var valuesFiles []string
+	for _, v := range rel.Values {
+		valuesFiles = append(valuesFiles, v.Get())
+	}
+
+	valOpts := &values.Options{ValueFiles: valuesFiles}
 	vals, err := valOpts.MergeValues(getter.All(helm))
 	if err != nil {
 		return nil, err
