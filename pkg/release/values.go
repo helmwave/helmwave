@@ -1,7 +1,11 @@
 package release
 
 import (
+	"crypto/sha1"
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/parallel"
+	"github.com/helmwave/helmwave/pkg/template"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -54,7 +58,37 @@ func (v *ValuesReference) Set(dst string) error {
 	return nil
 }
 
-//func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
-//	dst := dir + ".values/" + string(rel.Uniq()) + "/" + string(rune(i)) + ".yml"
-//	v.Set(dst)
-//}
+func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
+	h := sha1.New()
+	h.Write([]byte(v.Src))
+	bs := h.Sum(nil)
+
+	// Todo: fmt.Sprintf
+	dst := dir + ".values/" + string(rel.Uniq()) + "/" + string(bs) + ".yml"
+
+	err := v.Set(dst)
+	if err != nil {
+		log.Warn(v.Src, " skipping: ", err)
+		return nil
+	}
+
+	return template.Tpl2yml(dst, dst, struct{ Release *Config }{rel})
+}
+
+func (rel *Config) BuildValues(dir string) error {
+	wg := parallel.NewWaitGroup()
+	wg.Add(len(rel.Values))
+
+	for _, v := range rel.Values {
+		go func(wg *parallel.WaitGroup, v ValuesReference) {
+			defer wg.Done()
+			err := v.SetViaRelease(rel, dir)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+		}(wg, v)
+	}
+
+	return wg.Wait()
+}

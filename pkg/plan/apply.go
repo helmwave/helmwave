@@ -65,7 +65,7 @@ func (p *Plan) syncReleases() (err error) {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
 			log.Info(rel.Uniq(), " deploying...")
-			_, err := rel.Sync()
+			_, err = rel.Sync()
 			if err != nil {
 				log.Fatal(err)
 			}
