@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// Build Принимает на вход ямл и опции по работе с ним.
+// Build plan with yml and tags/matchALL options
 func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	// Create Body
 	body, err := NewBody(yml)
