@@ -11,6 +11,11 @@ type Yml struct {
 }
 
 func (i *Yml) Run() error {
+	log.WithFields(log.Fields{
+		"from": i.from,
+		"to":   i.to,
+	}).Debug("📄 Render yml")
+
 	err := template.Tpl2yml(i.from, i.to, nil)
 	if err != nil {
 		return err
