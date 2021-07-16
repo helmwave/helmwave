@@ -2,6 +2,7 @@ package release
 
 import (
 	"crypto/sha1"
+	"encoding/base64"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/template"
@@ -14,10 +15,17 @@ type ValuesReference struct {
 	dst string
 }
 
-//func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
-//	return unmarshal(&v.Src)
-//}
+func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	m := make(map[string]string)
+	if err := unmarshal(&m); err != nil {
+		return unmarshal(&v.Src)
+	}
 
+	v.Src = m["src"]
+	v.dst = m["dst"]
+
+	return nil
+}
 func (v ValuesReference) MarshalYAML() (interface{}, error) {
 	return struct {
 		Src string
@@ -61,10 +69,16 @@ func (v *ValuesReference) Set(dst string) error {
 func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	h := sha1.New()
 	h.Write([]byte(v.Src))
-	bs := h.Sum(nil)
+	sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 	// Todo: fmt.Sprintf
-	dst := dir + ".values/" + string(rel.Uniq()) + "/" + string(bs) + ".yml"
+	dst := dir + ".values/" + string(rel.Uniq()) + "/" + sha + ".yml"
+
+	log.WithFields(log.Fields{
+		"release": rel.Uniq(),
+		"src":     v.Src,
+		"dst":     dst,
+	}).Debug("Building values reference")
 
 	err := v.Set(dst)
 	if err != nil {
@@ -79,15 +93,17 @@ func (rel *Config) BuildValues(dir string) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(rel.Values))
 
-	for _, v := range rel.Values {
-		go func(wg *parallel.WaitGroup, v ValuesReference) {
+	for i := range rel.Values {
+		go func(wg *parallel.WaitGroup, i int) {
 			defer wg.Done()
-			err := v.SetViaRelease(rel, dir)
+			err := rel.Values[i].SetViaRelease(rel, dir)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-		}(wg, v)
+			//log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
+
+		}(wg, i)
 	}
 
 	return wg.Wait()

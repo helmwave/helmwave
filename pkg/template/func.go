@@ -33,7 +33,7 @@ func Tpl2yml(tpl, yml string, data interface{}) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
-	}).Info("📄 Render file")
+	}).Debug("📄 Render file")
 
 	if data == nil {
 		data = map[string]interface{}{}

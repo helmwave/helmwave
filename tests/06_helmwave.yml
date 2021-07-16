@@ -1,8 +1,6 @@
-project: Test05
+project: Test06
 
 repositories:
-- name: stable
-  url: https://kubernetes-charts.storage.googleapis.com
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 
@@ -13,4 +11,4 @@ releases:
     name: bitnami/nginx
   namespace: test
   values:
-    - tests/05_values.yaml
+    -  https://raw.githubusercontent.com/helmwave/helmwave/main/tests/06_values.yaml

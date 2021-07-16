@@ -1,0 +1,16 @@
+project: Test06
+
+repositories:
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+
+
+releases:
+- name: nginx
+  chart:
+    name: bitnami/nginx
+  store:
+    pullPolicy: Always
+  namespace: test
+  values:
+    - https://gist.githubusercontent.com/zhilyaev/dd0eb69f76d2ecaadadcc595ebf7df05/raw/b6e134de843945af40d0f79d108d64a255a55b7e/07_values.yaml

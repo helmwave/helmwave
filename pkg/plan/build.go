@@ -81,6 +81,7 @@ func (p *Plan) buildManifest() error {
 			r, err := rel.Sync()
 			rel.DryRun(false)
 			if err != nil {
+				log.Error("i cant generate manifest for ", rel.Uniq())
 				log.Fatal(err)
 			}
 

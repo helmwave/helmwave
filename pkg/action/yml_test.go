@@ -30,7 +30,7 @@ func TestRenderEnv(t *testing.T) {
 		t.Error(err)
 	}
 
-	if (value != b.Project) || (value != b.Releases[0].Options.Namespace) {
+	if (value != b.Project) || (value != b.Releases[0].Namespace) {
 		t.Error("Failed Test01")
 	}
 
