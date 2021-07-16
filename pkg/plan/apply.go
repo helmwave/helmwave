@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -28,11 +29,19 @@ func (p *Plan) Apply() (err error) {
 	return nil
 }
 
-func (p *Plan) syncRepositories() error {
+func (p *Plan) syncRepositories() (err error) {
 	settings := helm.New()
-	f, err := repo.LoadFile(settings.RepositoryConfig)
-	if err != nil {
-		return err
+	log.Trace("helm repository.yaml: ", settings.RepositoryConfig)
+
+	f := &repo.File{}
+	// Create if not exits
+	if !helper.IsExists(settings.RepositoryConfig) {
+		f = repo.NewFile()
+	} else {
+		f, err = repo.LoadFile(settings.RepositoryConfig)
+		if err != nil {
+			return err
+		}
 	}
 
 	wg := parallel.NewWaitGroup()
