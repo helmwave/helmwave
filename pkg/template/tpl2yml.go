@@ -26,7 +26,7 @@ func Tpl2yml(tpl, yml string, data interface{}) error {
 		return err
 	}
 
-	log.Debug(yml, " contents\n", buf.String())
+	log.Trace(yml, " contents\n", buf.String())
 
 	f, err := helper.CreateFile(yml)
 	if err != nil {

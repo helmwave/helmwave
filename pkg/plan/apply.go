@@ -1,12 +1,15 @@
 package plan
 
 import (
+	"context"
+	"github.com/gofrs/flock"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
+	"time"
 )
 
 func (p *Plan) Apply() (err error) {
@@ -42,6 +45,19 @@ func (p *Plan) syncRepositories() (err error) {
 		if err != nil {
 			return err
 		}
+	}
+
+	// Flock
+	lockPath := settings.RepositoryConfig + ".lock"
+	fileLock := flock.New(lockPath)
+	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
+	if err == nil && locked {
+		defer fileLock.Unlock()
+	} else if err != nil {
+		return err
 	}
 
 	wg := parallel.NewWaitGroup()
