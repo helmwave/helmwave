@@ -7,6 +7,8 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/lempiy/dgraph"
+	"github.com/lempiy/dgraph/core"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
@@ -23,6 +25,10 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 
 	// Build Releases
 	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
+
+	// Build graph
+	p.graphMD = buildGraphMD(p.body.Releases)
+	log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases))
 
 	// Build Values
 	err = p.buildValues(os.TempDir())
@@ -48,9 +54,6 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
-	// Build graph
-	p.graphMD = buildGraphMD(p.body.Releases)
-
 	return nil
 }
 
@@ -72,6 +75,26 @@ func buildGraphMD(releases []*release.Config) string {
 
 	md += "```"
 	return md
+}
+
+func buildGraphASCII(releases []*release.Config) string {
+	var list []core.NodeInput
+
+	for _, rel := range releases {
+		l := core.NodeInput{
+			Id:   string(rel.Uniq()),
+			Next: rel.DependsOn,
+		}
+
+		list = append(list, l)
+	}
+
+	canvas, err := dgraph.DrawGraph(list)
+	if err != nil {
+		log.Warn(err)
+	}
+
+	return canvas.String()
 }
 
 func (p *Plan) buildValues(dir string) error {

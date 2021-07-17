@@ -20,6 +20,7 @@ require (
 	github.com/helmwave/logrus-emoji-formatter v1.0.1
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.12
+	github.com/lempiy/dgraph v0.0.0-20190713130529-88f0f7cdb48e // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/prometheus/common v0.10.0 // indirect
