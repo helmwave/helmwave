@@ -59,7 +59,7 @@ func flagFile(v *string) *cli.StringFlag {
 func flagDiffWide(v *int) *cli.IntFlag {
 	return &cli.IntFlag{
 		Name:        "diff-wide",
-		Value:       10,
+		Value:       5,
 		Usage:       "Show line around change",
 		EnvVars:     []string{"HELMWAVE_DIFF_WIDE"},
 		Destination: v,
