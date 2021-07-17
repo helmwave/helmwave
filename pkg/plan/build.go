@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"fmt"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -47,7 +48,30 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
+	// Build graph
+	p.graphMD = buildGraphMD(p.body.Releases)
+
 	return nil
+}
+
+// Todo: graph Depends on CLI
+func buildGraphMD(releases []*release.Config) string {
+	md :=
+		"# Depends On\n\n" +
+			"```mermaid\ngraph RL\n"
+
+	for _, r := range releases {
+		for _, dep := range r.DependsOn {
+			md += fmt.Sprintf(
+				"\t%s[%q] --> %s[%q]\n",
+				strings.Replace(string(r.Uniq()), "@", "_", -1), r.Uniq(),
+				strings.Replace(dep, "@", "_", -1), dep,
+			)
+		}
+	}
+
+	md += "```"
+	return md
 }
 
 func (p *Plan) buildValues(dir string) error {

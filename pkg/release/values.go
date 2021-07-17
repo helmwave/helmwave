@@ -72,7 +72,7 @@ func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 	// Todo: fmt.Sprintf
-	dst := dir + ".values/" + string(rel.Uniq()) + "/" + sha + ".yml"
+	dst := dir + "values/" + string(rel.Uniq()) + "/" + sha + ".yml"
 
 	log.WithFields(log.Fields{
 		"release": rel.Uniq(),

@@ -20,6 +20,10 @@ func (p *Plan) Export() error {
 		return err
 	}
 
+	if err := p.exportGraphMD(); err != nil {
+		return err
+	}
+
 	return helper.SaveInterface(p.fullPath, p.body)
 }
 
@@ -44,6 +48,20 @@ func (p *Plan) exportManifest() error {
 	}
 
 	return nil
+}
+
+func (p *Plan) exportGraphMD() error {
+	f, err := helper.CreateFile(p.dir + "graph.md")
+	if err != nil {
+		return err
+	}
+
+	_, err = f.WriteString(p.graphMD)
+	if err != nil {
+		return err
+	}
+
+	return f.Close()
 }
 
 // IsExist returns true if planfile exists

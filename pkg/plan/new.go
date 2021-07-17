@@ -14,8 +14,8 @@ const (
 	Dir      = ".helmwave/"
 	File     = "planfile"
 	Body     = "helmwave.yml"
-	Manifest = ".manifest/"
-	Values   = ".values/"
+	Manifest = "manifest/"
+	Values   = "values/"
 )
 
 var (
@@ -30,6 +30,8 @@ type Plan struct {
 
 	manifests map[uniqname.UniqName]string
 	valuesTmp map[uniqname.UniqName]string
+
+	graphMD string
 }
 
 type planBody struct {

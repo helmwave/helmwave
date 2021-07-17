@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	Chart           chart
+	Chart           Chart
 	Name            string
 	Namespace       string
 	uniqName        uniqname.UniqName
@@ -50,7 +50,7 @@ func (rel *Config) DryRun(b bool) *Config {
 	return rel
 }
 
-type chart struct {
+type Chart struct {
 	Name                    string
 	action.ChartPathOptions `yaml:",inline"`
 }
