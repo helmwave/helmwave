@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,7 +14,11 @@ func Download(file, uri string) error {
 		return err
 	}
 
-	r, err := http.Get(uri)
+	req, err := http.NewRequestWithContext(context.TODO(), "GET", uri, nil)
+	if err != nil {
+		return err
+	}
+	r, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
