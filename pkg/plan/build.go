@@ -43,20 +43,15 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	}
 
 	// Build Repositories
-	repoMap, err := buildRepoMap(p.body.Releases)
+	reposTop, err := buildRepositories(
+		buildRepoMapTop(p.body.Releases),
+		p.body.Repositories,
+	)
 	if err != nil {
 		return err
 	}
-
-	log.Trace(repoMap)
-
-	p.body.Repositories, err = buildRepo(repoMap, p.body.Repositories)
-	if err != nil {
-		return err
-	}
-
-	// Sync Repo
-	err = p.syncRepositories()
+	// Sync Top Repo
+	err = syncRepositories(reposTop, helper.Helm)
 	if err != nil {
 		return err
 	}
@@ -231,7 +226,7 @@ func releaseNames(a []*release.Config) (n []string) {
 	return n
 }
 
-func buildRepo(m map[string][]*release.Config, in []*repo.Config) (out []*repo.Config, err error) {
+func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out []*repo.Config, err error) {
 	for rep, releases := range m {
 		rm := releaseNames(releases)
 		log.WithField(rep, rm).Debug("repo dependencies")
@@ -251,12 +246,11 @@ func buildRepo(m map[string][]*release.Config, in []*repo.Config) (out []*repo.C
 	return out, nil
 }
 
-func buildRepoMap(releases []*release.Config) (m map[string][]*release.Config, err error) {
+func buildRepoMapDeps(releases []*release.Config) (map[string][]*release.Config, error) {
+	m := make(map[string][]*release.Config)
 	for _, rel := range releases {
-
 		reps, err := rel.RepositoriesNames()
 		if err != nil {
-			log.Fatal("eto ", err)
 			return nil, err
 		}
 
@@ -270,8 +264,17 @@ func buildRepoMap(releases []*release.Config) (m map[string][]*release.Config, e
 		}
 	}
 
-	return m, err
+	return m, nil
 
+}
+
+func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
+	m := make(map[string][]*release.Config)
+	for _, rel := range releases {
+		m[rel.Repo()] = append(m[rel.Repo()], rel)
+	}
+
+	return m
 }
 
 // allRepos for releases

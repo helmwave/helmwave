@@ -68,7 +68,7 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 	return client.Run(rel.Name, ch, vals)
 }
 
-func (rel *Config) chartDepsUpd(settings *helm.EnvSettings) error {
+func (rel *Config) ChartDepsUpd(settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              os.Stdout,

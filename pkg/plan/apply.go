@@ -10,24 +10,25 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	rep "github.com/helmwave/helmwave/pkg/repo"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
-	helm "helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
 )
 
 var ErrDeploy = errors.New("deploy failed")
 
 func (p *Plan) Apply() (err error) {
-	if len(p.body.Releases) == 0 {
-		return release.ErrEmpty
-	}
-
 	log.Info("🗄 Sync repositories...")
-	err = p.syncRepositories()
+	err = syncRepositories(p.body.Repositories, helper.Helm)
 	if err != nil {
 		return err
 	}
+
+	//if len(p.body.Releases) == 0 {
+	//	return release.ErrEmpty
+	//}
 
 	log.Info("🛥 Sync releases...")
 	err = p.syncReleases()
@@ -38,23 +39,22 @@ func (p *Plan) Apply() (err error) {
 	return nil
 }
 
-func (p *Plan) syncRepositories() (err error) {
-	settings := helm.New()
-	log.Trace("helm repository.yaml: ", settings.RepositoryConfig)
+func syncRepositories(repositories []*rep.Config, helm *cli.EnvSettings) (err error) {
+	log.Trace("helm repository.yaml: ", helm.RepositoryConfig)
 
 	f := &repo.File{}
 	// Create if not exits
-	if !helper.IsExists(settings.RepositoryConfig) {
+	if !helper.IsExists(helm.RepositoryConfig) {
 		f = repo.NewFile()
 	} else {
-		f, err = repo.LoadFile(settings.RepositoryConfig)
+		f, err = repo.LoadFile(helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
 	}
 
 	// Flock
-	lockPath := settings.RepositoryConfig + ".lock"
+	lockPath := helm.RepositoryConfig + ".lock"
 	fileLock := flock.New(lockPath)
 	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -65,12 +65,12 @@ func (p *Plan) syncRepositories() (err error) {
 	}
 
 	wg := parallel.NewWaitGroup()
-	wg.Add(len(p.body.Repositories))
+	wg.Add(len(repositories))
 
-	for i := range p.body.Repositories {
+	for i := range repositories {
 		go func(wg *parallel.WaitGroup, i int) {
 			defer wg.Done()
-			err := p.body.Repositories[i].Install(settings, f)
+			err := repositories[i].Install(helm, f)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -82,7 +82,7 @@ func (p *Plan) syncRepositories() (err error) {
 		return err
 	}
 
-	err = f.WriteFile(settings.RepositoryConfig, os.FileMode(0o644))
+	err = f.WriteFile(helm.RepositoryConfig, os.FileMode(0o644))
 	if err != nil {
 		return err
 	}

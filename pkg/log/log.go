@@ -2,6 +2,7 @@ package log
 
 import (
 	"github.com/bombsimon/logrusr"
+	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -78,6 +79,7 @@ func (l *Settings) setLevel() error {
 	log.SetLevel(level)
 	if level >= log.DebugLevel {
 		log.SetReportCaller(true)
+		helper.Helm.Debug = true
 	}
 
 	return nil
