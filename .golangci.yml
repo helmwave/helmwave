@@ -122,6 +122,7 @@ linters-settings:
       - commentedOutCode
       - typeSwitchVar
       - whyNoLint
+      - yodaStyleExpr
 
     settings:
       captLocal: # must be valid enabled check name
@@ -306,7 +307,7 @@ linters-settings:
     # Select the Go version to target. The default is '1.13'.
     go: "1.16"
     # https://staticcheck.io/docs/options#checks
-    checks: [ "all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022" ]
+    checks: [ "all", "-ST1000", "-ST1003", "-ST1016", "-ST1017", "-ST1020", "-ST1021", "-ST1022" ]
     # https://staticcheck.io/docs/options#dot_import_whitelist
     dot-import-whitelist:
       - fmt
