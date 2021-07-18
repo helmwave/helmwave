@@ -2,6 +2,9 @@ package plan
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -10,8 +13,6 @@ import (
 	"github.com/lempiy/dgraph"
 	"github.com/lempiy/dgraph/core"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"strings"
 )
 
 // Build plan with yml and tags/matchALL options

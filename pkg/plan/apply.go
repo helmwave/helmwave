@@ -2,6 +2,8 @@ package plan
 
 import (
 	"context"
+	"time"
+
 	"github.com/gofrs/flock"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -9,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
-	"time"
 )
 
 func (p *Plan) Apply() (err error) {

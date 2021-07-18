@@ -1,8 +1,9 @@
 package release
 
 import (
-	"helm.sh/helm/v3/pkg/chart/loader"
 	"strings"
+
+	"helm.sh/helm/v3/pkg/chart/loader"
 )
 
 // Repositories returns repository for release

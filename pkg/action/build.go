@@ -1,11 +1,12 @@
 package action
 
 import (
+	"sort"
+	"strings"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"sort"
-	"strings"
 )
 
 type Build struct {

@@ -1,10 +1,11 @@
 package plan
 
 import (
+	"os"
+
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func (p *Plan) Import() error {

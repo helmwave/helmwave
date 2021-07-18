@@ -1,11 +1,12 @@
 package plan
 
 import (
+	"os"
+
 	"github.com/databus23/helm-diff/diff"
 	"github.com/databus23/helm-diff/manifest"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func (p *Plan) Diff(b *Plan, diffWide int) {

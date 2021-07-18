@@ -1,8 +1,9 @@
 package release
 
 import (
-	"gopkg.in/yaml.v2"
 	"testing"
+
+	"gopkg.in/yaml.v2"
 )
 
 func TestValuesReferenceParse(t *testing.T) {

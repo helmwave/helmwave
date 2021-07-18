@@ -2,9 +2,10 @@ package release
 
 import (
 	"fmt"
+	"regexp"
+
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
-	"regexp"
 )
 
 func (rel *Config) List() (*release.Release, error) {

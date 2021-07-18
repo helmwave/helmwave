@@ -2,12 +2,13 @@ package plan
 
 import (
 	"errors"
+	"io/ioutil"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
 const (

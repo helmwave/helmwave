@@ -1,6 +1,9 @@
 package release
 
 import (
+	"os"
+	"path/filepath"
+
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -9,8 +12,6 @@ import (
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
-	"os"
-	"path/filepath"
 )
 
 func (rel *Config) upgrade(helm *helm.EnvSettings) (*release.Release, error) {

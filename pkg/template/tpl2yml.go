@@ -2,10 +2,11 @@ package template
 
 import (
 	"bytes"
-	"github.com/helmwave/helmwave/pkg/helper"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"text/template"
+
+	"github.com/helmwave/helmwave/pkg/helper"
+	log "github.com/sirupsen/logrus"
 )
 
 func Tpl2yml(tpl, yml string, data interface{}) error {

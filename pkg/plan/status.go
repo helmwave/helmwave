@@ -3,10 +3,11 @@ package plan
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
-	"sort"
 )
 
 func (p *Plan) Status(names []string) error {

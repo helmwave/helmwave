@@ -1,11 +1,11 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"sort"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/pubsub"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 )
 

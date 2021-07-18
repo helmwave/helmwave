@@ -1,10 +1,11 @@
 package action
 
 import (
-	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/helmwave/helmwave/tests"
 	"os"
 	"testing"
+
+	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/tests"
 )
 
 func TestRenderEnv(t *testing.T) {

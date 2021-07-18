@@ -1,9 +1,10 @@
 package helper
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func Contains(t string, a []string) bool {

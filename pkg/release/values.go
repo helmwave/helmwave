@@ -3,11 +3,12 @@ package release
 import (
 	"crypto/sha1"
 	"encoding/base64"
+	"os"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 type ValuesReference struct {

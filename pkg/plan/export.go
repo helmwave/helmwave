@@ -1,8 +1,9 @@
 package plan
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
 	"os"
+
+	"github.com/helmwave/helmwave/pkg/helper"
 )
 
 // Export allows save plan to file

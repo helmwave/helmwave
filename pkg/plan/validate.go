@@ -2,8 +2,9 @@ package plan
 
 import (
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var ErrValidateFailed = errors.New("validate failed")

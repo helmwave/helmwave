@@ -1,8 +1,9 @@
 package pubsub
 
 import (
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"sync"
+
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 )
 
 const (

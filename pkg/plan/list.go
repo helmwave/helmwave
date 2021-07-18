@@ -1,11 +1,12 @@
 package plan
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/release"
-	"os"
-	"strconv"
 )
 
 func (p *Plan) List() error {
