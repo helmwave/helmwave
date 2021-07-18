@@ -22,17 +22,6 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 		return nil, err
 	}
 
-	valuesFiles := make([]string, 0, len(rel.Values))
-	for i := range rel.Values {
-		valuesFiles = append(valuesFiles, rel.Values[i].Get())
-	}
-
-	valOpts := &values.Options{ValueFiles: valuesFiles}
-	vals, err := valOpts.MergeValues(getter.All(settings))
-	if err != nil {
-		return nil, err
-	}
-
 	ch, err := loader.Load(locateChart)
 	if err != nil {
 		return nil, err
@@ -52,6 +41,19 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 		log.Warn("⚠️ This locateChart is deprecated")
 	}
 
+	// Values
+	valuesFiles := make([]string, 0, len(rel.Values))
+	for i := range rel.Values {
+		valuesFiles = append(valuesFiles, rel.Values[i].Get())
+	}
+
+	valOpts := &values.Options{ValueFiles: valuesFiles}
+	vals, err := valOpts.MergeValues(getter.All(settings))
+	if err != nil {
+		return nil, err
+	}
+
+	// Install
 	if !rel.isInstalled() || rel.dryRun {
 		if rel.dryRun {
 			log.Debugf("📄 Templating manifest %q ", rel.Uniq())
@@ -62,6 +64,7 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 		return rel.newInstall().Run(ch, vals)
 	}
 
+	// Upgrade
 	return client.Run(rel.Name, ch, vals)
 }
 
