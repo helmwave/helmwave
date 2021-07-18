@@ -57,7 +57,12 @@ func (p *Plan) syncRepositories() (err error) {
 
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
 	if err == nil && locked {
-		defer fileLock.Unlock()
+		defer func() {
+			err := fileLock.Unlock()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 	} else if err != nil {
 		return err
 	}
