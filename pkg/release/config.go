@@ -11,39 +11,34 @@ import (
 )
 
 type Config struct {
-	Chart           Chart
-	Name            string
-	Namespace       string
-	uniqName        uniqname.UniqName
-	CreateNamespace bool
-
-	Devel                    bool
-	dryRun                   bool
-	SkipCRDs                 bool
+	cfg                      *action.Configuration
+	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
+	Store                    map[string]interface{}
+	Chart                    Chart
+	uniqName                 uniqname.UniqName
+	Name                     string
+	Namespace                string
+	Description              string
+	DependsOn                []string `yaml:"depends_on"`
+	Values                   []ValuesReference
+	Tags                     []string
 	Timeout                  time.Duration
-	Wait                     bool
-	WaitForJobs              bool
-	DisableHooks             bool
-	Force                    bool
-	ResetValues              bool
-	ReuseValues              bool
-	Recreate                 bool
 	MaxHistory               int
+	CreateNamespace          bool
+	ResetValues              bool
+	Recreate                 bool
+	Force                    bool
 	Atomic                   bool
 	CleanupOnFail            bool
 	SubNotes                 bool
-	Description              string
+	DisableHooks             bool
 	DisableOpenAPIValidation bool
-
-	// Helmwave
-	Tags   []string
-	Values []ValuesReference
-
-	Store        map[string]interface{}
-	DependsOn    []string `yaml:"depends_on"`
-	dependencies map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
-
-	cfg *action.Configuration
+	WaitForJobs              bool
+	Wait                     bool
+	SkipCRDs                 bool
+	dryRun                   bool
+	Devel                    bool
+	ReuseValues              bool
 }
 
 func (rel *Config) DryRun(b bool) *Config {
