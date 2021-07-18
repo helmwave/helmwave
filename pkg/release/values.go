@@ -69,7 +69,7 @@ func (v *ValuesReference) Set(dst string) error {
 }
 
 func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
-	h := sha1.New()
+	h := sha1.New() // nolint:gosec
 	h.Write([]byte(v.Src))
 	sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
