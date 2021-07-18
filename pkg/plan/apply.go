@@ -3,7 +3,6 @@ package plan
 import (
 	"context"
 	"errors"
-	"github.com/olekukonko/tablewriter"
 	"os"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
@@ -114,7 +114,7 @@ func (p *Plan) syncReleases() (err error) {
 		}(wg, p.body.Releases[i])
 	}
 
-	if err = wg.Wait(); err != nil {
+	if err := wg.Wait(); err != nil {
 		return err
 	}
 
@@ -150,6 +150,8 @@ func (p *Plan) ApplyReport(fails map[*release.Config]error) error {
 				FailStatusColor,
 			})
 		}
+
+		table.Render()
 
 		return ErrDeploy
 	}

@@ -66,9 +66,9 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 }
 
 func New(dir string) *Plan {
-	//if dir[len(dir)-1:] != "/" {
+	// if dir[len(dir)-1:] != "/" {
 	//	dir += "/"
-	//}
+	// }
 
 	plan := &Plan{
 		dir:       dir,
