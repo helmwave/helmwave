@@ -380,5 +380,8 @@ severity:
         - godox
         - lll
         - nestif
+        - paralleltest
         - revive
+        - testpackage
+        - unused
       severity: warning
