@@ -2,6 +2,7 @@ package plan
 
 import (
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
 
@@ -26,6 +27,9 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 
 	// Build Releases
 	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
+	if len(p.body.Releases) == 0 {
+		return nil
+	}
 
 	// Build graph
 	p.graphMD = buildGraphMD(p.body.Releases)
@@ -42,6 +46,8 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	if err != nil {
 		return err
 	}
+
+	log.Trace(p.body.Repositories)
 
 	// Sync Repo
 	err = p.syncRepositories()
@@ -92,7 +98,7 @@ func buildGraphASCII(releases []*release.Config) string {
 
 	canvas, err := dgraph.DrawGraph(list)
 	if err != nil {
-		log.Warn(err)
+		log.Fatal(err)
 	}
 
 	return canvas.String()
@@ -126,17 +132,28 @@ func (p *Plan) buildManifest() error {
 			rel.DryRun(true)
 			r, err := rel.Sync()
 			rel.DryRun(false)
-			if err != nil {
+			if err != nil || r == nil {
 				log.Error("i cant generate manifest for ", rel.Uniq())
 				log.Fatal(err)
 			}
 
-			if r != nil {
-				log.Trace(r.Manifest)
+			var hooksManifests []string
+
+			for _, h := range r.Hooks {
+				hooksManifests = append(hooksManifests, h.Manifest)
 			}
 
+			hm, _ := yaml.Marshal(hooksManifests)
+
+			document := r.Manifest
+			if len(hooksManifests) > 0 {
+				document += "# Hooks\n" + string(hm)
+			}
+
+			log.Trace(document)
+
 			m := rel.Uniq() + ".yml"
-			p.manifests[m] = r.Manifest
+			p.manifests[m] = document
 
 			// log.Debug(rel.Uniq(), "`s manifest was successfully built ")
 		}(wg, rel)
@@ -222,6 +239,7 @@ func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []
 	all := getRepositories(releases)
 
 	for _, a := range all {
+		log.Trace("build repo ", a)
 		found := false
 		for _, b := range repositories {
 			if a == b.Name {

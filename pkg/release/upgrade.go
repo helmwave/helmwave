@@ -35,7 +35,6 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 
 	ch, err := loader.Load(locateChart)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
