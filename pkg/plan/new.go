@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"path/filepath"
 
@@ -77,4 +78,21 @@ func New(dir string) *Plan {
 	}
 
 	return plan
+}
+
+func (p *Plan) PrettyPlan() {
+	a := make([]string, 0, len(p.body.Releases))
+	for _, r := range p.body.Releases {
+		a = append(a, string(r.Uniq()))
+	}
+
+	b := make([]string, 0, len(p.body.Repositories))
+	for _, r := range p.body.Repositories {
+		b = append(b, r.Name)
+	}
+
+	log.WithFields(log.Fields{
+		"releases":     a,
+		"repositories": b,
+	}).Info("🏗 Plan")
 }

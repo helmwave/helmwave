@@ -1,24 +1,34 @@
 package release
 
 import (
-	"strings"
-
+	"errors"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/chart/loader"
+	"strings"
 )
 
-// Repositories returns repository for release
-func (rel *Config) Repositories() (repos []string, err error) {
+// RepositoriesNames returns repository for release
+func (rel *Config) RepositoriesNames() (repos []string, err error) {
+
 	chart, err := loader.Load(rel.Chart.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	deps := chart.Metadata.Dependencies
+	repos = append(repos, rel.Repo())
 
-	for _, d := range deps {
-		d.Repository = strings.TrimPrefix(d.Repository, "@")
-		repos = append(repos, d.Repository)
+	for _, d := range chart.Metadata.Dependencies {
+		if d.Enabled {
+			d.Repository = strings.TrimPrefix(d.Repository, "@")
+			repos = append(repos, d.Repository)
+		} else if helper.IsURL(d.Repository) {
+			return nil, errors.New("url is unsupported: " + d.Repository)
+		}
 	}
 
 	return repos, nil
+}
+
+func (rel *Config) Repo() string {
+	return strings.Split(rel.Chart.Name, "/")[0]
 }

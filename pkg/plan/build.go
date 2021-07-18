@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -42,12 +43,17 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	}
 
 	// Build Repositories
-	p.body.Repositories, err = buildRepo(p.body.Releases, p.body.Repositories)
+	repoMap, err := buildRepoMap(p.body.Releases)
 	if err != nil {
 		return err
 	}
 
-	log.Trace(p.body.Repositories)
+	log.Trace(repoMap)
+
+	p.body.Repositories, err = buildRepo(repoMap, p.body.Repositories)
+	if err != nil {
+		return err
+	}
 
 	// Sync Repo
 	err = p.syncRepositories()
@@ -64,7 +70,6 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	return nil
 }
 
-// Todo: graph Depends on CLI
 func buildGraphMD(releases []*release.Config) string {
 	md :=
 		"# Depends On\n\n" +
@@ -162,23 +167,6 @@ func (p *Plan) buildManifest() error {
 	return wg.Wait()
 }
 
-func (p *Plan) PrettyPlan() {
-	a := make([]string, 0, len(p.body.Releases))
-	for _, r := range p.body.Releases {
-		a = append(a, string(r.Uniq()))
-	}
-
-	b := make([]string, 0, len(p.body.Repositories))
-	for _, r := range p.body.Repositories {
-		b = append(b, r.Name)
-	}
-
-	log.WithFields(log.Fields{
-		"releases":     a,
-		"repositories": b,
-	}).Info("🏗 Plan")
-}
-
 func buildReleases(tags []string, releases []*release.Config, matchAll bool) (plan []*release.Config) {
 	if len(tags) == 0 {
 		return releases
@@ -235,55 +223,73 @@ func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
 	return matchAll
 }
 
-func buildRepo(releases []*release.Config, repositories []*repo.Config) (plan []*repo.Config, err error) {
-	all := getRepositories(releases)
-
-	for _, a := range all {
-		log.Trace("build repo ", a)
-		found := false
-		for _, b := range repositories {
-			if a == b.Name {
-				found = true
-				if !b.InByName(plan) {
-					plan = append(plan, b)
-					log.Debugf("🗄 %q has been added to the plan", a)
-				}
-			}
-		}
-
-		if !found {
-			log.Errorf("🗄 %q not found ", a)
-			return plan, repo.ErrNotFound
-		}
+func releaseNames(a []*release.Config) (n []string) {
+	for _, r := range a {
+		n = append(n, string(r.Uniq()))
 	}
 
-	return plan, nil
+	return n
 }
 
-// getRepositories for releases
-func getRepositories(releases []*release.Config) (repos []string) {
-	for _, rel := range releases {
-		rep := strings.Split(rel.Chart.Name, "/")[0]
-		deps, _ := rel.Repositories()
+func buildRepo(m map[string][]*release.Config, in []*repo.Config) (out []*repo.Config, err error) {
+	for rep, releases := range m {
+		rm := releaseNames(releases)
+		log.WithField(rep, rm).Debug("repo dependencies")
 
-		all := deps
 		if repoIsLocal(rep) {
 			log.Infof("🗄 %q is local repo", rep)
+		} else if index, found := repo.IndexOfName(in, rep); found {
+			out = append(out, in[index])
+			log.Infof("🗄 %q has been added to the plan", rep)
 		} else {
-			all = append(all, rep)
-		}
-
-		for _, r := range all {
-			if !helper.Contains(r, repos) {
-				repos = append(repos, r)
-			}
+			log.WithField("releases", rm).
+				Warn("🗄 you will not be able to install this")
+			return nil, errors.New("🗄 not found " + rep)
 		}
 	}
 
-	return repos
+	return out, nil
 }
 
-// repoIsLocal
+func buildRepoMap(releases []*release.Config) (m map[string][]*release.Config, err error) {
+	for _, rel := range releases {
+
+		reps, err := rel.RepositoriesNames()
+		if err != nil {
+			log.Fatal("eto ", err)
+			return nil, err
+		}
+
+		log.WithFields(log.Fields{
+			"release":      rel.Uniq(),
+			"repositories": reps,
+		}).Trace("Repositories names")
+
+		for _, rep := range reps {
+			m[rep] = append(m[rep], rel)
+		}
+	}
+
+	return m, err
+
+}
+
+// allRepos for releases
+func allRepos(releases []*release.Config) ([]string, error) {
+	var all []string
+	for _, rel := range releases {
+		r, err := rel.RepositoriesNames()
+		if err != nil {
+			return nil, err
+		}
+
+		all = append(all, r...)
+	}
+
+	return all, nil
+}
+
+// repoIsLocal return true if repo is dir
 func repoIsLocal(repoString string) bool {
 	if repoString == "" {
 		return true
