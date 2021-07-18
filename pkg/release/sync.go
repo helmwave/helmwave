@@ -4,9 +4,7 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/pflag"
 	"helm.sh/helm/v3/pkg/action"
-	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
@@ -17,13 +15,7 @@ func (rel *Config) Sync() (*release.Release, error) {
 		return nil, err
 	}
 
-	// can helm be top?
-	helmClient, err := rel.helm()
-	if err != nil {
-		return nil, err
-	}
-
-	return rel.upgrade(helmClient)
+	return rel.upgrade()
 }
 
 func (rel *Config) newCfg() (*action.Configuration, error) {
@@ -50,15 +42,15 @@ func (rel *Config) Cfg() *action.Configuration {
 	return rel.cfg
 }
 
-func (rel *Config) helm() (*helm.EnvSettings, error) {
-	env := helm.New()
-	fs := &pflag.FlagSet{}
-	env.AddFlags(fs)
-	flag := fs.Lookup("namespace")
-	err := flag.Value.Set(rel.Namespace)
-	if err != nil {
-		return nil, err
-	}
-
-	return env, nil
-}
+//func (rel *Config) helm() (*helm.EnvSettings, error) {
+//	env := helm.New()
+//	fs := &pflag.FlagSet{}
+//	env.AddFlags(fs)
+//	flag := fs.Lookup("namespace")
+//	err := flag.Value.Set(rel.Namespace)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return env, nil
+//}

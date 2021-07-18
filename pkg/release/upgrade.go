@@ -1,44 +1,19 @@
 package release
 
 import (
-	"os"
-	"path/filepath"
-
+	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/cli/values"
-	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error) {
+func (rel *Config) upgrade() (*release.Release, error) {
 	client := rel.newUpgrade()
 
-	locateChart, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, settings)
+	ch, err := rel.GetChart()
 	if err != nil {
 		return nil, err
-	}
-
-	ch, err := loader.Load(locateChart)
-	if err != nil {
-		return nil, err
-	}
-
-	if req := ch.Metadata.Dependencies; req != nil {
-		if err := action.CheckDependencies(ch, req); err != nil {
-			return nil, err
-		}
-	}
-
-	if !(ch.Metadata.Type == "" || ch.Metadata.Type == "application") {
-		log.Warnf("%s charts are not installable \n", ch.Metadata.Type)
-	}
-
-	if ch.Metadata.Deprecated {
-		log.Warn("⚠️ This locateChart is deprecated")
 	}
 
 	// Values
@@ -48,7 +23,7 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 	}
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}
-	vals, err := valOpts.MergeValues(getter.All(settings))
+	vals, err := valOpts.MergeValues(getter.All(helper.Helm))
 	if err != nil {
 		return nil, err
 	}
@@ -66,22 +41,4 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 
 	// Upgrade
 	return client.Run(rel.Name, ch, vals)
-}
-
-func (rel *Config) ChartDepsUpd(settings *helm.EnvSettings) error {
-	client := action.NewDependency()
-	man := &downloader.Manager{
-		Out:              os.Stdout,
-		ChartPath:        filepath.Clean(rel.Chart.Name),
-		Keyring:          client.Keyring,
-		SkipUpdate:       client.SkipRefresh,
-		Getters:          getter.All(settings),
-		RepositoryConfig: settings.RepositoryConfig,
-		RepositoryCache:  settings.RepositoryCache,
-		Debug:            settings.Debug,
-	}
-	if client.Verify {
-		man.Verify = downloader.VerifyAlways
-	}
-	return man.Update()
 }

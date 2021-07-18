@@ -3,14 +3,13 @@ package release
 import (
 	"errors"
 	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/chart/loader"
 	"strings"
 )
 
-// RepositoriesNames returns repository for release
-func (rel *Config) RepositoriesNames() (repos []string, err error) {
+// RepoDeps returns repository for release
+func (rel *Config) RepoDeps() (repos []string, err error) {
 
-	chart, err := loader.Load(rel.Chart.Name)
+	chart, err := rel.GetChart()
 	if err != nil {
 		return nil, err
 	}

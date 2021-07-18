@@ -42,7 +42,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
-	// Build Repositories
+	// Build RepoDeps
 	reposTop, err := buildRepositories(
 		buildRepoMapTop(p.body.Releases),
 		p.body.Repositories,
@@ -249,7 +249,7 @@ func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out [
 func buildRepoMapDeps(releases []*release.Config) (map[string][]*release.Config, error) {
 	m := make(map[string][]*release.Config)
 	for _, rel := range releases {
-		reps, err := rel.RepositoriesNames()
+		reps, err := rel.RepoDeps()
 		if err != nil {
 			return nil, err
 		}
@@ -257,7 +257,7 @@ func buildRepoMapDeps(releases []*release.Config) (map[string][]*release.Config,
 		log.WithFields(log.Fields{
 			"release":      rel.Uniq(),
 			"repositories": reps,
-		}).Trace("Repositories names")
+		}).Trace("RepoDeps names")
 
 		for _, rep := range reps {
 			m[rep] = append(m[rep], rel)
@@ -281,7 +281,7 @@ func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 func allRepos(releases []*release.Config) ([]string, error) {
 	var all []string
 	for _, rel := range releases {
-		r, err := rel.RepositoriesNames()
+		r, err := rel.RepoDeps()
 		if err != nil {
 			return nil, err
 		}
