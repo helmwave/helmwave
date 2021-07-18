@@ -195,7 +195,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 		def = varArgs[0]
 		obj = varArgs[1]
 	default:
-		return nil, fmt.Errorf("unexpected number of args pased to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
+		return nil, fmt.Errorf("unexpected number of args passed to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
 	}
 
 	if path == "" {
@@ -258,7 +258,7 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 		def = varArgs[0]
 		obj = varArgs[1]
 	default:
-		return false, fmt.Errorf("unexpected number of args pased to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
+		return false, fmt.Errorf("unexpected number of args passed to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
 	}
 
 	if path == "" {
