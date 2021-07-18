@@ -12,6 +12,13 @@ import (
 )
 
 func (rel *Config) Sync() (*release.Release, error) {
+
+	// DependsON
+	if err := rel.waitForDependencies(); err != nil {
+		return nil, err
+	}
+
+	// can helm be top?
 	helmClient, err := rel.helm()
 	if err != nil {
 		return nil, err

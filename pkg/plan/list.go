@@ -9,6 +9,11 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
+var (
+	FailStatusColor    = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)
+	SuccessStatusColor = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)
+)
+
 func (p *Plan) List() error {
 	log.Infof("Should be %d releases", len(p.body.Releases))
 	if len(p.body.Releases) == 0 {
@@ -26,9 +31,9 @@ func (p *Plan) List() error {
 
 		status := r.Info.Status
 
-		statusColor := tablewriter.Colors{tablewriter.Normal, tablewriter.FgGreenColor}
+		statusColor := SuccessStatusColor
 		if status != release.StatusDeployed {
-			statusColor = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)
+			statusColor = FailStatusColor
 		}
 
 		row := []string{

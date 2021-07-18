@@ -2,6 +2,8 @@ package plan
 
 import (
 	"context"
+	"errors"
+	"github.com/olekukonko/tablewriter"
 	"os"
 	"time"
 
@@ -13,6 +15,8 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
 )
+
+var ErrDeploy = errors.New("deploy failed")
 
 func (p *Plan) Apply() (err error) {
 	if len(p.body.Releases) == 0 {
@@ -56,14 +60,7 @@ func (p *Plan) syncRepositories() (err error) {
 	defer cancel()
 
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
-	if err == nil && locked {
-		defer func() {
-			err := fileLock.Unlock()
-			if err != nil {
-				log.Error(err)
-			}
-		}()
-	} else if err != nil {
+	if err != nil && !locked {
 		return err
 	}
 
@@ -85,12 +82,20 @@ func (p *Plan) syncRepositories() (err error) {
 		return err
 	}
 
-	return f.WriteFile(settings.RepositoryConfig, os.FileMode(0o644))
+	err = f.WriteFile(settings.RepositoryConfig, os.FileMode(0o644))
+	if err != nil {
+		return err
+	}
+
+	// Unlock
+	return fileLock.Unlock()
 }
 
 func (p *Plan) syncReleases() (err error) {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
+
+	fails := make(map[*release.Config]error)
 
 	for i := range p.body.Releases {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
@@ -98,10 +103,56 @@ func (p *Plan) syncReleases() (err error) {
 			log.Info(rel.Uniq(), " deploying...")
 			_, err = rel.Sync()
 			if err != nil {
-				log.Fatal(err)
+				log.Errorf("❌ %s: %v", rel.Uniq(), err)
+
+				rel.NotifyFailed()
+				fails[rel] = err
+			} else {
+				rel.NotifySuccess()
+				log.Infof("✅ %s", rel.Uniq())
 			}
 		}(wg, p.body.Releases[i])
 	}
 
-	return wg.Wait()
+	if err = wg.Wait(); err != nil {
+		return err
+	}
+
+	return p.ApplyReport(fails)
+}
+
+func (p *Plan) ApplyReport(fails map[*release.Config]error) error {
+	n := len(p.body.Releases)
+	k := len(fails)
+
+	log.Infof("Success %d / %d", n-k, n)
+
+	if len(fails) > 0 {
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"name", "namespace", "chart", "version", "err"})
+		table.SetAutoFormatHeaders(true)
+		table.SetBorder(false)
+
+		for r, err := range fails {
+			row := []string{
+				r.Name,
+				r.Namespace,
+				r.Chart.Name,
+				r.Chart.Version,
+				err.Error(),
+			}
+
+			table.Rich(row, []tablewriter.Colors{
+				{},
+				{},
+				{},
+				{},
+				FailStatusColor,
+			})
+		}
+
+		return ErrDeploy
+	}
+
+	return nil
 }
