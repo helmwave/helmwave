@@ -2,6 +2,7 @@ package plan
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 )
@@ -30,7 +31,7 @@ func (p *Plan) Export() error {
 
 func (p *Plan) exportManifest() error {
 	for k, v := range p.manifests {
-		m := p.dir + Manifest + string(k)
+		m := filepath.Join(p.dir, Manifest, string(k))
 
 		f, err := helper.CreateFile(m)
 		if err != nil {
@@ -52,7 +53,7 @@ func (p *Plan) exportManifest() error {
 }
 
 func (p *Plan) exportGraphMD() error {
-	f, err := helper.CreateFile(p.dir + "graph.md")
+	f, err := helper.CreateFile(filepath.Join(p.dir, "graph.md"))
 	if err != nil {
 		return err
 	}
@@ -72,5 +73,5 @@ func (p *Plan) IsExist() bool {
 
 // IsManifestExist returns true if planfile exists
 func (p *Plan) IsManifestExist() bool {
-	return helper.IsExists(p.dir + Manifest)
+	return helper.IsExists(filepath.Join(p.dir, Manifest))
 }

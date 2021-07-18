@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/version"
@@ -31,7 +32,7 @@ func (p *Plan) Import() error {
 }
 
 func (p *Plan) importManifest() error {
-	ls, err := os.ReadDir(p.dir + Manifest)
+	ls, err := os.ReadDir(filepath.Join(p.dir, Manifest))
 	if err != nil {
 		return err
 	}
@@ -42,7 +43,7 @@ func (p *Plan) importManifest() error {
 
 	for _, l := range ls {
 		if !l.IsDir() {
-			c, err := os.ReadFile(p.dir + Manifest + l.Name())
+			c, err := os.ReadFile(filepath.Join(p.dir, Manifest, l.Name()))
 			if err != nil {
 				return err
 			}

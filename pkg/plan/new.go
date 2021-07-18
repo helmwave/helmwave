@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"io/ioutil"
+	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -30,7 +31,6 @@ type Plan struct {
 	fullPath string
 
 	manifests map[uniqname.UniqName]string
-	// valuesTmp map[uniqname.UniqName]string
 
 	graphMD string
 }
@@ -66,13 +66,13 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 }
 
 func New(dir string) *Plan {
-	if dir[len(dir)-1:] != "/" {
-		dir += "/"
-	}
+	//if dir[len(dir)-1:] != "/" {
+	//	dir += "/"
+	//}
 
 	plan := &Plan{
 		dir:       dir,
-		fullPath:  dir + File,
+		fullPath:  filepath.Join(dir, File),
 		manifests: make(map[uniqname.UniqName]string),
 	}
 
