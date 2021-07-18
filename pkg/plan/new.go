@@ -42,7 +42,7 @@ type planBody struct {
 	Releases     []*release.Config
 }
 
-func NewBody(file string) (*planBody, error) {
+func NewBody(file string) (*planBody, error) { // nolint:revive
 	b := &planBody{
 		Version: version.Version,
 	}

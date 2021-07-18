@@ -39,7 +39,7 @@ func (v ValuesReference) MarshalYAML() (interface{}, error) {
 }
 
 func (v *ValuesReference) isURL() bool {
-	return helper.IsUrl(v.Src)
+	return helper.IsURL(v.Src)
 }
 
 func (v *ValuesReference) IsLocal() bool {
