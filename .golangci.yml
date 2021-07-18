@@ -5,18 +5,30 @@ run:
 linters:
   enable-all: true
   disable:
+    - cyclop
     - deadcode
+    - dupl
+    - funlen
     - gochecknoglobals
+    - gocognit
+    - gocyclo
     - godot
+    - godox
     - goerr113
     - golint
     - gomnd
     - ifshort
     - interfacer
+    - lll
     - maligned
+    - nestif
     - nlreturn
+    - paralleltest
+    - revive
     - scopelint
     - tagliatelle
+    - testpackage
+    - unused
     - wrapcheck
     - wsl
 
@@ -364,24 +376,3 @@ severity:
   # The default value is false.
   # If set to true severity-rules regular expressions become case sensitive.
   case-sensitive: false
-
-  # Default value is empty list.
-  # When a list of severity rules are provided, severity information will be added to lint
-  # issues. Severity rules have the same filtering capability as exclude rules except you
-  # are allowed to specify one matcher per severity rule.
-  # Only affects out formats that support setting severity information.
-  rules:
-    - linters:
-        - cyclop
-        - dupl
-        - funlen
-        - gocognit
-        - gocyclo
-        - godox
-        - lll
-        - nestif
-        - paralleltest
-        - revive
-        - testpackage
-        - unused
-      severity: warning
