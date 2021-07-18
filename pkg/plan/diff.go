@@ -10,7 +10,7 @@ import (
 )
 
 func (p *Plan) Diff(b *Plan, diffWide int) {
-	var visited []string
+	visited := make([]string, 0, len(p.body.Releases))
 	noChanges := 0
 
 	for _, rel := range p.body.Releases {

@@ -79,7 +79,7 @@ func buildGraphMD(releases []*release.Config) string {
 }
 
 func buildGraphASCII(releases []*release.Config) string {
-	var list []core.NodeInput
+	list := make([]core.NodeInput, 0, len(releases))
 
 	for _, rel := range releases {
 		l := core.NodeInput{
@@ -146,12 +146,12 @@ func (p *Plan) buildManifest() error {
 }
 
 func (p *Plan) PrettyPlan() {
-	var a []string
+	a := make([]string, 0, len(p.body.Releases))
 	for _, r := range p.body.Releases {
 		a = append(a, string(r.Uniq()))
 	}
 
-	var b []string
+	b := make([]string, 0, len(p.body.Repositories))
 	for _, r := range p.body.Repositories {
 		b = append(b, r.Name)
 	}

@@ -22,7 +22,7 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 		return nil, err
 	}
 
-	var valuesFiles []string
+	valuesFiles := make([]string, 0, len(rel.Values))
 	for i := range rel.Values {
 		valuesFiles = append(valuesFiles, rel.Values[i].Get())
 	}
