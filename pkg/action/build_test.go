@@ -1,6 +1,7 @@
 package action
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -46,7 +47,7 @@ func TestBuildRepositories404(t *testing.T) {
 	}
 
 	err := s.Run()
-	if err != repo.ErrNotFound && err != nil {
+	if !errors.Is(err, repo.ErrNotFound) && err != nil {
 		t.Error("'bitnami' must be not found")
 	}
 }

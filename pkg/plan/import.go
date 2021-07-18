@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"errors"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -15,11 +16,11 @@ func (p *Plan) Import() error {
 	}
 
 	err = p.importManifest()
-	if err == ErrManifestDirEmpty {
+	if errors.Is(err, ErrManifestDirEmpty) {
 		log.Warn(err)
 	}
 
-	if err != ErrManifestDirEmpty && err != nil {
+	if !errors.Is(err, ErrManifestDirEmpty) && err != nil {
 		return err
 	}
 
