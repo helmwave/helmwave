@@ -195,7 +195,12 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 		def = varArgs[0]
 		obj = varArgs[1]
 	default:
-		return nil, fmt.Errorf("unexpected number of args passed to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
+		return nil, fmt.Errorf(
+			"unexpected number of args passed to the template function get(path, [def, ]obj): "+
+				"expected 1 or 2, got %d, args was %v",
+			len(varArgs),
+			varArgs,
+		)
 	}
 
 	if path == "" {
@@ -224,7 +229,13 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	default:
 		maybeStruct := reflect.ValueOf(typedObj)
 		if maybeStruct.Kind() != reflect.Struct {
-			return nil, &noValueError{fmt.Sprintf("unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct", reflect.TypeOf(obj), keys[0])}
+			return nil, &noValueError{
+				fmt.Sprintf(
+					"unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct",
+					reflect.TypeOf(obj),
+					keys[0],
+				),
+			}
 		} else if maybeStruct.NumField() < 1 {
 			return nil, &noValueError{fmt.Sprintf("no accessible struct fields for key \"%s\"", keys[0])}
 		}
@@ -258,7 +269,12 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 		def = varArgs[0]
 		obj = varArgs[1]
 	default:
-		return false, fmt.Errorf("unexpected number of args passed to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
+		return false, fmt.Errorf(
+			"unexpected number of args passed to the template function get(path, [def, ]obj): "+
+				"expected 1 or 2, got %d, args was %v",
+			len(varArgs),
+			varArgs,
+		)
 	}
 
 	if path == "" {
@@ -281,7 +297,13 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	default:
 		maybeStruct := reflect.ValueOf(typedObj)
 		if maybeStruct.Kind() != reflect.Struct {
-			return false, &noValueError{fmt.Sprintf("unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct", reflect.TypeOf(obj), keys[0])}
+			return false, &noValueError{
+				fmt.Sprintf(
+					"unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct",
+					reflect.TypeOf(obj),
+					keys[0],
+				),
+			}
 		} else if maybeStruct.NumField() < 1 {
 			return false, &noValueError{fmt.Sprintf("no accessible struct fields for key \"%s\"", keys[0])}
 		}

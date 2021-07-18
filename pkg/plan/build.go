@@ -182,7 +182,8 @@ func buildReleases(tags []string, releases []*release.Config, matchAll bool) (pl
 	return plan
 }
 
-func addToPlan(plan []*release.Config, rel *release.Config, releases map[uniqname.UniqName]*release.Config) []*release.Config {
+func addToPlan(plan []*release.Config, rel *release.Config,
+	releases map[uniqname.UniqName]*release.Config) []*release.Config {
 	if rel.In(plan) {
 		return plan
 	}
