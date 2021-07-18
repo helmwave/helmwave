@@ -14,21 +14,21 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *Config) upgrade(helm *helm.EnvSettings) (*release.Release, error) {
+func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error) {
 	client := rel.newUpgrade()
 
-	locateChart, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, helm)
+	locateChart, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, settings)
 	if err != nil {
 		return nil, err
 	}
 
 	var valuesFiles []string
-	for _, v := range rel.Values {
-		valuesFiles = append(valuesFiles, v.Get())
+	for i := range rel.Values {
+		valuesFiles = append(valuesFiles, rel.Values[i].Get())
 	}
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}
-	vals, err := valOpts.MergeValues(getter.All(helm))
+	vals, err := valOpts.MergeValues(getter.All(settings))
 	if err != nil {
 		return nil, err
 	}

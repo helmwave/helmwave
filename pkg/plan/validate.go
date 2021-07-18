@@ -12,8 +12,8 @@ var ErrValidateFailed = errors.New("validate failed")
 func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
-		for _, val := range rel.Values {
-			_, err := os.Stat(val.Get())
+		for i := range rel.Values {
+			_, err := os.Stat(rel.Values[i].Get())
 			if os.IsNotExist(err) {
 				log.Error(err)
 				f = true

@@ -7,13 +7,13 @@ import (
 	"net/url"
 )
 
-func Download(file, url string) error {
+func Download(file, uri string) error {
 	f, err := CreateFile(file)
 	if err != nil {
 		return err
 	}
 
-	r, err := http.Get(url)
+	r, err := http.Get(uri)
 	if err != nil {
 		return err
 	}

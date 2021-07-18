@@ -26,15 +26,16 @@ func CreateFile(p string) (*os.File, error) {
 
 // IsExists return true if file exists
 func IsExists(s string) bool {
-	if _, err := os.Stat(s); err == nil {
+	_, err := os.Stat(s)
+	switch {
+	case err == nil:
 		return true
-	} else if os.IsNotExist(err) {
+	case os.IsNotExist(err):
 		return false
-	} else {
+	default:
 		// Schrodinger: file may or may not exist. See err for details.
 		// Therefore, do *NOT* use !os.IsNotExist(err) to test for file existence
 		log.Fatal(err)
 		return false
 	}
-
 }

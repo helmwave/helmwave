@@ -58,9 +58,9 @@ func NewBody(file string) (*planBody, error) {
 	}
 
 	// Setup dev version
-	//if b.Version == "" {
-	//	b.Version = version.Version
-	//}
+	// if b.Version == "" {
+	// 	 b.Version = version.Version
+	// }
 
 	return b, err
 

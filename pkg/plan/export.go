@@ -70,7 +70,7 @@ func (p *Plan) IsExist() bool {
 	return helper.IsExists(p.fullPath)
 }
 
-//IsManifestExist returns true if planfile exists
+// IsManifestExist returns true if planfile exists
 func (p *Plan) IsManifestExist() bool {
 	return helper.IsExists(p.dir + Manifest)
 }

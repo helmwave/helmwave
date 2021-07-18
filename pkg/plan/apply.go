@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/gofrs/flock"
@@ -79,7 +80,7 @@ func (p *Plan) syncRepositories() (err error) {
 		return err
 	}
 
-	return f.WriteFile(settings.RepositoryConfig, 0644)
+	return f.WriteFile(settings.RepositoryConfig, os.FileMode(0644))
 }
 
 func (p *Plan) syncReleases() (err error) {

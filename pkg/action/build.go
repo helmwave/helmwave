@@ -29,7 +29,7 @@ func (i *Build) Run() error {
 	oldPlan := plan.New(i.plandir)
 	if oldPlan.IsExist() {
 		log.Info("🆚 Diff with previous plan")
-		if err = oldPlan.Import(); err != nil {
+		if err := oldPlan.Import(); err != nil {
 			return err
 		}
 

@@ -102,7 +102,7 @@ func (rel *Config) BuildValues(dir string) error {
 				log.Fatal(err)
 			}
 
-			//log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
+			// log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
 
 		}(wg, i)
 	}

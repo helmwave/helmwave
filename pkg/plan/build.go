@@ -68,8 +68,8 @@ func buildGraphMD(releases []*release.Config) string {
 		for _, dep := range r.DependsOn {
 			md += fmt.Sprintf(
 				"\t%s[%q] --> %s[%q]\n",
-				strings.Replace(string(r.Uniq()), "@", "_", -1), r.Uniq(),
-				strings.Replace(dep, "@", "_", -1), dep,
+				strings.Replace(string(r.Uniq()), "@", "_", -1), r.Uniq(), // nolint:gocritic
+				strings.Replace(dep, "@", "_", -1), dep, // nolint:gocritic
 			)
 		}
 	}
@@ -140,7 +140,7 @@ func (p *Plan) buildManifest() error {
 			m := rel.Uniq() + ".yml"
 			p.manifests[m] = r.Manifest
 
-			//log.Debug(rel.Uniq(), "`s manifest was successfully built ")
+			// log.Debug(rel.Uniq(), "`s manifest was successfully built ")
 
 		}(wg, rel)
 
@@ -191,7 +191,7 @@ func addToPlan(plan []*release.Config, rel *release.Config, releases map[uniqnam
 		return plan
 	}
 
-	r := append(plan, rel)
+	r := append(plan, rel) // nolint:gocritic
 
 	for _, depName := range rel.DependsOn {
 		depUN := uniqname.UniqName(depName)
@@ -269,12 +269,12 @@ func getRepositories(releases []*release.Config) (repos []string) {
 }
 
 // repoIsLocal
-func repoIsLocal(repo string) bool {
-	if repo == "" {
+func repoIsLocal(repoString string) bool {
+	if repoString == "" {
 		return true
 	}
 
-	stat, err := os.Stat(repo)
+	stat, err := os.Stat(repoString)
 	if (err == nil || !os.IsNotExist(err)) && stat.IsDir() {
 		return true
 	}
