@@ -3,7 +3,6 @@ package helper
 import "testing"
 
 func TestContains(t *testing.T) {
-
 	b := Contains("c", []string{
 		"a",
 		"b",
@@ -27,5 +26,4 @@ func TestContains(t *testing.T) {
 	if b {
 		t.Error("bad contains: False-True")
 	}
-
 }

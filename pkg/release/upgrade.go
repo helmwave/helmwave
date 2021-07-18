@@ -65,7 +65,6 @@ func (rel *Config) upgrade(settings *helm.EnvSettings) (*release.Release, error)
 	}
 
 	return client.Run(rel.Name, ch, vals)
-
 }
 
 func (rel *Config) chartDepsUpd(settings *helm.EnvSettings) error {

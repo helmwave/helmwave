@@ -63,7 +63,6 @@ func NewBody(file string) (*planBody, error) {
 	// }
 
 	return b, err
-
 }
 
 func New(dir string) *Plan {

@@ -119,7 +119,6 @@ func (rel *Config) Uniq() uniqname.UniqName {
 	}
 
 	return rel.uniqName
-
 }
 
 // In check that 'x' found in 'array'

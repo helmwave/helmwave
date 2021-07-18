@@ -99,7 +99,6 @@ func buildGraphASCII(releases []*release.Config) string {
 }
 
 func (p *Plan) buildValues(dir string) error {
-
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -110,7 +109,6 @@ func (p *Plan) buildValues(dir string) error {
 			if err != nil {
 				log.Fatal(err)
 			}
-
 		}(wg, rel)
 	}
 
@@ -141,9 +139,7 @@ func (p *Plan) buildManifest() error {
 			p.manifests[m] = r.Manifest
 
 			// log.Debug(rel.Uniq(), "`s manifest was successfully built ")
-
 		}(wg, rel)
-
 	}
 
 	return wg.Wait()

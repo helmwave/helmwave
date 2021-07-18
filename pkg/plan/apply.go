@@ -80,11 +80,10 @@ func (p *Plan) syncRepositories() (err error) {
 		return err
 	}
 
-	return f.WriteFile(settings.RepositoryConfig, os.FileMode(0644))
+	return f.WriteFile(settings.RepositoryConfig, os.FileMode(0o644))
 }
 
 func (p *Plan) syncReleases() (err error) {
-
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 

@@ -45,5 +45,4 @@ values:
 		t.Log(c.Values)
 		t.Error("error parsed ValuesReference MAP")
 	}
-
 }

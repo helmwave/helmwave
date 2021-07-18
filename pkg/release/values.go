@@ -27,6 +27,7 @@ func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error
 
 	return nil
 }
+
 func (v ValuesReference) MarshalYAML() (interface{}, error) {
 	return struct {
 		Src string
@@ -103,7 +104,6 @@ func (rel *Config) BuildValues(dir string) error {
 			}
 
 			// log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
-
 		}(wg, i)
 	}
 

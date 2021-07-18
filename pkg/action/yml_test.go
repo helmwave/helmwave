@@ -21,7 +21,6 @@ func TestRenderEnv(t *testing.T) {
 	_ = os.Setenv("NAMESPACE", value)
 
 	err := s.Run()
-
 	if err != nil {
 		t.Error(err)
 	}
