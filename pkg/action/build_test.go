@@ -1,3 +1,5 @@
+// +build ignore integration
+
 package action
 
 import (
