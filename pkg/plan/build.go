@@ -39,7 +39,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
-	// Sync Top Repo
+	// Sync All
 	err = syncRepositories(p.body.Repositories)
 	if err != nil {
 		return err

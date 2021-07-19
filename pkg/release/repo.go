@@ -9,14 +9,9 @@ import (
 
 // RepoDeps returns repository for release
 func (rel *Config) RepoDeps() (repos []string, err error) {
-	err = rel.ChartDepsUpd()
-	if err != nil {
-		log.Warn("Cant get deps for ", rel.Uniq())
-	}
-
 	chart, err := rel.GetChart()
 	if err != nil {
-		log.Warn("Failed get chart")
+		log.Warn("Failed GetChart ", rel.Uniq())
 		return nil, err
 	}
 
