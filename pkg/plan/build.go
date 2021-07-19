@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -31,37 +30,17 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
-	// Build buildRepositories
-	reposTop, err := buildRepositories(
+	// Build Repositories
+	_, err = buildRepositories(
 		buildRepoMapTop(p.body.Releases),
 		p.body.Repositories,
 	)
-
-	log.Trace("repo top has been built")
 	if err != nil {
 		return err
 	}
+
 	// Sync Top Repo
-	err = syncRepositories(reposTop, helper.Helm)
-	if err != nil {
-		return err
-	}
-	log.Trace("repo top has been sync")
-
-	repoMap, err := buildRepoMapDeps(p.body.Releases)
-	if err != nil {
-		return err
-	}
-	log.Trace("repo MapAll has been built")
-
-	// Build buildRepositories
-	p.body.Repositories, err = buildRepositories(
-		repoMap,
-		p.body.Repositories,
-	)
-	log.Trace("repo ALL has been built")
-	// Sync All
-	err = syncRepositories(reposTop, helper.Helm)
+	err = syncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}

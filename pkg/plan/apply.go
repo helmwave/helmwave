@@ -13,7 +13,6 @@ import (
 	rep "github.com/helmwave/helmwave/pkg/repo"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
-	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
 )
 
@@ -21,14 +20,14 @@ var ErrDeploy = errors.New("deploy failed")
 
 func (p *Plan) Apply() (err error) {
 	log.Info("🗄 Sync repositories...")
-	err = syncRepositories(p.body.Repositories, helper.Helm)
+	err = syncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	//if len(p.body.Releases) == 0 {
-	//	return release.ErrEmpty
-	//}
+	if len(p.body.Releases) == 0 {
+		return nil
+	}
 
 	log.Info("🛥 Sync releases...")
 	err = p.syncReleases()
@@ -39,22 +38,22 @@ func (p *Plan) Apply() (err error) {
 	return nil
 }
 
-func syncRepositories(repositories []*rep.Config, helm *cli.EnvSettings) (err error) {
-	log.Trace("helm repository.yaml: ", helm.RepositoryConfig)
+func syncRepositories(repositories []*rep.Config) (err error) {
+	log.Trace("helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	f := &repo.File{}
 	// Create if not exits
-	if !helper.IsExists(helm.RepositoryConfig) {
+	if !helper.IsExists(helper.Helm.RepositoryConfig) {
 		f = repo.NewFile()
 	} else {
-		f, err = repo.LoadFile(helm.RepositoryConfig)
+		f, err = repo.LoadFile(helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
 	}
 
 	// Flock
-	lockPath := helm.RepositoryConfig + ".lock"
+	lockPath := helper.Helm.RepositoryConfig + ".lock"
 	fileLock := flock.New(lockPath)
 	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -70,7 +69,7 @@ func syncRepositories(repositories []*rep.Config, helm *cli.EnvSettings) (err er
 	for i := range repositories {
 		go func(wg *parallel.WaitGroup, i int) {
 			defer wg.Done()
-			err := repositories[i].Install(helm, f)
+			err := repositories[i].Install(helper.Helm, f)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -82,7 +81,7 @@ func syncRepositories(repositories []*rep.Config, helm *cli.EnvSettings) (err er
 		return err
 	}
 
-	err = f.WriteFile(helm.RepositoryConfig, os.FileMode(0o644))
+	err = f.WriteFile(helper.Helm.RepositoryConfig, os.FileMode(0o644))
 	if err != nil {
 		return err
 	}
