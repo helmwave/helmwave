@@ -19,7 +19,7 @@ func (rel *Config) GetChart() (*chart.Chart, error) {
 
 	ch, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, helper.Helm)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	c, err := loader.Load(ch)
@@ -51,6 +51,10 @@ func chartCheck(ch *chart.Chart) error {
 	}
 
 	return nil
+}
+
+func (rel *Config) ChartDepsUpd() error {
+	return chartDepsUpd(rel.Chart.Name)
 }
 
 func chartDepsUpd(name string) error {

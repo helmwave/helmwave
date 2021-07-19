@@ -3,7 +3,6 @@ package plan
 import (
 	"errors"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
 
@@ -42,15 +41,35 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 		return err
 	}
 
-	// Build RepoDeps
+	// Build buildRepositories
 	reposTop, err := buildRepositories(
 		buildRepoMapTop(p.body.Releases),
 		p.body.Repositories,
 	)
+	log.Trace("repo top has been built")
 	if err != nil {
 		return err
 	}
 	// Sync Top Repo
+	err = syncRepositories(reposTop, helper.Helm)
+	if err != nil {
+		return err
+	}
+	log.Trace("repo top has been sync")
+
+	repoMap, err := buildRepoMapDeps(p.body.Releases)
+	if err != nil {
+		return err
+	}
+	log.Trace("repo MapAll has been built")
+
+	// Build buildRepositories
+	p.body.Repositories, err = buildRepositories(
+		repoMap,
+		p.body.Repositories,
+	)
+	log.Trace("repo ALL has been built")
+	// Sync All
 	err = syncRepositories(reposTop, helper.Helm)
 	if err != nil {
 		return err
@@ -137,17 +156,14 @@ func (p *Plan) buildManifest() error {
 				log.Fatal(err)
 			}
 
-			var hooksManifests []string
-
+			hm := ""
 			for _, h := range r.Hooks {
-				hooksManifests = append(hooksManifests, h.Manifest)
+				hm += fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest)
 			}
 
-			hm, _ := yaml.Marshal(hooksManifests)
-
 			document := r.Manifest
-			if len(hooksManifests) > 0 {
-				document += "# Hooks\n" + string(hm)
+			if len(r.Hooks) > 0 {
+				document += "# ========= HOOKS ========\n" + hm
 			}
 
 			log.Trace(document)
