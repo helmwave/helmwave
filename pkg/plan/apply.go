@@ -3,6 +3,11 @@ package plan
 import (
 	"context"
 	"errors"
+	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/werf/kubedog/pkg/kube"
+	"github.com/werf/kubedog/pkg/tracker"
+	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
+	"k8s.io/client-go/kubernetes"
 	"os"
 	"time"
 
@@ -30,12 +35,23 @@ func (p *Plan) Apply() (err error) {
 	}
 
 	log.Info("🛥 Sync releases...")
-	err = p.syncReleases()
+	return p.syncReleases()
+}
+
+func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
+	log.Info("🗄 Sync repositories...")
+	err = syncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	if len(p.body.Releases) == 0 {
+		return nil
+	}
+
+	log.Info("🛥 Sync releases...")
+
+	return p.syncReleasesKubedog(kubedogConfig)
 }
 
 func syncRepositories(repositories []*rep.Config) (err error) {
@@ -156,4 +172,112 @@ func (p *Plan) ApplyReport(fails map[*release.Config]error) error {
 	}
 
 	return nil
+}
+
+func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) error {
+	mapSpecs, err := p.kubedogSpecs()
+	if err != nil {
+		return err
+	}
+
+	wg := parallel.NewWaitGroup()
+	//wg.Add(len(p.body.Releases))
+	wg.Add(1)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// KubeInit
+	err = kube.Init(kube.InitOptions{})
+	if err != nil {
+		return err
+	}
+
+	err = runMultiracks(ctx, mapSpecs, kubedogConfig, wg)
+	if err != nil {
+		return err
+	}
+
+	go func(wg *parallel.WaitGroup, cancel context.CancelFunc) {
+		defer wg.Done()
+		defer cancel()
+		wg.ErrChan() <- p.syncReleases()
+	}(wg, cancel)
+
+	return wg.Wait()
+
+}
+
+func runMultiracks(
+	ctx context.Context,
+	mapSpecs map[string]*multitrack.MultitrackSpecs,
+	kubedogConfig *kubedog.Config,
+	wg *parallel.WaitGroup,
+) error {
+
+	opts := multitrack.MultitrackOptions{
+		StatusProgressPeriod: kubedogConfig.StatusInterval,
+		Options: tracker.Options{
+			ParentContext: ctx,
+			Timeout:       kubedogConfig.Timeout,
+			LogsFromTime:  time.Now(),
+		},
+	}
+
+	for ns, specs := range mapSpecs {
+		// Todo Test it with different namespace
+		kube.Context = helper.Helm.KubeContext
+		kube.DefaultNamespace = ns
+
+		log.Info("🐶 kubedog for ", ns)
+
+		go func(
+			delay time.Duration,
+			kubeClient kubernetes.Interface,
+			specs multitrack.MultitrackSpecs,
+			opts multitrack.MultitrackOptions,
+			wg *parallel.WaitGroup,
+		) {
+			defer wg.Done()
+			time.Sleep(delay)
+			wg.Add(1)
+
+			wg.ErrChan() <- multitrack.Multitrack(kubeClient, specs, opts)
+		}(kubedogConfig.StartDelay, kube.Client, *specs, opts, wg)
+	}
+	return nil
+}
+
+func (p *Plan) kubedogSpecs() (map[string]*multitrack.MultitrackSpecs, error) {
+	mapSpecs := make(map[string]*multitrack.MultitrackSpecs)
+
+	for _, rel := range p.body.Releases {
+		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
+		relSpecs, err := kubedog.MakeSpecs(manifest, rel.Namespace)
+		if err != nil {
+			return nil, err
+		}
+
+		log.WithFields(log.Fields{
+			"Deployments":  len(relSpecs.Deployments),
+			"Jobs":         len(relSpecs.Jobs),
+			"DaemonSets":   len(relSpecs.DaemonSets),
+			"StatefulSets": len(relSpecs.StatefulSets),
+		}).Tracef("%s specs", rel.Uniq())
+
+		nsSpec, found := mapSpecs[rel.Namespace]
+		if found {
+			// Merge
+			nsSpec.DaemonSets = append(nsSpec.DaemonSets, relSpecs.DaemonSets...)
+			nsSpec.Deployments = append(nsSpec.Deployments, relSpecs.Deployments...)
+			nsSpec.StatefulSets = append(nsSpec.StatefulSets, relSpecs.StatefulSets...)
+			nsSpec.Jobs = append(nsSpec.Jobs, relSpecs.Jobs...)
+			mapSpecs[rel.Namespace] = nsSpec
+		} else {
+			mapSpecs[rel.Namespace] = relSpecs
+		}
+
+	}
+
+	return mapSpecs, nil
 }

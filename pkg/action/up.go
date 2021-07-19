@@ -1,6 +1,7 @@
 package action
 
 import (
+	log "github.com/sirupsen/logrus"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -9,9 +10,9 @@ import (
 )
 
 type Up struct {
-	dog     *kubedog.Config
-	plandir string
-	kubedog bool
+	dog            *kubedog.Config
+	plandir        string
+	kubedogEnabled bool
 }
 
 func (i *Up) Run() error {
@@ -21,6 +22,11 @@ func (i *Up) Run() error {
 	}
 
 	p.PrettyPlan()
+
+	if i.kubedogEnabled {
+		log.Warn("🐶 kubedog is enable")
+		return p.ApplyWithKubedog(i.dog)
+	}
 
 	return p.Apply()
 }
@@ -38,8 +44,8 @@ func (i *Up) Cmd() *cli.Command {
 				Name:        "kubedog",
 				Usage:       "Enable/Disable kubedog",
 				Value:       false,
-				EnvVars:     []string{"HELMWAVE_KUBEDOG"},
-				Destination: &i.kubedog,
+				EnvVars:     []string{"HELMWAVE_KUBEDOG_ENABLED", "HELMWAVE_KUBEDOG"},
+				Destination: &i.kubedogEnabled,
 			},
 			&cli.DurationFlag{
 				Name:        "kubedog-status-interval",

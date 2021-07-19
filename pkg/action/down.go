@@ -15,7 +15,7 @@ func (i *Down) Run() error {
 	if err := p.Import(); err != nil {
 		return err
 	}
-	return p.Apply()
+	return p.Destroy()
 }
 
 func (i *Down) Cmd() *cli.Command {
