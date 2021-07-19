@@ -9,6 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -60,7 +61,7 @@ func (rel *Config) ChartDepsUpd() error {
 func chartDepsUpd(name string) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
-		Out:              os.Stdout,
+		Out:              io.Discard,
 		ChartPath:        filepath.Clean(name),
 		Keyring:          client.Keyring,
 		SkipUpdate:       client.SkipRefresh,
@@ -72,5 +73,10 @@ func chartDepsUpd(name string) error {
 	if client.Verify {
 		man.Verify = downloader.VerifyAlways
 	}
+
+	if helper.Helm.Debug {
+		man.Out = os.Stdout
+	}
+
 	return man.Update()
 }
