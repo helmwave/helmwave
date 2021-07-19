@@ -16,6 +16,11 @@ func (p *Plan) buildManifest() error {
 			defer wg.Done()
 
 			rel.DryRun(true)
+
+			err := rel.ChartDepsUpd()
+			if err != nil {
+				log.Warn(err)
+			}
 			r, err := rel.Sync()
 			rel.DryRun(false)
 			if err != nil || r == nil {
