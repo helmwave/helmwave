@@ -2,14 +2,15 @@ package template
 
 import (
 	"fmt"
-	"golang.org/x/sync/errgroup"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"reflect"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
+	"gopkg.in/yaml.v2"
 )
 
 type Values = map[string]interface{}
@@ -26,7 +27,7 @@ func FromYaml(str string) (Values, error) {
 	m := Values{}
 
 	if err := yaml.Unmarshal([]byte(str), &m); err != nil {
-		return nil, fmt.Errorf("%s, offending yaml: %s", err, str)
+		return nil, fmt.Errorf("%w, offending yaml: %s", err, str)
 	}
 	return m, nil
 }
@@ -39,16 +40,16 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 
 	strArgs := make([]string, len(args))
 	for i, a := range args {
-		switch a.(type) {
+		switch a := a.(type) {
 		case string:
-			strArgs[i] = a.(string)
+			strArgs[i] = a
 		default:
 			return "", fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
 		}
 	}
 
 	cmd := exec.Command(command, strArgs...)
-	//cmd.Dir = c.basePath
+	// cmd.Dir = c.basePath
 
 	g := errgroup.Group{}
 
@@ -68,7 +69,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 			for {
 				n, err := io.WriteString(stdin, input[i:])
 				if err != nil {
-					return fmt.Errorf("failed while writing %d bytes to stdin of \"%s\": %v", len(input), command, err)
+					return fmt.Errorf("failed while writing %d bytes to stdin of \"%s\": %w", len(input), command, err)
 				}
 
 				i += n
@@ -194,7 +195,12 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 		def = varArgs[0]
 		obj = varArgs[1]
 	default:
-		return nil, fmt.Errorf("unexpected number of args pased to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
+		return nil, fmt.Errorf(
+			"unexpected number of args passed to the template function get(path, [def, ]obj): "+
+				"expected 1 or 2, got %d, args was %v",
+			len(varArgs),
+			varArgs,
+		)
 	}
 
 	if path == "" {
@@ -223,7 +229,13 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	default:
 		maybeStruct := reflect.ValueOf(typedObj)
 		if maybeStruct.Kind() != reflect.Struct {
-			return nil, &noValueError{fmt.Sprintf("unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct", reflect.TypeOf(obj), keys[0])}
+			return nil, &noValueError{
+				fmt.Sprintf(
+					"unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct",
+					reflect.TypeOf(obj),
+					keys[0],
+				),
+			}
 		} else if maybeStruct.NumField() < 1 {
 			return nil, &noValueError{fmt.Sprintf("no accessible struct fields for key \"%s\"", keys[0])}
 		}
@@ -257,7 +269,12 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 		def = varArgs[0]
 		obj = varArgs[1]
 	default:
-		return false, fmt.Errorf("unexpected number of args pased to the template function get(path, [def, ]obj): expected 1 or 2, got %d, args was %v", len(varArgs), varArgs)
+		return false, fmt.Errorf(
+			"unexpected number of args passed to the template function get(path, [def, ]obj): "+
+				"expected 1 or 2, got %d, args was %v",
+			len(varArgs),
+			varArgs,
+		)
 	}
 
 	if path == "" {
@@ -280,7 +297,13 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	default:
 		maybeStruct := reflect.ValueOf(typedObj)
 		if maybeStruct.Kind() != reflect.Struct {
-			return false, &noValueError{fmt.Sprintf("unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct", reflect.TypeOf(obj), keys[0])}
+			return false, &noValueError{
+				fmt.Sprintf(
+					"unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct",
+					reflect.TypeOf(obj),
+					keys[0],
+				),
+			}
 		} else if maybeStruct.NumField() < 1 {
 			return false, &noValueError{fmt.Sprintf("no accessible struct fields for key \"%s\"", keys[0])}
 		}

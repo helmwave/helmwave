@@ -1,24 +1,44 @@
 package main
 
 import (
-	helmwaveCli "github.com/helmwave/helmwave/pkg/cli"
-	"github.com/helmwave/helmwave/pkg/helmwave"
+	"os"
+
+	"github.com/helmwave/helmwave/pkg/action"
+	logSetup "github.com/helmwave/helmwave/pkg/log"
+	helmwave "github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"os"
 )
 
+var commands = []*cli.Command{
+	new(action.Build).Cmd(),
+	new(action.Diff).Cmd(),
+	new(action.Up).Cmd(),
+	new(action.List).Cmd(),
+	new(action.Rollback).Cmd(),
+	new(action.Status).Cmd(),
+	new(action.Down).Cmd(),
+	new(action.Validate).Cmd(),
+	new(action.Yml).Cmd(),
+	completion(),
+}
+
 func main() {
-	app = helmwaveCli.New()
 	c := cli.NewApp()
 	c.EnableBashCompletion = true
-	c.CommandNotFound = helmwave.Command404
+	c.Usage = "is like docker-compose for helm"
+	c.Version = helmwave.Version
+	c.Description =
+		"This tool helps you compose your helm releases!\n" +
+			"0. $ helmwave yml\n" +
+			"1. $ helmwave build\n" +
+			"2. $ helmwave apply\n"
 
-	c.Usage = "composer for helm"
-	c.Version = app.Version
-	c.Flags = flags(app)
-	c.Commands = commands()
-	c.Description = "🏖 This tool helps you compose your helm releases!"
+	logSet := logSetup.Settings{}
+	c.Before = logSet.Run
+	c.Flags = logSet.Flags()
+
+	c.Commands = commands
 
 	err := c.Run(os.Args)
 	if err != nil {

@@ -1,53 +1,53 @@
 package release
 
 import (
-	"errors"
-	"github.com/helmwave/helmwave/pkg/pubsub"
-	log "github.com/sirupsen/logrus"
 	"sort"
 	"time"
+
+	"github.com/helmwave/helmwave/pkg/pubsub"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	log "github.com/sirupsen/logrus"
 )
 
 var releasePubSub = pubsub.NewReleasePubSub()
-var DependencyFailedError = errors.New("dependency failed")
 
 func (rel *Config) NotifySuccess() {
-	if !rel.Options.DryRun {
-		releasePubSub.PublishSuccess(rel.UniqName())
+	if !rel.dryRun {
+		releasePubSub.PublishSuccess(rel.Uniq())
 	}
 }
 
 func (rel *Config) NotifyFailed() {
-	if !rel.Options.DryRun {
-		releasePubSub.PublishFailed(rel.UniqName())
+	if !rel.dryRun {
+		releasePubSub.PublishFailed(rel.Uniq())
 	}
 }
 
-func (rel *Config) addDependency(name string) {
+func (rel *Config) addDependency(name uniqname.UniqName) {
 	ch := releasePubSub.Subscribe(name)
 
 	if rel.dependencies == nil {
-		rel.dependencies = make(map[string]<-chan pubsub.ReleaseStatus)
+		rel.dependencies = make(map[uniqname.UniqName]<-chan pubsub.ReleaseStatus)
 	}
 
 	rel.dependencies[name] = ch
 }
 
 func (rel *Config) waitForDependencies() (err error) {
-	if rel.Options.DryRun {
+	if rel.dryRun {
 		return nil
 	}
 
 	for name, ch := range rel.dependencies {
 		status := rel.waitForDependency(ch, name)
 		if status == pubsub.ReleaseFailed {
-			err = DependencyFailedError
+			err = ErrDepFailed
 		}
 	}
 	return
 }
 
-func (rel *Config) waitForDependency(ch <-chan pubsub.ReleaseStatus, name string) pubsub.ReleaseStatus {
+func (rel *Config) waitForDependency(ch <-chan pubsub.ReleaseStatus, name uniqname.UniqName) pubsub.ReleaseStatus {
 	ticker := time.NewTicker(5 * time.Second)
 	var status pubsub.ReleaseStatus
 
@@ -58,10 +58,10 @@ F:
 			ticker.Stop()
 			break F
 		case <-ticker.C:
-			log.Infof("release %s is waiting for dependency %s", rel.Name, name)
+			log.Infof("release %s is waiting for dependency %s", rel.Uniq(), name)
 		}
 	}
-	log.Infof("dependency %s of release %s done", name, rel.Name)
+	log.Infof("dependency %s of release %s done", name, rel.Uniq())
 	return status
 }
 
@@ -70,10 +70,10 @@ func (rel *Config) HandleDependencies(releases []*Config) {
 
 	depsAdded := make(map[string]bool)
 	for _, r := range releases {
-		name := r.UniqName()
-		if i := sort.SearchStrings(rel.DependsOn, name); i < len(rel.DependsOn) && rel.DependsOn[i] == name {
+		name := r.Uniq()
+		if i := sort.SearchStrings(rel.DependsOn, string(name)); i < len(rel.DependsOn) && rel.DependsOn[i] == string(name) {
 			rel.addDependency(name)
-			depsAdded[name] = true
+			depsAdded[string(name)] = true
 		}
 	}
 

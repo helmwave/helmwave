@@ -3,8 +3,10 @@
 package pubsub
 
 import (
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/stretchr/testify/suite"
 )
 
 type PubSubTestSuite struct {
@@ -17,7 +19,7 @@ func (s *PubSubTestSuite) SetupTest() {
 }
 
 func (s *PubSubTestSuite) TestPublishFalied() {
-	release := "blabla1"
+	release := uniqname.UniqName("blabla1")
 	ch := s.ps.Subscribe(release)
 
 	s.ps.PublishFailed(release)
@@ -27,7 +29,7 @@ func (s *PubSubTestSuite) TestPublishFalied() {
 }
 
 func (s *PubSubTestSuite) TestPublishSuccess() {
-	release := "blabla2"
+	release := uniqname.UniqName("blabla2")
 	ch := s.ps.Subscribe(release)
 
 	s.ps.PublishSuccess(release)
@@ -37,7 +39,7 @@ func (s *PubSubTestSuite) TestPublishSuccess() {
 }
 
 func (s *PubSubTestSuite) TestSubscribe() {
-	release := "blabla3"
+	release := uniqname.UniqName("blabla3")
 	ch1 := s.ps.Subscribe(release)
 
 	s.NotNil(s.ps.subs)

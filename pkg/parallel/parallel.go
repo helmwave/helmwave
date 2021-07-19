@@ -1,8 +1,9 @@
 package parallel
 
 import (
-	"github.com/hashicorp/go-multierror"
 	"sync"
+
+	"github.com/hashicorp/go-multierror"
 )
 
 type WaitGroup struct {

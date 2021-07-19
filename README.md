@@ -44,12 +44,12 @@ Call helm | via Golang Module | Shell Executor
 
 ```
 $ docker run diamon/helmwave version
-helmwave version 0.9.2
+helmwave version 0.12.0
 $ docker run --entrypoint=ash -it --rm diamon/helmwave
 / # 
 ```
 
 ## 📖 [Documentation](https://helmwave.github.io/)
 
-Documentation is hosted live at https://helmwave.github.io
+Documentation available at https://helmwave.github.io
 

@@ -2,16 +2,19 @@ package kubedog
 
 import (
 	"fmt"
-	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 )
 
 func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
-	for _, r := range m {
+	for i := 0; i < len(m); i++ {
+		r := &m[i]
+
 		switch r.Kind {
 		case "Deployment":
 			s, err := r.MakeMultiTrackSpec(ns)
@@ -43,12 +46,11 @@ func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	return specs, nil
 }
 
-// BolgenOS on max
 func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, error) {
 	// Default spec
 	spec := &multitrack.MultitrackSpec{
 		ResourceName: r.Name,
-		//Namespace:               r.Namespace,
+		// Namespace:               r.Namespace,
 		Namespace:               ns,
 		LogRegexByContainerName: map[string]*regexp.Regexp{},
 		TrackTerminationMode:    multitrack.WaitUntilResourceReady,

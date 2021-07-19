@@ -1,0 +1,2 @@
+image:
+  pullPolicy: {{ .Release.Store.pullPolicy }}
