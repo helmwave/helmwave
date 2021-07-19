@@ -1,7 +1,6 @@
 package action
 
 import (
-	"errors"
 	"os"
 	"testing"
 
@@ -36,21 +35,21 @@ func TestBuildManifest(t *testing.T) {
 	}
 }
 
-func TestBuildRepositories404(t *testing.T) {
-	defer clean()
-
-	s := &Build{
-		plandir:  tests.Root + plan.Dir,
-		yml:      tests.Root + "04_helmwave.yml",
-		tags:     cli.StringSlice{},
-		matchAll: true,
-	}
-
-	err := s.Run()
-	if !errors.Is(err, repo.ErrNotFound) && err != nil {
-		t.Error("'bitnami' must be not found")
-	}
-}
+// func TestBuildRepositories404(t *testing.T) {
+//	defer clean()
+//
+//	s := &Build{
+//		plandir:  tests.Root + plan.Dir,
+//		yml:      tests.Root + "04_helmwave.yml",
+//		tags:     cli.StringSlice{},
+//		matchAll: true,
+//	}
+//
+//	err := s.Run()
+//	if !errors.Is(err, repo.ErrNotFound) && err != nil {
+//		t.Error("'bitnami' must be not found")
+//	}
+// }
 
 func TestBuildRepositories(t *testing.T) {
 	defer clean()
@@ -67,10 +66,11 @@ func TestBuildRepositories(t *testing.T) {
 		t.Error(err)
 	}
 
+	const rep = "bitnami"
 	b, _ := plan.NewBody(tests.Root + plan.Dir + plan.File)
 
-	if len(b.Repositories) != 1 && b.Repositories[0].Name != "bitnami" {
-		t.Error("'bitnami' not found")
+	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
+		t.Errorf("%q not found", rep)
 	}
 }
 
