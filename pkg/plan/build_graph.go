@@ -2,11 +2,12 @@ package plan
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/lempiy/dgraph"
 	"github.com/lempiy/dgraph/core"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 func buildGraphMD(releases []*release.Config) string {

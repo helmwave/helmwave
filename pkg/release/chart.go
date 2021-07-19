@@ -2,6 +2,10 @@ package release
 
 import (
 	"errors"
+	"io"
+	"os"
+	"path/filepath"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
@@ -9,9 +13,6 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
-	"io"
-	"os"
-	"path/filepath"
 )
 
 func (rel *Config) GetChart() (*chart.Chart, error) {
@@ -28,12 +29,11 @@ func (rel *Config) GetChart() (*chart.Chart, error) {
 		return nil, err
 	}
 
-	if err = chartCheck(c); err != nil {
+	if err := chartCheck(c); err != nil {
 		return nil, err
 	}
 
 	return c, nil
-
 }
 
 func chartCheck(ch *chart.Chart) error {

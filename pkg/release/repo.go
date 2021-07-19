@@ -4,8 +4,8 @@ import (
 	"strings"
 )
 
-//// RepoDeps returns repository for release
-//func (rel *Config) RepoDeps() (repos []string, err error) {
+// // RepoDeps returns repository for release
+// func (rel *Config) RepoDeps() (repos []string, err error) {
 //	chart, err := rel.GetChart()
 //	if err != nil {
 //		log.Warn("Failed GetChart ", rel.Uniq())
@@ -24,7 +24,7 @@ import (
 //	}
 //
 //	return repos, nil
-//}
+// }
 
 func (rel *Config) Repo() string {
 	return strings.Split(rel.Chart.Name, "/")[0]

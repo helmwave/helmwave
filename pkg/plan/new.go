@@ -2,7 +2,6 @@ package plan
 
 import (
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"path/filepath"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 

@@ -1,11 +1,11 @@
 package action
 
 import (
-	log "github.com/sirupsen/logrus"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 

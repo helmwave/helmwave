@@ -1,8 +1,9 @@
 package plan
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Build plan with yml and tags/matchALL options

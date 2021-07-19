@@ -42,7 +42,7 @@ func (rel *Config) Cfg() *action.Configuration {
 	return rel.cfg
 }
 
-//func (rel *Config) helm() (*helm.EnvSettings, error) {
+// func (rel *Config) helm() (*helm.EnvSettings, error) {
 //	env := helm.New()
 //	fs := &pflag.FlagSet{}
 //	env.AddFlags(fs)
@@ -53,4 +53,4 @@ func (rel *Config) Cfg() *action.Configuration {
 //	}
 //
 //	return env, nil
-//}
+// }

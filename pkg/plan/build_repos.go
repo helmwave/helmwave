@@ -2,10 +2,11 @@ package plan
 
 import (
 	"errors"
+	"os"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out []*repo.Config, err error) {
@@ -28,7 +29,7 @@ func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out [
 	return out, nil
 }
 
-//func buildRepoMapDeps(releases []*release.Config) (map[string][]*release.Config, error) {
+// func buildRepoMapDeps(releases []*release.Config) (map[string][]*release.Config, error) {
 //	m := make(map[string][]*release.Config)
 //	for _, rel := range releases {
 //		reps, err := rel.RepoDeps()
@@ -48,7 +49,7 @@ func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out [
 //
 //	return m, nil
 //
-//}
+// }
 
 func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 	m := make(map[string][]*release.Config)
@@ -59,8 +60,8 @@ func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 	return m
 }
 
-//// allRepos for releases
-//func allRepos(releases []*release.Config) ([]string, error) {
+// // allRepos for releases
+// func allRepos(releases []*release.Config) ([]string, error) {
 //	var all []string
 //	for _, rel := range releases {
 //		r, err := rel.RepoDeps()
@@ -72,7 +73,7 @@ func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 //	}
 //
 //	return all, nil
-//}
+// }
 
 // repoIsLocal return true if repo is dir
 func repoIsLocal(repoString string) bool {

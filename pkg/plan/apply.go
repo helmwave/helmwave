@@ -3,22 +3,22 @@ package plan
 import (
 	"context"
 	"errors"
-	"github.com/helmwave/helmwave/pkg/kubedog"
-	"github.com/werf/kubedog/pkg/kube"
-	"github.com/werf/kubedog/pkg/tracker"
-	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
-	"k8s.io/client-go/kubernetes"
 	"os"
 	"time"
 
 	"github.com/gofrs/flock"
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	rep "github.com/helmwave/helmwave/pkg/repo"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
+	"github.com/werf/kubedog/pkg/kube"
+	"github.com/werf/kubedog/pkg/tracker"
+	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"helm.sh/helm/v3/pkg/repo"
+	"k8s.io/client-go/kubernetes"
 )
 
 var ErrDeploy = errors.New("deploy failed")
@@ -181,7 +181,7 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) error {
 	}
 
 	wg := parallel.NewWaitGroup()
-	//wg.Add(len(p.body.Releases))
+	// wg.Add(len(p.body.Releases))
 	wg.Add(1)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -205,16 +205,13 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) error {
 	}(wg, cancel)
 
 	return wg.Wait()
-
 }
 
 func runMultiracks(
 	ctx context.Context,
 	mapSpecs map[string]*multitrack.MultitrackSpecs,
 	kubedogConfig *kubedog.Config,
-	wg *parallel.WaitGroup,
-) error {
-
+	wg *parallel.WaitGroup) error {
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogConfig.StatusInterval,
 		Options: tracker.Options{
@@ -276,7 +273,6 @@ func (p *Plan) kubedogSpecs() (map[string]*multitrack.MultitrackSpecs, error) {
 		} else {
 			mapSpecs[rel.Namespace] = relSpecs
 		}
-
 	}
 
 	return mapSpecs, nil
