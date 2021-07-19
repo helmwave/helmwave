@@ -44,7 +44,7 @@ func (i *Build) Run() error {
 
 	log.WithField(
 		"deploy it with next command",
-		"helmwave deploy --plandir "+i.plandir,
+		"helmwave up --plandir "+i.plandir,
 	).Info("🏗 Planfile is ready!")
 
 	return nil
