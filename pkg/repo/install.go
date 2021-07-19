@@ -30,6 +30,8 @@ func (rep *Config) Install(settings *helm.EnvSettings, f *repo.File) error {
 
 	chartRepo.CachePath = settings.RepositoryCache
 
+	// Hang tight while we grab the latest from your chart repositories...
+	log.Debugf("Download IndexFile for %q", chartRepo.Config.Name)
 	_, err = chartRepo.DownloadIndexFile()
 	if err != nil {
 		log.Warnf("⚠️ looks like %v is not a valid chart repository or cannot be reached", rep.URL)

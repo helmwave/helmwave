@@ -28,27 +28,27 @@ func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out [
 	return out, nil
 }
 
-func buildRepoMapDeps(releases []*release.Config) (map[string][]*release.Config, error) {
-	m := make(map[string][]*release.Config)
-	for _, rel := range releases {
-		reps, err := rel.RepoDeps()
-		if err != nil {
-			return nil, err
-		}
-
-		log.WithFields(log.Fields{
-			"release":      rel.Uniq(),
-			"repositories": reps,
-		}).Trace("RepoDeps names")
-
-		for _, rep := range reps {
-			m[rep] = append(m[rep], rel)
-		}
-	}
-
-	return m, nil
-
-}
+//func buildRepoMapDeps(releases []*release.Config) (map[string][]*release.Config, error) {
+//	m := make(map[string][]*release.Config)
+//	for _, rel := range releases {
+//		reps, err := rel.RepoDeps()
+//		if err != nil {
+//			return nil, err
+//		}
+//
+//		log.WithFields(log.Fields{
+//			"release":      rel.Uniq(),
+//			"repositories": reps,
+//		}).Trace("RepoDeps names")
+//
+//		for _, rep := range reps {
+//			m[rep] = append(m[rep], rel)
+//		}
+//	}
+//
+//	return m, nil
+//
+//}
 
 func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 	m := make(map[string][]*release.Config)
@@ -59,20 +59,20 @@ func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 	return m
 }
 
-// allRepos for releases
-func allRepos(releases []*release.Config) ([]string, error) {
-	var all []string
-	for _, rel := range releases {
-		r, err := rel.RepoDeps()
-		if err != nil {
-			return nil, err
-		}
-
-		all = append(all, r...)
-	}
-
-	return all, nil
-}
+//// allRepos for releases
+//func allRepos(releases []*release.Config) ([]string, error) {
+//	var all []string
+//	for _, rel := range releases {
+//		r, err := rel.RepoDeps()
+//		if err != nil {
+//			return nil, err
+//		}
+//
+//		all = append(all, r...)
+//	}
+//
+//	return all, nil
+//}
 
 // repoIsLocal return true if repo is dir
 func repoIsLocal(repoString string) bool {
