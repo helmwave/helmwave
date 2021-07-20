@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/action"
@@ -20,6 +21,7 @@ var commands = []*cli.Command{
 	new(action.Down).Cmd(),
 	new(action.Validate).Cmd(),
 	new(action.Yml).Cmd(),
+	version(),
 	completion(),
 }
 
@@ -50,4 +52,16 @@ func main() {
 func command404(c *cli.Context, s string) {
 	log.Errorf("👻 Command %q not found", s)
 	os.Exit(127)
+}
+
+func version() *cli.Command {
+	return &cli.Command{
+		Name:    "version",
+		Aliases: []string{"ver"},
+		Usage:   "Show shorts version",
+		Action: func(c *cli.Context) error {
+			fmt.Println(helmwave.Version)
+			return nil
+		},
+	}
 }
