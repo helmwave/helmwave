@@ -60,7 +60,7 @@ func version() *cli.Command {
 		Aliases: []string{"ver"},
 		Usage:   "Show shorts version",
 		Action: func(c *cli.Context) error {
-			fmt.Println(helmwave.Version)
+			fmt.Println(helmwave.Version) // nolint:forbidigo
 			return nil
 		},
 	}
