@@ -15,7 +15,7 @@ builds:
         goarch: 386
     main: ./cmd/helmwave
     ldflags:
-      - -s -w -X github.com/helmwave/helmwave/pkg/helmwave.Version={{.Version}}
+      - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}
 
 archives:
   - format_overrides:
@@ -39,6 +39,7 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+      - '^WIP:'
       - Merge pull request
       - Merge branch
       - go mod tidy
