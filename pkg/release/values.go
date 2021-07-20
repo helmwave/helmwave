@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"os"
+	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -73,8 +74,7 @@ func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	h.Write([]byte(v.Src))
 	sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
-	// Todo: fmt.Sprintf
-	dst := dir + "values/" + string(rel.Uniq()) + "/" + sha + ".yml"
+	dst := filepath.Join(dir, "values/", string(rel.Uniq()), "/", sha, ".yml")
 
 	log.WithFields(log.Fields{
 		"release": rel.Uniq(),
