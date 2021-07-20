@@ -39,9 +39,15 @@ func main() {
 	c.Flags = logSet.Flags()
 
 	c.Commands = commands
+	c.CommandNotFound = command404
 
 	err := c.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func command404(c *cli.Context, s string) {
+	log.Errorf("👻 Command %q not found", s)
+	os.Exit(127)
 }
