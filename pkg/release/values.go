@@ -2,7 +2,7 @@ package release
 
 import (
 	"crypto/sha1"
-	"encoding/base64"
+	"encoding/hex"
 	"os"
 	"path/filepath"
 
@@ -64,6 +64,11 @@ func (v *ValuesReference) Set(dst string) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		err := os.Rename(v.Src, v.dst)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -72,9 +77,11 @@ func (v *ValuesReference) Set(dst string) error {
 func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	h := sha1.New() // nolint:gosec
 	h.Write([]byte(v.Src))
-	sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	hash := h.Sum(nil)
+	hs := hex.EncodeToString(hash)
+	//b64 := base64.URLEncoding.EncodeToString(hash)
 
-	dst := filepath.Join(dir, "values/", string(rel.Uniq()), "/", sha, ".yml")
+	dst := filepath.Join(dir, "values", string(rel.Uniq()), hs+".yml")
 
 	log.WithFields(log.Fields{
 		"release": rel.Uniq(),
@@ -100,10 +107,10 @@ func (rel *Config) BuildValues(dir string) error {
 			defer wg.Done()
 			err := rel.Values[i].SetViaRelease(rel, dir)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal(rel.Uniq(), " : ", err)
 			}
 
-			// log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
+			log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
 		}(wg, i)
 	}
 

@@ -2,6 +2,7 @@ package plan
 
 import (
 	"os"
+	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -26,7 +27,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases))
 
 	// Build Values
-	err = p.buildValues(os.TempDir())
+	err = p.buildValues(filepath.Join(os.TempDir(), Dir))
 	if err != nil {
 		return err
 	}
