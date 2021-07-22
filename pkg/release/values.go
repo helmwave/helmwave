@@ -2,8 +2,9 @@ package release
 
 import (
 	"crypto/sha1"
-	"encoding/base64"
+	"encoding/hex"
 	"os"
+	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -55,40 +56,34 @@ func (v *ValuesReference) Get() string {
 	return v.dst
 }
 
-func (v *ValuesReference) Set(dst string) error {
-	v.dst = dst
-
-	if v.isURL() {
-		err := v.Download()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	h := sha1.New() // nolint:gosec
 	h.Write([]byte(v.Src))
-	sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	hash := h.Sum(nil)
+	hs := hex.EncodeToString(hash)
+	// b64 := base64.URLEncoding.EncodeToString(hash)
 
-	// Todo: fmt.Sprintf
-	dst := dir + "values/" + string(rel.Uniq()) + "/" + sha + ".yml"
+	v.dst = filepath.Join(dir, "values", string(rel.Uniq()), hs+".yml")
 
 	log.WithFields(log.Fields{
 		"release": rel.Uniq(),
 		"src":     v.Src,
-		"dst":     dst,
-	}).Debug("Building values reference")
+		"dst":     v.dst,
+	}).Trace("Building values reference")
 
-	err := v.Set(dst)
-	if err != nil {
-		log.Warn(v.Src, " skipping: ", err)
+	if v.isURL() {
+		err := v.Download()
+		if err != nil {
+			log.Warn(v.Src, "skipping: cant download ", err)
+			return nil
+		}
+		return template.Tpl2yml(v.dst, v.dst, struct{ Release *Config }{rel})
+	} else if !helper.IsExists(v.Src) {
+		log.Warn(v.Src, "skipping: local not found")
 		return nil
 	}
 
-	return template.Tpl2yml(dst, dst, struct{ Release *Config }{rel})
+	return template.Tpl2yml(v.Src, v.dst, struct{ Release *Config }{rel})
 }
 
 func (rel *Config) BuildValues(dir string) error {
@@ -100,10 +95,15 @@ func (rel *Config) BuildValues(dir string) error {
 			defer wg.Done()
 			err := rel.Values[i].SetViaRelease(rel, dir)
 			if err != nil {
-				log.Fatal(err)
+				log.WithFields(log.Fields{
+					"release": rel.Uniq(),
+					"err":     err,
+					"values":  rel.Values[i],
+				}).Fatal("Values failed")
 			}
 
 			// log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
+			log.Info(rel.Uniq(), " values are ok ")
 		}(wg, i)
 	}
 

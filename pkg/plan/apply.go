@@ -61,6 +61,11 @@ func syncRepositories(repositories []*rep.Config) (err error) {
 	// Create if not exits
 	if !helper.IsExists(helper.Helm.RepositoryConfig) {
 		f = repo.NewFile()
+
+		_, err = helper.CreateFile(helper.Helm.RepositoryConfig)
+		if err != nil {
+			return err
+		}
 	} else {
 		f, err = repo.LoadFile(helper.Helm.RepositoryConfig)
 		if err != nil {
