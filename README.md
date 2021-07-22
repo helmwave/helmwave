@@ -32,11 +32,12 @@ Helm 3 |✅|✅
 Helm 2 |❌|✅
 Parallel helm install/upgrade |✅|❌
 Repository Skipping|✅|❌
-Install only needs repositories|✅|❌
 Tags|✅| You can use labels
 Store|✅| You can use labels
 Planfile|✅|❌
+remote values | ✅ | ❌
 Sprig | ✅|✅
+helm-diff  | ✅  in-compile |✅ as plugin
 Call helm | via Golang Module | Shell Executor
 
 
@@ -44,7 +45,7 @@ Call helm | via Golang Module | Shell Executor
 
 ```
 $ docker run diamon/helmwave version
-helmwave version 0.12.0
+0.12.1
 $ docker run --entrypoint=ash -it --rm diamon/helmwave
 / # 
 ```
