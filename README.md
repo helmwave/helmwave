@@ -50,7 +50,7 @@ $ docker run --entrypoint=ash -it --rm diamon/helmwave
 / # 
 ```
 
-## 📖 [Documentation](https://helmwave.github.io/)
+## 📖 [Documentation](https://helmwave.github.io/docs)
 
-Documentation available at https://helmwave.github.io
+Documentation available at https://helmwave.github.io/docs
 
