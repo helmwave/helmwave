@@ -97,10 +97,15 @@ func (rel *Config) BuildValues(dir string) error {
 			defer wg.Done()
 			err := rel.Values[i].SetViaRelease(rel, dir)
 			if err != nil {
-				log.Fatal(rel.Uniq(), " : ", err)
+				log.WithFields(log.Fields{
+					"release": rel.Uniq(),
+					"err":     err,
+					"values":  rel.Values[i],
+				}).Fatal("Values failed")
 			}
 
-			log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
+			//log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
+			log.Info(rel.Uniq(), " values are ok ")
 		}(wg, i)
 	}
 
