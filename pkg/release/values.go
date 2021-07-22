@@ -61,7 +61,7 @@ func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	h.Write([]byte(v.Src))
 	hash := h.Sum(nil)
 	hs := hex.EncodeToString(hash)
-	//b64 := base64.URLEncoding.EncodeToString(hash)
+	// b64 := base64.URLEncoding.EncodeToString(hash)
 
 	v.dst = filepath.Join(dir, "values", string(rel.Uniq()), hs+".yml")
 
@@ -77,9 +77,7 @@ func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 			log.Warn(v.Src, "skipping: cant download ", err)
 			return nil
 		}
-
 		return template.Tpl2yml(v.dst, v.dst, struct{ Release *Config }{rel})
-
 	} else if !helper.IsExists(v.Src) {
 		log.Warn(v.Src, "skipping: local not found")
 		return nil
@@ -104,7 +102,7 @@ func (rel *Config) BuildValues(dir string) error {
 				}).Fatal("Values failed")
 			}
 
-			//log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
+			// log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
 			log.Info(rel.Uniq(), " values are ok ")
 		}(wg, i)
 	}
