@@ -16,6 +16,8 @@ func (p *Plan) buildValues(dir string) error {
 			err := rel.BuildValues(dir)
 			if err != nil {
 				log.Fatal(err)
+			} else {
+				log.Info()
 			}
 		}(wg, rel)
 	}

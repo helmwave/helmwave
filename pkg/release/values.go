@@ -101,9 +101,6 @@ func (rel *Config) BuildValues(dir string) error {
 					"values":  rel.Values[i],
 				}).Fatal("Values failed")
 			}
-
-			// log.WithField("values", rel.Values).Info(rel.Uniq(), " values are ok ")
-			log.Info(rel.Uniq(), " values are ok ")
 		}(wg, i)
 	}
 

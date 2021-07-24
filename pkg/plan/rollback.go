@@ -13,10 +13,11 @@ func (p *Plan) Rollback() error {
 	for i := range p.body.Releases {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
-			log.Info(rel.Uniq(), " rollback...")
 			err := rel.Rollback()
 			if err != nil {
-				log.Warn(err)
+				log.Errorf("❌ %s: %v", rel.Uniq(), err)
+			} else {
+				log.Infof("✅ %s rollback!", rel.Uniq())
 			}
 		}(wg, p.body.Releases[i])
 	}
