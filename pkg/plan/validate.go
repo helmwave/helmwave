@@ -15,7 +15,7 @@ func (p *Plan) ValidateValues() error {
 		for i := range rel.Values {
 			_, err := os.Stat(rel.Values[i].Get())
 			if os.IsNotExist(err) {
-				log.Error(err)
+				log.Errorf("❌ %s values (%s): %v", rel.Uniq(), rel.Values[i].Src, err)
 				f = true
 			} else {
 				// FatalError

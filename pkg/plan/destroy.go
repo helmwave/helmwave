@@ -16,6 +16,7 @@ func (p *Plan) Destroy() error {
 			_, err := rel.Uninstall()
 			if err != nil {
 				log.Errorf("❌ %s: %v", rel.Uniq(), err)
+				wg.ErrChan() <- err
 			} else {
 				log.Infof("✅ %s uninstalled!", rel.Uniq())
 			}

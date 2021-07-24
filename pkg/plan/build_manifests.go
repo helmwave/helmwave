@@ -26,7 +26,8 @@ func (p *Plan) buildManifest() error {
 			r, err := rel.Sync()
 			rel.DryRun(false)
 			if err != nil || r == nil {
-				log.Fatalf("❌ %s cant get manifests : %v", rel.Uniq(), err)
+				log.Errorf("❌ %s cant get manifests : %v", rel.Uniq(), err)
+				wg.ErrChan() <- err
 			}
 
 			hm := ""

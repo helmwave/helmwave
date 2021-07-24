@@ -91,9 +91,7 @@ func syncRepositories(repositories []*rep.Config) (err error) {
 		go func(wg *parallel.WaitGroup, i int) {
 			defer wg.Done()
 			err := repositories[i].Install(helper.Helm, f)
-			if err != nil {
-				log.Fatal(err)
-			}
+			wg.ErrChan() <- err
 		}(wg, i)
 	}
 
@@ -127,6 +125,8 @@ func (p *Plan) syncReleases() (err error) {
 
 				rel.NotifyFailed()
 				fails[rel] = err
+
+				wg.ErrChan() <- err
 			} else {
 				rel.NotifySuccess()
 				log.Infof("✅ %s", rel.Uniq())
