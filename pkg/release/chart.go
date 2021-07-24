@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
+	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 )
@@ -19,7 +19,7 @@ func (rel *Config) GetChart() (*chart.Chart, error) {
 	// Hmm nice action bro
 	client := rel.newInstall()
 
-	ch, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, helper.Helm)
+	ch, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, rel.Helm())
 	if err != nil {
 		return nil, err
 	}
@@ -55,26 +55,26 @@ func chartCheck(ch *chart.Chart) error {
 }
 
 func (rel *Config) ChartDepsUpd() error {
-	return chartDepsUpd(rel.Chart.Name)
+	return chartDepsUpd(rel.Chart.Name, rel.Helm())
 }
 
-func chartDepsUpd(name string) error {
+func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              io.Discard,
 		ChartPath:        filepath.Clean(name),
 		Keyring:          client.Keyring,
 		SkipUpdate:       client.SkipRefresh,
-		Getters:          getter.All(helper.Helm),
-		RepositoryConfig: helper.Helm.RepositoryConfig,
-		RepositoryCache:  helper.Helm.RepositoryCache,
-		Debug:            helper.Helm.Debug,
+		Getters:          getter.All(settings),
+		RepositoryConfig: settings.RepositoryConfig,
+		RepositoryCache:  settings.RepositoryCache,
+		Debug:            settings.Debug,
 	}
 	if client.Verify {
 		man.Verify = downloader.VerifyAlways
 	}
 
-	if helper.Helm.Debug {
+	if settings.Debug {
 		man.Out = os.Stdout
 	}
 

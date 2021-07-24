@@ -16,17 +16,18 @@ func (p *Plan) buildManifest() error {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
 
-			rel.DryRun(true)
-
 			err := rel.ChartDepsUpd()
 			if err != nil {
-				log.Warn(err)
+				log.Warnf("❌ %s cant get dependencies : %v", rel.Uniq(), err)
 			}
+
+			rel.DryRun(true)
+
 			r, err := rel.Sync()
 			rel.DryRun(false)
 			if err != nil || r == nil {
-				log.Error("i cant generate manifest for ", rel.Uniq())
-				log.Fatal(err)
+				log.Errorf("❌ %s cant get manifests : %v", rel.Uniq(), err)
+				wg.ErrChan() <- err
 			}
 
 			hm := ""
@@ -44,7 +45,7 @@ func (p *Plan) buildManifest() error {
 			m := rel.Uniq() + ".yml"
 			p.manifests[m] = document
 
-			// log.Debug(rel.Uniq(), "`s manifest was successfully built ")
+			log.Infof("✅ %s manifest done", rel.Uniq())
 		}(wg, rel)
 	}
 

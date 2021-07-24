@@ -12,7 +12,7 @@ import (
 func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out []*repo.Config, err error) {
 	for rep, releases := range m {
 		rm := releaseNames(releases)
-		log.WithField(rep, rm).Debug("repo dependencies")
+		log.WithField(rep, rm).Debug("🗄 repo dependencies")
 
 		if repoIsLocal(rep) {
 			log.Infof("🗄 %q is local repo", rep)

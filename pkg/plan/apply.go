@@ -55,7 +55,7 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 }
 
 func syncRepositories(repositories []*rep.Config) (err error) {
-	log.Trace("helm repository.yaml: ", helper.Helm.RepositoryConfig)
+	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	f := &repo.File{}
 	// Create if not exits
@@ -91,9 +91,7 @@ func syncRepositories(repositories []*rep.Config) (err error) {
 		go func(wg *parallel.WaitGroup, i int) {
 			defer wg.Done()
 			err := repositories[i].Install(helper.Helm, f)
-			if err != nil {
-				log.Fatal(err)
-			}
+			wg.ErrChan() <- err
 		}(wg, i)
 	}
 
@@ -120,13 +118,15 @@ func (p *Plan) syncReleases() (err error) {
 	for i := range p.body.Releases {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
-			log.Info(rel.Uniq(), " deploying...")
+			log.Infof("🛥 %q deployig... ", rel.Uniq())
 			_, err = rel.Sync()
 			if err != nil {
 				log.Errorf("❌ %s: %v", rel.Uniq(), err)
 
 				rel.NotifyFailed()
 				fails[rel] = err
+
+				wg.ErrChan() <- err
 			} else {
 				rel.NotifySuccess()
 				log.Infof("✅ %s", rel.Uniq())

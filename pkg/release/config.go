@@ -7,12 +7,14 @@ import (
 	"github.com/helmwave/helmwave/pkg/pubsub"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"helm.sh/helm/v3/pkg/action"
+	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
 type Config struct {
 	cfg                      *action.Configuration
 	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
+	helm                     *helm.EnvSettings
 	Store                    map[string]interface{}
 	Chart                    Chart
 	uniqName                 uniqname.UniqName
@@ -74,6 +76,7 @@ func (rel *Config) newInstall() *action.Install {
 
 	if client.DryRun {
 		client.Replace = true
+		client.ClientOnly = true
 	}
 
 	return client
