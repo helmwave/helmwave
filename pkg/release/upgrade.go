@@ -30,7 +30,7 @@ func (rel *Config) upgrade() (*release.Release, error) {
 	// Install
 	if !rel.isInstalled() || rel.dryRun {
 		if rel.dryRun {
-			log.Debugf("📄 Templating manifest %q ", rel.Uniq())
+			log.Debugf("📄 %q template manifest ", rel.Uniq())
 		} else {
 			log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.Uniq())
 		}

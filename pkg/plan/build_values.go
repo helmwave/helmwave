@@ -15,9 +15,9 @@ func (p *Plan) buildValues(dir string) error {
 			defer wg.Done()
 			err := rel.BuildValues(dir)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("❌ %s values: %v", rel.Uniq(), err)
 			} else {
-				log.Info()
+				log.Infof("✅ %s values count %d", rel.Uniq(), len(rel.Values))
 			}
 		}(wg, rel)
 	}
