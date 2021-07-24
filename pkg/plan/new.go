@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -30,6 +31,8 @@ type Plan struct {
 	body     *planBody
 	dir      string
 	fullPath string
+
+	tmpDir string
 
 	manifests map[uniqname.UniqName]string
 
@@ -72,6 +75,7 @@ func New(dir string) *Plan {
 	// }
 
 	plan := &Plan{
+		tmpDir:    filepath.Join(os.TempDir(), dir),
 		dir:       dir,
 		fullPath:  filepath.Join(dir, File),
 		manifests: make(map[uniqname.UniqName]string),

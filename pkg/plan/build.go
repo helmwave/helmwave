@@ -1,9 +1,6 @@
 package plan
 
 import (
-	"os"
-	"path/filepath"
-
 	log "github.com/sirupsen/logrus"
 )
 
@@ -30,7 +27,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 
 	// Build Values
 	log.Info("Building values...")
-	err = p.buildValues(filepath.Join(os.TempDir(), Dir))
+	err = p.buildValues(p.tmpDir)
 	if err != nil {
 		return err
 	}

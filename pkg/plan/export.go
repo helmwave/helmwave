@@ -17,8 +17,7 @@ func (p *Plan) Export() error {
 		return err
 	}
 
-	// Todo: Rename tmpDir is faster than rebuild values
-	if err := p.buildValues(p.dir); err != nil {
+	if err := p.exportValues(); err != nil {
 		return err
 	}
 
@@ -64,6 +63,13 @@ func (p *Plan) exportGraphMD() error {
 	}
 
 	return f.Close()
+}
+
+func (p *Plan) exportValues() error {
+	return os.Rename(
+		filepath.Join(p.tmpDir, Values),
+		filepath.Join(p.dir, Values),
+	)
 }
 
 // IsExist returns true if planfile exists
