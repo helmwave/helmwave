@@ -1,7 +1,6 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/getter"
@@ -23,7 +22,8 @@ func (rel *Config) upgrade() (*release.Release, error) {
 	}
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}
-	vals, err := valOpts.MergeValues(getter.All(helper.Helm))
+	vals, err := valOpts.MergeValues(getter.All(rel.Helm()))
+
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package release
 
 import (
 	"errors"
+	helm "helm.sh/helm/v3/pkg/cli"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/pubsub"
@@ -13,6 +14,7 @@ import (
 type Config struct {
 	cfg                      *action.Configuration
 	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
+	helm                     *helm.EnvSettings
 	Store                    map[string]interface{}
 	Chart                    Chart
 	uniqName                 uniqname.UniqName

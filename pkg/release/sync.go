@@ -1,12 +1,11 @@
 package release
 
 import (
-	"os"
-
+	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
+	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
-	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
 func (rel *Config) Sync() (*release.Release, error) {
@@ -18,21 +17,10 @@ func (rel *Config) Sync() (*release.Release, error) {
 	return rel.upgrade()
 }
 
-func (rel *Config) newCfg() (*action.Configuration, error) {
-	cfg := new(action.Configuration)
-	helmDriver := os.Getenv("HELM_DRIVER")
-	err := cfg.Init(genericclioptions.NewConfigFlags(false), rel.Namespace, helmDriver, log.Debugf)
-	if err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
-}
-
 func (rel *Config) Cfg() *action.Configuration {
 	if rel.cfg == nil {
 		var err error
-		rel.cfg, err = rel.newCfg()
+		rel.cfg, err = helper.NewCfg(rel.Namespace)
 		if err != nil {
 			log.Fatal(err)
 			return nil
@@ -42,15 +30,17 @@ func (rel *Config) Cfg() *action.Configuration {
 	return rel.cfg
 }
 
-// func (rel *Config) helm() (*helm.EnvSettings, error) {
-//	env := helm.New()
-//	fs := &pflag.FlagSet{}
-//	env.AddFlags(fs)
-//	flag := fs.Lookup("namespace")
-//	err := flag.Value.Set(rel.Namespace)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return env, nil
-// }
+func (rel *Config) Helm() *helm.EnvSettings {
+	if rel.helm == nil {
+		var err error
+		rel.helm, err = helper.NewHelm(rel.Namespace)
+		if err != nil {
+			log.Fatal(err)
+			return nil
+		}
+
+		rel.helm.Debug = helper.Helm.Debug
+	}
+
+	return rel.helm
+}
