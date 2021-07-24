@@ -23,7 +23,6 @@ func (rel *Config) upgrade() (*release.Release, error) {
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}
 	vals, err := valOpts.MergeValues(getter.All(rel.Helm()))
-
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,6 @@ import (
 )
 
 func TestHelmNS(t *testing.T) {
-
 	h1, err := NewHelm("my")
 	if err != nil {
 		t.Error(err)
