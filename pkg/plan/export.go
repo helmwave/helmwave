@@ -29,6 +29,10 @@ func (p *Plan) Export() error {
 }
 
 func (p *Plan) exportManifest() error {
+	if len(p.body.Releases) == 0 {
+		return nil
+	}
+
 	for k, v := range p.manifests {
 		m := filepath.Join(p.dir, Manifest, string(k))
 
@@ -66,6 +70,22 @@ func (p *Plan) exportGraphMD() error {
 }
 
 func (p *Plan) exportValues() error {
+	if len(p.body.Releases) == 0 {
+		return nil
+	}
+
+	found := false
+	for i := 0; i < len(p.body.Releases)-1 && !found; i++ {
+		for range p.body.Releases[i].Values {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return nil
+	}
+
 	return os.Rename(
 		filepath.Join(p.tmpDir, Values),
 		filepath.Join(p.dir, Values),
