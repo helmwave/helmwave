@@ -16,7 +16,7 @@ type Build struct {
 	diffWide int
 
 	autoYml bool
-	yml     Yml
+	yml     *Yml
 }
 
 func (i *Build) Run() error {
@@ -69,6 +69,9 @@ func (i *Build) Cmd() *cli.Command {
 }
 
 func (i *Build) flags() []cli.Flag {
+	// Init sub-structures
+	i.yml = &Yml{}
+
 	self := []cli.Flag{
 		flagPlandir(&i.plandir),
 		flagTags(&i.tags),
