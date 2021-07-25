@@ -20,9 +20,8 @@ func (i *Down) Run() error {
 
 func (i *Down) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:    "down",
-		Aliases: []string{"uninstall", "destroy", "delete", "del", "rm", "remove"},
-		Usage:   "🔪 Delete all",
+		Name:  "down",
+		Usage: "🔪 Delete all",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
 			// flagParallel(&i.parallel),
