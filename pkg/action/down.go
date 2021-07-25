@@ -7,7 +7,6 @@ import (
 
 type Down struct {
 	plandir string
-	// parallel bool
 }
 
 func (i *Down) Run() error {
@@ -24,7 +23,6 @@ func (i *Down) Cmd() *cli.Command {
 		Usage: "🔪 Delete all",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
-			// flagParallel(&i.parallel),
 		},
 		Action: toCtx(i.Run),
 	}

@@ -38,7 +38,6 @@ func (i *Up) Cmd() *cli.Command {
 		Usage: "🚢 Apply your plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
-			// flagParallel(&i.parallel),
 			&cli.BoolFlag{
 				Name:        "kubedog",
 				Usage:       "Enable/Disable kubedog",
