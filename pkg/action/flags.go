@@ -10,7 +10,7 @@ func flagPlandir(v *string) *cli.StringFlag {
 		Name:        "plandir",
 		Aliases:     []string{"p"},
 		Value:       plan.Dir,
-		Usage:       "Path to plandir",
+		Usage:       "Path file plandir",
 		EnvVars:     []string{"HELMWAVE_PLANDIR", "HELMWAVE_PLAN"},
 		Destination: v,
 	}
