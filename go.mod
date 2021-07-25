@@ -18,7 +18,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/werf/kubedog v0.4.1-0.20210219085634-2984d94c2a5f
@@ -26,7 +26,7 @@ require (
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 	google.golang.org/appengine v1.6.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0
-	helm.sh/helm/v3 v3.6.0
+	helm.sh/helm/v3 v3.6.3
 	k8s.io/apimachinery v0.21.0
 	k8s.io/cli-runtime v0.21.0
 	k8s.io/client-go v0.21.0
