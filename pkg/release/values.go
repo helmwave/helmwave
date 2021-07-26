@@ -1,7 +1,6 @@
 package release
 
 import (
-	"crypto/sha1"
 	"encoding/hex"
 	"os"
 	"path/filepath"
@@ -56,14 +55,18 @@ func (v *ValuesReference) Get() string {
 	return v.dst
 }
 
+func (v *ValuesReference) Set(dst string) *ValuesReference {
+	v.dst = dst
+	return v
+}
+
 func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
-	h := sha1.New() // nolint:gosec
-	h.Write([]byte(v.Src))
-	hash := h.Sum(nil)
+	helper.Sha1.Write([]byte(v.Src))
+	hash := helper.Sha1.Sum(nil)
 	hs := hex.EncodeToString(hash)
 	// b64 := base64.URLEncoding.EncodeToString(hash)
 
-	v.dst = filepath.Join(dir, "values", string(rel.Uniq()), hs+".yml")
+	v.Set(filepath.Join(dir, "values", string(rel.Uniq()), hs+".yml"))
 
 	log.WithFields(log.Fields{
 		"release": rel.Uniq(),

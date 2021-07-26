@@ -22,7 +22,7 @@ func TestBuildManifest(t *testing.T) {
 
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		yml:      tests.Root + "02_helmwave.yml",
+		ymlFile:  tests.Root + "02_helmwave.yml",
 		tags:     cli.StringSlice{},
 		matchAll: true,
 	}
@@ -42,7 +42,7 @@ func TestBuildManifest(t *testing.T) {
 //
 //	s := &Build{
 //		plandir:  tests.Root + plan.Dir,
-//		yml:      tests.Root + "04_helmwave.yml",
+//		ymlFile:      tests.Root + "04_helmwave.yml",
 //		tags:     cli.StringSlice{},
 //		matchAll: true,
 //	}
@@ -58,7 +58,7 @@ func TestBuildRepositories(t *testing.T) {
 
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		yml:      tests.Root + "02_helmwave.yml",
+		ymlFile:  tests.Root + "02_helmwave.yml",
 		tags:     cli.StringSlice{},
 		matchAll: true,
 	}
@@ -81,7 +81,7 @@ func TestBuildReleasesMatchGroup(t *testing.T) {
 
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		yml:      tests.Root + "03_helmwave.yml",
+		ymlFile:  tests.Root + "03_helmwave.yml",
 		tags:     *cli.NewStringSlice("b"),
 		matchAll: true,
 	}
@@ -103,7 +103,7 @@ func TestBuildReleasesMatchGroups(t *testing.T) {
 
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		yml:      tests.Root + "03_helmwave.yml",
+		ymlFile:  tests.Root + "03_helmwave.yml",
 		tags:     *cli.NewStringSlice("b", "redis"),
 		matchAll: true,
 	}
