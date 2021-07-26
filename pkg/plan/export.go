@@ -19,8 +19,7 @@ func (p *Plan) Export() error {
 		return err
 	}
 
-	// TODO make it better later
-	if err := p.buildValues(p.dir); err != nil {
+	if err := p.exportValues(); err != nil {
 		return err
 	}
 
