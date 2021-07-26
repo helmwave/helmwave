@@ -1,8 +1,8 @@
 package plan
 
 import (
-	"crypto/sha1"
 	"encoding/hex"
+	"github.com/helmwave/helmwave/pkg/parallel"
 	"os"
 	"path/filepath"
 
@@ -15,23 +15,33 @@ func (p *Plan) Export() error {
 		return err
 	}
 
-	if err := p.exportManifest(); err != nil {
+	wg := parallel.NewWaitGroup()
+	wg.Add(3)
+
+	go func() {
+		defer wg.Done()
+		if err := p.exportManifest(); err != nil {
+			wg.ErrChan() <- err
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		if err := p.exportValues(); err != nil {
+			wg.ErrChan() <- err
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		if err := p.exportGraphMD(); err != nil {
+			wg.ErrChan() <- err
+		}
+	}()
+
+	if err := wg.Wait(); err != nil {
 		return err
 	}
 
-	if err := p.exportValues(); err != nil {
-		return err
-	}
-
-	if err := helper.SaveInterface(p.fullPath, p.body); err != nil {
-		return err
-	}
-
-	if err := p.exportGraphMD(); err != nil {
-		return err
-	}
-
-	return nil
+	return helper.SaveInterface(p.fullPath, p.body)
 }
 
 func (p *Plan) exportManifest() error {
@@ -62,7 +72,8 @@ func (p *Plan) exportManifest() error {
 }
 
 func (p *Plan) exportGraphMD() error {
-	f, err := helper.CreateFile(filepath.Join(p.dir, "graph.md"))
+	const filename = "graph.md"
+	f, err := helper.CreateFile(filepath.Join(p.dir, filename))
 	if err != nil {
 		return err
 	}
@@ -81,13 +92,12 @@ func (p *Plan) exportValues() error {
 	}
 
 	found := false
-	h := sha1.New() // nolint:gosec
 
 	for i, rel := range p.body.Releases {
 		for j := range p.body.Releases[i].Values {
 			found = true
-			h.Write([]byte(p.body.Releases[i].Values[j].Src))
-			hash := h.Sum(nil)
+			helper.Sha1.Write([]byte(p.body.Releases[i].Values[j].Src))
+			hash := helper.Sha1.Sum(nil)
 			hs := hex.EncodeToString(hash)
 			p.body.Releases[i].Values[j].Set(filepath.Join(p.dir, "values", string(rel.Uniq()), hs+".yml"))
 		}
