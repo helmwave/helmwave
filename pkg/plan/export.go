@@ -2,11 +2,11 @@ package plan
 
 import (
 	"encoding/hex"
-	"github.com/helmwave/helmwave/pkg/parallel"
 	"os"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/parallel"
 )
 
 // Export allows save plan to file

@@ -59,6 +59,7 @@ func (v *ValuesReference) Set(dst string) *ValuesReference {
 	v.dst = dst
 	return v
 }
+
 func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	helper.Sha1.Write([]byte(v.Src))
 	hash := helper.Sha1.Sum(nil)
