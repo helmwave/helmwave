@@ -7,7 +7,6 @@ import (
 
 type Rollback struct {
 	plandir string
-	// parallel bool
 }
 
 func (i *Rollback) Run() error {
@@ -24,7 +23,6 @@ func (i *Rollback) Cmd() *cli.Command {
 		Usage: "⏮  Rollback your plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
-			// flagParallel(&i.parallel),
 		},
 		Action: toCtx(i.Run),
 	}

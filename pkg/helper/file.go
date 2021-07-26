@@ -1,11 +1,14 @@
 package helper
 
 import (
+	"crypto/sha1"
 	"os"
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 )
+
+var Sha1 = sha1.New() // nolint:gosec
 
 func Contains(t string, a []string) bool {
 	for _, v := range a {

@@ -34,12 +34,10 @@ func (i *Up) Run() error {
 func (i *Up) Cmd() *cli.Command {
 	i.dog = &kubedog.Config{}
 	return &cli.Command{
-		Name:    "up",
-		Aliases: []string{"install", "apply", "sync", "deploy"},
-		Usage:   "🚢 Apply your plan",
+		Name:  "up",
+		Usage: "🚢 Apply your plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
-			// flagParallel(&i.parallel),
 			&cli.BoolFlag{
 				Name:        "kubedog",
 				Usage:       "Enable/Disable kubedog",

@@ -18,7 +18,11 @@ func (p *Plan) buildValues(dir string) error {
 				log.Errorf("❌ %s values: %v", rel.Uniq(), err)
 				wg.ErrChan() <- err
 			} else {
-				log.Infof("✅ %s values count %d", rel.Uniq(), len(rel.Values))
+				var vals []string
+				for i := range rel.Values {
+					vals = append(vals, rel.Values[i].Get())
+				}
+				log.WithField("values", vals).Infof("✅ %s values count %d", rel.Uniq(), len(rel.Values))
 			}
 		}(wg, rel)
 	}

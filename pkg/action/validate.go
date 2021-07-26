@@ -19,9 +19,8 @@ func (l *Validate) Run() error {
 
 func (l *Validate) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:    "validate",
-		Aliases: []string{"check", "lint"},
-		Usage:   "🛂 Validate your plan",
+		Name:  "validate",
+		Usage: "🛂 Validate your plan",
 		Flags: []cli.Flag{
 			flagPlandir(&l.plandir),
 		},

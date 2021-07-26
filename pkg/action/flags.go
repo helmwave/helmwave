@@ -8,9 +8,10 @@ import (
 func flagPlandir(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "plandir",
+		Aliases:     []string{"p"},
 		Value:       plan.Dir,
 		Usage:       "Path to plandir",
-		EnvVars:     []string{"HELMWAVE_PLANDIR"},
+		EnvVars:     []string{"HELMWAVE_PLANDIR", "HELMWAVE_PLAN"},
 		Destination: v,
 	}
 }
@@ -35,23 +36,23 @@ func flagMatchAllTags(v *bool) *cli.BoolFlag {
 	}
 }
 
-// func flagParallel(v *bool) *cli.BoolFlag {
-// 	return &cli.BoolFlag{
-// 		Name:        "parallel",
-// 		Usage:       "It allows you call `helm` in parallel mode ",
-// 		Value:       true,
-// 		EnvVars:     []string{"HELMWAVE_PARALLEL"},
-// 		Destination: v,
-// 	}
-// }
-
-func flagFile(v *string) *cli.StringFlag {
+func flagYmlFile(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "file",
 		Aliases:     []string{"f"},
 		Value:       plan.Body,
 		Usage:       "Main yml file",
-		EnvVars:     []string{"HELMWAVE_YAML"},
+		EnvVars:     []string{"HELMWAVE_YAML", "HELMWAVE_YML"},
+		Destination: v,
+	}
+}
+
+func flagTplFile(v *string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:        "tpl",
+		Value:       "helmwave.yml.tpl",
+		Usage:       "Main tpl file",
+		EnvVars:     []string{"HELMWAVE_TPL"},
 		Destination: v,
 	}
 }

@@ -11,11 +11,6 @@ type Yml struct {
 }
 
 func (i *Yml) Run() error {
-	log.WithFields(log.Fields{
-		"from": i.from,
-		"to":   i.to,
-	}).Debug("📄 Render yml")
-
 	err := template.Tpl2yml(i.from, i.to, nil)
 	if err != nil {
 		return err
@@ -34,14 +29,8 @@ func (i *Yml) Cmd() *cli.Command {
 		Name:  "yml",
 		Usage: "📄 Render helmwave.yml.tpl -> helmwave.yml",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "tpl",
-				Value:       "helmwave.yml.tpl",
-				Usage:       "Main tpl file",
-				EnvVars:     []string{"HELMWAVE_TPL"},
-				Destination: &i.from,
-			},
-			flagFile(&i.to),
+			flagTplFile(&i.from),
+			flagYmlFile(&i.to),
 		},
 		Action: toCtx(i.Run),
 	}

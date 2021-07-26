@@ -10,15 +10,15 @@ import (
 )
 
 type Build struct {
-	plandir, yml string
-	tags         cli.StringSlice
-	matchAll     bool
-	diffWide     int
+	plandir, ymlFile string
+	tags             cli.StringSlice
+	matchAll         bool
+	diffWide         int
 }
 
 func (i *Build) Run() error {
 	newPlan := plan.New(i.plandir)
-	err := newPlan.Build(i.yml, i.normalizeTags(), i.matchAll)
+	err := newPlan.Build(i.ymlFile, i.normalizeTags(), i.matchAll)
 	if err != nil {
 		return err
 	}
@@ -52,14 +52,13 @@ func (i *Build) Run() error {
 
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:    "build",
-		Usage:   "🏗 Build a plan",
-		Aliases: []string{"plan"},
+		Name:  "build",
+		Usage: "🏗 Build a plan",
 		Flags: []cli.Flag{
 			flagPlandir(&i.plandir),
 			flagTags(&i.tags),
 			flagMatchAllTags(&i.matchAll),
-			flagFile(&i.yml),
+			flagYmlFile(&i.ymlFile),
 			flagDiffWide(&i.diffWide),
 		},
 		Action: toCtx(i.Run),
