@@ -1,6 +1,8 @@
 package plan
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"os"
 	"path/filepath"
 
@@ -17,7 +19,12 @@ func (p *Plan) Export() error {
 		return err
 	}
 
-	if err := p.exportValues(); err != nil {
+	// TODO make it better later
+	if err := p.buildValues(p.dir); err != nil {
+		return err
+	}
+
+	if err := helper.SaveInterface(p.fullPath, p.body); err != nil {
 		return err
 	}
 
@@ -25,7 +32,7 @@ func (p *Plan) Export() error {
 		return err
 	}
 
-	return helper.SaveInterface(p.fullPath, p.body)
+	return nil
 }
 
 func (p *Plan) exportManifest() error {
@@ -75,10 +82,15 @@ func (p *Plan) exportValues() error {
 	}
 
 	found := false
-	for i := 0; i < len(p.body.Releases)-1 && !found; i++ {
-		for range p.body.Releases[i].Values {
+	h := sha1.New() // nolint:gosec
+
+	for i, rel := range p.body.Releases {
+		for j := range p.body.Releases[i].Values {
 			found = true
-			break
+			h.Write([]byte(p.body.Releases[i].Values[j].Src))
+			hash := h.Sum(nil)
+			hs := hex.EncodeToString(hash)
+			p.body.Releases[i].Values[j].Set(filepath.Join(p.dir, "values", string(rel.Uniq()), hs+".yml"))
 		}
 	}
 
