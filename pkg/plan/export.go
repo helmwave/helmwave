@@ -29,6 +29,11 @@ func (p *Plan) Export() error {
 		if err := p.exportValues(); err != nil {
 			wg.ErrChan() <- err
 		}
+
+		// Save Planfile after values
+		if err := helper.SaveInterface(p.fullPath, p.body); err != nil {
+			wg.ErrChan() <- err
+		}
 	}()
 	go func() {
 		defer wg.Done()
@@ -37,11 +42,7 @@ func (p *Plan) Export() error {
 		}
 	}()
 
-	if err := wg.Wait(); err != nil {
-		return err
-	}
-
-	return helper.SaveInterface(p.fullPath, p.body)
+	return wg.Wait()
 }
 
 func (p *Plan) exportManifest() error {
