@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"encoding/hex"
 	"os"
 	"path/filepath"
 
@@ -97,10 +96,7 @@ func (p *Plan) exportValues() error {
 	for i, rel := range p.body.Releases {
 		for j := range p.body.Releases[i].Values {
 			found = true
-			helper.Sha1.Write([]byte(p.body.Releases[i].Values[j].Src))
-			hash := helper.Sha1.Sum(nil)
-			hs := hex.EncodeToString(hash)
-			p.body.Releases[i].Values[j].Set(filepath.Join(p.dir, "values", string(rel.Uniq()), hs+".yml"))
+			p.body.Releases[i].Values[j].SetUniq(p.dir, rel.Uniq())
 		}
 	}
 

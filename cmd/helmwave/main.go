@@ -34,7 +34,7 @@ func main() {
 		"This tool helps you compose your helm releases!\n" +
 			"0. $ helmwave yml\n" +
 			"1. $ helmwave build\n" +
-			"2. $ helmwave apply\n"
+			"2. $ helmwave up\n"
 
 	logSet := logSetup.Settings{}
 	c.Before = logSet.Run
