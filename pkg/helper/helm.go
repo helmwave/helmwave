@@ -15,7 +15,9 @@ var Helm = helm.New()
 func NewCfg(ns string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER")
-	err := cfg.Init(genericclioptions.NewConfigFlags(false), ns, helmDriver, log.Debugf)
+	config := genericclioptions.NewConfigFlags(false)
+	config.Namespace = &ns
+	err := cfg.Init(config, ns, helmDriver, log.Debugf)
 	if err != nil {
 		return nil, err
 	}
