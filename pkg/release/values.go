@@ -1,15 +1,19 @@
 package release
 
 import (
+	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"os"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/parallel"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 )
+
+var ErrSkipValues = errors.New("values has been skip")
 
 type ValuesReference struct {
 	Src string
@@ -55,18 +59,24 @@ func (v *ValuesReference) Get() string {
 	return v.dst
 }
 
-func (v *ValuesReference) Set(dst string) *ValuesReference {
-	v.dst = dst
+func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
+	h := sha1.New() // nolint:gosec
+	h.Write([]byte(v.Src))
+	hash := h.Sum(nil)
+	s := hex.EncodeToString(hash)
+
+	v.dst = filepath.Join(dir, "values", string(name), s+".yml")
+
 	return v
 }
 
-func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
-	helper.Sha1.Write([]byte(v.Src))
-	hash := helper.Sha1.Sum(nil)
-	hs := hex.EncodeToString(hash)
-	// b64 := base64.URLEncoding.EncodeToString(hash)
+// func (v *ValuesReference) Set(dst string) *ValuesReference {
+//	v.dst = dst
+//	return v
+// }
 
-	v.Set(filepath.Join(dir, "values", string(rel.Uniq()), hs+".yml"))
+func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
+	v.SetUniq(dir, rel.Uniq())
 
 	log.WithFields(log.Fields{
 		"release": rel.Uniq(),
@@ -77,35 +87,32 @@ func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
 	if v.isURL() {
 		err := v.Download()
 		if err != nil {
-			log.Warn(v.Src, "skipping: cant download ", err)
-			return nil
+			log.Warnf("%s skipping: cant download %v", v.Src, err)
+			return ErrSkipValues
 		}
 		return template.Tpl2yml(v.dst, v.dst, struct{ Release *Config }{rel})
 	} else if !helper.IsExists(v.Src) {
-		log.Warn(v.Src, "skipping: local not found")
-		return nil
+		log.Warnf("%s skipping: local not found", v.Src)
+		return ErrSkipValues
 	}
 
 	return template.Tpl2yml(v.Src, v.dst, struct{ Release *Config }{rel})
 }
 
 func (rel *Config) BuildValues(dir string) error {
-	wg := parallel.NewWaitGroup()
-	wg.Add(len(rel.Values))
-
-	for i := range rel.Values {
-		go func(wg *parallel.WaitGroup, i int) {
-			defer wg.Done()
-			err := rel.Values[i].SetViaRelease(rel, dir)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"release": rel.Uniq(),
-					"err":     err,
-					"values":  rel.Values[i],
-				}).Fatal("Values failed")
-			}
-		}(wg, i)
+	for i := len(rel.Values) - 1; i >= 0; i-- {
+		err := rel.Values[i].SetViaRelease(rel, dir)
+		if errors.Is(ErrSkipValues, err) {
+			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+		} else if err != nil {
+			log.WithFields(log.Fields{
+				"release": rel.Uniq(),
+				"err":     err,
+				"values":  rel.Values[i],
+			}).Fatal("Values failed")
+			return err
+		}
 	}
 
-	return wg.Wait()
+	return nil
 }
