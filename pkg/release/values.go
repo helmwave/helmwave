@@ -1,12 +1,14 @@
 package release
 
 import (
+	"crypto/sha1"
 	"encoding/hex"
 	"errors"
 	"os"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 )
@@ -57,18 +59,24 @@ func (v *ValuesReference) Get() string {
 	return v.dst
 }
 
-func (v *ValuesReference) Set(dst string) *ValuesReference {
-	v.dst = dst
+func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
+	h := sha1.New() // nolint:gosec
+	h.Write([]byte(v.Src))
+	hash := h.Sum(nil)
+	s := hex.EncodeToString(hash)
+
+	v.dst = filepath.Join(dir, "values", string(name), s+".yml")
+
 	return v
 }
 
-func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
-	helper.Sha1.Write([]byte(v.Src))
-	hash := helper.Sha1.Sum(nil)
-	hs := hex.EncodeToString(hash)
-	// b64 := base64.URLEncoding.EncodeToString(hash)
+// func (v *ValuesReference) Set(dst string) *ValuesReference {
+//	v.dst = dst
+//	return v
+// }
 
-	v.Set(filepath.Join(dir, "values", string(rel.Uniq()), hs+".yml"))
+func (v *ValuesReference) SetViaRelease(rel *Config, dir string) error {
+	v.SetUniq(dir, rel.Uniq())
 
 	log.WithFields(log.Fields{
 		"release": rel.Uniq(),
