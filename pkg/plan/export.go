@@ -6,7 +6,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
-	copyDir "github.com/otiai10/copy"
+	dir "github.com/otiai10/copy"
 )
 
 // Export allows save plan to file
@@ -73,6 +73,22 @@ func (p *Plan) exportManifest() error {
 }
 
 func (p *Plan) exportGraphMD() error {
+	if len(p.body.Releases) == 0 {
+		return nil
+	}
+
+	found := false
+	for _, rel := range p.body.Releases {
+		if len(rel.DependsOn) > 0 {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return nil
+	}
+
 	const filename = "graph.md"
 	f, err := helper.CreateFile(filepath.Join(p.dir, filename))
 	if err != nil {
@@ -106,12 +122,12 @@ func (p *Plan) exportValues() error {
 	}
 
 	// It doesnt work if workdir is mount.
-	//return os.Rename(
-	//	filepath.Join(p.tmpDir, Values),
-	//	filepath.Join(p.dir, Values),
-	//)
+	// return os.Rename(
+	//	 filepath.Join(p.tmpDir, Values),
+	//	 filepath.Join(p.dir, Values),
+	// )
 
-	return copyDir.Copy(
+	return dir.Copy(
 		filepath.Join(p.tmpDir, Values),
 		filepath.Join(p.dir, Values),
 	)
