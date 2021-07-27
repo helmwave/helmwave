@@ -6,6 +6,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
+	copyDir "github.com/otiai10/copy"
 )
 
 // Export allows save plan to file
@@ -104,7 +105,13 @@ func (p *Plan) exportValues() error {
 		return nil
 	}
 
-	return os.Rename(
+	// It doesnt work if workdir is mount.
+	//return os.Rename(
+	//	filepath.Join(p.tmpDir, Values),
+	//	filepath.Join(p.dir, Values),
+	//)
+
+	return copyDir.Copy(
 		filepath.Join(p.tmpDir, Values),
 		filepath.Join(p.dir, Values),
 	)
