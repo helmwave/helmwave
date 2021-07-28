@@ -43,7 +43,7 @@ func status(all []*release.Config, names []string) error {
 			"namespace":     s.Namespace,
 			"chart":         fmt.Sprintf("%s-%s", s.Chart.Name(), s.Chart.Metadata.Version),
 			"last deployed": s.Info.LastDeployed,
-			"s":             s.Info.Status,
+			"status":        s.Info.Status,
 			"revision":      s.Version,
 		}).Infof("General s of %s", rel.Uniq())
 
@@ -57,7 +57,7 @@ func status(all []*release.Config, names []string) error {
 		log.WithFields(log.Fields{
 			"hooks":    s.Hooks,
 			"manifest": s.Manifest,
-		}).Tracef("Superdebug s of %s", rel.Uniq())
+		}).Tracef("Superdebug status of %s", rel.Uniq())
 	}
 
 	return nil
