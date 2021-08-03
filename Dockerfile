@@ -3,7 +3,7 @@ ARG ALPINE_VERSION=3.14
 
 FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 
-LABEL maintainer="helmwave+zhilyaev.dmitriy@gmail.com"
+LABEL maintainer="zhilyaev.dmitriy+helmwave@gmail.com"
 LABEL name="helmwave"
 
 # enable Go modules support
