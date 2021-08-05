@@ -18,6 +18,7 @@ func (rel *Config) isInstalled() bool {
 	case err == nil:
 		return true
 	default:
+		log.Errorf("i can't check %q is installed", rel.Uniq())
 		log.Fatal(err)
 		return false
 	}
