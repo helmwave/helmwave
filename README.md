@@ -15,10 +15,14 @@
 🌊 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**.
 HelmWave is like docker-compose for helm.
 
-- Keep a directory of chart value files and maintain changes in version control.
-- Apply CI/CD to configuration changes
+- Deploy multiple environments by one step
+- Seperate values for environments
+- Common values for apps
+- Keep a directory of chart value files
+- Maintain changes in version control.
 - Template values
-- Aggregate your application
+- Step by Step deployment.
+
 
 ## Comparison
 
@@ -45,7 +49,7 @@ Call helm | via Golang Module | Shell Executor
 
 ```
 $ docker run diamon/helmwave version
-0.12.1
+0.12.7
 $ docker run --entrypoint=ash -it --rm diamon/helmwave
 / # 
 ```
