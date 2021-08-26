@@ -34,7 +34,7 @@ func (rel *Config) upgrade() (*release.Release, error) {
 	}
 
 	// Install
-	if rel.isInstalled() {
+	if !rel.isInstalled() {
 		log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.Uniq())
 		return rel.newInstall().Run(ch, vals)
 	}

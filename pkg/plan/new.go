@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -75,7 +77,11 @@ func New(dir string) *Plan {
 	// }
 
 	plan := &Plan{
-		tmpDir:    filepath.Join(os.TempDir(), dir),
+		tmpDir: filepath.Join(
+			os.TempDir(),
+			dir,
+			strconv.FormatInt(time.Now().Unix(), 10),
+		),
 		dir:       dir,
 		fullPath:  filepath.Join(dir, File),
 		manifests: make(map[uniqname.UniqName]string),

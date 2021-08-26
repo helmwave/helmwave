@@ -121,16 +121,18 @@ func (p *Plan) exportValues() error {
 		return nil
 	}
 
-	// It doesnt work if workdir is mount.
-	// return os.Rename(
-	//	 filepath.Join(p.tmpDir, Values),
-	//	 filepath.Join(p.dir, Values),
-	// )
-
-	return dir.Copy(
+	// It doesnt work if workdir has been mounted.
+	err := os.Rename(
 		filepath.Join(p.tmpDir, Values),
 		filepath.Join(p.dir, Values),
 	)
+	if err != nil {
+		return dir.Copy(
+			filepath.Join(p.tmpDir, Values),
+			filepath.Join(p.dir, Values),
+		)
+	}
+	return nil
 }
 
 // IsExist returns true if planfile exists
