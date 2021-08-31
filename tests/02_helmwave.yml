@@ -1,8 +1,6 @@
 project: Test02
 
 repositories:
-- name: stable
-  url: https://kubernetes-charts.storage.googleapis.com
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 

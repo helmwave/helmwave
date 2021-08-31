@@ -27,14 +27,15 @@ func (rel *Config) upgrade() (*release.Release, error) {
 		return nil, err
 	}
 
-	// Install
-	if !rel.isInstalled() || rel.dryRun {
-		if rel.dryRun {
-			log.Debugf("📄 %q template manifest ", rel.Uniq())
-		} else {
-			log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.Uniq())
-		}
+	// Template
+	if rel.dryRun {
+		log.Debugf("📄 %q template manifest ", rel.Uniq())
+		return rel.newInstall().Run(ch, vals)
+	}
 
+	// Install
+	if !rel.isInstalled() {
+		log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.Uniq())
 		return rel.newInstall().Run(ch, vals)
 	}
 
