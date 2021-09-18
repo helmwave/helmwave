@@ -119,3 +119,33 @@ func TestBuildReleasesMatchGroups(t *testing.T) {
 		t.Error("'redis-b' not found")
 	}
 }
+
+func TestBuildAutoYml(t *testing.T) {
+	defer clean()
+
+	y := &Yml{
+		tests.Root + "01_helmwave.yml.tpl",
+		tests.Root + "01_auto_yaml_helmwave.yml",
+	}
+
+	s := &Build{
+		plandir:  tests.Root + plan.Dir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
+	}
+
+	value := "Test01"
+	_ = os.Setenv("PROJECT_NAME", value)
+	_ = os.Setenv("NAMESPACE", value)
+
+	err := s.Run()
+	if err != nil {
+		t.Error(err)
+	}
+
+	if ok := helper.IsExists(tests.Root + plan.Dir + plan.Manifest); !ok {
+		t.Error(plan.ErrManifestDirNotFound)
+	}
+}
