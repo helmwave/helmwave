@@ -48,14 +48,14 @@ func (d *Diff) Cmd() *cli.Command {
 			&cli.StringFlag{
 				Name:        "plandir1",
 				Value:       ".helmwave/",
-				Usage:       "Path file plandir1",
+				Usage:       "Path to plandir1",
 				EnvVars:     []string{"HELMWAVE_PLANDIR_1", "HELMWAVE_PLANDIR"},
 				Destination: &d.plandir1,
 			},
 			&cli.StringFlag{
 				Name:        "plandir2",
 				Value:       ".helmwave/",
-				Usage:       "Path file plandir2",
+				Usage:       "Path to plandir2",
 				EnvVars:     []string{"HELMWAVE_PLANDIR_2"},
 				Destination: &d.plandir2,
 			},

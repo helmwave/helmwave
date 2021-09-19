@@ -20,9 +20,14 @@ func clean() {
 func TestBuildManifest(t *testing.T) {
 	defer clean()
 
+	y := &Yml{
+		tests.Root + "01_helmwave.yml.tpl",
+		tests.Root + "02_helmwave.yml",
+	}
+
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		ymlFile:  tests.Root + "02_helmwave.yml",
+		yml:      y,
 		tags:     cli.StringSlice{},
 		matchAll: true,
 	}
@@ -56,9 +61,14 @@ func TestBuildManifest(t *testing.T) {
 func TestBuildRepositories(t *testing.T) {
 	defer clean()
 
+	y := &Yml{
+		tests.Root + "01_helmwave.yml.tpl",
+		tests.Root + "02_helmwave.yml",
+	}
+
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		ymlFile:  tests.Root + "02_helmwave.yml",
+		yml:      y,
 		tags:     cli.StringSlice{},
 		matchAll: true,
 	}
@@ -79,9 +89,14 @@ func TestBuildRepositories(t *testing.T) {
 func TestBuildReleasesMatchGroup(t *testing.T) {
 	defer clean()
 
+	y := &Yml{
+		tests.Root + "01_helmwave.yml.tpl",
+		tests.Root + "03_helmwave.yml",
+	}
+
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		ymlFile:  tests.Root + "03_helmwave.yml",
+		yml:      y,
 		tags:     *cli.NewStringSlice("b"),
 		matchAll: true,
 	}
@@ -101,9 +116,14 @@ func TestBuildReleasesMatchGroup(t *testing.T) {
 func TestBuildReleasesMatchGroups(t *testing.T) {
 	defer clean()
 
+	y := &Yml{
+		tests.Root + "01_helmwave.yml.tpl",
+		tests.Root + "03_helmwave.yml",
+	}
+
 	s := &Build{
 		plandir:  tests.Root + plan.Dir,
-		ymlFile:  tests.Root + "03_helmwave.yml",
+		yml:      y,
 		tags:     *cli.NewStringSlice("b", "redis"),
 		matchAll: true,
 	}
