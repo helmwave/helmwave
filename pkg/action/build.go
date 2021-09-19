@@ -10,13 +10,12 @@ import (
 )
 
 type Build struct {
+	yml      *Yml
 	plandir  string
 	tags     cli.StringSlice
 	matchAll bool
+	autoYml  bool
 	diffWide int
-
-	autoYml bool
-	yml     *Yml
 }
 
 func (i *Build) Run() error {

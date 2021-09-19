@@ -10,11 +10,11 @@ import (
 )
 
 type Up struct {
-	dog            *kubedog.Config
-	kubedogEnabled bool
+	build *Build
+	dog   *kubedog.Config
 
-	autoBuild bool
-	build     *Build
+	autoBuild      bool
+	kubedogEnabled bool
 }
 
 func (i *Up) Run() error {
