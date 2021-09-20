@@ -10,15 +10,23 @@ import (
 )
 
 type Build struct {
-	plandir, ymlFile string
-	tags             cli.StringSlice
-	matchAll         bool
-	diffWide         int
+	yml      *Yml
+	plandir  string
+	tags     cli.StringSlice
+	matchAll bool
+	autoYml  bool
+	diffWide int
 }
 
 func (i *Build) Run() error {
+	if i.autoYml {
+		if err := i.yml.Run(); err != nil {
+			return err
+		}
+	}
+
 	newPlan := plan.New(i.plandir)
-	err := newPlan.Build(i.ymlFile, i.normalizeTags(), i.matchAll)
+	err := newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll)
 	if err != nil {
 		return err
 	}
@@ -52,17 +60,33 @@ func (i *Build) Run() error {
 
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "build",
-		Usage: "🏗 Build a plan",
-		Flags: []cli.Flag{
-			flagPlandir(&i.plandir),
-			flagTags(&i.tags),
-			flagMatchAllTags(&i.matchAll),
-			flagYmlFile(&i.ymlFile),
-			flagDiffWide(&i.diffWide),
-		},
+		Name:   "build",
+		Usage:  "🏗 Build a plan",
+		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}
+}
+
+func (i *Build) flags() []cli.Flag {
+	// Init sub-structures
+	i.yml = &Yml{}
+
+	self := []cli.Flag{
+		flagPlandir(&i.plandir),
+		flagTags(&i.tags),
+		flagMatchAllTags(&i.matchAll),
+		flagDiffWide(&i.diffWide),
+
+		&cli.BoolFlag{
+			Name:        "yml",
+			Usage:       "Auto helmwave.yml.tpl --> helmwave.yml",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
+			Destination: &i.autoYml,
+		},
+	}
+
+	return append(self, i.yml.flags()...)
 }
 
 func (i *Build) normalizeTags() []string {

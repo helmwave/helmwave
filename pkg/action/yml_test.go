@@ -27,7 +27,7 @@ func TestRenderEnv(t *testing.T) {
 		t.Error(err)
 	}
 
-	b, err := plan.NewBody(s.to)
+	b, err := plan.NewBody(s.file)
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,5 +37,5 @@ func TestRenderEnv(t *testing.T) {
 	}
 
 	// Clean
-	_ = os.Remove(s.to)
+	_ = os.Remove(s.file)
 }
