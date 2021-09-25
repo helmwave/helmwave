@@ -25,7 +25,11 @@ func Tpl2yml(tpl, yml string, data interface{}) error {
 	}
 
 	// Template
-	t := template.Must(template.New("tpl").Funcs(FuncMap()).Parse(string(src)))
+	t, err := template.New("tpl").Funcs(FuncMap()).Parse(string(src))
+	if err != nil {
+		return err
+	}
+
 	var buf bytes.Buffer
 	err = t.Execute(&buf, data)
 	if err != nil {

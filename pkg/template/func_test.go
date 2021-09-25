@@ -47,6 +47,11 @@ func (s *FuncTestSuite) TestEnabledGomplate() {
 }
 
 func (s *FuncTestSuite) TestDisabledGomplate() {
+	SetConfig(&Config{
+		Gomplate: GomplateConfig{
+			Enabled: false,
+		},
+	})
 	fm := FuncMap()
 
 	for key := range funcs.CreateDataFuncs(context.Background(), nil) {
@@ -55,6 +60,6 @@ func (s *FuncTestSuite) TestDisabledGomplate() {
 }
 
 func TestFuncTestSuite(t *testing.T) {
-	t.Parallel()
+	//t.Parallel()
 	suite.Run(t, new(FuncTestSuite))
 }
