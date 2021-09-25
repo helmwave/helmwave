@@ -1,4 +1,4 @@
-// +build ignore unit
+//go:build ignore || unit
 
 package plan
 
