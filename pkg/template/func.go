@@ -1,9 +1,11 @@
 package template
 
 import (
+	"context"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
+	"github.com/hairyhenderson/gomplate/v3"
 )
 
 var (
@@ -26,15 +28,30 @@ var (
 )
 
 func FuncMap() template.FuncMap {
-	funcMap := sprig.TxtFuncMap()
+	funcMap := template.FuncMap{}
 
+	sprigFuncMap := sprig.TxtFuncMap()
 	for orig, alias := range sprigAliases {
-		funcMap[alias] = funcMap[orig]
+		sprigFuncMap[alias] = sprigFuncMap[orig]
+	}
+	addToMap(funcMap, sprigFuncMap)
+
+	if gomplateEnabled() {
+		gomplateFuncMap := gomplate.CreateFuncs(context.Background(), cfg.Gomplate.Data)
+		addToMap(funcMap, gomplateFuncMap)
 	}
 
-	for name, f := range customFuncs {
-		funcMap[name] = f
-	}
+	addToMap(funcMap, customFuncs)
 
 	return funcMap
+}
+
+func addToMap(dst, src template.FuncMap) {
+	for k, v := range src {
+		dst[k] = v
+	}
+}
+
+func gomplateEnabled() bool {
+	return cfg != nil && cfg.Gomplate.Enabled
 }

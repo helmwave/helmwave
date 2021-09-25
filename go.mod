@@ -7,17 +7,14 @@ require (
 	github.com/aryann/difflib v0.0.0-20210328193216-ff5ff6dc229b // indirect
 	github.com/bombsimon/logrusr v1.0.0
 	github.com/databus23/helm-diff v3.1.1+incompatible
-	github.com/fatih/color v1.9.0 // indirect
 	github.com/gofrs/flock v0.8.0
-	github.com/google/go-cmp v0.5.6 // indirect
+	github.com/hairyhenderson/gomplate/v3 v3.10.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/logrus-emoji-formatter v1.0.1
-	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/lempiy/dgraph v0.0.0-20190713130529-88f0f7cdb48e
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.6.0
-	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
@@ -27,9 +24,9 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.4.0
 	helm.sh/helm/v3 v3.7.0
-	k8s.io/apimachinery v0.22.1
+	k8s.io/apimachinery v0.22.2
 	k8s.io/cli-runtime v0.22.1
-	k8s.io/client-go v0.22.1
+	k8s.io/client-go v0.22.2
 	k8s.io/helm v2.17.0+incompatible // indirect
 	k8s.io/klog/v2 v2.9.0
 )
