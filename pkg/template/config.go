@@ -9,14 +9,11 @@ type Config struct {
 }
 
 type GomplateConfig struct {
+	Data    *data.Data
 	Enabled bool
-
-	Data *data.Data
 }
 
-var (
-	cfg *Config
-)
+var cfg *Config
 
 func SetConfig(config *Config) {
 	cfg = config
