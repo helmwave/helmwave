@@ -11,6 +11,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -44,6 +45,7 @@ type Plan struct {
 type planBody struct {
 	Project      string
 	Version      string
+	Template     *template.Config
 	Repositories []*repo.Config
 	Releases     []*release.Config
 }
@@ -67,6 +69,8 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 	// if b.Version == "" {
 	// 	 b.Version = version.Version
 	// }
+
+	template.SetConfig(b.Template)
 
 	return b, err
 }
