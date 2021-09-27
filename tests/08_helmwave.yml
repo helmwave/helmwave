@@ -4,6 +4,12 @@ repositories:
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 
+template:
+  gomplate:
+    enabled: true
+    datasources:
+      test:
+        url: https://raw.githubusercontent.com/helmwave/helmwave/main/tests/06_values.yaml
 
 releases:
 - name: adm-frontend
@@ -49,3 +55,5 @@ releases:
   namespace: test
   chart:
     name: bitnami/nginx
+  values:
+    - tests/08_values.yaml
