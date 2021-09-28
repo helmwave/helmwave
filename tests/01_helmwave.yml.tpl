@@ -2,7 +2,7 @@ project: {{ env "PROJECT_NAME" | default "bad" }}
 
 repositories:
 - name: stable
-  url: https://kubernetes-charts.storage.googleapis.com
+  url: https://charts.helm.sh/stable
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 

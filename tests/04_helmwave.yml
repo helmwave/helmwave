@@ -2,7 +2,7 @@ project: Test04
 
 repositories:
 - name: stable
-  url: https://kubernetes-charts.storage.googleapis.com
+  url: https://charts.helm.sh/stable
 - name: cetic
   url: https://cetic.github.io/helm-charts
 
