@@ -169,3 +169,33 @@ func TestBuildAutoYml(t *testing.T) {
 		t.Error(plan.ErrManifestDirNotFound)
 	}
 }
+
+func TestBuildGomplate(t *testing.T) {
+	defer clean()
+
+	y := &Yml{
+		tests.Root + "08_helmwave.yml",
+		tests.Root + "08_values.yml",
+	}
+
+	s := &Build{
+		plandir:  tests.Root + plan.Dir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
+	}
+
+	value := "Test08"
+	_ = os.Setenv("PROJECT_NAME", value)
+	_ = os.Setenv("NAMESPACE", value)
+
+	err := s.Run()
+	if err != nil {
+		t.Error(err)
+	}
+
+	if ok := helper.IsExists(tests.Root + plan.Dir + plan.Manifest); !ok {
+		t.Error(plan.ErrManifestDirNotFound)
+	}
+}
