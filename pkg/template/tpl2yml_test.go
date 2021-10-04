@@ -22,7 +22,7 @@ func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
 		},
 	})
 
-	tpl := path.Join(tests.Root, "08_values.yaml")
+	tpl := path.Join(tests.Root, "09_values.yaml")
 
 	dst, err := os.CreateTemp("", "helmwave")
 	s.Require().NoError(err)
@@ -40,7 +40,7 @@ func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
 		},
 	})
 
-	tpl := path.Join(tests.Root, "08_values.yaml")
+	tpl := path.Join(tests.Root, "09_values.yaml")
 
 	dst, err := os.CreateTemp("", "helmwave")
 	s.Require().NoError(err)

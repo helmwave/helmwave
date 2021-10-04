@@ -7,35 +7,46 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestRenderEnv(t *testing.T) {
+type YmlTestSuite struct {
+	suite.Suite
+}
+
+func (s *YmlTestSuite) TestRenderEnv() {
 	defer clean()
 
-	s := &Yml{
+	y := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "01_helmwave.yml",
 	}
+	defer os.Remove(y.file)
 
 	value := "Test01"
 	_ = os.Setenv("PROJECT_NAME", value)
 	_ = os.Setenv("NAMESPACE", value)
 
-	err := s.Run()
-	if err != nil {
-		t.Error(err)
-	}
+	template.SetConfig(&template.Config{
+		Gomplate: template.GomplateConfig{
+			Enabled: false,
+		},
+	})
 
-	b, err := plan.NewBody(s.file)
-	if err != nil {
-		t.Error(err)
-	}
+	err := y.Run()
+	s.Require().NoError(err)
 
-	if (value != b.Project) || (value != b.Releases[0].Namespace) {
-		t.Error("Failed Test01")
-	}
+	b, err := plan.NewBody(y.file)
+	s.Require().NoError(err)
 
-	// Clean
-	_ = os.Remove(s.file)
+	s.Require().Equal(value, b.Project)
+	s.Require().Len(b.Releases, 1)
+	s.Require().Equal(value, b.Releases[0].Namespace)
+}
+
+func TestYmlTestSuite(t *testing.T) {
+	//t.Parallel()
+	suite.Run(t, new(YmlTestSuite))
 }

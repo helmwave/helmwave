@@ -1,4 +1,1 @@
-{{ if (file.Exists "08_values.yaml") }}
-image:
-  pullPolicy: {{ .Release.Store.pullPolicy }}
-{{ end }}
+{{ include "test" | data.YAML | data.ToYAML }}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/hairyhenderson/gomplate/v3"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -30,24 +31,27 @@ var (
 func FuncMap() template.FuncMap {
 	funcMap := template.FuncMap{}
 
+	log.Debug("Loading sprig template functions")
 	sprigFuncMap := sprig.TxtFuncMap()
 	for orig, alias := range sprigAliases {
 		sprigFuncMap[alias] = sprigFuncMap[orig]
 	}
-	addToMap(funcMap, sprigFuncMap)
+	addToMap(funcMap, sprigFuncMap, "sprig")
 
 	if gomplateEnabled() {
-		gomplateFuncMap := gomplate.CreateFuncs(context.Background(), cfg.Gomplate.Data)
-		addToMap(funcMap, gomplateFuncMap)
+		log.Debug("Loading gomplate template functions")
+		gomplateFuncMap := gomplate.CreateFuncs(context.Background(), cfg.Gomplate.data)
+		addToMap(funcMap, gomplateFuncMap, "gomplate")
 	}
 
-	addToMap(funcMap, customFuncs)
+	addToMap(funcMap, customFuncs, "custom overrides")
 
 	return funcMap
 }
 
-func addToMap(dst, src template.FuncMap) {
+func addToMap(dst, src template.FuncMap, name string) {
 	for k, v := range src {
+		log.Trace("Loading function ", k, " out of ", name)
 		dst[k] = v
 	}
 }
