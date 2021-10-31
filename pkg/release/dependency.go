@@ -12,15 +12,24 @@ import (
 var releasePubSub = pubsub.NewReleasePubSub()
 
 func (rel *Config) NotifySuccess() {
-	if !rel.dryRun {
-		releasePubSub.PublishSuccess(rel.Uniq())
+	if rel.dryRun {
+		return
 	}
+	releasePubSub.PublishSuccess(rel.Uniq())
 }
 
 func (rel *Config) NotifyFailed() {
-	if !rel.dryRun {
-		releasePubSub.PublishFailed(rel.Uniq())
+	if rel.dryRun {
+		return
 	}
+
+	if rel.AllowFailure {
+		log.Warnf("%s failed but is allowed to fail", rel.Uniq())
+		releasePubSub.PublishSuccess(rel.Uniq())
+		return
+	}
+
+	releasePubSub.PublishFailed(rel.Uniq())
 }
 
 func (rel *Config) addDependency(name uniqname.UniqName) {
