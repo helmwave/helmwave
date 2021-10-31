@@ -22,11 +22,11 @@ type Config struct {
 	Namespace                string            `yaml:"namespace"`
 	Description              string            `yaml:"description"`
 	DependsOn                []string          `yaml:"depends_on"`
-	AllowFailure             bool              `yaml:"allow_failure"`
 	Values                   []ValuesReference `yaml:"values"`
 	Tags                     []string          `yaml:"tags"`
 	Timeout                  time.Duration     `yaml:"timeout"`
 	MaxHistory               int
+	AllowFailure             bool `yaml:"allow_failure"`
 	CreateNamespace          bool
 	ResetValues              bool
 	Recreate                 bool
