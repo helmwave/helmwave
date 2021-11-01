@@ -18,14 +18,15 @@ type Config struct {
 	Store                    map[string]interface{}
 	Chart                    Chart
 	uniqName                 uniqname.UniqName
-	Name                     string
-	Namespace                string
-	Description              string
-	DependsOn                []string `yaml:"depends_on"`
-	Values                   []ValuesReference
-	Tags                     []string
-	Timeout                  time.Duration
+	Name                     string            `yaml:"name"`
+	Namespace                string            `yaml:"namespace"`
+	Description              string            `yaml:"description"`
+	DependsOn                []string          `yaml:"depends_on"`
+	Values                   []ValuesReference `yaml:"values"`
+	Tags                     []string          `yaml:"tags"`
+	Timeout                  time.Duration     `yaml:"timeout"`
 	MaxHistory               int
+	AllowFailure             bool `yaml:"allow_failure"`
 	CreateNamespace          bool
 	ResetValues              bool
 	Recreate                 bool
