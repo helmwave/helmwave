@@ -48,9 +48,9 @@ Call helm | via Golang Module | Shell Executor
 ### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
 
 ```
-$ docker run diamon/helmwave version
-0.12.7
-$ docker run --entrypoint=ash -it --rm diamon/helmwave
+$ docker run ghcr.io/helmwave/helmwave:scratch version
+0.15.1
+$ docker run --entrypoint=ash -it --rm ghcr.io/helmwave/helmwave:latest
 / # 
 ```
 

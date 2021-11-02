@@ -60,6 +60,9 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--label=org.opencontainers.image.licenses=MIT"
+    - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
+    - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
+    - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
 
     - "--platform=linux/amd64"
     - "--target=scratch-goreleaser"
@@ -80,6 +83,10 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.licenses=MIT"
+      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
+      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
+      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
+
 
       - "--platform=linux/amd64"
       - "--target=goreleaser"
