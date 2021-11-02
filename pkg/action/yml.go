@@ -18,7 +18,7 @@ func (i *Yml) Run() error {
 
 	log.WithField(
 		"build plan with next command",
-		"helmwave build",
+		"helmwave build -f "+i.file,
 	).Info("📄 YML is ready!")
 
 	return nil
