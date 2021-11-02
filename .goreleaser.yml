@@ -48,6 +48,26 @@ changelog:
 dockers:
   - dockerfile: Dockerfile
     image_templates:
+    - "ghcr.io/helmwave/helmwave:{{ .Version }}-scratch"
+    - "ghcr.io/helmwave/helmwave:scratch"
+
+    - "diamon/helmwave:{{ .Version }}-scratch"
+    - "diamon/helmwave:scratch"
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.licenses=MIT"
+
+    - "--platform=linux/amd64"
+    - "--target=scratch-goreleaser"
+    goos: linux
+    goarch: amd64
+    use_buildx: true
+  - dockerfile: Dockerfile
+    image_templates:
       - "ghcr.io/helmwave/helmwave:{{ .Version }}"
       - "ghcr.io/helmwave/helmwave:latest"
 
