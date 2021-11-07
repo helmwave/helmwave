@@ -13,7 +13,7 @@ import (
 
 var commands = []*cli.Command{
 	new(action.Build).Cmd(),
-	new(action.Diff).Cmd(),
+	new(action.DiffPlans).Cmd(),
 	new(action.Up).Cmd(),
 	new(action.List).Cmd(),
 	new(action.Rollback).Cmd(),

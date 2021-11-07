@@ -8,12 +8,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type Diff struct {
+type DiffPlans struct {
 	plandir1, plandir2 string
 	diffWide           int
+	diffShowSecret     bool
 }
 
-func (d *Diff) Run() error {
+func (d *DiffPlans) Run() error {
 	if d.plandir1 == d.plandir2 {
 		return errors.New("plan1 and plan2 are the same")
 	}
@@ -34,12 +35,12 @@ func (d *Diff) Run() error {
 		return os.ErrNotExist
 	}
 
-	plan1.Diff(plan2, d.diffWide)
+	plan1.Diff(plan2, d.diffWide, d.diffShowSecret)
 
 	return nil
 }
 
-func (d *Diff) Cmd() *cli.Command {
+func (d *DiffPlans) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "diff",
 		Usage:   "🆚 Differences between plan1 and plan2",
@@ -60,6 +61,7 @@ func (d *Diff) Cmd() *cli.Command {
 				Destination: &d.plandir2,
 			},
 			flagDiffWide(&d.diffWide),
+			flagDiffShowSecret(&d.diffShowSecret),
 		},
 		Action: toCtx(d.Run),
 	}

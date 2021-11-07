@@ -66,3 +66,13 @@ func flagDiffWide(v *int) *cli.IntFlag {
 		Destination: v,
 	}
 }
+
+func flagDiffShowSecret(v *bool) *cli.BoolFlag {
+	return &cli.BoolFlag{
+		Name:        "diff-show-secret",
+		Value:       true,
+		Usage:       "Show secret in diff",
+		EnvVars:     []string{"HELMWAVE_DIFF_SHOW_SECRET"},
+		Destination: v,
+	}
+}
