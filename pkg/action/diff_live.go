@@ -3,11 +3,12 @@ package action
 import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
+	"os"
 )
 
 type DiffLive struct {
-	plandir  string
-	diffWide int
+	plandir string
+	diff    *Diff
 }
 
 func (d *DiffLive) Run() error {
@@ -15,19 +16,21 @@ func (d *DiffLive) Run() error {
 	if err := p.Import(); err != nil {
 		return err
 	}
+	if ok := p.IsManifestExist(); !ok {
+		return os.ErrNotExist
+	}
 
-	p.DiffLive(d.diffWide)
+	p.DiffLive(d.diff.ShowSecret, d.diff.Wide)
 
 	return nil
 }
 
 func (d *DiffLive) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "diff-live",
-		Usage: "🆚 Differences between plan and live",
+		Name:  "live",
+		Usage: "plan 🆚 live",
 		Flags: []cli.Flag{
 			flagPlandir(&d.plandir),
-			flagDiffWide(&d.diffWide),
 		},
 		Action: toCtx(d.Run),
 	}

@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"errors"
 	"os"
 
 	"github.com/databus23/helm-diff/diff"
@@ -12,8 +13,10 @@ import (
 	live "helm.sh/helm/v3/pkg/release"
 )
 
-// Diff show diff between 2 plans
-func (p *Plan) Diff(b *Plan, diffWide int, showSecret bool) {
+var ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
+
+// DiffPlan show diff between 2 plans
+func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	visited := make([]uniqname.UniqName, 0, len(p.body.Releases))
 	k := 0
 
@@ -35,7 +38,7 @@ func (p *Plan) Diff(b *Plan, diffWide int, showSecret bool) {
 }
 
 // DiffLive show diff with production releases in k8s-cluster
-func (p *Plan) DiffLive(diffWide int, showSecret bool) {
+func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 	alive, _, err := p.GetLive()
 	if err != nil {
 		log.Fatalf("Something went wrong with getting realeases in the kubernetes cluster: %v", err)
@@ -51,7 +54,7 @@ func (p *Plan) DiffLive(diffWide int, showSecret bool) {
 		oldSpecs := manifest.Parse(alive[rel.Uniq()].Manifest, rel.Namespace)
 		newSpecs := manifest.Parse(p.manifests[m], rel.Namespace)
 
-		change := diff.Manifests(oldSpecs, newSpecs, []string{}, true, diffWide, os.Stdout)
+		change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, os.Stdout)
 		if !change {
 			k++
 			log.Info("🆚 ❎ ", rel.Uniq(), " no changes")

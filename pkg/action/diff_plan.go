@@ -1,7 +1,7 @@
 package action
 
 import (
-	"errors"
+	log "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -10,13 +10,12 @@ import (
 
 type DiffPlans struct {
 	plandir1, plandir2 string
-	diffWide           int
-	diffShowSecret     bool
+	diff               *Diff
 }
 
 func (d *DiffPlans) Run() error {
 	if d.plandir1 == d.plandir2 {
-		return errors.New("plan1 and plan2 are the same")
+		log.Warn(plan.ErrPlansAreTheSame)
 	}
 
 	plan1 := plan.New(d.plandir1)
@@ -35,34 +34,35 @@ func (d *DiffPlans) Run() error {
 		return os.ErrNotExist
 	}
 
-	plan1.Diff(plan2, d.diffWide, d.diffShowSecret)
+	plan1.DiffPlan(plan2, d.diff.ShowSecret, d.diff.Wide)
 
 	return nil
 }
 
 func (d *DiffPlans) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:    "diff",
-		Usage:   "🆚 Differences between plan1 and plan2",
-		Aliases: []string{"vs"},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "plandir1",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir1",
-				EnvVars:     []string{"HELMWAVE_PLANDIR_1", "HELMWAVE_PLANDIR"},
-				Destination: &d.plandir1,
-			},
-			&cli.StringFlag{
-				Name:        "plandir2",
-				Value:       ".helmwave/",
-				Usage:       "Path to plandir2",
-				EnvVars:     []string{"HELMWAVE_PLANDIR_2"},
-				Destination: &d.plandir2,
-			},
-			flagDiffWide(&d.diffWide),
-			flagDiffShowSecret(&d.diffShowSecret),
-		},
+		Name:   "plan",
+		Usage:  "plan1  🆚  plan2",
+		Flags:  d.flags(),
 		Action: toCtx(d.Run),
+	}
+}
+
+func (d *DiffPlans) flags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "plandir1",
+			Value:       ".helmwave/",
+			Usage:       "Path to plandir1",
+			EnvVars:     []string{"HELMWAVE_PLANDIR_1", "HELMWAVE_PLANDIR"},
+			Destination: &d.plandir1,
+		},
+		&cli.StringFlag{
+			Name:        "plandir2",
+			Value:       ".helmwave/",
+			Usage:       "Path to plandir2",
+			EnvVars:     []string{"HELMWAVE_PLANDIR_2"},
+			Destination: &d.plandir2,
+		},
 	}
 }

@@ -59,7 +59,7 @@ func flagTplFile(v *string) *cli.StringFlag {
 
 func flagDiffWide(v *int) *cli.IntFlag {
 	return &cli.IntFlag{
-		Name:        "diff-wide",
+		Name:        "wide",
 		Value:       5,
 		Usage:       "Show line around change",
 		EnvVars:     []string{"HELMWAVE_DIFF_WIDE"},
@@ -69,7 +69,7 @@ func flagDiffWide(v *int) *cli.IntFlag {
 
 func flagDiffShowSecret(v *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
-		Name:        "diff-show-secret",
+		Name:        "show-secret",
 		Value:       true,
 		Usage:       "Show secret in diff",
 		EnvVars:     []string{"HELMWAVE_DIFF_SHOW_SECRET"},

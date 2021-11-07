@@ -10,13 +10,12 @@ import (
 )
 
 type Build struct {
-	yml            *Yml
-	plandir        string
-	tags           cli.StringSlice
-	matchAll       bool
-	autoYml        bool
-	diffWide       int
-	diffShowSecret bool
+	yml      *Yml
+	plandir  string
+	tags     cli.StringSlice
+	matchAll bool
+	autoYml  bool
+	diff     *DiffPlans
 }
 
 func (i *Build) Run() error {
@@ -43,7 +42,12 @@ func (i *Build) Run() error {
 		}
 
 		// Diff
-		newPlan.Diff(oldPlan, i.diffWide, i.diffShowSecret)
+		//newPlan.Diff(oldPlan, i.diffWide, i.diffShowSecret)
+		err := i.diff.Run()
+		if err != nil {
+			return err
+		}
+
 	}
 
 	err = newPlan.Export()
@@ -76,8 +80,6 @@ func (i *Build) flags() []cli.Flag {
 		flagPlandir(&i.plandir),
 		flagTags(&i.tags),
 		flagMatchAllTags(&i.matchAll),
-		flagDiffWide(&i.diffWide),
-		flagDiffShowSecret(&i.diffShowSecret),
 
 		&cli.BoolFlag{
 			Name:        "yml",
