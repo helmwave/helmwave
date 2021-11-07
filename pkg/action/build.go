@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type Build struct {
+type Build struct { //nolint:govet
 	yml      *Yml
 	plandir  string
 	tags     cli.StringSlice
@@ -42,12 +42,10 @@ func (i *Build) Run() error {
 		}
 
 		// Diff
-		//newPlan.Diff(oldPlan, i.diffWide, i.diffShowSecret)
-		err := i.diff.Run()
+		err = i.diff.Run()
 		if err != nil {
 			return err
 		}
-
 	}
 
 	err = newPlan.Export()

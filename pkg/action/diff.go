@@ -10,7 +10,6 @@ type Diff struct {
 }
 
 func (d *Diff) Cmd() *cli.Command {
-
 	plan := DiffPlans{diff: d}
 	live := DiffLive{diff: d}
 

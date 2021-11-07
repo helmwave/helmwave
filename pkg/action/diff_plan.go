@@ -1,14 +1,14 @@
 package action
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
-type DiffPlans struct {
+type DiffPlans struct { //nolint:govet
 	plandir1, plandir2 string
 	diff               *Diff
 }

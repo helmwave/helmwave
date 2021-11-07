@@ -1,12 +1,13 @@
 package action
 
 import (
+	"os"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
-	"os"
 )
 
-type DiffLive struct {
+type DiffLive struct { //nolint:govet
 	plandir string
 	diff    *Diff
 }
