@@ -3,9 +3,10 @@
 package plan
 
 import (
+	"testing"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
-	"testing"
 )
 
 func TestExportValuesEmpty(t *testing.T) {
@@ -42,5 +43,4 @@ func TestExportValuesOneRelease(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }

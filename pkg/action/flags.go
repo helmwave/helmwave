@@ -57,12 +57,32 @@ func flagTplFile(v *string) *cli.StringFlag {
 	}
 }
 
+func flagDiffMode(v *string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:        "diff-mode",
+		Value:       "live",
+		Usage:       "You can set: [ live | local ]",
+		EnvVars:     []string{"HELMWAVE_DIFF_MODE"},
+		Destination: v,
+	}
+}
+
 func flagDiffWide(v *int) *cli.IntFlag {
 	return &cli.IntFlag{
-		Name:        "diff-wide",
+		Name:        "wide",
 		Value:       5,
 		Usage:       "Show line around change",
 		EnvVars:     []string{"HELMWAVE_DIFF_WIDE"},
+		Destination: v,
+	}
+}
+
+func flagDiffShowSecret(v *bool) *cli.BoolFlag {
+	return &cli.BoolFlag{
+		Name:        "show-secret",
+		Value:       true,
+		Usage:       "Show secret in diff",
+		EnvVars:     []string{"HELMWAVE_DIFF_SHOW_SECRET"},
 		Destination: v,
 	}
 }

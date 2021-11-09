@@ -9,14 +9,23 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type Build struct {
+type Build struct { //nolint:govet
 	yml      *Yml
 	plandir  string
 	tags     cli.StringSlice
 	matchAll bool
 	autoYml  bool
-	diffWide int
+
+	diffMode string
+	diff     *Diff
+	// diffLive *DiffLive
+	// diffLocal *DiffLocalPlan
 }
+
+var (
+	diffModeLive  = "live"
+	diffModeLocal = "local"
+)
 
 func (i *Build) Run() error {
 	if i.autoYml {
@@ -34,15 +43,23 @@ func (i *Build) Run() error {
 	// Show current plan
 	newPlan.PrettyPlan()
 
-	oldPlan := plan.New(i.plandir)
-	if oldPlan.IsExist() {
-		log.Info("🆚 Diff with previous plan")
-		if err := oldPlan.Import(); err != nil {
-			return err
+	switch i.diffMode {
+	case diffModeLocal:
+		oldPlan := plan.New(i.plandir)
+		if oldPlan.IsExist() {
+			log.Info("🆚 Diff with previous local plan")
+			if err := oldPlan.Import(); err != nil {
+				return err
+			}
+
+			newPlan.DiffPlan(oldPlan, i.diff.ShowSecret, i.diff.Wide)
 		}
 
-		// Diff
-		newPlan.Diff(oldPlan, i.diffWide)
+	case diffModeLive:
+		log.Info("🆚 Diff manifests in the kubernetes cluster")
+		newPlan.DiffLive(i.diff.ShowSecret, i.diff.Wide)
+	default:
+		log.Warnf("I dont know what is %q. I am skiping diff.", i.diffMode)
 	}
 
 	err = newPlan.Export()
@@ -70,12 +87,13 @@ func (i *Build) Cmd() *cli.Command {
 func (i *Build) flags() []cli.Flag {
 	// Init sub-structures
 	i.yml = &Yml{}
+	i.diff = &Diff{}
 
 	self := []cli.Flag{
 		flagPlandir(&i.plandir),
 		flagTags(&i.tags),
 		flagMatchAllTags(&i.matchAll),
-		flagDiffWide(&i.diffWide),
+		flagDiffMode(&i.diffMode),
 
 		&cli.BoolFlag{
 			Name:        "yml",
@@ -86,7 +104,10 @@ func (i *Build) flags() []cli.Flag {
 		},
 	}
 
-	return append(self, i.yml.flags()...)
+	self = append(self, i.diff.flags()...)
+	self = append(self, i.yml.flags()...)
+
+	return self
 }
 
 func (i *Build) normalizeTags() []string {
