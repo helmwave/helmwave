@@ -8,12 +8,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type DiffPlans struct { //nolint:govet
+type DiffLocalPlan struct { //nolint:govet
 	plandir1, plandir2 string
 	diff               *Diff
 }
 
-func (d *DiffPlans) Run() error {
+func (d *DiffLocalPlan) Run() error {
 	if d.plandir1 == d.plandir2 {
 		log.Warn(plan.ErrPlansAreTheSame)
 	}
@@ -39,7 +39,7 @@ func (d *DiffPlans) Run() error {
 	return nil
 }
 
-func (d *DiffPlans) Cmd() *cli.Command {
+func (d *DiffLocalPlan) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "plan",
 		Usage:  "plan1  🆚  plan2",
@@ -48,7 +48,7 @@ func (d *DiffPlans) Cmd() *cli.Command {
 	}
 }
 
-func (d *DiffPlans) flags() []cli.Flag {
+func (d *DiffLocalPlan) flags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "plandir1",

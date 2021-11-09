@@ -6,6 +6,8 @@ import (
 )
 
 func (rel *Config) Get() (*release.Release, error) {
+	// IDK wtf is going on
+	rel.cfg = nil
 	client := action.NewGet(rel.Cfg())
 	return client.Run(rel.Name)
 }

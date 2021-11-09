@@ -49,15 +49,17 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 	for _, rel := range p.body.Releases {
 		m := rel.Uniq() + ".yml"
 		visited = append(visited, rel.Uniq())
-		// I dont use manifest.ParseRelease
-		// Because Structs are different.
-		oldSpecs := manifest.Parse(alive[rel.Uniq()].Manifest, rel.Namespace)
-		newSpecs := manifest.Parse(p.manifests[m], rel.Namespace)
+		if active, ok := alive[rel.Uniq()]; ok {
+			// I dont use manifest.ParseRelease
+			// Because Structs are different.
+			oldSpecs := manifest.Parse(active.Manifest, rel.Namespace)
+			newSpecs := manifest.Parse(p.manifests[m], rel.Namespace)
 
-		change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, os.Stdout)
-		if !change {
-			k++
-			log.Info("🆚 ❎ ", rel.Uniq(), " no changes")
+			change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, os.Stdout)
+			if !change {
+				k++
+				log.Info("🆚 ❎ ", rel.Uniq(), " no changes")
+			}
 		}
 	}
 
@@ -79,6 +81,16 @@ func showChangesReport(releases []*release.Config, visited []uniqname.UniqName, 
 	}
 }
 
+func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
+	for _, rel := range p.body.Releases {
+		if rel.Uniq() == name {
+			return rel.Get()
+		}
+	}
+
+	return nil, errors.New("release 404")
+}
+
 // GetLive returns maps of releases in a k8s-cluster
 func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []uniqname.UniqName, err error) {
 	wg := parallel.NewWaitGroup()
@@ -91,7 +103,7 @@ func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []
 			defer wg.Done()
 			r, err := rel.Get()
 			if err != nil {
-				log.Warn(err)
+				log.Warnf("I cant get realease from k8s: %v", err)
 				notFound = append(notFound, rel.Uniq())
 			} else {
 				found[rel.Uniq()] = r
