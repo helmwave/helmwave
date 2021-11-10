@@ -51,7 +51,7 @@ func (p *Plan) exportManifest() error {
 	}
 
 	for k, v := range p.manifests {
-		m := filepath.Join(p.dir, Manifest, string(k))
+		m := filepath.Join(p.dir, Manifest, string(k)+".yml")
 
 		f, err := helper.CreateFile(m)
 		if err != nil {
