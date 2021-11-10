@@ -47,6 +47,6 @@ func (s *YmlTestSuite) TestRenderEnv() {
 }
 
 func TestYmlTestSuite(t *testing.T) {
-	//t.Parallel()
+	// t.Parallel()
 	suite.Run(t, new(YmlTestSuite))
 }

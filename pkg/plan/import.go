@@ -48,7 +48,9 @@ func (p *Plan) importManifest() error {
 				return err
 			}
 
-			p.manifests[uniqname.UniqName(l.Name())] = string(c)
+			n := l.Name()[:len(l.Name())-4]
+
+			p.manifests[uniqname.UniqName(n)] = string(c)
 		}
 	}
 

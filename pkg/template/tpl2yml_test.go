@@ -3,10 +3,11 @@
 package template
 
 import (
-	"github.com/helmwave/helmwave/tests"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/helmwave/helmwave/tests"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -52,6 +53,6 @@ func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
 }
 
 func TestTpl2YmlTestSuite(t *testing.T) {
-	//t.Parallel()
+	// t.Parallel()
 	suite.Run(t, new(Tpl2YmlTestSuite))
 }

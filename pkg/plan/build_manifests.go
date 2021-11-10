@@ -42,8 +42,7 @@ func (p *Plan) buildManifest() error {
 
 			log.Trace(document)
 
-			m := rel.Uniq() + ".yml"
-			p.manifests[m] = document
+			p.manifests[rel.Uniq()] = document
 
 			log.Infof("✅ %s manifest done", rel.Uniq())
 		}(wg, rel)
