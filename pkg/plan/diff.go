@@ -21,11 +21,10 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	k := 0
 
 	for _, rel := range p.body.Releases {
-		m := rel.Uniq() + ".yml"
 		visited = append(visited, rel.Uniq())
 
-		oldSpecs := manifest.Parse(b.manifests[m], rel.Namespace)
-		newSpecs := manifest.Parse(p.manifests[m], rel.Namespace)
+		oldSpecs := manifest.Parse(b.manifests[rel.Uniq()], rel.Namespace)
+		newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace)
 
 		change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, os.Stdout)
 		if !change {
@@ -47,13 +46,12 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 	visited := make([]uniqname.UniqName, 0, len(p.body.Releases))
 	k := 0
 	for _, rel := range p.body.Releases {
-		m := rel.Uniq() + ".yml"
 		visited = append(visited, rel.Uniq())
 		if active, ok := alive[rel.Uniq()]; ok {
 			// I dont use manifest.ParseRelease
 			// Because Structs are different.
 			oldSpecs := manifest.Parse(active.Manifest, rel.Namespace)
-			newSpecs := manifest.Parse(p.manifests[m], rel.Namespace)
+			newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace)
 
 			change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, os.Stdout)
 			if !change {
