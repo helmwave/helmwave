@@ -68,7 +68,7 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 func showChangesReport(releases []*release.Config, visited []uniqname.UniqName, k int) {
 	previous := false
 	for _, rel := range releases {
-		if !uniqname.Contains(rel.Uniq(), visited) {
+		if !rel.Uniq().In(visited) {
 			previous = true
 			log.Warn("🆚 ", rel.Uniq(), " was found in previous plan but not affected in new")
 		}

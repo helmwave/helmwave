@@ -156,7 +156,7 @@ func TestBuildAutoYml(t *testing.T) {
 		yml:      y,
 	}
 
-	value := "Test01"
+	value := "test01"
 	_ = os.Setenv("PROJECT_NAME", value)
 	_ = os.Setenv("NAMESPACE", value)
 
@@ -186,7 +186,7 @@ func TestBuildGomplate(t *testing.T) {
 		yml:      y,
 	}
 
-	value := "Test08"
+	value := "test08"
 	_ = os.Setenv("PROJECT_NAME", value)
 	_ = os.Setenv("NAMESPACE", value)
 

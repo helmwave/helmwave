@@ -25,7 +25,7 @@ func (s *YmlTestSuite) TestRenderEnv() {
 	}
 	defer os.Remove(y.file)
 
-	value := "Test01"
+	value := "test01"
 	_ = os.Setenv("PROJECT_NAME", value)
 	_ = os.Setenv("NAMESPACE", value)
 

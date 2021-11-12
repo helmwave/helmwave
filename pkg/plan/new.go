@@ -70,9 +70,13 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 	// 	 b.Version = version.Version
 	// }
 
+	if err := b.Validate(); err != nil {
+		return nil, err
+	}
+
 	template.SetConfig(b.Template)
 
-	return b, err
+	return b, nil
 }
 
 func New(dir string) *Plan {
