@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"net/url"
 	"os"
 	"regexp"
 
@@ -50,12 +51,16 @@ func (p *planBody) Validate() error {
 func (p *planBody) ValidateRepositories() error {
 	a := make(map[string]int8)
 	for _, r := range p.Repositories {
-		if len(r.Name) == 0 {
+		if r.Name == "" {
 			return errors.New("repository name is empty")
 		}
 
-		if len(r.URL) == 0 {
+		if r.URL == "" {
 			return errors.New("repository url is empty")
+		}
+
+		if _, err := url.Parse(r.URL); err != nil {
+			return errors.New("cant parse url: " + r.URL)
 		}
 
 		a[r.Name]++
@@ -70,7 +75,7 @@ func (p *planBody) ValidateRepositories() error {
 func (p *planBody) ValidateReleases() error {
 	a := make(map[string]int8)
 	for _, r := range p.Releases {
-		if len(r.Name) == 0 {
+		if r.Name == "" {
 			return errors.New("release name is empty")
 		}
 
@@ -78,7 +83,7 @@ func (p *planBody) ValidateReleases() error {
 			return errors.New("bad uniqname: " + string(r.Uniq()))
 		}
 
-		if len(r.Namespace) == 0 {
+		if r.Namespace == "" {
 			log.Warnf("namespace for %q is empty. I will use the namespace of your k8s context.", r.Uniq())
 		}
 
