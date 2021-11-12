@@ -10,7 +10,7 @@ ignore:
 coverage:
   precision: 2
   round: down
-  range: "70...100"
+  range: "20...70"
 
 parsers:
   gcov:
