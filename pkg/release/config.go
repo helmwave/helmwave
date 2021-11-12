@@ -112,14 +112,13 @@ func (rel *Config) newUpgrade() *action.Upgrade {
 var (
 	ErrNotFound      = driver.ErrReleaseNotFound
 	ErrFoundMultiple = errors.New("found multiple releases o_0")
-	ErrEmpty         = errors.New("releases are empty")
 	ErrDepFailed     = errors.New("dependency failed")
 )
 
 // Uniq redis@my-namespace
 func (rel *Config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
-		rel.uniqName = uniqname.UniqName(rel.Name + "@" + rel.Namespace)
+		rel.uniqName = uniqname.UniqName(rel.Name + uniqname.Separator + rel.Namespace)
 	}
 
 	return rel.uniqName
