@@ -2,7 +2,7 @@ package template
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 	"text/template"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -19,7 +19,7 @@ func Tpl2yml(tpl, yml string, data interface{}) error {
 		data = map[string]interface{}{}
 	}
 
-	src, err := ioutil.ReadFile(tpl)
+	src, err := os.ReadFile(tpl)
 	if err != nil {
 		return err
 	}

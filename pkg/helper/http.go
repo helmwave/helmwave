@@ -14,7 +14,7 @@ func Download(file, uri string) error {
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(context.TODO(), "GET", uri, nil)
+	req, err := http.NewRequestWithContext(context.TODO(), "GET", uri, http.NoBody)
 	if err != nil {
 		return err
 	}

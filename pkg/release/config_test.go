@@ -15,5 +15,4 @@ func TestConfigUniq(t *testing.T) {
 	if r.Uniq().Validate() {
 		t.Error("problem with validate uniqname")
 	}
-
 }
