@@ -3,7 +3,6 @@ package template
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"reflect"
@@ -166,7 +165,7 @@ func Required(warn string, val interface{}) (interface{}, error) {
 }
 
 func ReadFile(file string) (string, error) {
-	bytes, err := ioutil.ReadFile(file)
+	bytes, err := os.ReadFile(file)
 	if err != nil {
 		return "", err
 	}
@@ -216,7 +215,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 			if defSet {
 				return def, nil
 			}
-			return nil, &noValueError{fmt.Sprintf("no value exist for key \"%s\" in %v", keys[0], typedObj)}
+			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
 		}
 	case map[interface{}]interface{}:
 		v, ok = typedObj[keys[0]]
@@ -224,27 +223,27 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 			if defSet {
 				return def, nil
 			}
-			return nil, &noValueError{fmt.Sprintf("no value exist for key \"%s\" in %v", keys[0], typedObj)}
+			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
 		}
 	default:
 		maybeStruct := reflect.ValueOf(typedObj)
 		if maybeStruct.Kind() != reflect.Struct {
 			return nil, &noValueError{
 				fmt.Sprintf(
-					"unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct",
+					"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
 					reflect.TypeOf(obj),
 					keys[0],
 				),
 			}
 		} else if maybeStruct.NumField() < 1 {
-			return nil, &noValueError{fmt.Sprintf("no accessible struct fields for key \"%s\"", keys[0])}
+			return nil, &noValueError{fmt.Sprintf("no accessible struct fields for key %q", keys[0])}
 		}
 		f := maybeStruct.FieldByName(keys[0])
 		if !f.IsValid() {
 			if defSet {
 				return def, nil
 			}
-			return nil, &noValueError{fmt.Sprintf("no field named \"%s\" exist in %v", keys[0], typedObj)}
+			return nil, &noValueError{fmt.Sprintf("no field named %q exist in %v", keys[0], typedObj)}
 		}
 		v = f.Interface()
 	}
@@ -299,13 +298,13 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 		if maybeStruct.Kind() != reflect.Struct {
 			return false, &noValueError{
 				fmt.Sprintf(
-					"unexpected type(%v) of value for key \"%s\": it must be either map[string]interface{} or any struct",
+					"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
 					reflect.TypeOf(obj),
 					keys[0],
 				),
 			}
 		} else if maybeStruct.NumField() < 1 {
-			return false, &noValueError{fmt.Sprintf("no accessible struct fields for key \"%s\"", keys[0])}
+			return false, &noValueError{fmt.Sprintf("no accessible struct fields for key %q", keys[0])}
 		}
 		f := maybeStruct.FieldByName(keys[0])
 		if !f.IsValid() {

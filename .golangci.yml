@@ -5,6 +5,7 @@ run:
 linters:
   enable-all: true
   disable:
+    - varnamelen
     - cyclop
     - deadcode
     - dupl

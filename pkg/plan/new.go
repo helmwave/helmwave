@@ -2,7 +2,6 @@ package plan
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -55,7 +54,7 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 		Version: version.Version,
 	}
 
-	src, err := ioutil.ReadFile(file)
+	src, err := os.ReadFile(file)
 	if err != nil {
 		return b, err
 	}
