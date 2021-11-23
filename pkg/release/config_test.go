@@ -1,3 +1,5 @@
+//go:build ignore || unit
+
 package release
 
 import "testing"
@@ -12,7 +14,7 @@ func TestConfigUniq(t *testing.T) {
 		t.Error("method uniq() doesnt work")
 	}
 
-	if r.Uniq().Validate() {
+	if !r.Uniq().Validate() {
 		t.Error("problem with validate uniqname")
 	}
 }
