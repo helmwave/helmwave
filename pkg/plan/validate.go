@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -73,14 +74,10 @@ func (p *planBody) ValidateRepositories() error {
 }
 
 func (p *planBody) ValidateReleases() error {
-	a := make(map[string]int8)
+	a := make(map[uniqname.UniqName]int8)
 	for _, r := range p.Releases {
 		if r.Name == "" {
 			return errors.New("release name is empty")
-		}
-
-		if !r.Uniq().Validate() {
-			return errors.New("bad uniqname: " + string(r.Uniq()))
 		}
 
 		if r.Namespace == "" {
@@ -91,9 +88,13 @@ func (p *planBody) ValidateReleases() error {
 			return errors.New("bad namespace: " + r.Namespace)
 		}
 
-		a[r.Name]++
-		if a[r.Name] > 1 {
-			return errors.New("release name duplicate: " + r.Name)
+		if !r.Uniq().Validate() {
+			return errors.New("bad uniqname: " + string(r.Uniq()))
+		}
+
+		a[r.Uniq()]++
+		if a[r.Uniq()] > 1 {
+			return errors.New("release duplicate: " + string(r.Uniq()))
 		}
 	}
 
