@@ -116,9 +116,10 @@ func (p *Plan) syncReleases() (err error) {
 	fails := make(map[*release.Config]error)
 
 	for i := range p.body.Releases {
+		p.body.Releases[i].HandleDependencies(p.body.Releases)
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
-			log.Infof("🛥 %q deployig... ", rel.Uniq())
+			log.Infof("🛥 %q deploying... ", rel.Uniq())
 			_, err = rel.Sync()
 			if err != nil {
 				log.Errorf("❌ %s: %v", rel.Uniq(), err)
