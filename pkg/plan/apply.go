@@ -119,7 +119,7 @@ func (p *Plan) syncReleases() (err error) {
 		p.body.Releases[i].HandleDependencies(p.body.Releases)
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
-			log.Infof("🛥 %q deploing... ", rel.Uniq())
+			log.Infof("🛥 %q deploying... ", rel.Uniq())
 			_, err = rel.Sync()
 			if err != nil {
 				log.Errorf("❌ %s: %v", rel.Uniq(), err)
