@@ -21,10 +21,10 @@ require (
 	github.com/werf/logboek v0.5.4
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.4.0
-	helm.sh/helm/v3 v3.7.1
-	k8s.io/apimachinery v0.22.2
-	k8s.io/cli-runtime v0.22.1
-	k8s.io/client-go v0.22.2
+	helm.sh/helm/v3 v3.7.2
+	k8s.io/apimachinery v0.22.4
+	k8s.io/cli-runtime v0.22.4
+	k8s.io/client-go v0.22.4
 	k8s.io/klog/v2 v2.9.0
 )
 
@@ -42,7 +42,7 @@ require (
 	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
-	github.com/Masterminds/squirrel v1.5.0 // indirect
+	github.com/Masterminds/squirrel v1.5.2 // indirect
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/Microsoft/hcsshim v0.8.21 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20210920160938-87db9fbc61c7 // indirect
@@ -216,13 +216,13 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e // indirect
-	k8s.io/api v0.22.2 // indirect
-	k8s.io/apiextensions-apiserver v0.22.1 // indirect
-	k8s.io/apiserver v0.22.1 // indirect
-	k8s.io/component-base v0.22.1 // indirect
+	k8s.io/api v0.22.4 // indirect
+	k8s.io/apiextensions-apiserver v0.22.4 // indirect
+	k8s.io/apiserver v0.22.4 // indirect
+	k8s.io/component-base v0.22.4 // indirect
 	k8s.io/helm v2.17.0+incompatible // indirect
-	k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e // indirect
-	k8s.io/kubectl v0.22.1 // indirect
+	k8s.io/kube-openapi v0.0.0-20211109043538-20434351676c // indirect
+	k8s.io/kubectl v0.22.4 // indirect
 	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a // indirect
 	oras.land/oras-go v0.4.0 // indirect
 	sigs.k8s.io/kustomize/api v0.8.11 // indirect
