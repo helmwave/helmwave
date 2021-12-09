@@ -68,7 +68,7 @@ dockers:
     - "--target=scratch-goreleaser"
     goos: linux
     goarch: amd64
-    use_buildx: true
+    use: buildx
   - dockerfile: Dockerfile
     image_templates:
       - "ghcr.io/helmwave/helmwave:{{ .Version }}"
@@ -92,7 +92,7 @@ dockers:
       - "--target=goreleaser"
     goos: linux
     goarch: amd64
-    use_buildx: true
+    use: buildx
 
 brews:
   - tap:
