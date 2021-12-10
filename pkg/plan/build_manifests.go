@@ -2,10 +2,11 @@ package plan
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
-	"sync"
 )
 
 func (p *Plan) buildManifest() error {
