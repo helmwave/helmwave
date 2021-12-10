@@ -1,0 +1,26 @@
+name: trivy
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '44 10 * * 6'
+
+jobs:
+  build:
+    name: Build
+    runs-on: "ubuntu-18.04"
+    steps:
+      - name: Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@2a2157eb22c08c9a1fac99263430307b8d1bc7a2
+        with:
+          image-ref: 'ghcr.io/helmwave/helmwave:latest'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
