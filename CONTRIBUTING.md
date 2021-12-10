@@ -10,3 +10,13 @@ We use milestones to track progress of specific planned releases.
 ## Versioning
 
 We use [semver](https://semver.org/) 
+
+## Developing flow
+
+*fix/feature-branch --> release-$SEMVER --> main*
+
+
+**Example:**
+
+- my-feature --> release-0.15.0 --> main
+- my-fix --> release-0.15.1 --> main
