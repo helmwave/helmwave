@@ -20,3 +20,9 @@ We use [semver](https://semver.org/)
 
 - my-feature --> release-0.15.0 --> main
 - my-fix --> release-0.15.1 --> main
+
+
+## How to build?
+
+https://helmwave.github.io/docs/0.16.x/install/#compile-from-source
+
