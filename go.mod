@@ -12,7 +12,7 @@ require (
 	github.com/helmwave/logrus-emoji-formatter v1.0.1
 	github.com/lempiy/dgraph v0.0.0-20190713130529-88f0f7cdb48e
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/otiai10/copy v1.6.0
+	github.com/otiai10/copy v1.7.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
