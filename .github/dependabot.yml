@@ -11,6 +11,7 @@ updates:
       interval: "daily"
     labels:
       - "dependencies"
+      - "go mod"
       
   - package-ecosystem: "docker"
     directory: "/"
@@ -18,6 +19,7 @@ updates:
       interval: "weekly"
     labels:
       - "dependencies"
+      - "dockerfile"
      
      
   - package-ecosystem: "github-actions"
@@ -26,4 +28,5 @@ updates:
       interval: "weekly"
     labels:
       - "dependencies"
+      - "ci"
 
