@@ -31,7 +31,7 @@ jobs:
       - name: Run unit tests
         run: go test -race -coverpkg=./pkg/... -coverprofile=./unit.cov -v --tags=unit -covermode=atomic ./...
 
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v2.1.0
         with:
           files: ./unit.cov
           flags: unit
