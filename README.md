@@ -1,8 +1,8 @@
 <p align="center">
-  <img  src="https://raw.githubusercontent.com/helmwave/logo/main/logo.png" style="max-height:100%;" height="220px" />
+  <img  src="https://raw.githubusercontent.com/helmwave/logo/main/logo.png" style="max-height:100%;" height="300px" />
 </p>
 
-<h1 align="center"> HelmWave</h1>
+<h1 align="center"> Helmwave</h1>
 
 <p align="center">
   <a href="https://github.com/helmwave/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/helmwave/helmwave/workflows/release/badge.svg" /></a>
@@ -13,7 +13,7 @@
 </p>
 
 
-🌊 HelmWave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**.
+🌊 Helmwave is **[helm](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts via **GitOps**.
 HelmWave is like docker-compose for helm.
 
 - Deploy multiple environments by one step
@@ -23,6 +23,8 @@ HelmWave is like docker-compose for helm.
 - Maintain changes in version control.
 - Template values
 - Step by Step deployment.
+
+Look at in our [docs](https://helmwave.github.io/docs)
 
 
 ## Comparison
@@ -50,7 +52,7 @@ Call helm | via Golang Module | Shell Executor
 
 ```
 $ docker run ghcr.io/helmwave/helmwave:scratch version
-0.15.1
+0.16.5
 $ docker run --entrypoint=ash -it --rm ghcr.io/helmwave/helmwave:latest
 / # 
 ```
@@ -64,3 +66,5 @@ Documentation available at https://helmwave.github.io/docs
 
 - [telegram chat](https://t.me/helmwave)
 - [kanban](https://github.com/orgs/helmwave/projects/1)
+- [contribution guide](https://github.com/helmwave/helmwave/blob/main/CONTRIBUTING.md)
+- [security and vulnerabilities](https://github.com/helmwave/helmwave/blob/main/SECURITY.md)
