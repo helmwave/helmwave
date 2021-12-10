@@ -2,6 +2,7 @@ package plan
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -11,6 +12,8 @@ import (
 func (p *Plan) buildManifest() error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
+
+	mu := &sync.Mutex{}
 
 	for _, rel := range p.body.Releases {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
@@ -42,7 +45,9 @@ func (p *Plan) buildManifest() error {
 
 			log.Trace(document)
 
+			mu.Lock()
 			p.manifests[rel.Uniq()] = document
+			mu.Unlock()
 
 			log.Infof("✅ %s manifest done", rel.Uniq())
 		}(wg, rel)
