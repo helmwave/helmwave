@@ -24,7 +24,7 @@ HelmWave is like docker-compose for helm.
 - Template values
 - Step by Step deployment.
 
-Look at in our [docs](https://helmwave.github.io/docs)
+Look at  the examples in our [docs](https://helmwave.github.io/docs)
 
 
 ## Comparison
