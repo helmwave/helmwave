@@ -21,7 +21,7 @@ func (ts *BuildTestSuite) TearDownTest() {
 	_ = os.RemoveAll(tests.Root + plan.Dir)
 }
 
-func (ts *BuildTestSuite) BuildManifest() {
+func (ts *BuildTestSuite) TestManifest() {
 	y := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "02_helmwave.yml",
@@ -38,7 +38,7 @@ func (ts *BuildTestSuite) BuildManifest() {
 	ts.Require().DirExists(tests.Root + plan.Dir + plan.Manifest)
 }
 
-// func (ts *BuildTestSuite) BuildRepositories404() {
+// func (ts *BuildTestSuite) TestRepositories404() {
 //	s := &Build{
 //		plandir:  tests.Root + plan.Dir,
 //		ymlFile:      tests.Root + "04_helmwave.yml",
@@ -52,7 +52,7 @@ func (ts *BuildTestSuite) BuildManifest() {
 //	}
 // }
 
-func (ts *BuildTestSuite) BuildRepositories() {
+func (ts *BuildTestSuite) TestRepositories() {
 	y := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "02_helmwave.yml",
@@ -75,7 +75,7 @@ func (ts *BuildTestSuite) BuildRepositories() {
 	}
 }
 
-func (ts *BuildTestSuite) BuildReleasesMatchGroup() {
+func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 	y := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "03_helmwave.yml",
@@ -117,7 +117,7 @@ func (ts *BuildTestSuite) BuildReleasesMatchGroup() {
 
 }
 
-func (ts *BuildTestSuite) BuildAutoYml() {
+func (ts *BuildTestSuite) TestAutoYml() {
 	y := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "01_auto_yaml_helmwave.yml",
@@ -139,7 +139,7 @@ func (ts *BuildTestSuite) BuildAutoYml() {
 	ts.Require().DirExists(tests.Root + plan.Dir + plan.Manifest)
 }
 
-func (ts *BuildTestSuite) BuildGomplate() {
+func (ts *BuildTestSuite) TestGomplate() {
 	y := &Yml{
 		tests.Root + "08_helmwave.yml",
 		tests.Root + "08_values.yml",
@@ -159,6 +159,44 @@ func (ts *BuildTestSuite) BuildGomplate() {
 
 	ts.Require().NoError(s.Run())
 	ts.Require().DirExists(tests.Root + plan.Dir + plan.Manifest)
+}
+
+func (ts *BuildTestSuite) TestDiffLocal() {
+	y := &Yml{
+		tests.Root + "08_helmwave.yml",
+		tests.Root + "08_values.yml",
+	}
+
+	s := &Build{
+		plandir:  tests.Root + plan.Dir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
+		diff:     &Diff{},
+		diffMode: diffModeLocal,
+	}
+
+	ts.Require().NoError(s.Run())
+}
+
+func (ts *BuildTestSuite) TestDiffLive() {
+	y := &Yml{
+		tests.Root + "08_helmwave.yml",
+		tests.Root + "08_values.yml",
+	}
+
+	s := &Build{
+		plandir:  tests.Root + plan.Dir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
+		diff:     &Diff{},
+		diffMode: diffModeLive,
+	}
+
+	ts.Require().NoError(s.Run())
 }
 
 func TestBuildTestSuite(t *testing.T) {
