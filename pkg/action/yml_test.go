@@ -3,12 +3,10 @@
 package action
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -18,7 +16,7 @@ type YmlTestSuite struct {
 }
 
 func (s *YmlTestSuite) TestRenderEnv() {
-	tmpDir := ts.T().TempDir()
+	tmpDir := s.T().TempDir()
 	y := &Yml{
 		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		filepath.Join(tmpDir, "01_helmwave.yml"),
