@@ -16,7 +16,7 @@ func (p *Plan) buildManifest() error {
 	mu := &sync.Mutex{}
 
 	for _, rel := range p.body.Releases {
-		go func(wg *parallel.WaitGroup, rel *release.Config) {
+		go func(wg *parallel.WaitGroup, rel *release.Config, mu *sync.Mutex) {
 			defer wg.Done()
 
 			err := rel.ChartDepsUpd()
@@ -50,7 +50,7 @@ func (p *Plan) buildManifest() error {
 			mu.Unlock()
 
 			log.Infof("✅ %s manifest done", rel.Uniq())
-		}(wg, rel)
+		}(wg, rel, mu)
 	}
 
 	return wg.Wait()
