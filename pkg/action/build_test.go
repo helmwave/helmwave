@@ -165,8 +165,8 @@ func (ts *BuildTestSuite) TestGomplate() {
 func (ts *BuildTestSuite) TestDiffLocal() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "08_helmwave.yml"),
-		filepath.Join(tmpDir, "08_values.yml"),
+		filepath.Join(tests.Root, "07_helmwave.yml"),
+		filepath.Join(tests.Root, "07_helmwave.yml"),
 	}
 
 	s := &Build{
