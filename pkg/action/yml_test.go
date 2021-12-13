@@ -16,9 +16,11 @@ type YmlTestSuite struct {
 	suite.Suite
 }
 
-func (s *YmlTestSuite) TestRenderEnv() {
-	defer clean()
+func (s *YmlTestSuite) TearDownTest() {
+	_ = os.RemoveAll(tests.Root + plan.Dir)
+}
 
+func (s *YmlTestSuite) TestRenderEnv() {
 	y := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tests.Root + "01_helmwave.yml",
