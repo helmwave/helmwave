@@ -4,6 +4,7 @@ package action
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -16,29 +17,18 @@ type YmlTestSuite struct {
 	suite.Suite
 }
 
-func (s *YmlTestSuite) TearDownTest() {
-	_ = os.RemoveAll(tests.Root + plan.Dir)
-}
-
 func (s *YmlTestSuite) TestRenderEnv() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tests.Root + "01_helmwave.yml",
+		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		filepath.Join(tmpDir, "01_helmwave.yml"),
 	}
-	defer os.Remove(y.file)
 
 	value := "test01"
 	s.T().Setenv("PROJECT_NAME", value)
 	s.T().Setenv("NAMESPACE", value)
 
-	template.SetConfig(&template.Config{
-		Gomplate: template.GomplateConfig{
-			Enabled: false,
-		},
-	})
-
-	err := y.Run()
-	s.Require().NoError(err)
+	s.Require().NoError(y.Run())
 
 	b, err := plan.NewBody(y.file)
 	s.Require().NoError(err)
@@ -49,6 +39,6 @@ func (s *YmlTestSuite) TestRenderEnv() {
 }
 
 func TestYmlTestSuite(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	suite.Run(t, new(YmlTestSuite))
 }
