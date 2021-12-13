@@ -17,11 +17,9 @@ type Tpl2YmlTestSuite struct {
 }
 
 func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
-	SetConfig(&Config{
-		Gomplate: GomplateConfig{
-			Enabled: false,
-		},
-	})
+	gomplateConfig := &GomplateConfig{
+		Enabled: false,
+	}
 
 	tpl := path.Join(tests.Root, "09_values.yaml")
 
@@ -30,16 +28,14 @@ func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
 	dst.Close()
 	defer os.Remove(dst.Name())
 
-	err = Tpl2yml(tpl, dst.Name(), nil)
+	err = Tpl2yml(tpl, dst.Name(), nil, gomplateConfig)
 	s.Require().Error(err)
 }
 
 func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
-	SetConfig(&Config{
-		Gomplate: GomplateConfig{
-			Enabled: true,
-		},
-	})
+	gomplateConfig := &GomplateConfig{
+		Enabled: true,
+	}
 
 	tpl := path.Join(tests.Root, "09_values.yaml")
 
@@ -48,11 +44,11 @@ func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
 	dst.Close()
 	defer os.Remove(dst.Name())
 
-	err = Tpl2yml(tpl, dst.Name(), nil)
+	err = Tpl2yml(tpl, dst.Name(), nil, gomplateConfig)
 	s.Require().NoError(err)
 }
 
 func TestTpl2YmlTestSuite(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	suite.Run(t, new(Tpl2YmlTestSuite))
 }

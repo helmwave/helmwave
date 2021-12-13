@@ -18,7 +18,10 @@ type FuncTestSuite struct {
 func (s *FuncTestSuite) TestFuncMap() {
 	sprigFuncs := sprig.FuncMap()
 
-	fm := FuncMap()
+	gomplateConfig := &GomplateConfig{
+		Enabled: false,
+	}
+	fm := FuncMap(gomplateConfig)
 
 	for key := range sprigFuncs {
 		if alias, ok := sprigAliases[key]; ok {
@@ -34,12 +37,10 @@ func (s *FuncTestSuite) TestFuncMap() {
 }
 
 func (s *FuncTestSuite) TestEnabledGomplate() {
-	SetConfig(&Config{
-		Gomplate: GomplateConfig{
-			Enabled: true,
-		},
-	})
-	fm := FuncMap()
+	gomplateConfig := &GomplateConfig{
+		Enabled: true,
+	}
+	fm := FuncMap(gomplateConfig)
 
 	for key := range funcs.CreateDataFuncs(context.Background(), nil) {
 		s.Contains(fm, key)
@@ -47,12 +48,10 @@ func (s *FuncTestSuite) TestEnabledGomplate() {
 }
 
 func (s *FuncTestSuite) TestDisabledGomplate() {
-	SetConfig(&Config{
-		Gomplate: GomplateConfig{
-			Enabled: false,
-		},
-	})
-	fm := FuncMap()
+	gomplateConfig := &GomplateConfig{
+		Enabled: false,
+	}
+	fm := FuncMap(gomplateConfig)
 
 	for key := range funcs.CreateDataFuncs(context.Background(), nil) {
 		s.NotContains(fm, key)
