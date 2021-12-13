@@ -3,7 +3,6 @@
 package action
 
 import (
-	"os"
 	"strings"
 	"testing"
 
@@ -13,42 +12,36 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type DownTestSuite struct {
+type UpTestSuite struct {
 	suite.Suite
 }
 
-func (ts *DownTestSuite) TestRun() {
+func (ts *UpTestSuite) TestAutoBuild() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tests.Root + "01_helmwave.yml.tpl",
 		tmpDir + "02_helmwave.yml",
 	}
 
-	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
-		autoYml: true,
-		yml:     y,
+	u := &Up{
+		build: &Build{
+			plandir: tmpDir,
+			tags:    cli.StringSlice{},
+			autoYml: true,
+			yml:     y,
+		},
+		dog:       &kubedog.Config{},
+		autoBuild: true,
 	}
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("PROJECT_NAME", value)
 	ts.T().Setenv("NAMESPACE", value)
 
-	d := Down{plandir: s.plandir}
-	ts.Require().ErrorIs(d.Run(), os.ErrNotExist, "down should fail before build")
-	ts.Require().NoError(s.Run())
-
-	u := &Up{
-		build: s,
-		dog:   &kubedog.Config{},
-	}
-
 	ts.Require().NoError(u.Run())
-	ts.Require().NoError(d.Run())
 }
 
-func TestDownTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(DownTestSuite))
+func TestUpTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(UpTestSuite))
 }

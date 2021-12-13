@@ -9,31 +9,12 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/tests"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
 )
 
 type DiffLiveTestSuite struct {
 	suite.Suite
-}
-
-func (ts *DiffLiveTestSuite) TestBuild() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		filepath.Join(tests.Root, "07_helmwave.yml"),
-		filepath.Join(tests.Root, "07_helmwave.yml"),
-	}
-
-	s := &Build{
-		plandir:  tmpDir,
-		tags:     cli.StringSlice{},
-		yml:      y,
-		diff:     &Diff{},
-		diffMode: diffModeLive,
-	}
-
-	ts.Require().NoError(s.Run())
 }
 
 func (ts *DiffLiveTestSuite) TestRun() {
@@ -62,8 +43,6 @@ func (ts *DiffLiveTestSuite) TestRun() {
 }
 
 func TestDiffLiveTestSuite(t *testing.T) {
-	// t.Parallel()
-	level, _ := log.ParseLevel("debug")
-	log.SetLevel(level)
+	t.Parallel()
 	suite.Run(t, new(DiffLiveTestSuite))
 }
