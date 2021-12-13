@@ -84,20 +84,13 @@ func syncRepositories(repositories []*rep.Config) (err error) {
 		return err
 	}
 
-	wg := parallel.NewWaitGroup()
-	wg.Add(len(repositories))
-
+	// We cannot parallel repositories installation as helm manages single repositories.yaml.
+	// To prevent data race we need either make helm use futex or not parallel at all
 	for i := range repositories {
-		go func(wg *parallel.WaitGroup, i int) {
-			defer wg.Done()
-			err := repositories[i].Install(helper.Helm, f)
-			wg.ErrChan() <- err
-		}(wg, i)
-	}
-
-	err = wg.Wait()
-	if err != nil {
-		return err
+		err := repositories[i].Install(helper.Helm, f)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = f.WriteFile(helper.Helm.RepositoryConfig, os.FileMode(0o644))
