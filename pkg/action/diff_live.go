@@ -7,9 +7,9 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type DiffLive struct { //nolint:govet
-	plandir string
+type DiffLive struct {
 	diff    *Diff
+	plandir string
 }
 
 func (d *DiffLive) Run() error {

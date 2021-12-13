@@ -9,15 +9,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type Build struct { //nolint:govet
+type Build struct {
 	yml      *Yml
+	diff     *Diff
 	plandir  string
+	diffMode string
 	tags     cli.StringSlice
 	matchAll bool
 	autoYml  bool
 
-	diffMode string
-	diff     *Diff
 	// diffLive *DiffLive
 	// diffLocal *DiffLocalPlan
 }
