@@ -33,6 +33,10 @@ func (ts *DiffLiveTestSuite) TestRun() {
 
 	d := DiffLive{diff: s.diff, plandir: s.plandir}
 
+	value := "default"
+	ts.T().Setenv("PROJECT_NAME", value)
+	ts.T().Setenv("NAMESPACE", value)
+
 	ts.Require().ErrorIs(d.Run(), os.ErrNotExist)
 	ts.Require().NoError(s.Run())
 	ts.Require().NoError(d.Run())

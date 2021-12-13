@@ -4,6 +4,7 @@ package action
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -30,7 +31,7 @@ func (ts *DownTestSuite) TestRun() {
 		yml:     y,
 	}
 
-	value := "default"
+	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("PROJECT_NAME", value)
 	ts.T().Setenv("NAMESPACE", value)
 

@@ -203,6 +203,6 @@ func (ts *BuildTestSuite) TestDiffLive() {
 }
 
 func TestBuildTestSuite(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	suite.Run(t, new(BuildTestSuite))
 }
