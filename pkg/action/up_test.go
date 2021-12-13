@@ -42,6 +42,7 @@ func (ts *UpTestSuite) TestAutoBuild() {
 }
 
 func TestUpTestSuite(t *testing.T) {
+	// cannot parallel because of setenv
 	// t.Parallel()
 	suite.Run(t, new(UpTestSuite))
 }

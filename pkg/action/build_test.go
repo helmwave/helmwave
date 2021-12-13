@@ -113,53 +113,6 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		ts.Require().ElementsMatch(c.names, names)
 	}
-
-}
-
-func (ts *BuildTestSuite) TestAutoYml() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
-	}
-
-	s := &Build{
-		plandir:  tmpDir,
-		tags:     cli.StringSlice{},
-		matchAll: true,
-		autoYml:  true,
-		yml:      y,
-	}
-
-	value := "test01"
-	ts.T().Setenv("PROJECT_NAME", value)
-	ts.T().Setenv("NAMESPACE", value)
-
-	ts.Require().NoError(s.Run())
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
-}
-
-func (ts *BuildTestSuite) TestGomplate() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		filepath.Join(tests.Root, "08_helmwave.yml"),
-		filepath.Join(tmpDir, "08_helmwave.yml"),
-	}
-
-	s := &Build{
-		plandir:  tmpDir,
-		tags:     cli.StringSlice{},
-		matchAll: true,
-		autoYml:  true,
-		yml:      y,
-	}
-
-	value := "test08"
-	ts.T().Setenv("PROJECT_NAME", value)
-	ts.T().Setenv("NAMESPACE", value)
-
-	ts.Require().NoError(s.Run())
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
 func (ts *BuildTestSuite) TestDiffLocal() {
@@ -186,4 +139,60 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 func TestBuildTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(BuildTestSuite))
+}
+
+type NonParallelBuildTestSuite struct {
+	suite.Suite
+}
+
+func (ts *NonParallelBuildTestSuite) TestAutoYml() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
+	}
+
+	s := &Build{
+		plandir:  tmpDir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
+	}
+
+	value := "test01"
+	ts.T().Setenv("PROJECT_NAME", value)
+	ts.T().Setenv("NAMESPACE", value)
+
+	ts.Require().NoError(s.Run())
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+}
+
+func (ts *NonParallelBuildTestSuite) TestGomplate() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		filepath.Join(tests.Root, "08_helmwave.yml"),
+		filepath.Join(tmpDir, "08_helmwave.yml"),
+	}
+
+	s := &Build{
+		plandir:  tmpDir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
+	}
+
+	value := "test08"
+	ts.T().Setenv("PROJECT_NAME", value)
+	ts.T().Setenv("NAMESPACE", value)
+
+	ts.Require().NoError(s.Run())
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+}
+
+func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
+	// cannot parallel because of setenv
+	// t.Parallel()
+	suite.Run(t, new(NonParallelBuildTestSuite))
 }

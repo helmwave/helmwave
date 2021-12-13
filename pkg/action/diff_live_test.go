@@ -5,7 +5,6 @@ package action
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/helmwave/helmwave/tests"
@@ -20,8 +19,8 @@ type DiffLiveTestSuite struct {
 func (ts *DiffLiveTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "07_helmwave.yml"),
-		filepath.Join(tests.Root, "07_helmwave.yml"),
+		filepath.Join(tests.Root, "02_helmwave.yml"),
+		filepath.Join(tests.Root, "02_helmwave.yml"),
 	}
 
 	s := &Build{
@@ -33,9 +32,6 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	}
 
 	d := DiffLive{diff: s.diff, plandir: s.plandir}
-
-	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
-	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().ErrorIs(d.Run(), os.ErrNotExist)
 	ts.Require().NoError(s.Run())

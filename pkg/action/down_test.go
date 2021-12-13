@@ -4,7 +4,7 @@ package action
 
 import (
 	"os"
-	"strings"
+	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -20,8 +20,8 @@ type DownTestSuite struct {
 func (ts *DownTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tmpDir + "02_helmwave.yml",
+		filepath.Join(tests.Root, "02_helmwave.yml"),
+		filepath.Join(tests.Root, "02_helmwave.yml"),
 	}
 
 	s := &Build{
@@ -30,10 +30,6 @@ func (ts *DownTestSuite) TestRun() {
 		autoYml: true,
 		yml:     y,
 	}
-
-	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
-	ts.T().Setenv("PROJECT_NAME", value)
-	ts.T().Setenv("NAMESPACE", value)
 
 	d := Down{plandir: s.plandir}
 	ts.Require().ErrorIs(d.Run(), os.ErrNotExist, "down should fail before build")

@@ -58,7 +58,7 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 func syncRepositories(repositories []*rep.Config) (err error) {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
-	f := &repo.File{}
+	var f *repo.File
 	// Create if not exits
 	if !helper.IsExists(helper.Helm.RepositoryConfig) {
 		f = repo.NewFile()

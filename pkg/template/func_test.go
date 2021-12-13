@@ -59,6 +59,6 @@ func (s *FuncTestSuite) TestDisabledGomplate() {
 }
 
 func TestFuncTestSuite(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	suite.Run(t, new(FuncTestSuite))
 }
