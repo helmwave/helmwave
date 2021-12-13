@@ -4,9 +4,12 @@ package action
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/helmwave/helmwave/tests"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
 )
@@ -15,17 +18,34 @@ type DiffLiveTestSuite struct {
 	suite.Suite
 }
 
-func (ts *DiffLiveTestSuite) TestRun() {
+func (ts *DiffLiveTestSuite) TestBuild() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tmpDir + "02_helmwave.yml",
+		filepath.Join(tests.Root, "07_helmwave.yml"),
+		filepath.Join(tests.Root, "07_helmwave.yml"),
 	}
 
 	s := &Build{
 		plandir:  tmpDir,
 		tags:     cli.StringSlice{},
-		autoYml:  true,
+		yml:      y,
+		diff:     &Diff{},
+		diffMode: diffModeLive,
+	}
+
+	ts.Require().NoError(s.Run())
+}
+
+func (ts *DiffLiveTestSuite) TestRun() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		filepath.Join(tests.Root, "07_helmwave.yml"),
+		filepath.Join(tests.Root, "07_helmwave.yml"),
+	}
+
+	s := &Build{
+		plandir:  tmpDir,
+		tags:     cli.StringSlice{},
 		yml:      y,
 		diff:     &Diff{},
 		diffMode: diffModeLive,
@@ -33,8 +53,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 
 	d := DiffLive{diff: s.diff, plandir: s.plandir}
 
-	value := "default"
-	ts.T().Setenv("PROJECT_NAME", value)
+	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().ErrorIs(d.Run(), os.ErrNotExist)
@@ -44,5 +63,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 
 func TestDiffLiveTestSuite(t *testing.T) {
 	// t.Parallel()
+	level, _ := log.ParseLevel("debug")
+	log.SetLevel(level)
 	suite.Run(t, new(DiffLiveTestSuite))
 }

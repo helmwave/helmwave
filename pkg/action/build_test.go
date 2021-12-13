@@ -1,4 +1,4 @@
-//go:build ignore || integration
+//go:build ignore || unit
 
 package action
 
@@ -179,27 +179,8 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 		diffMode: diffModeLocal,
 	}
 
-	ts.Require().NoError(s.Run())
-}
-
-func (ts *BuildTestSuite) TestDiffLive() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		filepath.Join(tests.Root, "08_helmwave.yml"),
-		filepath.Join(tmpDir, "08_values.yml"),
-	}
-
-	s := &Build{
-		plandir:  tmpDir,
-		tags:     cli.StringSlice{},
-		matchAll: true,
-		autoYml:  true,
-		yml:      y,
-		diff:     &Diff{},
-		diffMode: diffModeLive,
-	}
-
-	ts.Require().NoError(s.Run())
+	ts.Require().NoError(s.Run(), "build should not fail without diffing")
+	ts.Require().NoError(s.Run(), "build should not fail with diffing with previous plan")
 }
 
 func TestBuildTestSuite(t *testing.T) {
