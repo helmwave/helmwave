@@ -28,8 +28,8 @@ func (s *YmlTestSuite) TestRenderEnv() {
 	defer os.Remove(y.file)
 
 	value := "test01"
-	_ = os.Setenv("PROJECT_NAME", value)
-	_ = os.Setenv("NAMESPACE", value)
+	ts.T().Setenv("PROJECT_NAME", value)
+	ts.T().Setenv("NAMESPACE", value)
 
 	template.SetConfig(&template.Config{
 		Gomplate: template.GomplateConfig{

@@ -3,7 +3,7 @@
 package action
 
 import (
-	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -17,31 +17,28 @@ type BuildTestSuite struct {
 	suite.Suite
 }
 
-func (ts *BuildTestSuite) TearDownTest() {
-	_ = os.RemoveAll(tests.Root + plan.Dir)
-}
-
 func (ts *BuildTestSuite) TestManifest() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tests.Root + "02_helmwave.yml",
+		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		filepath.Join(tests.Root, "02_helmwave.yml"),
 	}
 
 	s := &Build{
-		plandir:  tests.Root + plan.Dir,
+		plandir:  tmpDir,
 		yml:      y,
 		tags:     cli.StringSlice{},
 		matchAll: true,
 	}
 
 	ts.Require().NoError(s.Run())
-	ts.Require().DirExists(tests.Root + plan.Dir + plan.Manifest)
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
 // func (ts *BuildTestSuite) TestRepositories404() {
 //	s := &Build{
-//		plandir:  tests.Root + plan.Dir,
-//		ymlFile:      tests.Root + "04_helmwave.yml",
+//		plandir:  tmpDir,
+//		ymlFile:      filepath.Join(tests.Root, "04_helmwave.yml"),
 //		tags:     cli.StringSlice{},
 //		matchAll: true,
 //	}
@@ -53,13 +50,14 @@ func (ts *BuildTestSuite) TestManifest() {
 // }
 
 func (ts *BuildTestSuite) TestRepositories() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tests.Root + "02_helmwave.yml",
+		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		filepath.Join(tests.Root, "02_helmwave.yml"),
 	}
 
 	s := &Build{
-		plandir:  tests.Root + plan.Dir,
+		plandir:  tmpDir,
 		yml:      y,
 		tags:     cli.StringSlice{},
 		matchAll: true,
@@ -68,7 +66,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 	ts.Require().NoError(s.Run())
 
 	const rep = "bitnami"
-	b, _ := plan.NewBody(tests.Root + plan.Dir + plan.File)
+	b, _ := plan.NewBody(filepath.Join(s.plandir, plan.File))
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
 		ts.Failf("%q not found", rep)
@@ -76,9 +74,10 @@ func (ts *BuildTestSuite) TestRepositories() {
 }
 
 func (ts *BuildTestSuite) TestReleasesMatchGroup() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tests.Root + "03_helmwave.yml",
+		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		filepath.Join(tests.Root, "03_helmwave.yml"),
 	}
 
 	cases := []struct {
@@ -97,7 +96,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 	for _, c := range cases {
 		s := &Build{
-			plandir:  tests.Root + plan.Dir,
+			plandir:  tmpDir,
 			yml:      y,
 			tags:     *c.tags,
 			matchAll: true,
@@ -105,7 +104,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		ts.Require().NoError(s.Run())
 
-		b, _ := plan.NewBody(tests.Root + plan.Dir + plan.File)
+		b, _ := plan.NewBody(filepath.Join(s.plandir, plan.File))
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {
@@ -118,13 +117,14 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 }
 
 func (ts *BuildTestSuite) TestAutoYml() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tests.Root + "01_auto_yaml_helmwave.yml",
+		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
 	}
 
 	s := &Build{
-		plandir:  tests.Root + plan.Dir,
+		plandir:  tmpDir,
 		tags:     cli.StringSlice{},
 		matchAll: true,
 		autoYml:  true,
@@ -132,21 +132,22 @@ func (ts *BuildTestSuite) TestAutoYml() {
 	}
 
 	value := "test01"
-	_ = os.Setenv("PROJECT_NAME", value)
-	_ = os.Setenv("NAMESPACE", value)
+	ts.T().Setenv("PROJECT_NAME", value)
+	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(s.Run())
-	ts.Require().DirExists(tests.Root + plan.Dir + plan.Manifest)
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
 func (ts *BuildTestSuite) TestGomplate() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "08_helmwave.yml",
-		tests.Root + "08_values.yml",
+		filepath.Join(tests.Root, "08_helmwave.yml"),
+		filepath.Join(tmpDir, "08_helmwave.yml"),
 	}
 
 	s := &Build{
-		plandir:  tests.Root + plan.Dir,
+		plandir:  tmpDir,
 		tags:     cli.StringSlice{},
 		matchAll: true,
 		autoYml:  true,
@@ -154,21 +155,22 @@ func (ts *BuildTestSuite) TestGomplate() {
 	}
 
 	value := "test08"
-	_ = os.Setenv("PROJECT_NAME", value)
-	_ = os.Setenv("NAMESPACE", value)
+	ts.T().Setenv("PROJECT_NAME", value)
+	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(s.Run())
-	ts.Require().DirExists(tests.Root + plan.Dir + plan.Manifest)
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
 func (ts *BuildTestSuite) TestDiffLocal() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "08_helmwave.yml",
-		tests.Root + "08_values.yml",
+		filepath.Join(tests.Root, "08_helmwave.yml"),
+		filepath.Join(tmpDir, "08_values.yml"),
 	}
 
 	s := &Build{
-		plandir:  tests.Root + plan.Dir,
+		plandir:  tmpDir,
 		tags:     cli.StringSlice{},
 		matchAll: true,
 		autoYml:  true,
@@ -181,13 +183,14 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 }
 
 func (ts *BuildTestSuite) TestDiffLive() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "08_helmwave.yml",
-		tests.Root + "08_values.yml",
+		filepath.Join(tests.Root, "08_helmwave.yml"),
+		filepath.Join(tmpDir, "08_values.yml"),
 	}
 
 	s := &Build{
-		plandir:  tests.Root + plan.Dir,
+		plandir:  tmpDir,
 		tags:     cli.StringSlice{},
 		matchAll: true,
 		autoYml:  true,
