@@ -73,8 +73,6 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 		return nil, err
 	}
 
-	template.SetConfig(b.Template)
-
 	return b, nil
 }
 

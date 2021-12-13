@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Tpl2yml(tpl, yml string, data interface{}) error {
+func Tpl2yml(tpl, yml string, data interface{}, gomplateConfig *GomplateConfig) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
@@ -25,7 +25,8 @@ func Tpl2yml(tpl, yml string, data interface{}) error {
 	}
 
 	// Template
-	t, err := template.New("tpl").Funcs(FuncMap()).Parse(string(src))
+	funcs := FuncMap(gomplateConfig)
+	t, err := template.New("tpl").Funcs(funcs).Parse(string(src))
 	if err != nil {
 		return err
 	}

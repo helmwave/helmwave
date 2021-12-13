@@ -10,10 +10,12 @@ func (p *Plan) buildValues(dir string) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
+	gomplateConfig := &p.body.Template.Gomplate
+
 	for _, rel := range p.body.Releases {
 		go func(wg *parallel.WaitGroup, rel *release.Config) {
 			defer wg.Done()
-			err := rel.BuildValues(dir)
+			err := rel.BuildValues(dir, gomplateConfig)
 			if err != nil {
 				log.Errorf("❌ %s values: %v", rel.Uniq(), err)
 				wg.ErrChan() <- err

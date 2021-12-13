@@ -28,7 +28,7 @@ var (
 	}
 )
 
-func FuncMap() template.FuncMap {
+func FuncMap(gomplateConfig *GomplateConfig) template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading sprig template functions")
@@ -38,9 +38,9 @@ func FuncMap() template.FuncMap {
 	}
 	addToMap(funcMap, sprigFuncMap, "sprig")
 
-	if gomplateEnabled() {
+	if gomplateConfig.Enabled {
 		log.Debug("Loading gomplate template functions")
-		gomplateFuncMap := gomplate.CreateFuncs(context.Background(), cfg.Gomplate.data)
+		gomplateFuncMap := gomplate.CreateFuncs(context.Background(), gomplateConfig.data)
 		addToMap(funcMap, gomplateFuncMap, "gomplate")
 	}
 
@@ -54,8 +54,4 @@ func addToMap(dst, src template.FuncMap, name string) {
 		log.Trace("Loading function ", k, " out of ", name)
 		dst[k] = v
 	}
-}
-
-func gomplateEnabled() bool {
-	return cfg != nil && cfg.Gomplate.Enabled
 }
