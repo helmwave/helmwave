@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gofrs/flock"
@@ -57,7 +58,7 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 func syncRepositories(repositories []*rep.Config) (err error) {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
-	f := &repo.File{}
+	var f *repo.File
 	// Create if not exits
 	if !helper.IsExists(helper.Helm.RepositoryConfig) {
 		f = repo.NewFile()
@@ -84,20 +85,13 @@ func syncRepositories(repositories []*rep.Config) (err error) {
 		return err
 	}
 
-	wg := parallel.NewWaitGroup()
-	wg.Add(len(repositories))
-
+	// We cannot parallel repositories installation as helm manages single repositories.yaml.
+	// To prevent data race we need either make helm use futex or not parallel at all
 	for i := range repositories {
-		go func(wg *parallel.WaitGroup, i int) {
-			defer wg.Done()
-			err := repositories[i].Install(helper.Helm, f)
-			wg.ErrChan() <- err
-		}(wg, i)
-	}
-
-	err = wg.Wait()
-	if err != nil {
-		return err
+		err := repositories[i].Install(helper.Helm, f)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = f.WriteFile(helper.Helm.RepositoryConfig, os.FileMode(0o644))
@@ -115,9 +109,11 @@ func (p *Plan) syncReleases() (err error) {
 
 	fails := make(map[*release.Config]error)
 
+	mu := &sync.Mutex{}
+
 	for i := range p.body.Releases {
 		p.body.Releases[i].HandleDependencies(p.body.Releases)
-		go func(wg *parallel.WaitGroup, rel *release.Config) {
+		go func(wg *parallel.WaitGroup, rel *release.Config, mu *sync.Mutex) {
 			defer wg.Done()
 			log.Infof("🛥 %q deploying... ", rel.Uniq())
 			_, err = rel.Sync()
@@ -125,14 +121,17 @@ func (p *Plan) syncReleases() (err error) {
 				log.Errorf("❌ %s: %v", rel.Uniq(), err)
 
 				rel.NotifyFailed()
+
+				mu.Lock()
 				fails[rel] = err
+				mu.Unlock()
 
 				wg.ErrChan() <- err
 			} else {
 				rel.NotifySuccess()
 				log.Infof("✅ %s", rel.Uniq())
 			}
-		}(wg, p.body.Releases[i])
+		}(wg, p.body.Releases[i], mu)
 	}
 
 	if err := wg.Wait(); err != nil {

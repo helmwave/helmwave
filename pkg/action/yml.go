@@ -11,7 +11,7 @@ type Yml struct {
 }
 
 func (i *Yml) Run() error {
-	err := template.Tpl2yml(i.tpl, i.file, nil)
+	err := template.Tpl2yml(i.tpl, i.file, nil, &template.GomplateConfig{Enabled: false})
 	if err != nil {
 		return err
 	}

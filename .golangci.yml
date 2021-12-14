@@ -24,7 +24,6 @@ linters:
     - maligned
     - nestif
     - nlreturn
-    - paralleltest
     - revive
     - scopelint
     - tagliatelle

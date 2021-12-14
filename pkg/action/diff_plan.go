@@ -8,9 +8,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type DiffLocalPlan struct { //nolint:govet
-	plandir1, plandir2 string
-	diff               *Diff
+type DiffLocalPlan struct {
+	diff     *Diff
+	plandir1 string
+	plandir2 string
 }
 
 func (d *DiffLocalPlan) Run() error {

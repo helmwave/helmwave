@@ -3,11 +3,10 @@
 package action
 
 import (
-	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -17,26 +16,17 @@ type YmlTestSuite struct {
 }
 
 func (s *YmlTestSuite) TestRenderEnv() {
-	defer clean()
-
+	tmpDir := s.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tests.Root + "01_helmwave.yml",
+		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		filepath.Join(tmpDir, "01_helmwave.yml"),
 	}
-	defer os.Remove(y.file)
 
 	value := "test01"
-	_ = os.Setenv("PROJECT_NAME", value)
-	_ = os.Setenv("NAMESPACE", value)
+	s.T().Setenv("PROJECT_NAME", value)
+	s.T().Setenv("NAMESPACE", value)
 
-	template.SetConfig(&template.Config{
-		Gomplate: template.GomplateConfig{
-			Enabled: false,
-		},
-	})
-
-	err := y.Run()
-	s.Require().NoError(err)
+	s.Require().NoError(y.Run())
 
 	b, err := plan.NewBody(y.file)
 	s.Require().NoError(err)
@@ -47,6 +37,7 @@ func (s *YmlTestSuite) TestRenderEnv() {
 }
 
 func TestYmlTestSuite(t *testing.T) {
+	// cannot parallel because of setenv
 	// t.Parallel()
 	suite.Run(t, new(YmlTestSuite))
 }

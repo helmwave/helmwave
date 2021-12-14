@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"os"
+	"sync"
 
 	"github.com/databus23/helm-diff/diff"
 	"github.com/databus23/helm-diff/manifest"
@@ -40,7 +41,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 	alive, _, err := p.GetLive()
 	if err != nil {
-		log.Fatalf("Something went wrong with getting realeases in the kubernetes cluster: %v", err)
+		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
 	}
 
 	visited := make([]uniqname.UniqName, 0, len(p.body.Releases))
@@ -95,18 +96,24 @@ func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []
 	wg.Add(len(p.body.Releases))
 
 	found = make(map[uniqname.UniqName]*live.Release)
+	mu := &sync.Mutex{}
 
 	for i := range p.body.Releases {
-		go func(wg *parallel.WaitGroup, rel *release.Config) {
+		go func(wg *parallel.WaitGroup, mu *sync.Mutex, rel *release.Config) {
 			defer wg.Done()
+
 			r, err := rel.Get()
+
+			mu.Lock()
+			defer mu.Unlock()
+
 			if err != nil {
-				log.Warnf("I cant get realease from k8s: %v", err)
+				log.Warnf("I cant get release from k8s: %v", err)
 				notFound = append(notFound, rel.Uniq())
 			} else {
 				found[rel.Uniq()] = r
 			}
-		}(wg, p.body.Releases[i])
+		}(wg, mu, p.body.Releases[i])
 	}
 
 	if err := wg.Wait(); err != nil {
