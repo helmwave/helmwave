@@ -20,6 +20,14 @@ type Source struct {
 	URL *url.URL
 }
 
+func (s Source) MarshalYAML() (interface{}, error) {
+	type raw struct {
+		URL string
+	}
+	r := raw{URL: s.URL.String()}
+	return r, nil
+}
+
 func (s *Source) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	type raw struct {
 		URL string
@@ -31,13 +39,6 @@ func (s *Source) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 		return err
 	}
 
-	u, err := url.Parse(r.URL)
-	if err != nil {
-		return err
-	}
-
-	*s = Source{
-		URL: u,
-	}
-	return nil
+	s.URL, err = url.Parse(r.URL)
+	return err
 }
