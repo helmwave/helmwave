@@ -4,7 +4,7 @@ package template
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/tests"
@@ -16,19 +16,42 @@ type Tpl2YmlTestSuite struct {
 	suite.Suite
 }
 
+func (s *Tpl2YmlTestSuite) TestNonExistingTemplate() {
+	gomplateConfig := &GomplateConfig{
+		Enabled: false,
+	}
+
+	tmpDir := s.T().TempDir()
+	tpl := filepath.Join(tmpDir, "values.yaml")
+	dst := filepath.Join(tmpDir, "values.yaml")
+
+	err := Tpl2yml(tpl, dst, nil, gomplateConfig)
+	s.Require().ErrorIs(err, os.ErrNotExist)
+}
+
+func (s *Tpl2YmlTestSuite) TestNonExistingDestDir() {
+	gomplateConfig := &GomplateConfig{
+		Enabled: false,
+	}
+
+	tmpDir := s.T().TempDir()
+	tpl := filepath.Join(tests.Root, "05_values.yaml")
+	dst := filepath.Join(tmpDir, "blabla", "values.yaml")
+
+	err := Tpl2yml(tpl, dst, nil, gomplateConfig)
+	s.Require().NoError(err)
+}
+
 func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
 	gomplateConfig := &GomplateConfig{
 		Enabled: false,
 	}
 
-	tpl := path.Join(tests.Root, "09_values.yaml")
+	tmpDir := s.T().TempDir()
+	tpl := filepath.Join(tests.Root, "09_values.yaml")
+	dst := filepath.Join(tmpDir, "values.yaml")
 
-	dst, err := os.CreateTemp("", "helmwave")
-	s.Require().NoError(err)
-	dst.Close()
-	defer os.Remove(dst.Name())
-
-	err = Tpl2yml(tpl, dst.Name(), nil, gomplateConfig)
+	err := Tpl2yml(tpl, dst, nil, gomplateConfig)
 	s.Require().Error(err)
 }
 
@@ -37,14 +60,11 @@ func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
 		Enabled: true,
 	}
 
-	tpl := path.Join(tests.Root, "09_values.yaml")
+	tmpDir := s.T().TempDir()
+	tpl := filepath.Join(tests.Root, "09_values.yaml")
+	dst := filepath.Join(tmpDir, "values.yaml")
 
-	dst, err := os.CreateTemp("", "helmwave")
-	s.Require().NoError(err)
-	dst.Close()
-	defer os.Remove(dst.Name())
-
-	err = Tpl2yml(tpl, dst.Name(), nil, gomplateConfig)
+	err := Tpl2yml(tpl, dst, nil, gomplateConfig)
 	s.Require().NoError(err)
 }
 

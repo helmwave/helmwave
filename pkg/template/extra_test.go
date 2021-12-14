@@ -14,12 +14,19 @@ type ExtraTestSuite struct {
 	suite.Suite
 }
 
-func (s *ExtraTestSuite) TestUnmarshal() {
-	s.T().Skip("not implemented")
-}
-
 func (s *ExtraTestSuite) TestToYaml() {
-	s.T().Skip("not implemented")
+	data := struct {
+		Field       interface{}
+		nonexported interface{}
+	}{
+		Field:       "field",
+		nonexported: 123,
+	}
+	yamlData := "field: field"
+
+	y, err := ToYaml(data)
+	s.Require().NoError(err)
+	s.Require().YAMLEq(yamlData, y)
 }
 
 func (s *ExtraTestSuite) TestFromYaml() {
