@@ -21,6 +21,14 @@ We use [semver](https://semver.org/)
 - my-feature --> release-0.15.0 --> main
 - my-fix --> release-0.15.1 --> main
 
+### Non product update
+
+When don't affect any `*.go` files we use [githubFlow](https://docs.github.com/en/get-started/quickstart/github-flow). 
+
+`some branch --> main`
+
+
+
 
 ## How to build?
 
