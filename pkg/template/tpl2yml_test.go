@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/tests"
-
 	"github.com/stretchr/testify/suite"
 )
 
@@ -40,6 +39,19 @@ func (s *Tpl2YmlTestSuite) TestNonExistingDestDir() {
 
 	err := Tpl2yml(tpl, dst, nil, gomplateConfig)
 	s.Require().NoError(err)
+}
+
+func (s *Tpl2YmlTestSuite) TestMissingData() {
+	gomplateConfig := &GomplateConfig{
+		Enabled: false,
+	}
+
+	tmpDir := s.T().TempDir()
+	tpl := filepath.Join(tests.Root, "08_values.yaml")
+	dst := filepath.Join(tmpDir, "values.yaml")
+
+	err := Tpl2yml(tpl, dst, nil, gomplateConfig)
+	s.Require().EqualError(err, "template: tpl:1: function \"include\" not defined")
 }
 
 func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
