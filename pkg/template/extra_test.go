@@ -4,6 +4,7 @@ package template
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -86,6 +87,20 @@ func (s *ExtraTestSuite) TestExecInvalidArg() {
 	res, err := Exec("pwd", []interface{}{123})
 	s.Require().Error(err)
 	s.Require().Empty(res)
+}
+
+func (s *ExtraTestSuite) TestExecError() {
+	res, err := Exec("pwd", []interface{}{"123"})
+	expected := &exec.ExitError{}
+	s.Require().ErrorAs(err, &expected)
+	s.Require().Empty(res)
+}
+
+func (s *ExtraTestSuite) TestExecStdin() {
+	input := "123"
+	res, err := Exec("cat", []interface{}{}, input)
+	s.Require().NoError(err)
+	s.Require().Equal(input, res)
 }
 
 func (s *ExtraTestSuite) TestSetValueAtPath() {
