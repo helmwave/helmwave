@@ -32,7 +32,7 @@ func (s *CliTestSuite) TestCommandNotFound() {
 	app, _, _, _ := s.prepareApp()
 
 	cmd := s.T().Name()
-	expectedError := ErrCommandNotFound{Command: cmd}.Error()
+	expectedError := CommandNotFoundError{Command: cmd}.Error()
 
 	s.Require().PanicsWithError(expectedError, func() { app.Run([]string{"helmwave", cmd}) })
 }

@@ -11,21 +11,19 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var (
-	commands = []*cli.Command{
-		new(action.Build).Cmd(),
-		new(action.Diff).Cmd(),
-		new(action.Up).Cmd(),
-		new(action.List).Cmd(),
-		new(action.Rollback).Cmd(),
-		new(action.Status).Cmd(),
-		new(action.Down).Cmd(),
-		new(action.Validate).Cmd(),
-		new(action.Yml).Cmd(),
-		version(),
-		completion(),
-	}
-)
+var commands = []*cli.Command{
+	new(action.Build).Cmd(),
+	new(action.Diff).Cmd(),
+	new(action.Up).Cmd(),
+	new(action.List).Cmd(),
+	new(action.Rollback).Cmd(),
+	new(action.Status).Cmd(),
+	new(action.Down).Cmd(),
+	new(action.Validate).Cmd(),
+	new(action.Yml).Cmd(),
+	version(),
+	completion(),
+}
 
 func main() {
 	c := CreateApp()
@@ -34,14 +32,14 @@ func main() {
 
 	err := c.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regural command errors
 	}
 }
 
 func recoverPanic() {
 	if r := recover(); r != nil {
 		switch r.(type) {
-		case ErrCommandNotFound:
+		case CommandNotFoundError:
 			log.Error(r)
 			log.Exit(127)
 		default:
@@ -56,11 +54,10 @@ func CreateApp() *cli.App {
 	c.EnableBashCompletion = true
 	c.Usage = "is like docker-compose for helm"
 	c.Version = helmwave.Version
-	c.Description =
-		"This tool helps you compose your helm releases!\n" +
-			"0. $ helmwave yml\n" +
-			"1. $ helmwave build\n" +
-			"2. $ helmwave up\n"
+	c.Description = "This tool helps you compose your helm releases!\n" +
+		"0. $ helmwave yml\n" +
+		"1. $ helmwave build\n" +
+		"2. $ helmwave up\n"
 
 	logSet := logSetup.Settings{}
 	c.Before = logSet.Run
@@ -72,16 +69,16 @@ func CreateApp() *cli.App {
 	return c
 }
 
-type ErrCommandNotFound struct {
+type CommandNotFoundError struct {
 	Command string
 }
 
-func (e ErrCommandNotFound) Error() string {
+func (e CommandNotFoundError) Error() string {
 	return fmt.Sprintf("👻 Command %q not found", e.Command)
 }
 
 func command404(c *cli.Context, s string) {
-	err := ErrCommandNotFound{
+	err := CommandNotFoundError{
 		Command: s,
 	}
 	panic(err)
