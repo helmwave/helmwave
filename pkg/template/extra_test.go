@@ -90,9 +90,8 @@ func (s *ExtraTestSuite) TestExecInvalidArg() {
 }
 
 func (s *ExtraTestSuite) TestExecError() {
-	res, err := Exec("pwd", []interface{}{"123"})
-	expected := &exec.ExitError{}
-	s.Require().ErrorAs(err, &expected)
+	res, err := Exec(s.T().Name(), []interface{}{})
+	s.Require().Error(err)
 	s.Require().Empty(res)
 }
 
