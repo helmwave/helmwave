@@ -11,22 +11,48 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var commands = []*cli.Command{
-	new(action.Build).Cmd(),
-	new(action.Diff).Cmd(),
-	new(action.Up).Cmd(),
-	new(action.List).Cmd(),
-	new(action.Rollback).Cmd(),
-	new(action.Status).Cmd(),
-	new(action.Down).Cmd(),
-	new(action.Validate).Cmd(),
-	new(action.Yml).Cmd(),
-	version(),
-	completion(),
-}
+var (
+	commands = []*cli.Command{
+		new(action.Build).Cmd(),
+		new(action.Diff).Cmd(),
+		new(action.Up).Cmd(),
+		new(action.List).Cmd(),
+		new(action.Rollback).Cmd(),
+		new(action.Status).Cmd(),
+		new(action.Down).Cmd(),
+		new(action.Validate).Cmd(),
+		new(action.Yml).Cmd(),
+		version(),
+		completion(),
+	}
+)
 
 func main() {
+	c := CreateApp()
+
+	defer recoverPanic()
+
+	err := c.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func recoverPanic() {
+	if r := recover(); r != nil {
+		switch r.(type) {
+		case ErrCommandNotFound:
+			log.Error(r)
+			log.Exit(127)
+		default:
+			log.Fatal(r)
+		}
+	}
+}
+
+func CreateApp() *cli.App {
 	c := cli.NewApp()
+
 	c.EnableBashCompletion = true
 	c.Usage = "is like docker-compose for helm"
 	c.Version = helmwave.Version
@@ -43,15 +69,22 @@ func main() {
 	c.Commands = commands
 	c.CommandNotFound = command404
 
-	err := c.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return c
+}
+
+type ErrCommandNotFound struct {
+	Command string
+}
+
+func (e ErrCommandNotFound) Error() string {
+	return fmt.Sprintf("👻 Command %q not found", e.Command)
 }
 
 func command404(c *cli.Context, s string) {
-	log.Errorf("👻 Command %q not found", s)
-	os.Exit(127)
+	err := ErrCommandNotFound{
+		Command: s,
+	}
+	panic(err)
 }
 
 func version() *cli.Command {
