@@ -139,9 +139,9 @@ func (s *LogTestSuite) TestFormatter() {
 		},
 	}
 
-	for _, item := range settings {
-		s.Require().NoError(item.s.Init())
-		s.Require().Equal(item.formatter, log.StandardLogger().Formatter, item.msg)
+	for i := range settings {
+		s.Require().NoError(settings[i].s.Init())
+		s.Require().Equal(settings[i].formatter, log.StandardLogger().Formatter, settings[i].msg)
 	}
 }
 
@@ -185,7 +185,8 @@ func (s *LogTestSuite) TestLogboekWidth() {
 	s.Require().Equal(settings.width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 
+//nolint:paralleltest // helmwave uses single logger for the whole program
 func TestLogTestSuite(t *testing.T) {
-	// t.Parallel() // helmwave uses single logger for the whole program
+	// t.Parallel()
 	suite.Run(t, new(LogTestSuite))
 }

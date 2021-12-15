@@ -6,7 +6,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -31,9 +30,7 @@ func (s *ParallelTestSuite) TestErrors() {
 	}(s.wg, err)
 
 	e := s.wg.Wait()
-	s.Require().Error(e)
-	s.Require().IsType(&multierror.Error{}, e)
-	s.Equal(err, e.(*multierror.Error).Unwrap())
+	s.Require().ErrorIs(e, err)
 }
 
 func TestParallelTestSuite(t *testing.T) {

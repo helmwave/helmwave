@@ -94,11 +94,11 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 		},
 	}
 
-	for _, c := range cases {
+	for i := range cases {
 		s := &Build{
 			plandir:  tmpDir,
 			yml:      y,
-			tags:     *c.tags,
+			tags:     *cases[i].tags,
 			matchAll: true,
 		}
 
@@ -111,7 +111,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 			names = append(names, r.Name)
 		}
 
-		ts.Require().ElementsMatch(c.names, names)
+		ts.Require().ElementsMatch(cases[i].names, names)
 	}
 }
 
@@ -191,8 +191,8 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
+//nolint:paralleltest // cannot parallel because of setenv
 func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
-	// cannot parallel because of setenv
 	// t.Parallel()
 	suite.Run(t, new(NonParallelBuildTestSuite))
 }

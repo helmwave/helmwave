@@ -2,9 +2,17 @@
 
 package helper
 
-import "testing"
+import (
+	"testing"
 
-func TestContains(t *testing.T) {
+	"github.com/stretchr/testify/suite"
+)
+
+type FileTestSuite struct {
+	suite.Suite
+}
+
+func (s *FileTestSuite) TestGood() {
 	b := Contains("c", []string{
 		"a",
 		"b",
@@ -13,11 +21,11 @@ func TestContains(t *testing.T) {
 		"c",
 	})
 
-	if !b {
-		t.Error("bad contains: True-False")
-	}
+	s.Require().True(b)
+}
 
-	b = Contains("12", []string{
+func (s *FileTestSuite) TestBad() {
+	b := Contains("12", []string{
 		"a",
 		"b",
 		"c",
@@ -25,7 +33,10 @@ func TestContains(t *testing.T) {
 		"c",
 	})
 
-	if b {
-		t.Error("bad contains: False-True")
-	}
+	s.Require().False(b)
+}
+
+func TestFileTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(FileTestSuite))
 }

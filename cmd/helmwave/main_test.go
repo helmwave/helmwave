@@ -14,6 +14,7 @@ type CliTestSuite struct {
 	suite.Suite
 }
 
+//nolint:unparam // we may use not all buffers
 func (s *CliTestSuite) prepareApp() (*cli.App, *bytes.Buffer, *bytes.Buffer, *bytes.Buffer) {
 	s.T().Helper()
 
@@ -29,21 +30,26 @@ func (s *CliTestSuite) prepareApp() (*cli.App, *bytes.Buffer, *bytes.Buffer, *by
 }
 
 func (s *CliTestSuite) TestCommandNotFound() {
-	app, _, _, _ := s.prepareApp()
+	app, _, _, _ := s.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
 
 	cmd := s.T().Name()
 	expectedError := CommandNotFoundError{Command: cmd}.Error()
 
-	s.Require().PanicsWithError(expectedError, func() { app.Run([]string{"helmwave", cmd}) })
+	s.Require().PanicsWithError(
+		expectedError,
+		func() {
+			_ = app.Run([]string{"helmwave", cmd})
+		},
+	)
 }
 
 func (s *CliTestSuite) TestCommandsList() {
 	requiredCommands := []string{"build", "up", "down", "yml"}
 
-	app, _, _, _ := s.prepareApp()
+	app, _, _, _ := s.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
 
 	commands := app.VisibleCommands()
-	var cmds []string
+	cmds := make([]string, 0, len(commands))
 
 	for _, cmd := range commands {
 		cmds = append(cmds, cmd.Name)

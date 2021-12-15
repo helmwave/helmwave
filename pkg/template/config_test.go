@@ -21,7 +21,7 @@ func (s *ConfigTestSuite) TestUnmarshal() {
 	source := &Config{
 		Gomplate: GomplateConfig{
 			Datasources: map[string]Source{
-				"test": Source{
+				"test": {
 					u,
 				},
 			},

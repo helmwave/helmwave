@@ -4,15 +4,22 @@ package helper
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
-func TestHelmNS(t *testing.T) {
-	h1, err := NewHelm("my")
-	if err != nil {
-		t.Error(err)
-	}
+type HelmTestSuite struct {
+	suite.Suite
+}
 
-	if h1.Namespace() != "my" {
-		t.Error("helm custom namespace is failed")
-	}
+func (s *HelmTestSuite) TestHelmNS() {
+	h1, err := NewHelm("my")
+
+	s.Require().NoError(err)
+	s.Require().Equal("my", h1.Namespace())
+}
+
+func TestHelmTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(HelmTestSuite))
 }

@@ -2,19 +2,27 @@
 
 package release
 
-import "testing"
+import (
+	"testing"
 
-func TestConfigUniq(t *testing.T) {
+	"github.com/stretchr/testify/suite"
+)
+
+type ConfigTestSuite struct {
+	suite.Suite
+}
+
+func (s *ConfigTestSuite) TestConfigUniq() {
 	r := &Config{
 		Name:      "redis",
 		Namespace: "test",
 	}
 
-	if r.Uniq() != r.uniqName {
-		t.Error("method uniq() doesnt work")
-	}
+	s.Require().Equal(r.Uniq(), r.uniqName)
+	s.Require().True(r.Uniq().Validate())
+}
 
-	if !r.Uniq().Validate() {
-		t.Error("problem with validate uniqname")
-	}
+func TestConfigTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(ConfigTestSuite))
 }

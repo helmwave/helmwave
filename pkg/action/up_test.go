@@ -41,8 +41,8 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	ts.Require().NoError(u.Run())
 }
 
+//nolint:paralleltest // cannot parallel because of setenv
 func TestUpTestSuite(t *testing.T) {
-	// cannot parallel because of setenv
 	// t.Parallel()
 	suite.Run(t, new(UpTestSuite))
 }
