@@ -6,6 +6,7 @@ codecov:
 
 ignore:
   - cmd
+  - pkg/action/commands.go
 
 coverage:
   precision: 2

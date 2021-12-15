@@ -5,7 +5,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
 )
 
 type DiffLocalPlan struct {
@@ -38,32 +37,4 @@ func (d *DiffLocalPlan) Run() error {
 	plan1.DiffPlan(plan2, d.diff.ShowSecret, d.diff.Wide)
 
 	return nil
-}
-
-func (d *DiffLocalPlan) Cmd() *cli.Command {
-	return &cli.Command{
-		Name:   "plan",
-		Usage:  "plan1  🆚  plan2",
-		Flags:  d.flags(),
-		Action: toCtx(d.Run),
-	}
-}
-
-func (d *DiffLocalPlan) flags() []cli.Flag {
-	return []cli.Flag{
-		&cli.StringFlag{
-			Name:        "plandir1",
-			Value:       ".helmwave/",
-			Usage:       "Path to plandir1",
-			EnvVars:     []string{"HELMWAVE_PLANDIR_1", "HELMWAVE_PLANDIR"},
-			Destination: &d.plandir1,
-		},
-		&cli.StringFlag{
-			Name:        "plandir2",
-			Value:       ".helmwave/",
-			Usage:       "Path to plandir2",
-			EnvVars:     []string{"HELMWAVE_PLANDIR_2"},
-			Destination: &d.plandir2,
-		},
-	}
 }

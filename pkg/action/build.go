@@ -75,41 +75,6 @@ func (i *Build) Run() error {
 	return nil
 }
 
-func (i *Build) Cmd() *cli.Command {
-	return &cli.Command{
-		Name:   "build",
-		Usage:  "🏗 Build a plan",
-		Flags:  i.flags(),
-		Action: toCtx(i.Run),
-	}
-}
-
-func (i *Build) flags() []cli.Flag {
-	// Init sub-structures
-	i.yml = &Yml{}
-	i.diff = &Diff{}
-
-	self := []cli.Flag{
-		flagPlandir(&i.plandir),
-		flagTags(&i.tags),
-		flagMatchAllTags(&i.matchAll),
-		flagDiffMode(&i.diffMode),
-
-		&cli.BoolFlag{
-			Name:        "yml",
-			Usage:       "Auto helmwave.yml.tpl --> helmwave.yml",
-			Value:       false,
-			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
-			Destination: &i.autoYml,
-		},
-	}
-
-	self = append(self, i.diff.flags()...)
-	self = append(self, i.yml.flags()...)
-
-	return self
-}
-
 func (i *Build) normalizeTags() []string {
 	return normalizeTagList(i.tags.Value())
 }

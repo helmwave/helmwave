@@ -18,14 +18,3 @@ func (l *Status) Run() error {
 
 	return p.Status(l.names.Value())
 }
-
-func (l *Status) Cmd() *cli.Command {
-	return &cli.Command{
-		Name:  "status",
-		Usage: "👁️ Status of deployed releases",
-		Flags: []cli.Flag{
-			flagPlandir(&l.plandir),
-		},
-		Action: toCtx(l.Run),
-	}
-}

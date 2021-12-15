@@ -3,7 +3,6 @@ package action
 import (
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
 )
 
 type Yml struct {
@@ -22,20 +21,4 @@ func (i *Yml) Run() error {
 	).Info("📄 YML is ready!")
 
 	return nil
-}
-
-func (i *Yml) Cmd() *cli.Command {
-	return &cli.Command{
-		Name:   "yml",
-		Usage:  "📄 Render helmwave.yml.tpl -> helmwave.yml",
-		Flags:  i.flags(),
-		Action: toCtx(i.Run),
-	}
-}
-
-func (i *Yml) flags() []cli.Flag {
-	return []cli.Flag{
-		flagTplFile(&i.tpl),
-		flagYmlFile(&i.file),
-	}
 }

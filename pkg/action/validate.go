@@ -2,7 +2,6 @@ package action
 
 import (
 	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/urfave/cli/v2"
 )
 
 type Validate struct {
@@ -15,15 +14,4 @@ func (l *Validate) Run() error {
 		return err
 	}
 	return p.ValidateValues()
-}
-
-func (l *Validate) Cmd() *cli.Command {
-	return &cli.Command{
-		Name:  "validate",
-		Usage: "🛂 Validate your plan",
-		Flags: []cli.Flag{
-			flagPlandir(&l.plandir),
-		},
-		Action: toCtx(l.Run),
-	}
 }
