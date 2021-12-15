@@ -34,3 +34,6 @@ When don't affect any `*.go` files we use [githubFlow](https://docs.github.com/e
 
 https://helmwave.github.io/docs/0.16.x/install/#compile-from-source
 
+### Pre commit
+
+We use https://pre-commit.com for git hooks
