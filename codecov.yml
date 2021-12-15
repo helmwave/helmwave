@@ -1,16 +1,12 @@
 codecov:
   require_ci_to_pass: true
-  branch: main
   allow_pseudo_compare: true
   allow_coverage_offsets: true
-
-ignore:
-  - cmd
 
 coverage:
   precision: 2
   round: down
-  range: "20...70"
+  range: "30...100"
 
 parsers:
   gcov:

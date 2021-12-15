@@ -26,15 +26,38 @@ var commands = []*cli.Command{
 }
 
 func main() {
+	c := CreateApp()
+
+	defer recoverPanic()
+
+	err := c.Run(os.Args)
+	if err != nil {
+		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regural command errors
+	}
+}
+
+func recoverPanic() {
+	if r := recover(); r != nil {
+		switch r.(type) {
+		case CommandNotFoundError:
+			log.Error(r)
+			log.Exit(127)
+		default:
+			log.Fatal(r)
+		}
+	}
+}
+
+func CreateApp() *cli.App {
 	c := cli.NewApp()
+
 	c.EnableBashCompletion = true
 	c.Usage = "is like docker-compose for helm"
 	c.Version = helmwave.Version
-	c.Description =
-		"This tool helps you compose your helm releases!\n" +
-			"0. $ helmwave yml\n" +
-			"1. $ helmwave build\n" +
-			"2. $ helmwave up\n"
+	c.Description = "This tool helps you compose your helm releases!\n" +
+		"0. $ helmwave yml\n" +
+		"1. $ helmwave build\n" +
+		"2. $ helmwave up\n"
 
 	logSet := logSetup.Settings{}
 	c.Before = logSet.Run
@@ -43,15 +66,22 @@ func main() {
 	c.Commands = commands
 	c.CommandNotFound = command404
 
-	err := c.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return c
+}
+
+type CommandNotFoundError struct {
+	Command string
+}
+
+func (e CommandNotFoundError) Error() string {
+	return fmt.Sprintf("👻 Command %q not found", e.Command)
 }
 
 func command404(c *cli.Context, s string) {
-	log.Errorf("👻 Command %q not found", s)
-	os.Exit(127)
+	err := CommandNotFoundError{
+		Command: s,
+	}
+	panic(err)
 }
 
 func version() *cli.Command {
