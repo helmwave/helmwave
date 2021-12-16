@@ -2,9 +2,17 @@
 
 package helper
 
-import "testing"
+import (
+	"testing"
 
-func TestIsURL(t *testing.T) {
+	"github.com/stretchr/testify/suite"
+)
+
+type HTTPTestSuite struct {
+	suite.Suite
+}
+
+func (s *HTTPTestSuite) TestIsURL() {
 	urls := []string{
 		"https://blog.golang.org/slices-intro",
 		"https://helmwave.github.io/",
@@ -12,8 +20,11 @@ func TestIsURL(t *testing.T) {
 
 	for _, url := range urls {
 		b := IsURL(url)
-		if !b {
-			t.Error("bad url: ", url)
-		}
+		s.True(b)
 	}
+}
+
+func TestHTTPTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(HTTPTestSuite))
 }

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/Masterminds/sprig/v3"
-	"github.com/hairyhenderson/gomplate/v3/funcs"
+	"github.com/hairyhenderson/gomplate/v3/funcs" //nolint:staticcheck,gci // we need to check only small subset of functions
 	"github.com/stretchr/testify/suite"
 )
 

@@ -45,8 +45,8 @@ func (s *ExtraTestSuite) TestToYamlNil() {
 
 func (s *ExtraTestSuite) TestFromYaml() {
 	tests := []struct {
-		yaml   string
 		result Values
+		yaml   string
 		fails  bool
 	}{
 		{
@@ -60,14 +60,14 @@ func (s *ExtraTestSuite) TestFromYaml() {
 		},
 	}
 
-	for _, test := range tests {
-		v, err := FromYaml(test.yaml)
-		if test.fails {
+	for i := range tests {
+		v, err := FromYaml(tests[i].yaml)
+		if tests[i].fails {
 			s.Require().Error(err)
 			s.Require().Empty(v)
 		} else {
 			s.Require().NoError(err)
-			s.Require().Equal(test.result, v)
+			s.Require().Equal(tests[i].result, v)
 		}
 	}
 }
@@ -110,9 +110,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	}
 
 	tests := []struct {
-		path   string
-		value  interface{}
 		result Values
+		value  interface{}
+		path   string
 		fails  bool
 	}{
 		{
@@ -150,14 +150,14 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		},
 	}
 
-	for _, test := range tests {
-		res, err := SetValueAtPath(test.path, test.value, data)
-		if test.fails {
+	for i := range tests {
+		res, err := SetValueAtPath(tests[i].path, tests[i].value, data)
+		if tests[i].fails {
 			s.Require().Error(err)
 			s.Require().Nil(res)
 		} else {
 			s.Require().NoError(err)
-			s.Require().Equal(test.result, res)
+			s.Require().Equal(tests[i].result, res)
 		}
 	}
 }
@@ -223,7 +223,7 @@ func (s *ExtraTestSuite) TestReadFile() {
 
 	data := s.T().Name()
 
-	s.Require().NoError(os.WriteFile(tmpFile, []byte(data), 0666))
+	s.Require().NoError(os.WriteFile(tmpFile, []byte(data), 0o600))
 	s.Require().FileExists(tmpFile)
 
 	res, err = ReadFile(tmpFile)
@@ -241,8 +241,8 @@ func (s *ExtraTestSuite) TestGet() {
 	}
 
 	tests := []struct {
-		path   string
 		result interface{}
+		path   string
 		fails  bool
 	}{
 		{
@@ -267,14 +267,14 @@ func (s *ExtraTestSuite) TestGet() {
 		},
 	}
 
-	for _, test := range tests {
-		res, err := Get(test.path, data)
-		if test.fails {
+	for i := range tests {
+		res, err := Get(tests[i].path, data)
+		if tests[i].fails {
 			s.Require().Error(err)
 			s.Require().Nil(res)
 		} else {
 			s.Require().NoError(err)
-			s.Require().Equal(test.result, res)
+			s.Require().Equal(tests[i].result, res)
 		}
 	}
 }

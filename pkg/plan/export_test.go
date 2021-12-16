@@ -7,9 +7,14 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestExportValuesEmpty(t *testing.T) {
+type ExportTestSuite struct {
+	suite.Suite
+}
+
+func (s *ExportTestSuite) TestValuesEmpty() {
 	p := New(Dir)
 
 	p.body = &planBody{
@@ -18,12 +23,10 @@ func TestExportValuesEmpty(t *testing.T) {
 	}
 
 	err := p.exportValues()
-	if err != nil {
-		t.Error(err)
-	}
+	s.Require().NoError(err)
 }
 
-func TestExportValuesOneRelease(t *testing.T) {
+func (s *ExportTestSuite) TestValuesOneRelease() {
 	p := New(Dir)
 
 	p.body = &planBody{
@@ -40,7 +43,10 @@ func TestExportValuesOneRelease(t *testing.T) {
 	}
 
 	err := p.exportValues()
-	if err != nil {
-		t.Error(err)
-	}
+	s.Require().NoError(err)
+}
+
+func TestExportTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(ExportTestSuite))
 }

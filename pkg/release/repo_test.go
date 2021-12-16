@@ -3,25 +3,33 @@
 package release
 
 import (
-	"errors"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
-func TestConfig_Repo(t *testing.T) {
+type RepoTestSuite struct {
+	suite.Suite
+}
+
+func (s *RepoTestSuite) TestRepoWithSlash() {
 	const bitnami = "bitnami"
 	r := &Config{Chart: Chart{
 		Name: bitnami + "/redis",
 	}}
 
-	if r.Repo() != bitnami {
-		t.Error(errors.New("get repo remote failed"))
-	}
+	s.Require().Equal(bitnami, r.Repo())
+}
 
-	r = &Config{Chart: Chart{
+func (s *RepoTestSuite) TestRepoWithoutSlash() {
+	r := &Config{Chart: Chart{
 		Name: "api",
 	}}
 
-	if r.Repo() != "api" {
-		t.Error(errors.New("get repo local failed"))
-	}
+	s.Require().Equal("api", r.Repo())
+}
+
+func TestRepoTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(RepoTestSuite))
 }
