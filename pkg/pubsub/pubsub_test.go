@@ -46,11 +46,11 @@ func (s *PubSubTestSuite) TestSubscribe() {
 	s.Require().Contains(s.ps.subs, release)
 	s.Require().NotNil(s.ps.subs[release])
 	s.Require().Len(s.ps.subs[release], 1)
-	s.Require().EqualValues(ch1, <-chan ReleaseStatus(s.ps.subs[release][0])) //nolint:unconvert
+	s.Require().EqualValues(ch1, (<-chan ReleaseStatus)(s.ps.subs[release][0])) //nolint:gocritic
 
 	ch2 := s.ps.Subscribe(release)
 	s.Require().Len(s.ps.subs[release], 2)
-	s.Require().EqualValues(ch2, <-chan ReleaseStatus(s.ps.subs[release][1])) //nolint:unconvert
+	s.Require().EqualValues(ch2, (<-chan ReleaseStatus)(s.ps.subs[release][1])) //nolint:gocritic
 }
 
 func TestPubSubTestSuite(t *testing.T) {
