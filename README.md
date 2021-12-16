@@ -30,6 +30,8 @@ Look at  the examples in our [docs](https://helmwave.github.io/docs)
 
 ## Comparison
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/70b4e901b5464f18bafd872948326478)](https://app.codacy.com/gh/helmwave/helmwave?utm_source=github.com&utm_medium=referral&utm_content=helmwave/helmwave&utm_campaign=Badge_Grade_Settings)
+
 🚀 Features  | 🌊 HelmWave   | helmfile
 -------------| :------------:|:-----------:
 Docker | ![Docker Image Size helmwave (latest by date)](https://img.shields.io/docker/image-size/diamon/helmwave) | ![Docker Image Size helmfile (latest by date)](https://img.shields.io/docker/image-size/chatwork/helmfile)
