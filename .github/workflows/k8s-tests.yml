@@ -4,9 +4,13 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - '**.go'
   push:
     branches:
       - main
+    paths:
+      - '**.go'
 
 jobs:
   integration-tests:
