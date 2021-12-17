@@ -44,9 +44,8 @@ type config struct {
 	ReuseValues              bool
 }
 
-func (rel *config) DryRun(b bool) Config {
+func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
-	return rel
 }
 
 type Chart struct {
