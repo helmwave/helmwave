@@ -103,7 +103,7 @@ func (rel *config) BuildValues(dir string, gomplate *template.GomplateConfig) er
 	for i := len(rel.Values()) - 1; i >= 0; i-- {
 		err := rel.Values()[i].SetViaRelease(rel, dir, gomplate)
 		if errors.Is(ErrSkipValues, err) {
-			rel.ValuesF = append(rel.Values()[:i], rel.Values()[i+1:]...)
+			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
 		} else if err != nil {
 			log.WithFields(log.Fields{
 				"release": rel.Uniq(),

@@ -14,7 +14,7 @@ type RepoTestSuite struct {
 
 func (s *RepoTestSuite) TestRepoWithSlash() {
 	const bitnami = "bitnami"
-	r := &Config{Chart: Chart{
+	r := &config{ChartF: Chart{
 		Name: bitnami + "/redis",
 	}}
 
@@ -22,7 +22,7 @@ func (s *RepoTestSuite) TestRepoWithSlash() {
 }
 
 func (s *RepoTestSuite) TestRepoWithoutSlash() {
-	r := &Config{Chart: Chart{
+	r := &config{ChartF: Chart{
 		Name: "api",
 	}}
 

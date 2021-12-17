@@ -108,7 +108,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {
-			names = append(names, r.Name)
+			names = append(names, r.Name())
 		}
 
 		ts.Require().ElementsMatch(cases[i].names, names)
