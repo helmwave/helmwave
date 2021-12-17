@@ -41,11 +41,23 @@ type Plan struct {
 	graphMD string
 }
 
+type repoConfigs []repo.Config
+
+func (r *repoConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	if r == nil {
+		r = new(repoConfigs)
+	}
+	var err error
+
+	*r, err = repo.UnmarshalYAML(unmarshal)
+	return err
+}
+
 type planBody struct {
 	Project      string
 	Version      string
 	Template     *template.Config
-	Repositories []*repo.Config
+	Repositories repoConfigs
 	Releases     []*release.Config
 }
 
@@ -103,7 +115,7 @@ func (p *Plan) PrettyPlan() {
 
 	b := make([]string, 0, len(p.body.Repositories))
 	for _, r := range p.body.Repositories {
-		b = append(b, r.Name)
+		b = append(b, r.Name())
 	}
 
 	log.WithFields(log.Fields{

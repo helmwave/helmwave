@@ -12,13 +12,12 @@ import (
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
-	rep "github.com/helmwave/helmwave/pkg/repo"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/kube"
 	"github.com/werf/kubedog/pkg/tracker"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
-	"helm.sh/helm/v3/pkg/repo"
+	helmRepo "helm.sh/helm/v3/pkg/repo"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -55,20 +54,20 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	return p.syncReleasesKubedog(kubedogConfig)
 }
 
-func syncRepositories(repositories []*rep.Config) (err error) {
+func syncRepositories(repositories repoConfigs) (err error) {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
-	var f *repo.File
+	var f *helmRepo.File
 	// Create if not exits
 	if !helper.IsExists(helper.Helm.RepositoryConfig) {
-		f = repo.NewFile()
+		f = helmRepo.NewFile()
 
 		_, err = helper.CreateFile(helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
 	} else {
-		f, err = repo.LoadFile(helper.Helm.RepositoryConfig)
+		f, err = helmRepo.LoadFile(helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}

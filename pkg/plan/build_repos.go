@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out []*repo.Config, err error) {
+func buildRepositories(m map[string][]*release.Config, in []repo.Config) (out []repo.Config, err error) {
 	for rep, releases := range m {
 		rm := releaseNames(releases)
 		log.WithField(rep, rm).Debug("🗄 repo dependencies")

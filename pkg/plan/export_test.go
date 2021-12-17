@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -19,7 +18,7 @@ func (s *ExportTestSuite) TestValuesEmpty() {
 
 	p.body = &planBody{
 		Releases:     []*release.Config{},
-		Repositories: []*repo.Config{},
+		Repositories: repoConfigs{},
 	}
 
 	err := p.exportValues()

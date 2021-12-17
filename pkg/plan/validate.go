@@ -52,21 +52,21 @@ func (p *planBody) Validate() error {
 func (p *planBody) ValidateRepositories() error {
 	a := make(map[string]int8)
 	for _, r := range p.Repositories {
-		if r.Name == "" {
+		if r.Name() == "" {
 			return errors.New("repository name is empty")
 		}
 
-		if r.URL == "" {
+		if r.URL() == "" {
 			return errors.New("repository url is empty")
 		}
 
-		if _, err := url.Parse(r.URL); err != nil {
-			return errors.New("cant parse url: " + r.URL)
+		if _, err := url.Parse(r.URL()); err != nil {
+			return errors.New("cant parse url: " + r.URL())
 		}
 
-		a[r.Name]++
-		if a[r.Name] > 1 {
-			return errors.New("repository name duplicate: " + r.Name)
+		a[r.Name()]++
+		if a[r.Name()] > 1 {
+			return errors.New("repository name duplicate: " + r.Name())
 		}
 	}
 
