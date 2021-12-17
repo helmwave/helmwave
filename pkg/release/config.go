@@ -44,7 +44,6 @@ type config struct {
 	ReuseValues              bool
 }
 
-//nolint:ireturn // we need to return interface to implement interface LUL
 func (rel *config) DryRun(b bool) Config {
 	rel.dryRun = b
 	return rel
