@@ -15,10 +15,10 @@ var ErrValidateFailed = errors.New("validate failed")
 func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
-		for i := range rel.Values {
-			_, err := os.Stat(rel.Values[i].Get())
+		for i := range rel.Values() {
+			_, err := os.Stat(rel.Values()[i].Get())
 			if os.IsNotExist(err) {
-				log.Errorf("❌ %s values (%s): %v", rel.Uniq(), rel.Values[i].Src, err)
+				log.Errorf("❌ %s values (%s): %v", rel.Uniq(), rel.Values()[i].Src, err)
 				f = true
 			} else {
 				// FatalError
@@ -76,16 +76,16 @@ func (p *planBody) ValidateRepositories() error {
 func (p *planBody) ValidateReleases() error {
 	a := make(map[uniqname.UniqName]int8)
 	for _, r := range p.Releases {
-		if r.Name == "" {
+		if r.Name() == "" {
 			return errors.New("release name is empty")
 		}
 
-		if r.Namespace == "" {
+		if r.Namespace() == "" {
 			log.Warnf("namespace for %q is empty. I will use the namespace of your k8s context.", r.Uniq())
 		}
 
-		if !validateNS(r.Namespace) {
-			return errors.New("bad namespace: " + r.Namespace)
+		if !validateNS(r.Namespace()) {
+			return errors.New("bad namespace: " + r.Namespace())
 		}
 
 		if !r.Uniq().Validate() {

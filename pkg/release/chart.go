@@ -15,11 +15,11 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 )
 
-func (rel *Config) GetChart() (*chart.Chart, error) {
+func (rel *config) GetChart() (*chart.Chart, error) {
 	// Hmm nice action bro
 	client := rel.newInstall()
 
-	ch, err := client.ChartPathOptions.LocateChart(rel.Chart.Name, rel.Helm())
+	ch, err := client.ChartPathOptions.LocateChart(rel.Chart().Name, rel.Helm())
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func chartCheck(ch *chart.Chart) error {
 	return nil
 }
 
-func (rel *Config) ChartDepsUpd() error {
-	return chartDepsUpd(rel.Chart.Name, rel.Helm())
+func (rel *config) ChartDepsUpd() error {
+	return chartDepsUpd(rel.Chart().Name, rel.Helm())
 }
 
 func chartDepsUpd(name string, settings *helm.EnvSettings) error {

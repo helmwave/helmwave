@@ -11,7 +11,7 @@ func (p *Plan) Destroy() error {
 	wg.Add(len(p.body.Releases))
 
 	for i := range p.body.Releases {
-		go func(wg *parallel.WaitGroup, rel *release.Config) {
+		go func(wg *parallel.WaitGroup, rel release.Config) {
 			defer wg.Done()
 			_, err := rel.Uninstall()
 			if err != nil {

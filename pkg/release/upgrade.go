@@ -7,7 +7,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *Config) upgrade() (*release.Release, error) {
+func (rel *config) upgrade() (*release.Release, error) {
 	client := rel.newUpgrade()
 
 	ch, err := rel.GetChart()
@@ -16,9 +16,9 @@ func (rel *Config) upgrade() (*release.Release, error) {
 	}
 
 	// Values
-	valuesFiles := make([]string, 0, len(rel.Values))
-	for i := range rel.Values {
-		valuesFiles = append(valuesFiles, rel.Values[i].Get())
+	valuesFiles := make([]string, 0, len(rel.Values()))
+	for i := range rel.Values() {
+		valuesFiles = append(valuesFiles, rel.Values()[i].Get())
 	}
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}
@@ -40,5 +40,5 @@ func (rel *Config) upgrade() (*release.Release, error) {
 	}
 
 	// Upgrade
-	return client.Run(rel.Name, ch, vals)
+	return client.Run(rel.Name(), ch, vals)
 }

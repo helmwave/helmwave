@@ -14,12 +14,12 @@ func (p *Plan) Status(names []string) error {
 	return status(p.body.Releases, names)
 }
 
-func status(all []*release.Config, names []string) error {
+func status(all []release.Config, names []string) error {
 	r := all
 
 	if len(names) > 0 {
 		sort.Strings(names)
-		r = make([]*release.Config, 0, len(all))
+		r = make([]release.Config, 0, len(all))
 
 		for _, rel := range all {
 			if helper.Contains(string(rel.Uniq()), names) {

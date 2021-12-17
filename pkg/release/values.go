@@ -75,7 +75,7 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 //	return v
 // }
 
-func (v *ValuesReference) SetViaRelease(rel *Config, dir string, gomplate *template.GomplateConfig) error {
+func (v *ValuesReference) SetViaRelease(rel *config, dir string, gomplate *template.GomplateConfig) error {
 	v.SetUniq(dir, rel.Uniq())
 
 	log.WithFields(log.Fields{
@@ -90,25 +90,25 @@ func (v *ValuesReference) SetViaRelease(rel *Config, dir string, gomplate *templ
 			log.Warnf("%s skipping: cant download %v", v.Src, err)
 			return ErrSkipValues
 		}
-		return template.Tpl2yml(v.dst, v.dst, struct{ Release *Config }{rel}, gomplate)
+		return template.Tpl2yml(v.dst, v.dst, struct{ Release *config }{rel}, gomplate)
 	} else if !helper.IsExists(v.Src) {
 		log.Warnf("%s skipping: local not found", v.Src)
 		return ErrSkipValues
 	}
 
-	return template.Tpl2yml(v.Src, v.dst, struct{ Release *Config }{rel}, gomplate)
+	return template.Tpl2yml(v.Src, v.dst, struct{ Release *config }{rel}, gomplate)
 }
 
-func (rel *Config) BuildValues(dir string, gomplate *template.GomplateConfig) error {
-	for i := len(rel.Values) - 1; i >= 0; i-- {
-		err := rel.Values[i].SetViaRelease(rel, dir, gomplate)
+func (rel *config) BuildValues(dir string, gomplate *template.GomplateConfig) error {
+	for i := len(rel.Values()) - 1; i >= 0; i-- {
+		err := rel.Values()[i].SetViaRelease(rel, dir, gomplate)
 		if errors.Is(ErrSkipValues, err) {
-			rel.Values = append(rel.Values[:i], rel.Values[i+1:]...)
+			rel.ValuesF = append(rel.Values()[:i], rel.Values()[i+1:]...)
 		} else if err != nil {
 			log.WithFields(log.Fields{
 				"release": rel.Uniq(),
 				"err":     err,
-				"values":  rel.Values[i],
+				"values":  rel.Values()[i],
 			}).Fatal("Values failed")
 			return err
 		}

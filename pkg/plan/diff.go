@@ -24,8 +24,8 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	for _, rel := range p.body.Releases {
 		visited = append(visited, rel.Uniq())
 
-		oldSpecs := manifest.Parse(b.manifests[rel.Uniq()], rel.Namespace)
-		newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace)
+		oldSpecs := manifest.Parse(b.manifests[rel.Uniq()], rel.Namespace())
+		newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace())
 
 		change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, os.Stdout)
 		if !change {
@@ -51,8 +51,8 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 		if active, ok := alive[rel.Uniq()]; ok {
 			// I dont use manifest.ParseRelease
 			// Because Structs are different.
-			oldSpecs := manifest.Parse(active.Manifest, rel.Namespace)
-			newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace)
+			oldSpecs := manifest.Parse(active.Manifest, rel.Namespace())
+			newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace())
 
 			change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, os.Stdout)
 			if !change {
@@ -66,7 +66,7 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 }
 
 // showChangesReport help function for reporting helm-diff
-func showChangesReport(releases []*release.Config, visited []uniqname.UniqName, k int) {
+func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k int) {
 	previous := false
 	for _, rel := range releases {
 		if !rel.Uniq().In(visited) {
@@ -99,7 +99,7 @@ func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []
 	mu := &sync.Mutex{}
 
 	for i := range p.body.Releases {
-		go func(wg *parallel.WaitGroup, mu *sync.Mutex, rel *release.Config) {
+		go func(wg *parallel.WaitGroup, mu *sync.Mutex, rel release.Config) {
 			defer wg.Done()
 
 			r, err := rel.Get()

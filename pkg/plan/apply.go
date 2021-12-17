@@ -106,13 +106,13 @@ func (p *Plan) syncReleases() (err error) {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
-	fails := make(map[*release.Config]error)
+	fails := make(map[release.Config]error)
 
 	mu := &sync.Mutex{}
 
 	for i := range p.body.Releases {
 		p.body.Releases[i].HandleDependencies(p.body.Releases)
-		go func(wg *parallel.WaitGroup, rel *release.Config, mu *sync.Mutex) {
+		go func(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
 			defer wg.Done()
 			log.Infof("🛥 %q deploying... ", rel.Uniq())
 			_, err = rel.Sync()
@@ -140,7 +140,7 @@ func (p *Plan) syncReleases() (err error) {
 	return p.ApplyReport(fails)
 }
 
-func (p *Plan) ApplyReport(fails map[*release.Config]error) error {
+func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 	n := len(p.body.Releases)
 	k := len(fails)
 
@@ -154,10 +154,10 @@ func (p *Plan) ApplyReport(fails map[*release.Config]error) error {
 
 		for r, err := range fails {
 			row := []string{
-				r.Name,
-				r.Namespace,
-				r.Chart.Name,
-				r.Chart.Version,
+				r.Name(),
+				r.Namespace(),
+				r.Chart().Name,
+				r.Chart().Version,
 				err.Error(),
 			}
 
@@ -254,7 +254,7 @@ func (p *Plan) kubedogSpecs() (map[string]*multitrack.MultitrackSpecs, error) {
 
 	for _, rel := range p.body.Releases {
 		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
-		relSpecs, err := kubedog.MakeSpecs(manifest, rel.Namespace)
+		relSpecs, err := kubedog.MakeSpecs(manifest, rel.Namespace())
 		if err != nil {
 			return nil, err
 		}
@@ -266,16 +266,16 @@ func (p *Plan) kubedogSpecs() (map[string]*multitrack.MultitrackSpecs, error) {
 			"StatefulSets": len(relSpecs.StatefulSets),
 		}).Tracef("%s specs", rel.Uniq())
 
-		nsSpec, found := mapSpecs[rel.Namespace]
+		nsSpec, found := mapSpecs[rel.Namespace()]
 		if found {
 			// Merge
 			nsSpec.DaemonSets = append(nsSpec.DaemonSets, relSpecs.DaemonSets...)
 			nsSpec.Deployments = append(nsSpec.Deployments, relSpecs.Deployments...)
 			nsSpec.StatefulSets = append(nsSpec.StatefulSets, relSpecs.StatefulSets...)
 			nsSpec.Jobs = append(nsSpec.Jobs, relSpecs.Jobs...)
-			mapSpecs[rel.Namespace] = nsSpec
+			mapSpecs[rel.Namespace()] = nsSpec
 		} else {
-			mapSpecs[rel.Namespace] = relSpecs
+			mapSpecs[rel.Namespace()] = relSpecs
 		}
 	}
 

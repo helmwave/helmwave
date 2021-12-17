@@ -53,12 +53,24 @@ func (r *repoConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return err
 }
 
+type releaseConfigs []release.Config
+
+func (r *releaseConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	if r == nil {
+		r = new(releaseConfigs)
+	}
+	var err error
+
+	*r, err = release.UnmarshalYAML(unmarshal)
+	return err
+}
+
 type planBody struct {
 	Project      string
 	Version      string
 	Template     *template.Config
 	Repositories repoConfigs
-	Releases     []*release.Config
+	Releases     releaseConfigs
 }
 
 func NewBody(file string) (*planBody, error) { // nolint:revive
