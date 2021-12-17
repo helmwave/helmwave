@@ -12,7 +12,7 @@ type Config interface {
 	Sync() (*release.Release, error)
 	NotifySuccess()
 	NotifyFailed()
-	DryRun(bool) Config
+	DryRun(bool)
 	ChartDepsUpd() error
 	In(a []Config) bool
 	BuildValues(dir string, gomplate *template.GomplateConfig) error
