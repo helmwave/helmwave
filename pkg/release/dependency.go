@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// TODO: we need to move this out of global context
 var releasePubSub = pubsub.NewReleasePubSub()
 
 func (rel *config) NotifySuccess() {
