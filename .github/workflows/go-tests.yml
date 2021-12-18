@@ -26,8 +26,6 @@ jobs:
         with:
           version: v3.7.1
 
-#      - run: helm repo add bitnami https://charts.bitnami.com/bitnami
-
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
