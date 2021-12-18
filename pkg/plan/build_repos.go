@@ -9,6 +9,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func (p *Plan) buildRepositories() (out []repo.Config, err error) {
+	return buildRepositories(
+		buildRepoMapTop(p.body.Releases),
+		p.body.Repositories,
+	)
+}
+
 func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []repo.Config, err error) {
 	for rep, releases := range m {
 		rm := releaseNames(releases)
