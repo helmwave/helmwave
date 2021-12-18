@@ -20,11 +20,11 @@ type DiffPlanTestSuite struct {
 	suite.Suite
 }
 
-func (s *DiffPlanTestSuite) SetupTest() {
+func (ts *DiffPlanTestSuite) SetupTest() {
 	log.StandardLogger().SetOutput(&buf)
 }
 
-func (s *DiffPlanTestSuite) TearDownTest() {
+func (ts *DiffPlanTestSuite) TearDownTest() {
 	log.StandardLogger().SetOutput(os.Stderr)
 }
 
