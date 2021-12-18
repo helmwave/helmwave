@@ -11,19 +11,19 @@ import (
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
-type Config struct {
+type config struct {
 	cfg                      *action.Configuration
 	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
 	helm                     *helm.EnvSettings
 	Store                    map[string]interface{}
-	Chart                    Chart
+	ChartF                   Chart `yaml:"chart"`
 	uniqName                 uniqname.UniqName
-	Name                     string            `yaml:"name"`
-	Namespace                string            `yaml:"namespace"`
-	Description              string            `yaml:"description"`
-	DependsOn                []string          `yaml:"depends_on"`
-	Values                   []ValuesReference `yaml:"values"`
-	Tags                     []string          `yaml:"tags"`
+	NameF                    string            `yaml:"name"`
+	NamespaceF               string            `yaml:"namespace"`
+	DescriptionF             string            `yaml:"description"`
+	DependsOnF               []string          `yaml:"depends_on"`
+	ValuesF                  []ValuesReference `yaml:"values"`
+	TagsF                    []string          `yaml:"tags"`
 	Timeout                  time.Duration     `yaml:"timeout"`
 	MaxHistory               int
 	AllowFailure             bool `yaml:"allow_failure"`
@@ -44,9 +44,8 @@ type Config struct {
 	ReuseValues              bool
 }
 
-func (rel *Config) DryRun(b bool) *Config {
+func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
-	return rel
 }
 
 type Chart struct {
@@ -54,18 +53,18 @@ type Chart struct {
 	action.ChartPathOptions `yaml:",inline"`
 }
 
-func (rel *Config) newInstall() *action.Install {
+func (rel *config) newInstall() *action.Install {
 	client := action.NewInstall(rel.Cfg())
 
 	// Only Up
 	client.CreateNamespace = rel.CreateNamespace
-	client.ReleaseName = rel.Name
+	client.ReleaseName = rel.Name()
 
 	// Common Part
 	client.DryRun = rel.dryRun
 	client.Devel = rel.Devel
-	client.Namespace = rel.Namespace
-	client.ChartPathOptions = rel.Chart.ChartPathOptions
+	client.Namespace = rel.Namespace()
+	client.ChartPathOptions = rel.Chart().ChartPathOptions
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
@@ -73,7 +72,7 @@ func (rel *Config) newInstall() *action.Install {
 	client.Atomic = rel.Atomic
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
-	client.Description = rel.Description
+	client.Description = rel.Description()
 
 	if client.DryRun {
 		client.Replace = true
@@ -83,7 +82,7 @@ func (rel *Config) newInstall() *action.Install {
 	return client
 }
 
-func (rel *Config) newUpgrade() *action.Upgrade {
+func (rel *config) newUpgrade() *action.Upgrade {
 	client := action.NewUpgrade(rel.Cfg())
 	// Only Upgrade
 	client.CleanupOnFail = rel.CleanupOnFail
@@ -95,8 +94,8 @@ func (rel *Config) newUpgrade() *action.Upgrade {
 	// Common Part
 	client.DryRun = rel.dryRun
 	client.Devel = rel.Devel
-	client.Namespace = rel.Namespace
-	client.ChartPathOptions = rel.Chart.ChartPathOptions
+	client.Namespace = rel.Namespace()
+	client.ChartPathOptions = rel.Chart().ChartPathOptions
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
@@ -104,7 +103,7 @@ func (rel *Config) newUpgrade() *action.Upgrade {
 	client.Atomic = rel.Atomic
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
-	client.Description = rel.Description
+	client.Description = rel.Description()
 
 	return client
 }
@@ -116,20 +115,48 @@ var (
 )
 
 // Uniq redis@my-namespace
-func (rel *Config) Uniq() uniqname.UniqName {
+func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
-		rel.uniqName = uniqname.UniqName(rel.Name + uniqname.Separator + rel.Namespace)
+		rel.uniqName = uniqname.UniqName(rel.Name() + uniqname.Separator + rel.Namespace())
 	}
 
 	return rel.uniqName
 }
 
 // In check that 'x' found in 'array'
-func (rel *Config) In(a []*Config) bool {
+func (rel *config) In(a []Config) bool {
 	for _, r := range a {
-		if rel == r {
+		if rel.Uniq() == r.Uniq() {
 			return true
 		}
 	}
 	return false
+}
+
+func (rel *config) Name() string {
+	return rel.NameF
+}
+
+func (rel *config) Namespace() string {
+	return rel.NamespaceF
+}
+
+func (rel *config) Description() string {
+	return rel.DescriptionF
+}
+
+func (rel *config) Chart() Chart {
+	return rel.ChartF
+}
+
+func (rel *config) DependsOn() []string {
+	return rel.DependsOnF
+}
+
+func (rel *config) Tags() []string {
+	return rel.TagsF
+}
+
+func (rel *config) Values() []ValuesReference {
+	return rel.ValuesF
 }

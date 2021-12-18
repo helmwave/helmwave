@@ -79,7 +79,7 @@ func (p *Plan) exportGraphMD() error {
 
 	found := false
 	for _, rel := range p.body.Releases {
-		if len(rel.DependsOn) > 0 {
+		if len(rel.DependsOn()) > 0 {
 			found = true
 			break
 		}
@@ -111,9 +111,9 @@ func (p *Plan) exportValues() error {
 	found := false
 
 	for i, rel := range p.body.Releases {
-		for j := range p.body.Releases[i].Values {
+		for j := range p.body.Releases[i].Values() {
 			found = true
-			p.body.Releases[i].Values[j].SetUniq(p.dir, rel.Uniq())
+			p.body.Releases[i].Values()[j].SetUniq(p.dir, rel.Uniq())
 		}
 	}
 

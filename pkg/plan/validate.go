@@ -15,10 +15,10 @@ var ErrValidateFailed = errors.New("validate failed")
 func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
-		for i := range rel.Values {
-			_, err := os.Stat(rel.Values[i].Get())
+		for i := range rel.Values() {
+			_, err := os.Stat(rel.Values()[i].Get())
 			if os.IsNotExist(err) {
-				log.Errorf("❌ %s values (%s): %v", rel.Uniq(), rel.Values[i].Src, err)
+				log.Errorf("❌ %s values (%s): %v", rel.Uniq(), rel.Values()[i].Src, err)
 				f = true
 			} else {
 				// FatalError
@@ -52,21 +52,21 @@ func (p *planBody) Validate() error {
 func (p *planBody) ValidateRepositories() error {
 	a := make(map[string]int8)
 	for _, r := range p.Repositories {
-		if r.Name == "" {
+		if r.Name() == "" {
 			return errors.New("repository name is empty")
 		}
 
-		if r.URL == "" {
+		if r.URL() == "" {
 			return errors.New("repository url is empty")
 		}
 
-		if _, err := url.Parse(r.URL); err != nil {
-			return errors.New("cant parse url: " + r.URL)
+		if _, err := url.Parse(r.URL()); err != nil {
+			return errors.New("cant parse url: " + r.URL())
 		}
 
-		a[r.Name]++
-		if a[r.Name] > 1 {
-			return errors.New("repository name duplicate: " + r.Name)
+		a[r.Name()]++
+		if a[r.Name()] > 1 {
+			return errors.New("repository name duplicate: " + r.Name())
 		}
 	}
 
@@ -76,16 +76,16 @@ func (p *planBody) ValidateRepositories() error {
 func (p *planBody) ValidateReleases() error {
 	a := make(map[uniqname.UniqName]int8)
 	for _, r := range p.Releases {
-		if r.Name == "" {
+		if r.Name() == "" {
 			return errors.New("release name is empty")
 		}
 
-		if r.Namespace == "" {
+		if r.Namespace() == "" {
 			log.Warnf("namespace for %q is empty. I will use the namespace of your k8s context.", r.Uniq())
 		}
 
-		if !validateNS(r.Namespace) {
-			return errors.New("bad namespace: " + r.Namespace)
+		if !validateNS(r.Namespace()) {
+			return errors.New("bad namespace: " + r.Namespace())
 		}
 
 		if !r.Uniq().Validate() {

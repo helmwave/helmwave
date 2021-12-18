@@ -7,19 +7,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func buildReleases(tags []string, releases []*release.Config, matchAll bool) (plan []*release.Config) {
+func buildReleases(tags []string, releases []release.Config, matchAll bool) (plan []release.Config) {
 	if len(tags) == 0 {
 		return releases
 	}
 
-	releasesMap := make(map[uniqname.UniqName]*release.Config)
+	releasesMap := make(map[uniqname.UniqName]release.Config)
 
 	for _, r := range releases {
 		releasesMap[r.Uniq()] = r
 	}
 
 	for _, r := range releases {
-		if checkTagInclusion(tags, r.Tags, matchAll) {
+		if checkTagInclusion(tags, r.Tags(), matchAll) {
 			plan = addToPlan(plan, r, releasesMap)
 		}
 	}
@@ -27,15 +27,15 @@ func buildReleases(tags []string, releases []*release.Config, matchAll bool) (pl
 	return plan
 }
 
-func addToPlan(plan []*release.Config, rel *release.Config,
-	releases map[uniqname.UniqName]*release.Config) []*release.Config {
+func addToPlan(plan []release.Config, rel release.Config,
+	releases map[uniqname.UniqName]release.Config) []release.Config {
 	if rel.In(plan) {
 		return plan
 	}
 
 	r := append(plan, rel) // nolint:gocritic
 
-	for _, depName := range rel.DependsOn {
+	for _, depName := range rel.DependsOn() {
 		depUN := uniqname.UniqName(depName)
 
 		if dep, ok := releases[depUN]; ok {
@@ -48,7 +48,7 @@ func addToPlan(plan []*release.Config, rel *release.Config,
 	return r
 }
 
-func releaseNames(a []*release.Config) (n []string) {
+func releaseNames(a []release.Config) (n []string) {
 	for _, r := range a {
 		n = append(n, string(r.Uniq()))
 	}

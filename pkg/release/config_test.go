@@ -1,5 +1,3 @@
-//go:build ignore || unit
-
 package release
 
 import (
@@ -13,9 +11,9 @@ type ConfigTestSuite struct {
 }
 
 func (s *ConfigTestSuite) TestConfigUniq() {
-	r := &Config{
-		Name:      "redis",
-		Namespace: "test",
+	r := &config{
+		NameF:      "redis",
+		NamespaceF: "test",
 	}
 
 	s.Require().Equal(r.Uniq(), r.uniqName)

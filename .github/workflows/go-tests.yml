@@ -1,18 +1,33 @@
-name: Unit tests
+name: Run tests
 
 on:
   pull_request:
     branches:
       - main
-      - release*
+    paths:
+      - '**.go'
   push:
     branches:
       - main
+    paths:
+      - '**.go'
 
 jobs:
-  unit-tests:
+  go-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Create KinD cluster
+        uses: container-tools/kind-action@v1
+        with:
+          registry: false
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.7.1
+
+#      - run: helm repo add bitnami https://charts.bitnami.com/bitnami
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -31,11 +46,10 @@ jobs:
       - name: Install go modules
         run: go mod download
 
-      - name: Run unit tests
-        run: go test -race -coverpkg=./... -coverprofile=./unit.cov -v --tags=unit -covermode=atomic ./...
+      - name: Run tests
+        run: go test -race -coverpkg=./... -coverprofile=./tests.cov -v -covermode=atomic --tags=integration ./...
 
       - uses: codecov/codecov-action@v2.1.0
         with:
-          files: ./unit.cov
-          flags: unit
+          files: ./tests.cov
           fail_ci_if_error: true

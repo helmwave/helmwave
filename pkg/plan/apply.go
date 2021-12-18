@@ -12,13 +12,12 @@ import (
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
-	rep "github.com/helmwave/helmwave/pkg/repo"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/kube"
 	"github.com/werf/kubedog/pkg/tracker"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
-	"helm.sh/helm/v3/pkg/repo"
+	helmRepo "helm.sh/helm/v3/pkg/repo"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -55,20 +54,20 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	return p.syncReleasesKubedog(kubedogConfig)
 }
 
-func syncRepositories(repositories []*rep.Config) (err error) {
+func syncRepositories(repositories repoConfigs) (err error) {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
-	var f *repo.File
+	var f *helmRepo.File
 	// Create if not exits
 	if !helper.IsExists(helper.Helm.RepositoryConfig) {
-		f = repo.NewFile()
+		f = helmRepo.NewFile()
 
 		_, err = helper.CreateFile(helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
 	} else {
-		f, err = repo.LoadFile(helper.Helm.RepositoryConfig)
+		f, err = helmRepo.LoadFile(helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
@@ -107,13 +106,13 @@ func (p *Plan) syncReleases() (err error) {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
-	fails := make(map[*release.Config]error)
+	fails := make(map[release.Config]error)
 
 	mu := &sync.Mutex{}
 
 	for i := range p.body.Releases {
 		p.body.Releases[i].HandleDependencies(p.body.Releases)
-		go func(wg *parallel.WaitGroup, rel *release.Config, mu *sync.Mutex) {
+		go func(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
 			defer wg.Done()
 			log.Infof("🛥 %q deploying... ", rel.Uniq())
 			_, err = rel.Sync()
@@ -141,7 +140,7 @@ func (p *Plan) syncReleases() (err error) {
 	return p.ApplyReport(fails)
 }
 
-func (p *Plan) ApplyReport(fails map[*release.Config]error) error {
+func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 	n := len(p.body.Releases)
 	k := len(fails)
 
@@ -155,10 +154,10 @@ func (p *Plan) ApplyReport(fails map[*release.Config]error) error {
 
 		for r, err := range fails {
 			row := []string{
-				r.Name,
-				r.Namespace,
-				r.Chart.Name,
-				r.Chart.Version,
+				r.Name(),
+				r.Namespace(),
+				r.Chart().Name,
+				r.Chart().Version,
 				err.Error(),
 			}
 
@@ -255,7 +254,7 @@ func (p *Plan) kubedogSpecs() (map[string]*multitrack.MultitrackSpecs, error) {
 
 	for _, rel := range p.body.Releases {
 		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
-		relSpecs, err := kubedog.MakeSpecs(manifest, rel.Namespace)
+		relSpecs, err := kubedog.MakeSpecs(manifest, rel.Namespace())
 		if err != nil {
 			return nil, err
 		}
@@ -267,16 +266,16 @@ func (p *Plan) kubedogSpecs() (map[string]*multitrack.MultitrackSpecs, error) {
 			"StatefulSets": len(relSpecs.StatefulSets),
 		}).Tracef("%s specs", rel.Uniq())
 
-		nsSpec, found := mapSpecs[rel.Namespace]
+		nsSpec, found := mapSpecs[rel.Namespace()]
 		if found {
 			// Merge
 			nsSpec.DaemonSets = append(nsSpec.DaemonSets, relSpecs.DaemonSets...)
 			nsSpec.Deployments = append(nsSpec.Deployments, relSpecs.Deployments...)
 			nsSpec.StatefulSets = append(nsSpec.StatefulSets, relSpecs.StatefulSets...)
 			nsSpec.Jobs = append(nsSpec.Jobs, relSpecs.Jobs...)
-			mapSpecs[rel.Namespace] = nsSpec
+			mapSpecs[rel.Namespace()] = nsSpec
 		} else {
-			mapSpecs[rel.Namespace] = relSpecs
+			mapSpecs[rel.Namespace()] = relSpecs
 		}
 	}
 

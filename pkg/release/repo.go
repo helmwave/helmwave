@@ -26,6 +26,6 @@ import (
 //	return repos, nil
 // }
 
-func (rel *Config) Repo() string {
-	return strings.Split(rel.Chart.Name, "/")[0]
+func (rel *config) Repo() string {
+	return strings.Split(rel.Chart().Name, "/")[0]
 }
