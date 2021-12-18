@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,21 +10,42 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type ExportTestSuite struct {
+type BuildValuesTestSuite struct {
 	suite.Suite
 }
 
-func (s *ExportTestSuite) TestValuesEmpty() {
+func (s *BuildValuesTestSuite) TestValuesEmpty() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
 	p.body = &planBody{}
 
-	err := p.exportValues()
-	s.Require().NoError(err)
+	s.Require().NoError(p.buildValues())
 }
 
-func (s *ExportTestSuite) TestValuesOneRelease() {
+func (s *BuildValuesTestSuite) TestValuesBuildError() {
+	tmpDir := s.T().TempDir()
+	p := New(filepath.Join(tmpDir, Dir))
+
+	tmpValues := filepath.Join(tmpDir, "blablavalues.yaml")
+	s.Require().NoError(os.WriteFile(tmpValues, []byte("a: b"), 0o600))
+
+	mockedRelease := &mockReleaseConfig{}
+	mockedRelease.On("Name").Return("redis")
+	mockedRelease.On("Namespace").Return("defaultblabla")
+
+	errBuildValues := errors.New("values build error")
+	mockedRelease.On("BuildValues").Return(errBuildValues)
+
+	p.body = &planBody{
+		Releases: releaseConfigs{mockedRelease},
+	}
+
+	s.Require().ErrorIs(p.buildValues(), errBuildValues)
+	mockedRelease.AssertExpectations(s.T())
+}
+
+func (s *BuildValuesTestSuite) TestSuccess() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
@@ -45,17 +67,10 @@ func (s *ExportTestSuite) TestValuesOneRelease() {
 	}
 
 	s.Require().NoError(p.buildValues())
-	s.Require().NoError(p.exportValues())
 	mockedRelease.AssertExpectations(s.T())
-	s.Require().DirExists(filepath.Join(tmpDir, Dir, Values))
-	s.Require().FileExists(filepath.Join(tmpDir, Dir, Values, valuesName))
-
-	contents, err := os.ReadFile(filepath.Join(tmpDir, Dir, Values, valuesName))
-	s.Require().NoError(err)
-	s.Require().Equal(valuesContents, contents)
 }
 
-func TestExportTestSuite(t *testing.T) {
+func TestBuildValuesTestSuite(t *testing.T) {
 	t.Parallel()
-	suite.Run(t, new(ExportTestSuite))
+	suite.Run(t, new(BuildValuesTestSuite))
 }

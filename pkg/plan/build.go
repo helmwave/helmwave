@@ -27,17 +27,14 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 
 	// Build Values
 	log.Info("Building values...")
-	err = p.buildValues(p.tmpDir)
+	err = p.buildValues()
 	if err != nil {
 		return err
 	}
 
 	// Build Repositories
 	log.Info("Building repositories...")
-	_, err = buildRepositories(
-		buildRepoMapTop(p.body.Releases),
-		p.body.Repositories,
-	)
+	_, err = p.buildRepositories()
 	if err != nil {
 		return err
 	}

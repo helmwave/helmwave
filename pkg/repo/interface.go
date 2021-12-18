@@ -5,6 +5,7 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
+// Config is an interface to manage particular helm repository
 type Config interface {
 	In([]Config) bool
 	Install(*helm.EnvSettings, *repo.File) error
@@ -12,6 +13,7 @@ type Config interface {
 	URL() string
 }
 
+// UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v2 to parse YAML into `Config` interface
 func UnmarshalYAML(unmarshal func(interface{}) error) ([]Config, error) {
 	r := make([]*config, 0)
 	if err := unmarshal(&r); err != nil {
