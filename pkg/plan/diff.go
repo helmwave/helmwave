@@ -18,7 +18,6 @@ var ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 // DiffPlan show diff between 2 plans
 func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	visited := make(map[uniqname.UniqName]bool)
-	//	visited := make([]uniqname.UniqName, 0, len(p.body.Releases) + len(b.body.Releases))
 	k := 0
 
 	for _, rel := range append(p.body.Releases, b.body.Releases...) {
