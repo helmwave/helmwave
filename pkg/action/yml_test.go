@@ -19,25 +19,25 @@ func (ts *YmlTestSuite) TestImplementsAction() {
 	ts.Require().Implements((*Action)(nil), &Yml{})
 }
 
-func (s *YmlTestSuite) TestRenderEnv() {
-	tmpDir := s.T().TempDir()
+func (ts *YmlTestSuite) TestRenderEnv() {
+	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		filepath.Join(tmpDir, "01_helmwave.yml"),
 	}
 
 	value := "test01"
-	s.T().Setenv("PROJECT_NAME", value)
-	s.T().Setenv("NAMESPACE", value)
+	ts.T().Setenv("PROJECT_NAME", value)
+	ts.T().Setenv("NAMESPACE", value)
 
-	s.Require().NoError(y.Run())
+	ts.Require().NoError(y.Run())
 
 	b, err := plan.NewBody(y.file)
-	s.Require().NoError(err)
+	ts.Require().NoError(err)
 
-	s.Require().Equal(value, b.Project)
-	s.Require().Len(b.Releases, 1)
-	s.Require().Equal(value, b.Releases[0].Namespace())
+	ts.Require().Equal(value, b.Project)
+	ts.Require().Len(b.Releases, 1)
+	ts.Require().Equal(value, b.Releases[0].Namespace())
 }
 
 //nolint:paralleltest // cannot parallel because of setenv

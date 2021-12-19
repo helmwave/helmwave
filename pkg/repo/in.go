@@ -1,6 +1,6 @@
 package repo
 
-// In check that rep in a
+// In check that rep in a.
 func (rep *config) In(a []Config) bool {
 	for i := range a {
 		if rep.Name() == a[i].Name() {
@@ -11,7 +11,7 @@ func (rep *config) In(a []Config) bool {
 	return false
 }
 
-// IndexOf check that rep in a by name
+// IndexOf check that rep in a by name.
 func (rep *config) IndexOf(a []Config) (int, bool) {
 	return IndexOf(a, rep)
 }

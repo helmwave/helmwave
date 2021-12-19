@@ -24,7 +24,7 @@ func CreateFile(p string) (*os.File, error) {
 	return os.Create(p)
 }
 
-// IsExists return true if file exists
+// IsExists return true if file exists.
 func IsExists(s string) bool {
 	_, err := os.Stat(s)
 	switch {

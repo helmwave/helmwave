@@ -2,37 +2,30 @@
 run:
   timeout: 5m
   build-tags:
-    - unit
     - integration
 
 linters:
   enable-all: true
   disable:
-    - varnamelen
     - cyclop
-    - deadcode
     - dupl
     - funlen
     - gci
-    - gochecknoglobals
+    - gochecknoglobals # TODO: get rid of globals
     - gocognit
     - gocyclo
-    - godot
     - godox
     - goerr113
     - golint
     - gomnd
     - ifshort
     - interfacer
-    - lll
     - maligned
-    - nestif
     - nlreturn
-    - revive
     - scopelint
     - tagliatelle
-    - testpackage
-    - unused
+    - testpackage # TODO: rename test packages to *_test
+    - varnamelen
     - wrapcheck
     - wsl
 

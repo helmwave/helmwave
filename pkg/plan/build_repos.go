@@ -67,7 +67,7 @@ func buildRepoMapTop(releases []release.Config) map[string][]release.Config {
 	return m
 }
 
-// // allRepos for releases
+// // allRepos for releases.
 // func allRepos(releases []*release.Config) ([]string, error) {
 //	var all []string
 //	for _, rel := range releases {
@@ -82,7 +82,7 @@ func buildRepoMapTop(releases []release.Config) map[string][]release.Config {
 //	return all, nil
 // }
 
-// repoIsLocal return true if repo is dir
+// repoIsLocal return true if repo is dir.
 func repoIsLocal(repoString string) bool {
 	if repoString == "" {
 		return true

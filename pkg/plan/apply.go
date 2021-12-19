@@ -140,7 +140,7 @@ func (p *Plan) syncReleases() (err error) {
 	return p.ApplyReport(fails)
 }
 
-// ApplyReport renders table report for failed releases
+// ApplyReport renders table report for failed releases.
 func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 	n := len(p.body.Releases)
 	k := len(fails)

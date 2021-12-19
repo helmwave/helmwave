@@ -9,7 +9,7 @@ import (
 	dir "github.com/otiai10/copy"
 )
 
-// Export allows save plan to file
+// Export allows save plan to file.
 func (p *Plan) Export() error {
 	if err := os.RemoveAll(p.dir); err != nil {
 		return err
@@ -135,12 +135,12 @@ func (p *Plan) exportValues() error {
 	return nil
 }
 
-// IsExist returns true if planfile exists
+// IsExist returns true if planfile exists.
 func (p *Plan) IsExist() bool {
 	return helper.IsExists(p.fullPath)
 }
 
-// IsManifestExist returns true if planfile exists
+// IsManifestExist returns true if planfile exists.
 func (p *Plan) IsManifestExist() bool {
 	return helper.IsExists(filepath.Join(p.dir, Manifest))
 }

@@ -15,7 +15,7 @@ import (
 
 var ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
-// DiffPlan show diff between 2 plans
+// DiffPlan show diff between 2 plans.
 func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	visited := make(map[uniqname.UniqName]bool)
 	k := 0
@@ -44,7 +44,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	showChangesReport(p.body.Releases, visitedNames, k)
 }
 
-// DiffLive show diff with production releases in k8s-cluster
+// DiffLive show diff with production releases in k8s-cluster.
 func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 	alive, _, err := p.GetLive()
 	if err != nil {
@@ -72,7 +72,7 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 	showChangesReport(p.body.Releases, visited, k)
 }
 
-// showChangesReport help function for reporting helm-diff
+// showChangesReport help function for reporting helm-diff.
 func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k int) {
 	previous := false
 	for _, rel := range releases {
@@ -97,7 +97,7 @@ func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
 	return nil, errors.New("release 404")
 }
 
-// GetLive returns maps of releases in a k8s-cluster
+// GetLive returns maps of releases in a k8s-cluster.
 func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []uniqname.UniqName, err error) {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))

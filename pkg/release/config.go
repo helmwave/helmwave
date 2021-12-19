@@ -114,7 +114,7 @@ var (
 	ErrDepFailed     = errors.New("dependency failed")
 )
 
-// Uniq redis@my-namespace
+// Uniq redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
 		rel.uniqName = uniqname.UniqName(rel.Name() + uniqname.Separator + rel.Namespace())
@@ -123,7 +123,7 @@ func (rel *config) Uniq() uniqname.UniqName {
 	return rel.uniqName
 }
 
-// In check that 'x' found in 'array'
+// In check that 'x' found in 'array'.
 func (rel *config) In(a []Config) bool {
 	for _, r := range a {
 		if rel.Uniq() == r.Uniq() {

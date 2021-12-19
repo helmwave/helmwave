@@ -4,7 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Build plan with yml and tags/matchALL options
+// Build plan with yml and tags/matchALL options.
 func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	// Create Body
 	body, err := NewBody(yml)

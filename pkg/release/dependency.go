@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// TODO: we need to move this out of global context
+// TODO: we need to move this out of global context.
 var releasePubSub = pubsub.NewReleasePubSub()
 
 func (rel *config) NotifySuccess() {
@@ -81,7 +81,8 @@ func (rel *config) HandleDependencies(releases []Config) {
 	depsAdded := make(map[string]bool)
 	for _, r := range releases {
 		name := r.Uniq()
-		if i := sort.SearchStrings(rel.DependsOn(), string(name)); i < len(rel.DependsOn()) && rel.DependsOn()[i] == string(name) {
+		i := sort.SearchStrings(rel.DependsOn(), string(name))
+		if i < len(rel.DependsOn()) && rel.DependsOn()[i] == string(name) {
 			rel.addDependency(name)
 			depsAdded[string(name)] = true
 		}

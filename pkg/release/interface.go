@@ -6,7 +6,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-// Config is an interface to manage particular helm release
+// Config is an interface to manage particular helm release.
 type Config interface {
 	Uniq() uniqname.UniqName
 	HandleDependencies([]Config)
@@ -32,7 +32,7 @@ type Config interface {
 	Values() []ValuesReference
 }
 
-// UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v2 to parse YAML into `Config` interface
+// UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v2 to parse YAML into `Config` interface.
 func UnmarshalYAML(unmarshal func(interface{}) error) ([]Config, error) {
 	r := make([]*config, 0)
 	if err := unmarshal(&r); err != nil {
