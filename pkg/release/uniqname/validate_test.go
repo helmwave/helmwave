@@ -1,5 +1,3 @@
-//go:build ignore || unit
-
 package uniqname
 
 import (

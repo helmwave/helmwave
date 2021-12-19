@@ -28,6 +28,10 @@ func (ts *DiffPlanTestSuite) TearDownTest() {
 	log.StandardLogger().SetOutput(os.Stderr)
 }
 
+func (ts *DiffPlanTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &DiffLocalPlan{})
+}
+
 func (ts *DiffPlanTestSuite) TestRun() {
 	s1 := &Build{
 		plandir: ts.T().TempDir(),
