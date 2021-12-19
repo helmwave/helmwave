@@ -73,7 +73,7 @@ func completion() *cli.Command {
 			 echo "source <(helmwave completion zsh)" >> ~/.zshrc"
 		`,
 		Action: func(c *cli.Context) error {
-			if 0 == c.Args().Len() {
+			if c.Args().Len() == 0 {
 				return ErrNotChose
 			}
 

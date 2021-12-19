@@ -15,6 +15,10 @@ type BuildTestSuite struct {
 	suite.Suite
 }
 
+func (ts *BuildTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Build{})
+}
+
 func (ts *BuildTestSuite) TestManifest() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{

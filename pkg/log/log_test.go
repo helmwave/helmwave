@@ -3,6 +3,7 @@ package log
 import (
 	"bytes"
 	"encoding/json"
+	"os"
 	"strings"
 	"testing"
 
@@ -22,6 +23,10 @@ type LogTestSuite struct {
 
 func (s *LogTestSuite) SetupTest() {
 	log.StandardLogger().SetOutput(&buf)
+}
+
+func (s *LogTestSuite) TearDownTest() {
+	log.StandardLogger().SetOutput(os.Stderr)
 }
 
 func (s *LogTestSuite) TestKLogHandler() {
@@ -55,7 +60,7 @@ func (s *LogTestSuite) TestLogLevel() {
 
 	log.Debug("test 123")
 	defer buf.Reset()
-	s.Require().Empty(buf.Bytes(), "message below minimum level should not be logged")
+	s.Require().Empty(buf.String(), "message below minimum level should not be logged")
 }
 
 func (s *LogTestSuite) TestDebugLogLevel() {

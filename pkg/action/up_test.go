@@ -16,6 +16,10 @@ type UpTestSuite struct {
 	suite.Suite
 }
 
+func (ts *UpTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Up{})
+}
+
 func (ts *UpTestSuite) TestAutoBuild() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
