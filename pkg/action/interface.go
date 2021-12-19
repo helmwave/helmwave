@@ -2,7 +2,6 @@ package action
 
 import "github.com/urfave/cli/v2"
 
-//nolint:unused
 type Action interface {
 	Run() error
 	Cmd() *cli.Command
