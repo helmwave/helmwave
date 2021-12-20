@@ -1,8 +1,9 @@
-package helper
+package helper_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -11,7 +12,7 @@ type FileTestSuite struct {
 }
 
 func (s *FileTestSuite) TestGood() {
-	b := Contains("c", []string{
+	b := helper.Contains("c", []string{
 		"a",
 		"b",
 		"c",
@@ -23,7 +24,7 @@ func (s *FileTestSuite) TestGood() {
 }
 
 func (s *FileTestSuite) TestBad() {
-	b := Contains("12", []string{
+	b := helper.Contains("12", []string{
 		"a",
 		"b",
 		"c",

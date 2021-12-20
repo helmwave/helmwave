@@ -27,6 +27,7 @@ func Byte(in interface{}) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return data
 }
 

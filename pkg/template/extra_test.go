@@ -1,4 +1,4 @@
-package template
+package template_test
 
 import (
 	"os"
@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -23,7 +24,7 @@ func (s *ExtraTestSuite) TestToYaml() {
 	}
 	yamlData := "field: field"
 
-	y, err := ToYaml(data)
+	y, err := template.ToYaml(data)
 	s.Require().NoError(err)
 	s.Require().YAMLEq(yamlData, y)
 }
@@ -36,20 +37,20 @@ func (r raw) MarshalYAML() (interface{}, error) {
 
 func (s *ExtraTestSuite) TestToYamlNil() {
 	data := raw{}
-	y, err := ToYaml(data)
+	y, err := template.ToYaml(data)
 	s.Require().Equal("", y)
 	s.Require().ErrorIs(err, os.ErrNotExist)
 }
 
 func (s *ExtraTestSuite) TestFromYaml() {
 	tests := []struct {
-		result Values
+		result template.Values
 		yaml   string
 		fails  bool
 	}{
 		{
 			yaml:   "abc: 123",
-			result: Values{"abc": 123},
+			result: template.Values{"abc": 123},
 			fails:  false,
 		},
 		{
@@ -59,7 +60,7 @@ func (s *ExtraTestSuite) TestFromYaml() {
 	}
 
 	for i := range tests {
-		v, err := FromYaml(tests[i].yaml)
+		v, err := template.FromYaml(tests[i].yaml)
 		if tests[i].fails {
 			s.Require().Error(err)
 			s.Require().Empty(v)
@@ -71,7 +72,7 @@ func (s *ExtraTestSuite) TestFromYaml() {
 }
 
 func (s *ExtraTestSuite) TestExec() {
-	res, err := Exec("pwd", []interface{}{})
+	res, err := template.Exec("pwd", []interface{}{})
 	s.Require().NoError(err)
 
 	pwd, err := os.Getwd()
@@ -81,26 +82,26 @@ func (s *ExtraTestSuite) TestExec() {
 }
 
 func (s *ExtraTestSuite) TestExecInvalidArg() {
-	res, err := Exec("pwd", []interface{}{123})
+	res, err := template.Exec("pwd", []interface{}{123})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
 
 func (s *ExtraTestSuite) TestExecError() {
-	res, err := Exec(s.T().Name(), []interface{}{})
+	res, err := template.Exec(s.T().Name(), []interface{}{})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
 
 func (s *ExtraTestSuite) TestExecStdin() {
 	input := "123"
-	res, err := Exec("cat", []interface{}{}, input)
+	res, err := template.Exec("cat", []interface{}{}, input)
 	s.Require().NoError(err)
 	s.Require().Equal(input, res)
 }
 
 func (s *ExtraTestSuite) TestSetValueAtPath() {
-	data := Values{
+	data := template.Values{
 		"a": map[string]interface{}{
 			"b": "123",
 		},
@@ -108,7 +109,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	}
 
 	tests := []struct {
-		result Values
+		result template.Values
 		value  interface{}
 		path   string
 		fails  bool
@@ -116,7 +117,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		{
 			path:  "c",
 			value: 321,
-			result: Values{
+			result: template.Values{
 				"a": map[string]interface{}{"b": "123"},
 				"c": 321,
 			},
@@ -125,7 +126,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		{
 			path:  "a.b",
 			value: "321",
-			result: Values{
+			result: template.Values{
 				"a": map[string]interface{}{"b": "321"},
 				"c": 321,
 			},
@@ -134,7 +135,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		{
 			path:  "a.c",
 			value: "321",
-			result: Values{
+			result: template.Values{
 				"a": map[string]interface{}{"b": "321", "c": "321"},
 				"c": 321,
 			},
@@ -149,7 +150,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	}
 
 	for i := range tests {
-		res, err := SetValueAtPath(tests[i].path, tests[i].value, data)
+		res, err := template.SetValueAtPath(tests[i].path, tests[i].value, data)
 		if tests[i].fails {
 			s.Require().Error(err)
 			s.Require().Nil(res)
@@ -163,14 +164,14 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 func (s *ExtraTestSuite) TestRequiredEnv() {
 	name := s.T().Name()
 
-	res, err := RequiredEnv(name)
+	res, err := template.RequiredEnv(name)
 	s.Require().Error(err)
 	s.Require().Empty(res)
 
 	data := "test"
 	s.T().Setenv(name, data)
 
-	res, err = RequiredEnv(name)
+	res, err = template.RequiredEnv(name)
 	s.Require().NoError(err)
 	s.Require().Equal(data, res)
 }
@@ -199,7 +200,7 @@ func (s *ExtraTestSuite) TestRequired() {
 	}
 
 	for _, t := range tests {
-		res, err := Required("blabla", t.data)
+		res, err := template.Required("blabla", t.data)
 		if t.fails {
 			s.Require().Error(err)
 			s.Require().Nil(res)
@@ -214,7 +215,7 @@ func (s *ExtraTestSuite) TestReadFile() {
 	tmpDir := s.T().TempDir()
 	tmpFile := filepath.Join(tmpDir, "blablafile")
 
-	res, err := ReadFile(tmpFile)
+	res, err := template.ReadFile(tmpFile)
 
 	s.Require().Equal("", res)
 	s.Require().ErrorIs(err, os.ErrNotExist)
@@ -224,14 +225,14 @@ func (s *ExtraTestSuite) TestReadFile() {
 	s.Require().NoError(os.WriteFile(tmpFile, []byte(data), 0o600))
 	s.Require().FileExists(tmpFile)
 
-	res, err = ReadFile(tmpFile)
+	res, err = template.ReadFile(tmpFile)
 
 	s.Require().NoError(err)
 	s.Require().Equal(data, res)
 }
 
 func (s *ExtraTestSuite) TestGet() {
-	data := Values{
+	data := template.Values{
 		"a": map[string]interface{}{
 			"b": "123",
 		},
@@ -266,7 +267,7 @@ func (s *ExtraTestSuite) TestGet() {
 	}
 
 	for i := range tests {
-		res, err := Get(tests[i].path, data)
+		res, err := template.Get(tests[i].path, data)
 		if tests[i].fails {
 			s.Require().Error(err)
 			s.Require().Nil(res)
@@ -278,7 +279,7 @@ func (s *ExtraTestSuite) TestGet() {
 }
 
 func (s *ExtraTestSuite) TestHasKey() {
-	data := Values{
+	data := template.Values{
 		"a": map[string]interface{}{
 			"b": "123",
 		},
@@ -313,7 +314,7 @@ func (s *ExtraTestSuite) TestHasKey() {
 	}
 
 	for _, test := range tests {
-		res, err := HasKey(test.path, data)
+		res, err := template.HasKey(test.path, data)
 		s.Require().Equal(test.result, res)
 
 		if test.fails {

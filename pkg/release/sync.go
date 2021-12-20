@@ -23,6 +23,7 @@ func (rel *config) Cfg() *action.Configuration {
 		rel.cfg, err = helper.NewCfg(rel.Namespace())
 		if err != nil {
 			log.Fatal(err)
+
 			return nil
 		}
 	}
@@ -36,6 +37,7 @@ func (rel *config) Helm() *helm.EnvSettings {
 		rel.helm, err = helper.NewHelm(rel.Namespace())
 		if err != nil {
 			log.Fatal(err)
+
 			return nil
 		}
 

@@ -1,8 +1,9 @@
-package action
+package action_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/action"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -11,7 +12,7 @@ type RollbackTestSuite struct {
 }
 
 func (ts *RollbackTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &Rollback{})
+	ts.Require().Implements((*action.Action)(nil), &action.Rollback{})
 }
 
 func TestRollbackTestSuite(t *testing.T) {

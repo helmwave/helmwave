@@ -48,6 +48,7 @@ func (r *repoConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var err error
 
 	*r, err = repo.UnmarshalYAML(unmarshal)
+
 	return err
 }
 
@@ -60,6 +61,7 @@ func (r *releaseConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error 
 	var err error
 
 	*r, err = release.UnmarshalYAML(unmarshal)
+
 	return err
 }
 

@@ -1,8 +1,9 @@
-package uniqname
+package uniqname_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,7 +18,7 @@ func (s *ValidateTestSuite) TestGood() {
 	}
 
 	for _, d := range data {
-		s.Require().True(UniqName(d).Validate())
+		s.Require().True(uniqname.UniqName(d).Validate())
 	}
 }
 
@@ -35,7 +36,7 @@ func (s *ValidateTestSuite) TestBad() {
 	}
 
 	for _, d := range data {
-		s.Require().False(UniqName(d).Validate())
+		s.Require().False(uniqname.UniqName(d).Validate())
 	}
 }
 

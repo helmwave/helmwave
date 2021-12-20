@@ -8,7 +8,6 @@ linters:
   enable-all: true
   disable:
     - cyclop
-    - dupl
     - funlen
     - gci
     - gochecknoglobals # TODO: get rid of globals
@@ -16,18 +15,17 @@ linters:
     - gocyclo
     - godox
     - goerr113
-    - golint
-    - gomnd
+    - goimports # we already lint with gofumpt
+    - golint # deprecated
+    - gomnd # we want to keep magic numbers
     - ifshort
-    - interfacer
-    - maligned
-    - nlreturn
-    - scopelint
+    - interfacer # deprecated
+    - maligned # deprecated
+    - scopelint # deprecated
     - tagliatelle
-    - testpackage # TODO: rename test packages to *_test
     - varnamelen
     - wrapcheck
-    - wsl
+    - wsl # lots of style checks
 
 # all available settings of specific linters
 linters-settings:
@@ -175,8 +173,6 @@ linters-settings:
     # Choose whether or not to use the extra rules that are disabled
     # by default
     extra-rules: false
-
-  goimports:
 
   gomoddirectives:
     # Allow local `replace` directives. Default is false.

@@ -103,5 +103,6 @@ func (p *planBody) ValidateReleases() error {
 
 func validateNS(ns string) bool {
 	r := regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
+
 	return r.MatchString(ns)
 }

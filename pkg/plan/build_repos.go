@@ -29,6 +29,7 @@ func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []r
 		} else {
 			log.WithField("releases", rm).
 				Warn("🗄 you will not be able to install this")
+
 			return nil, errors.New("🗄 not found " + rep)
 		}
 	}

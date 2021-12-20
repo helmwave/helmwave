@@ -113,6 +113,7 @@ loop:
 			for _, mode := range values {
 				if mode == v {
 					spec.TrackTerminationMode = v
+
 					continue loop
 				}
 			}
@@ -128,6 +129,7 @@ loop:
 			for _, mode := range values {
 				if mode == v {
 					spec.FailMode = v
+
 					continue loop
 				}
 			}

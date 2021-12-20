@@ -51,8 +51,7 @@ func (r *mockReleaseConfig) In(a []release.Config) bool {
 
 func (r *mockReleaseConfig) BuildValues(dir string, gomplate *template.GomplateConfig) error {
 	args := r.Called()
-	errReturn := args.Error(0)
-	if errReturn != nil {
+	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn
 	}
 

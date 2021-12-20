@@ -35,6 +35,7 @@ func (p *Plan) Apply() (err error) {
 	}
 
 	log.Info("🛥 Sync releases...")
+
 	return p.syncReleases()
 }
 
@@ -247,6 +248,7 @@ func runMultiracks(
 			wg.ErrChan() <- multitrack.Multitrack(kubeClient, specs, opts)
 		}(kubedogConfig.StartDelay, kube.Client, *specs, opts, wg)
 	}
+
 	return nil
 }
 
