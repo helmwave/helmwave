@@ -80,9 +80,11 @@ func completion() *cli.Command {
 			switch c.Args().First() {
 			case "bash":
 				fmt.Print(bash) // nolint:forbidigo
+
 				return nil
 			case "zsh":
 				fmt.Print(zsh) // nolint:forbidigo
+
 				return nil
 			default:
 				return ErrWrongShell

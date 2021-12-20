@@ -1,8 +1,9 @@
-package helper
+package helper_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -11,7 +12,7 @@ type HelmTestSuite struct {
 }
 
 func (s *HelmTestSuite) TestHelmNS() {
-	h1, err := NewHelm("my")
+	h1, err := helper.NewHelm("my")
 
 	s.Require().NoError(err)
 	s.Require().Equal("my", h1.Namespace())

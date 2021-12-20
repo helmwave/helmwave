@@ -20,6 +20,7 @@ func (rep *config) Install(settings *helm.EnvSettings, f *repo.File) error {
 
 		// The add is idempotent so do nothing
 		log.Infof("❎  %q already exists with the same configuration, skipping", rep.Name())
+
 		return nil
 	}
 

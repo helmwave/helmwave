@@ -1,8 +1,9 @@
-package release
+package release_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -12,17 +13,19 @@ type RepoTestSuite struct {
 
 func (s *RepoTestSuite) TestRepoWithSlash() {
 	const bitnami = "bitnami"
-	r := &config{ChartF: Chart{
+	r := release.NewConfig()
+	r.ChartF = release.Chart{
 		Name: bitnami + "/redis",
-	}}
+	}
 
 	s.Require().Equal(bitnami, r.Repo())
 }
 
 func (s *RepoTestSuite) TestRepoWithoutSlash() {
-	r := &config{ChartF: Chart{
+	r := release.NewConfig()
+	r.ChartF = release.Chart{
 		Name: "api",
-	}}
+	}
 
 	s.Require().Equal("api", r.Repo())
 }

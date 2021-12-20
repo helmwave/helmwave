@@ -91,6 +91,7 @@ func version() *cli.Command {
 		Usage:   "Show shorts version",
 		Action: func(c *cli.Context) error {
 			fmt.Println(helmwave.Version) // nolint:forbidigo
+
 			return nil
 		},
 	}

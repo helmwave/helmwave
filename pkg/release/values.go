@@ -48,6 +48,7 @@ func (v *ValuesReference) isURL() bool {
 
 func (v *ValuesReference) IsLocal() bool {
 	stat, err := os.Stat(v.Src)
+
 	return err == nil && !stat.IsDir()
 }
 
@@ -88,11 +89,14 @@ func (v *ValuesReference) SetViaRelease(rel *config, dir string, gomplate *templ
 		err := v.Download()
 		if err != nil {
 			log.Warnf("%s skipping: cant download %v", v.Src, err)
+
 			return ErrSkipValues
 		}
+
 		return template.Tpl2yml(v.dst, v.dst, struct{ Release *config }{rel}, gomplate)
 	} else if !helper.IsExists(v.Src) {
 		log.Warnf("%s skipping: local not found", v.Src)
+
 		return ErrSkipValues
 	}
 
@@ -110,6 +114,7 @@ func (rel *config) BuildValues(dir string, gomplate *template.GomplateConfig) er
 				"err":     err,
 				"values":  rel.Values()[i],
 			}).Fatal("Values failed")
+
 			return err
 		}
 	}

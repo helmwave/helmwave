@@ -26,6 +26,7 @@ func buildGraphMD(releases []release.Config) string {
 	}
 
 	md += "```"
+
 	return md
 }
 

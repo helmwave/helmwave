@@ -32,6 +32,7 @@ func status(all []release.Config, names []string) error {
 		s, err := rel.Status()
 		if err != nil {
 			log.Errorf("Failed to get s of %s: %v", rel.Uniq(), err)
+
 			continue
 		}
 

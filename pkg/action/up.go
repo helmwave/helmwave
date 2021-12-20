@@ -33,6 +33,7 @@ func (i *Up) Run() error {
 
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")
+
 		return p.ApplyWithKubedog(i.dog)
 	}
 

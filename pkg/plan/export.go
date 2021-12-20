@@ -81,6 +81,7 @@ func (p *Plan) exportGraphMD() error {
 	for _, rel := range p.body.Releases {
 		if len(rel.DependsOn()) > 0 {
 			found = true
+
 			break
 		}
 	}
@@ -132,6 +133,7 @@ func (p *Plan) exportValues() error {
 			filepath.Join(p.dir, Values),
 		)
 	}
+
 	return nil
 }
 

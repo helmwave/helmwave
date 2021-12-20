@@ -25,6 +25,7 @@ func (s Source) MarshalYAML() (interface{}, error) {
 		URL string
 	}
 	r := raw{URL: s.URL.String()}
+
 	return r, nil
 }
 
@@ -40,5 +41,6 @@ func (s *Source) UnmarshalYAML(unmarshal func(v interface{}) error) error {
 	}
 
 	s.URL, err = url.Parse(r.URL)
+
 	return err
 }

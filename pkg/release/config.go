@@ -130,6 +130,7 @@ func (rel *config) In(a []Config) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

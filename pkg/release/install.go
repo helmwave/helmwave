@@ -20,6 +20,7 @@ func (rel *config) isInstalled() bool {
 	default:
 		log.Errorf("i can't check %q is installed", rel.Uniq())
 		log.Fatal(err)
+
 		return false
 	}
 }

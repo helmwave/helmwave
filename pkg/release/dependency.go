@@ -27,6 +27,7 @@ func (rel *config) NotifyFailed() {
 	if rel.AllowFailure {
 		log.Warnf("%s failed but is allowed to fail", rel.Uniq())
 		releasePubSub.PublishSuccess(rel.Uniq())
+
 		return
 	}
 
@@ -54,6 +55,7 @@ func (rel *config) waitForDependencies() (err error) {
 			err = ErrDepFailed
 		}
 	}
+
 	return
 }
 
@@ -66,12 +68,14 @@ F:
 		select {
 		case status = <-ch:
 			ticker.Stop()
+
 			break F
 		case <-ticker.C:
 			log.Infof("release %s is waiting for dependency %s", rel.Uniq(), name)
 		}
 	}
 	log.Infof("dependency %s of release %s done", name, rel.Uniq())
+
 	return status
 }
 

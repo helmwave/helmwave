@@ -24,6 +24,7 @@ func NewWaitGroup() *WaitGroup {
 		err:     &multierror.Error{},
 	}
 	go wg.gatherErrors()
+
 	return wg
 }
 
