@@ -1,10 +1,9 @@
-package main_test
+package main
 
 import (
 	"bytes"
 	"testing"
 
-	. "github.com/helmwave/helmwave/cmd/helmwave"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
 )

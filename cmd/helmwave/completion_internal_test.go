@@ -1,4 +1,4 @@
-package main_test
+package main
 
 func (s *CliTestSuite) TestCompletion() {
 	tests := []struct {
