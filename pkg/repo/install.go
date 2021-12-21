@@ -9,17 +9,18 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-func (rep *Config) Install(settings *helm.EnvSettings, f *repo.File) error {
-	if !rep.Force && f.Has(rep.Name) {
-		existing := f.Get(rep.Name)
+func (rep *config) Install(settings *helm.EnvSettings, f *repo.File) error {
+	if !rep.Force && f.Has(rep.Name()) {
+		existing := f.Get(rep.Name())
 		if rep.Entry != *existing {
 			// The input coming in for the name is different from what is already
 			// configured. Return an error.
-			return fmt.Errorf("❌ repository name (%s) already exists, please specify a different name", rep.Name)
+			return fmt.Errorf("❌ repository name (%s) already exists, please specify a different name", rep.Name())
 		}
 
 		// The add is idempotent so do nothing
-		log.Infof("❎  %q already exists with the same configuration, skipping", rep.Name)
+		log.Infof("❎  %q already exists with the same configuration, skipping", rep.Name())
+
 		return nil
 	}
 
@@ -34,7 +35,7 @@ func (rep *Config) Install(settings *helm.EnvSettings, f *repo.File) error {
 	log.Debugf("Download IndexFile for %q", chartRepo.Config.Name)
 	_, err = chartRepo.DownloadIndexFile()
 	if err != nil {
-		log.Warnf("⚠️ looks like %v is not a valid chart repository or cannot be reached", rep.URL)
+		log.Warnf("⚠️ looks like %v is not a valid chart repository or cannot be reached", rep.URL())
 	}
 
 	f.Update(&rep.Entry)

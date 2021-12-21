@@ -17,6 +17,10 @@ type DownTestSuite struct {
 	suite.Suite
 }
 
+func (ts *DownTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Down{})
+}
+
 func (ts *DownTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{

@@ -19,6 +19,7 @@ func ToYaml(v interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return string(data), nil
 }
 
@@ -28,6 +29,7 @@ func FromYaml(str string) (Values, error) {
 	if err := yaml.Unmarshal([]byte(str), &m); err != nil {
 		return nil, fmt.Errorf("%w, offending yaml: %s", err, str)
 	}
+
 	return m, nil
 }
 
@@ -89,6 +91,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 		}
 
 		bytes = bs
+
 		return nil
 	})
 
@@ -141,6 +144,7 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 	default:
 		return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" was not a map", path, key)
 	}
+
 	return values, nil
 }
 
@@ -169,6 +173,7 @@ func ReadFile(file string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return string(bytes), nil
 }
 
@@ -215,6 +220,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 			if defSet {
 				return def, nil
 			}
+
 			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
 		}
 	case map[interface{}]interface{}:
@@ -223,6 +229,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 			if defSet {
 				return def, nil
 			}
+
 			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
 		}
 	default:
@@ -243,6 +250,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 			if defSet {
 				return def, nil
 			}
+
 			return nil, &noValueError{fmt.Sprintf("no field named %q exist in %v", keys[0], typedObj)}
 		}
 		v = f.Interface()
@@ -251,6 +259,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	if defSet {
 		return Get(strings.Join(keys[1:], "."), def, v)
 	}
+
 	return Get(strings.Join(keys[1:], "."), v)
 }
 
@@ -316,5 +325,6 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	if defSet {
 		return HasKey(strings.Join(keys[1:], "."), def, v)
 	}
+
 	return HasKey(strings.Join(keys[1:], "."), v)
 }

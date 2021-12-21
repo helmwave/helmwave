@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *Plan) buildValues(dir string) error {
+func (p *Plan) buildValues() error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -18,18 +18,18 @@ func (p *Plan) buildValues(dir string) error {
 	}
 
 	for _, rel := range p.body.Releases {
-		go func(wg *parallel.WaitGroup, rel *release.Config) {
+		go func(wg *parallel.WaitGroup, rel release.Config) {
 			defer wg.Done()
-			err := rel.BuildValues(dir, gomplateConfig)
+			err := rel.BuildValues(p.tmpDir, gomplateConfig)
 			if err != nil {
 				log.Errorf("❌ %s values: %v", rel.Uniq(), err)
 				wg.ErrChan() <- err
 			} else {
 				var vals []string
-				for i := range rel.Values {
-					vals = append(vals, rel.Values[i].Get())
+				for i := range rel.Values() {
+					vals = append(vals, rel.Values()[i].Get())
 				}
-				log.WithField("values", vals).Infof("✅ %s values count %d", rel.Uniq(), len(rel.Values))
+				log.WithField("values", vals).Infof("✅ %s values count %d", rel.Uniq(), len(rel.Values()))
 			}
 		}(wg, rel)
 	}

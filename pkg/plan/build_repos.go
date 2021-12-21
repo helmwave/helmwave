@@ -9,7 +9,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out []*repo.Config, err error) {
+func (p *Plan) buildRepositories() (out []repo.Config, err error) {
+	return buildRepositories(
+		buildRepoMapTop(p.body.Releases),
+		p.body.Repositories,
+	)
+}
+
+func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []repo.Config, err error) {
 	for rep, releases := range m {
 		rm := releaseNames(releases)
 		log.WithField(rep, rm).Debug("🗄 repo dependencies")
@@ -22,6 +29,7 @@ func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out [
 		} else {
 			log.WithField("releases", rm).
 				Warn("🗄 you will not be able to install this")
+
 			return nil, errors.New("🗄 not found " + rep)
 		}
 	}
@@ -51,8 +59,8 @@ func buildRepositories(m map[string][]*release.Config, in []*repo.Config) (out [
 //
 // }
 
-func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
-	m := make(map[string][]*release.Config)
+func buildRepoMapTop(releases []release.Config) map[string][]release.Config {
+	m := make(map[string][]release.Config)
 	for _, rel := range releases {
 		m[rel.Repo()] = append(m[rel.Repo()], rel)
 	}
@@ -60,7 +68,7 @@ func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 	return m
 }
 
-// // allRepos for releases
+// // allRepos for releases.
 // func allRepos(releases []*release.Config) ([]string, error) {
 //	var all []string
 //	for _, rel := range releases {
@@ -75,7 +83,7 @@ func buildRepoMapTop(releases []*release.Config) map[string][]*release.Config {
 //	return all, nil
 // }
 
-// repoIsLocal return true if repo is dir
+// repoIsLocal return true if repo is dir.
 func repoIsLocal(repoString string) bool {
 	if repoString == "" {
 		return true

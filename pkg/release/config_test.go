@@ -1,10 +1,9 @@
-//go:build ignore || unit
-
-package release
+package release_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -13,12 +12,10 @@ type ConfigTestSuite struct {
 }
 
 func (s *ConfigTestSuite) TestConfigUniq() {
-	r := &Config{
-		Name:      "redis",
-		Namespace: "test",
-	}
+	r := release.NewConfig()
+	r.NameF = "redis"
+	r.NamespaceF = "test"
 
-	s.Require().Equal(r.Uniq(), r.uniqName)
 	s.Require().True(r.Uniq().Validate())
 }
 

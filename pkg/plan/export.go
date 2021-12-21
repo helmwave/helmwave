@@ -9,7 +9,7 @@ import (
 	dir "github.com/otiai10/copy"
 )
 
-// Export allows save plan to file
+// Export allows save plan to file.
 func (p *Plan) Export() error {
 	if err := os.RemoveAll(p.dir); err != nil {
 		return err
@@ -79,8 +79,9 @@ func (p *Plan) exportGraphMD() error {
 
 	found := false
 	for _, rel := range p.body.Releases {
-		if len(rel.DependsOn) > 0 {
+		if len(rel.DependsOn()) > 0 {
 			found = true
+
 			break
 		}
 	}
@@ -111,9 +112,9 @@ func (p *Plan) exportValues() error {
 	found := false
 
 	for i, rel := range p.body.Releases {
-		for j := range p.body.Releases[i].Values {
+		for j := range p.body.Releases[i].Values() {
 			found = true
-			p.body.Releases[i].Values[j].SetUniq(p.dir, rel.Uniq())
+			p.body.Releases[i].Values()[j].SetUniq(p.dir, rel.Uniq())
 		}
 	}
 
@@ -132,15 +133,16 @@ func (p *Plan) exportValues() error {
 			filepath.Join(p.dir, Values),
 		)
 	}
+
 	return nil
 }
 
-// IsExist returns true if planfile exists
+// IsExist returns true if planfile exists.
 func (p *Plan) IsExist() bool {
 	return helper.IsExists(p.fullPath)
 }
 
-// IsManifestExist returns true if planfile exists
+// IsManifestExist returns true if planfile exists.
 func (p *Plan) IsManifestExist() bool {
 	return helper.IsExists(filepath.Join(p.dir, Manifest))
 }

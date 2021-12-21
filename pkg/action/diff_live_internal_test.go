@@ -16,6 +16,10 @@ type DiffLiveTestSuite struct {
 	suite.Suite
 }
 
+func (ts *DiffLiveTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &DiffLive{})
+}
+
 func (ts *DiffLiveTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{

@@ -26,6 +26,7 @@ func (p *Plan) List() error {
 		r, err := rel.List()
 		if err != nil {
 			log.Errorf("Failed to list %s release, skipping: %v", string(rel.Uniq()), err)
+
 			continue
 		}
 

@@ -8,7 +8,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *Config) Sync() (*release.Release, error) {
+func (rel *config) Sync() (*release.Release, error) {
 	// DependsON
 	if err := rel.waitForDependencies(); err != nil {
 		return nil, err
@@ -17,12 +17,13 @@ func (rel *Config) Sync() (*release.Release, error) {
 	return rel.upgrade()
 }
 
-func (rel *Config) Cfg() *action.Configuration {
+func (rel *config) Cfg() *action.Configuration {
 	if rel.cfg == nil {
 		var err error
-		rel.cfg, err = helper.NewCfg(rel.Namespace)
+		rel.cfg, err = helper.NewCfg(rel.Namespace())
 		if err != nil {
 			log.Fatal(err)
+
 			return nil
 		}
 	}
@@ -30,12 +31,13 @@ func (rel *Config) Cfg() *action.Configuration {
 	return rel.cfg
 }
 
-func (rel *Config) Helm() *helm.EnvSettings {
+func (rel *config) Helm() *helm.EnvSettings {
 	if rel.helm == nil {
 		var err error
-		rel.helm, err = helper.NewHelm(rel.Namespace)
+		rel.helm, err = helper.NewHelm(rel.Namespace())
 		if err != nil {
 			log.Fatal(err)
+
 			return nil
 		}
 

@@ -8,10 +8,10 @@ import (
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
-func (rel *Config) isInstalled() bool {
+func (rel *config) isInstalled() bool {
 	client := action.NewHistory(rel.Cfg())
 	client.Max = 1
-	_, err := client.Run(rel.Name)
+	_, err := client.Run(rel.Name())
 	switch {
 	case errors.Is(err, driver.ErrReleaseNotFound):
 		return false
@@ -20,6 +20,7 @@ func (rel *Config) isInstalled() bool {
 	default:
 		log.Errorf("i can't check %q is installed", rel.Uniq())
 		log.Fatal(err)
+
 		return false
 	}
 }

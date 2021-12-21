@@ -1,10 +1,9 @@
-//go:build ignore || unit
-
-package helper
+package helper_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -19,7 +18,7 @@ func (s *HTTPTestSuite) TestIsURL() {
 	}
 
 	for _, url := range urls {
-		b := IsURL(url)
+		b := helper.IsURL(url)
 		s.True(b)
 	}
 }

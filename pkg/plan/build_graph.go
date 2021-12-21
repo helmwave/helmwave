@@ -10,13 +10,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func buildGraphMD(releases []*release.Config) string {
+func buildGraphMD(releases []release.Config) string {
 	md :=
 		"# Depends On\n\n" +
 			"```mermaid\ngraph RL\n"
 
 	for _, r := range releases {
-		for _, dep := range r.DependsOn {
+		for _, dep := range r.DependsOn() {
 			md += fmt.Sprintf(
 				"\t%s[%q] --> %s[%q]\n",
 				strings.Replace(string(r.Uniq()), "@", "_", -1), r.Uniq(), // nolint:gocritic
@@ -26,16 +26,17 @@ func buildGraphMD(releases []*release.Config) string {
 	}
 
 	md += "```"
+
 	return md
 }
 
-func buildGraphASCII(releases []*release.Config) string {
+func buildGraphASCII(releases []release.Config) string {
 	list := make([]core.NodeInput, 0, len(releases))
 
 	for _, rel := range releases {
 		l := core.NodeInput{
 			Id:   string(rel.Uniq()),
-			Next: rel.DependsOn,
+			Next: rel.DependsOn(),
 		}
 
 		list = append(list, l)

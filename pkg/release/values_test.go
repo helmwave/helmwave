@@ -1,10 +1,9 @@
-//go:build ignore || unit
-
-package release
+package release_test
 
 import (
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v2"
 )
@@ -15,7 +14,7 @@ type ValuesTestSuite struct {
 
 func (s *ValuesTestSuite) TestList() {
 	type config struct {
-		Values []ValuesReference
+		Values []release.ValuesReference
 	}
 
 	src := `
@@ -29,7 +28,7 @@ values:
 	s.Require().NoError(err)
 
 	s.Require().Equal(&config{
-		Values: []ValuesReference{
+		Values: []release.ValuesReference{
 			{Src: "a"},
 			{Src: "b"},
 		},
@@ -38,7 +37,7 @@ values:
 
 func (s *ValuesTestSuite) TestMap() {
 	type config struct {
-		Values []ValuesReference
+		Values []release.ValuesReference
 	}
 
 	src := `
@@ -54,9 +53,9 @@ values:
 	s.Require().NoError(err)
 
 	s.Require().Equal(&config{
-		Values: []ValuesReference{
-			{Src: "1", dst: "a"},
-			{Src: "2", dst: "b"},
+		Values: []release.ValuesReference{
+			release.NewValuesReference("1", "a"),
+			release.NewValuesReference("2", "b"),
 		},
 	}, c)
 }

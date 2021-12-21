@@ -68,6 +68,7 @@ func (l *Settings) Init() error {
 	}
 
 	l.setFormat()
+
 	return l.setLevel()
 }
 

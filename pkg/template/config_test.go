@@ -1,11 +1,10 @@
-//go:build ignore || unit
-
-package template
+package template_test
 
 import (
 	"net/url"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v2"
 )
@@ -18,17 +17,14 @@ func (s *ConfigTestSuite) TestUnmarshal() {
 	u, err := url.Parse("http://blabla")
 	s.Require().NoError(err)
 
-	source := &Config{
-		Gomplate: GomplateConfig{
-			Datasources: map[string]Source{
-				"test": {
-					u,
-				},
-			},
+	source := &template.Config{}
+	source.Gomplate.Datasources = map[string]template.Source{
+		"test": {
+			u,
 		},
 	}
-	dest := &Config{
-		Gomplate: GomplateConfig{},
+	dest := &template.Config{
+		Gomplate: template.GomplateConfig{},
 	}
 
 	data, err := yaml.Marshal(source)

@@ -1,5 +1,3 @@
-//go:build ignore || unit
-
 package action
 
 import (
@@ -15,6 +13,10 @@ import (
 
 type BuildTestSuite struct {
 	suite.Suite
+}
+
+func (ts *BuildTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Build{})
 }
 
 func (ts *BuildTestSuite) TestManifest() {
@@ -108,7 +110,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {
-			names = append(names, r.Name)
+			names = append(names, r.Name())
 		}
 
 		ts.Require().ElementsMatch(cases[i].names, names)
@@ -145,6 +147,7 @@ type NonParallelBuildTestSuite struct {
 	suite.Suite
 }
 
+//nolint:dupl
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
@@ -168,6 +171,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
+//nolint:dupl
 func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
