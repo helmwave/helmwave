@@ -3,6 +3,7 @@
 package action
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -23,8 +24,9 @@ func (ts *UpTestSuite) TestImplementsAction() {
 func (ts *UpTestSuite) TestAutoBuild() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tests.Root + "01_helmwave.yml.tpl",
-		tmpDir + "02_helmwave.yml",
+		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		file:      filepath.Join(tmpDir, "02_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	u := &Up{

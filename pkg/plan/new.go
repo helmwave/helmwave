@@ -8,7 +8,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -37,6 +36,8 @@ type Plan struct {
 	manifests map[uniqname.UniqName]string
 
 	graphMD string
+
+	templater string
 }
 
 type repoConfigs []repo.Config
@@ -68,7 +69,6 @@ func (r *releaseConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error 
 type planBody struct {
 	Project      string
 	Version      string
-	Template     *template.Config
 	Repositories repoConfigs
 	Releases     releaseConfigs
 }

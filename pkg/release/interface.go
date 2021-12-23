@@ -2,7 +2,6 @@ package release
 
 import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	"github.com/helmwave/helmwave/pkg/template"
 	"helm.sh/helm/v3/pkg/release"
 )
 
@@ -15,8 +14,8 @@ type Config interface {
 	NotifyFailed()
 	DryRun(bool)
 	ChartDepsUpd() error
-	In(a []Config) bool
-	BuildValues(dir string, gomplate *template.GomplateConfig) error
+	In([]Config) bool
+	BuildValues(string, string) error
 	Uninstall() (*release.UninstallReleaseResponse, error)
 	Get() (*release.Release, error)
 	List() (*release.Release, error)

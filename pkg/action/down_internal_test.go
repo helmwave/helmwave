@@ -24,8 +24,9 @@ func (ts *DownTestSuite) TestImplementsAction() {
 func (ts *DownTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "02_helmwave.yml"),
-		filepath.Join(tests.Root, "02_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	s := &Build{

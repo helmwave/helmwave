@@ -15,67 +15,47 @@ type Tpl2YmlTestSuite struct {
 }
 
 func (s *Tpl2YmlTestSuite) TestNonExistingTemplate() {
-	gomplateConfig := &template.GomplateConfig{
-		Enabled: false,
-	}
-
 	tmpDir := s.T().TempDir()
 	tpl := filepath.Join(tmpDir, "values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, gomplateConfig)
+	err := template.Tpl2yml(tpl, dst, nil, "sprig")
 	s.Require().ErrorIs(err, os.ErrNotExist)
 }
 
 func (s *Tpl2YmlTestSuite) TestNonExistingDestDir() {
-	gomplateConfig := &template.GomplateConfig{
-		Enabled: false,
-	}
-
 	tmpDir := s.T().TempDir()
 	tpl := filepath.Join(tests.Root, "05_values.yaml")
 	dst := filepath.Join(tmpDir, "blabla", "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, gomplateConfig)
+	err := template.Tpl2yml(tpl, dst, nil, "sprig")
 	s.Require().NoError(err)
 }
 
 func (s *Tpl2YmlTestSuite) TestMissingData() {
-	gomplateConfig := &template.GomplateConfig{
-		Enabled: false,
-	}
-
 	tmpDir := s.T().TempDir()
 	tpl := filepath.Join(tests.Root, "08_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, gomplateConfig)
+	err := template.Tpl2yml(tpl, dst, nil, "sprig")
 	s.Require().EqualError(err, "template: tpl:1: function \"include\" not defined")
 }
 
 func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
-	gomplateConfig := &template.GomplateConfig{
-		Enabled: false,
-	}
-
 	tmpDir := s.T().TempDir()
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, gomplateConfig)
+	err := template.Tpl2yml(tpl, dst, nil, "sprig")
 	s.Require().Error(err)
 }
 
 func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
-	gomplateConfig := &template.GomplateConfig{
-		Enabled: true,
-	}
-
 	tmpDir := s.T().TempDir()
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, gomplateConfig)
+	err := template.Tpl2yml(tpl, dst, nil, "gomplate")
 	s.Require().NoError(err)
 }
 

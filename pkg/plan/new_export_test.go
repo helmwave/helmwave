@@ -49,7 +49,7 @@ func (r *mockReleaseConfig) In(a []release.Config) bool {
 	panic("not implemented") // TODO: Implement
 }
 
-func (r *mockReleaseConfig) BuildValues(dir string, gomplate *template.GomplateConfig) error {
+func (r *mockReleaseConfig) BuildValues(dir, templater string) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn
@@ -58,7 +58,7 @@ func (r *mockReleaseConfig) BuildValues(dir string, gomplate *template.GomplateC
 	for i := len(r.Values()) - 1; i >= 0; i-- {
 		v := r.Values()[i]
 		dst := filepath.Join(dir, Values, filepath.Base(v.Src))
-		err := template.Tpl2yml(v.Src, dst, nil, gomplate)
+		err := template.Tpl2yml(v.Src, dst, nil, templater)
 		if err != nil {
 			return err
 		}
