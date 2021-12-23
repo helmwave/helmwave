@@ -3,7 +3,7 @@ package kubedog
 import (
 	"bytes"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	meta1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

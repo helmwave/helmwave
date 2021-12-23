@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"gopkg.in/yaml.v3"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
 )
@@ -13,10 +14,10 @@ type Config interface {
 	URL() string
 }
 
-// UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v2 to parse YAML into `Config` interface.
-func UnmarshalYAML(unmarshal func(interface{}) error) ([]Config, error) {
+// UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.
+func UnmarshalYAML(node *yaml.Node) ([]Config, error) {
 	r := make([]*config, 0)
-	if err := unmarshal(&r); err != nil {
+	if err := node.Decode(&r); err != nil {
 		return nil, err
 	}
 
