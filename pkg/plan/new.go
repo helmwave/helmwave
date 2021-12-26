@@ -11,7 +11,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -41,26 +41,26 @@ type Plan struct {
 
 type repoConfigs []repo.Config
 
-func (r *repoConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (r *repoConfigs) UnmarshalYAML(node *yaml.Node) error {
 	if r == nil {
 		r = new(repoConfigs)
 	}
 	var err error
 
-	*r, err = repo.UnmarshalYAML(unmarshal)
+	*r, err = repo.UnmarshalYAML(node)
 
 	return err
 }
 
 type releaseConfigs []release.Config
 
-func (r *releaseConfigs) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (r *releaseConfigs) UnmarshalYAML(node *yaml.Node) error {
 	if r == nil {
 		r = new(releaseConfigs)
 	}
 	var err error
 
-	*r, err = release.UnmarshalYAML(unmarshal)
+	*r, err = release.UnmarshalYAML(node)
 
 	return err
 }
