@@ -2,7 +2,7 @@ package helper
 
 import (
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // SaveInterface encodes input to YAML and saves to file.
