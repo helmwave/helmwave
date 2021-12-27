@@ -12,8 +12,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Values = map[string]interface{}
+// Values is alias for string map of interfaces.
+type Values map[string]interface{}
 
+// ToYaml renders data into YAML string.
+// Used as custom template function.
 func ToYaml(v interface{}) (string, error) {
 	data, err := yaml.Marshal(v)
 	if err != nil {
@@ -23,6 +26,8 @@ func ToYaml(v interface{}) (string, error) {
 	return string(data), nil
 }
 
+// FromYaml parses YAML string into data.
+// Used as custom template function.
 func FromYaml(str string) (Values, error) {
 	m := Values{}
 
@@ -33,6 +38,8 @@ func FromYaml(str string) (Values, error) {
 	return m, nil
 }
 
+// Exec runs external binary and returns its standard output.
+// Used as custom template function.
 //nolint:funlen,gocognit // TODO: split this function
 func Exec(command string, args []interface{}, inputs ...string) (string, error) {
 	var input string
@@ -103,6 +110,8 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 	return string(bytes), nil
 }
 
+// SetValueAtPath sets value in map by dot-separated key path.
+// Used as custom template function.
 func SetValueAtPath(path string, value interface{}, values Values) (Values, error) {
 	var current interface{}
 	current = values
@@ -149,6 +158,8 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 	return values, nil
 }
 
+// RequiredEnv returns environment variable by name and errors if it is not defined.
+// Used as custom template function.
 func RequiredEnv(name string) (string, error) {
 	if val, exists := os.LookupEnv(name); exists && len(val) > 0 {
 		return val, nil
@@ -157,6 +168,8 @@ func RequiredEnv(name string) (string, error) {
 	return "", fmt.Errorf("required env var `%s` is not set", name)
 }
 
+// Required returns error if val is nil of empty string. Otherwise it returns the same val.
+// Used as custom template function.
 func Required(warn string, val interface{}) (interface{}, error) {
 	if val == nil {
 		return nil, fmt.Errorf(warn)
@@ -169,6 +182,8 @@ func Required(warn string, val interface{}) (interface{}, error) {
 	return val, nil
 }
 
+// ReadFile reads file and returns its contents as string.
+// Used as custom template function.
 func ReadFile(file string) (string, error) {
 	bytes, err := os.ReadFile(file)
 	if err != nil {
@@ -186,6 +201,11 @@ func (e *noValueError) Error() string {
 	return e.msg
 }
 
+// Get returns value in map by dot-separated key path.
+// First argument is dot-separated key path.
+// Second argument is default value if key not found and is optional.
+// Third argument is map to search in.
+// Used as custom template function.
 //nolint:funlen,gocognit // TODO: split this function
 func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	var defSet bool
@@ -265,6 +285,8 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	return Get(strings.Join(keys[1:], "."), v)
 }
 
+// HasKey searches for any value by dot-separated key path in map.
+// Used as custom template function.
 //nolint:funlen // TODO: split this function
 func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	var defSet bool

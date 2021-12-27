@@ -8,6 +8,7 @@ import (
 	"net/url"
 )
 
+// Download downloads uri to file.
 func Download(file, uri string) error {
 	f, err := CreateFile(file)
 	if err != nil {
@@ -37,6 +38,7 @@ func Download(file, uri string) error {
 	return nil
 }
 
+// IsURL reports whether provided string is a valid URL.
 func IsURL(str string) bool {
 	u, err := url.Parse(str)
 

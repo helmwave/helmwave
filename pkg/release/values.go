@@ -4,7 +4,6 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
-	"os"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -13,13 +12,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// ErrSkipValues is returned when values cannot be used and are skipped.
 var ErrSkipValues = errors.New("values has been skip")
 
+// ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
 	Src string
 	dst string
 }
 
+// UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v2.
 func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	m := make(map[string]string)
 	if err := unmarshal(&m); err != nil {
@@ -32,6 +34,7 @@ func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error
 	return nil
 }
 
+// MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v2.
 func (v ValuesReference) MarshalYAML() (interface{}, error) {
 	return struct {
 		Src string
@@ -46,20 +49,17 @@ func (v *ValuesReference) isURL() bool {
 	return helper.IsURL(v.Src)
 }
 
-func (v *ValuesReference) IsLocal() bool {
-	stat, err := os.Stat(v.Src)
-
-	return err == nil && !stat.IsDir()
-}
-
+// Download downloads values by source URL and places to destination path.
 func (v *ValuesReference) Download() error {
 	return helper.Download(v.dst, v.Src)
 }
 
+// Get returns destination path of values.
 func (v *ValuesReference) Get() string {
 	return v.dst
 }
 
+// SetUniq generates unique file path based on provided base directory, release uniqname and sha1 of source path.
 func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
 	h := sha1.New() // nolint:gosec
 	h.Write([]byte(v.Src))
@@ -76,6 +76,8 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 //	return v
 // }
 
+// SetViaRelease downloads and templates values file.
+// Returns ErrSkipValues if values cannot be downloaded or doesn't exist in local FS.
 func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
 	v.SetUniq(dir, rel.Uniq())
 

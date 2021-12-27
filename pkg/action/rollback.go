@@ -5,10 +5,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Rollback is struct for running 'rollback' command.
 type Rollback struct {
 	plandir string
 }
 
+// Run is main function for 'rollback' command.
 func (i *Rollback) Run() error {
 	p := plan.New(i.plandir)
 	if err := p.Import(); err != nil {
@@ -18,6 +20,7 @@ func (i *Rollback) Run() error {
 	return p.Rollback()
 }
 
+// Cmd returns 'rollback' *cli.Command.
 func (i *Rollback) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:  "rollback",

@@ -5,11 +5,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Status is struct for running 'status' command.
 type Status struct {
 	plandir string
 	names   cli.StringSlice
 }
 
+// Run is main function for 'status' command.
 func (l *Status) Run() error {
 	p := plan.New(l.plandir)
 	if err := p.Import(); err != nil {
@@ -19,6 +21,7 @@ func (l *Status) Run() error {
 	return p.Status(l.names.Value())
 }
 
+// Cmd returns 'status' *cli.Command.
 func (l *Status) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:  "status",

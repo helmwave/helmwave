@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Import parses directory with plan files and imports them into structure.
 func (p *Plan) Import() error {
 	body, err := NewBody(p.fullPath)
 	if err != nil {
@@ -55,9 +56,4 @@ func (p *Plan) importManifest() error {
 	}
 
 	return nil
-}
-
-func (p *Plan) Clean() {
-	_ = os.RemoveAll(p.dir)
-	_ = os.RemoveAll(p.fullPath)
 }

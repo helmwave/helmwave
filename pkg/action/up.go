@@ -9,6 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Up is struct for running 'up' command.
 type Up struct {
 	build *Build
 	dog   *kubedog.Config
@@ -17,6 +18,7 @@ type Up struct {
 	kubedogEnabled bool
 }
 
+// Run is main function for 'up' command.
 func (i *Up) Run() error {
 	if i.autoBuild {
 		if err := i.build.Run(); err != nil {
@@ -40,6 +42,7 @@ func (i *Up) Run() error {
 	return p.Apply()
 }
 
+// Cmd returns 'up' *cli.Command.
 func (i *Up) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "up",

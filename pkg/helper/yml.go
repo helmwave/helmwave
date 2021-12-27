@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// SaveInterface encodes input to YAML and saves to file.
 func SaveInterface(file string, in interface{}) error {
 	f, err := CreateFile(file)
 	if err != nil {
@@ -22,6 +23,7 @@ func SaveInterface(file string, in interface{}) error {
 	return f.Sync()
 }
 
+// Byte marshals input to YAML and returns YAML byte slice.
 func Byte(in interface{}) []byte {
 	data, err := yaml.Marshal(in)
 	if err != nil {
@@ -31,6 +33,7 @@ func Byte(in interface{}) []byte {
 	return data
 }
 
+// String marshals input to YAML and returns YAML string.
 func String(in interface{}) string {
 	return string(Byte(in))
 }

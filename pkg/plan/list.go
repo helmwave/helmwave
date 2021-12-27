@@ -10,10 +10,15 @@ import (
 )
 
 var (
-	FailStatusColor    = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)
+	// FailStatusColor is tablewriter color for failed releases.
+	FailStatusColor = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)
+
+	// SuccessStatusColor is tablewriter color for succeeded releases.
 	SuccessStatusColor = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)
 )
 
+// List renders releases status table and writes it to stdout.
+// Listed only releases that exist in plan.
 func (p *Plan) List() error {
 	log.Infof("Should be %d releases", len(p.body.Releases))
 	if len(p.body.Releases) == 0 {

@@ -4,11 +4,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Diff is struct for running 'diff' commands.
 type Diff struct {
 	Wide       int
 	ShowSecret bool
 }
 
+// Cmd returns 'diff' *cli.Command.
 func (d *Diff) Cmd() *cli.Command {
 	plan := DiffLocalPlan{diff: d}
 	live := DiffLive{diff: d}

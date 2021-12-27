@@ -60,8 +60,11 @@ compdef _cli_zsh_autocomplete helmwave
 )
 
 var (
+	// ErrWrongShell is an error for unsupported shell.
 	ErrWrongShell = errors.New("wrong shell")
-	ErrNotChose   = errors.New("you did not specify a shell")
+
+	// ErrNotChose is an error for not provided shell name.
+	ErrNotChose = errors.New("you did not specify a shell")
 )
 
 func completion() *cli.Command {

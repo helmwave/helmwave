@@ -10,8 +10,10 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
+// Helm is an instance of helm CLI.
 var Helm = helm.New()
 
+// NewCfg creates helm internal configuration for provided namespace.
 func NewCfg(ns string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER")
@@ -25,6 +27,7 @@ func NewCfg(ns string) (*action.Configuration, error) {
 	return cfg, nil
 }
 
+// NewHelm is a hack to create an instance of helm CLI and specifying namespace without environment variables.
 func NewHelm(ns string) (*helm.EnvSettings, error) {
 	env := helm.New()
 	fs := &pflag.FlagSet{}

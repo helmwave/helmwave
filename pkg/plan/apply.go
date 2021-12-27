@@ -21,8 +21,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// ErrDeploy is returned when deploy is failed for whatever reason.
 var ErrDeploy = errors.New("deploy failed")
 
+// Apply syncs repositories and releases.
 func (p *Plan) Apply() (err error) {
 	log.Info("🗄 Sync repositories...")
 	err = syncRepositories(p.body.Repositories)
@@ -39,6 +41,7 @@ func (p *Plan) Apply() (err error) {
 	return p.syncReleases()
 }
 
+// ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
 func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	log.Info("🗄 Sync repositories...")
 	err = syncRepositories(p.body.Repositories)

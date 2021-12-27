@@ -47,6 +47,7 @@ func recoverPanic() {
 	}
 }
 
+// CreateApp creates *cli.App with all commands.
 func CreateApp() *cli.App {
 	c := cli.NewApp()
 
@@ -68,6 +69,7 @@ func CreateApp() *cli.App {
 	return c
 }
 
+// CommandNotFoundError is return when CLI command is not found.
 type CommandNotFoundError struct {
 	Command string
 }
