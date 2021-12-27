@@ -6,7 +6,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type ConfigTestSuite struct {

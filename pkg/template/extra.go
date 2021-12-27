@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"golang.org/x/sync/errgroup"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type Values = map[string]interface{}
