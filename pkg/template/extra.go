@@ -70,7 +70,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 	wg.Add(1)
 	go writeCommandInput(stdin, input, wg)
 
-	var output bytes.Buffer
+	output := &bytes.Buffer{}
 	wg.Add(1)
 	go getCommandOutput(cmd, output, wg)
 
@@ -102,7 +102,7 @@ func writeCommandInput(stdin io.WriteCloser, input string, wg *parallel.WaitGrou
 	}
 }
 
-func getCommandOutput(cmd *exec.Cmd, output bytes.Buffer, wg *parallel.WaitGroup) {
+func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGroup) {
 	defer wg.Done()
 
 	bs, err := cmd.Output()
