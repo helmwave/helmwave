@@ -13,7 +13,7 @@ import (
 )
 
 // Values is alias for string map of interfaces.
-type Values map[string]interface{}
+type Values = map[string]interface{}
 
 // ToYaml renders data into YAML string.
 // Used as custom template function.
@@ -121,12 +121,6 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 
 	for _, k := range pathToMap {
 		switch typedCurrent := current.(type) {
-		case Values:
-			v, exists := typedCurrent[k]
-			if !exists {
-				return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" does not exist", path, k)
-			}
-			current = v
 		case map[string]interface{}:
 			v, exists := typedCurrent[k]
 			if !exists {
@@ -153,8 +147,6 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 	case map[string]interface{}:
 		typedCurrent[key] = value
 	case map[interface{}]interface{}:
-		typedCurrent[key] = value
-	case Values:
 		typedCurrent[key] = value
 	default:
 		return nil, fmt.Errorf(
@@ -246,15 +238,6 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	var v interface{}
 	var ok bool
 	switch typedObj := obj.(type) {
-	case Values:
-		v, ok = typedObj[keys[0]]
-		if !ok {
-			if defSet {
-				return def, nil
-			}
-
-			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
-		}
 	case map[string]interface{}:
 		v, ok = typedObj[keys[0]]
 		if !ok {
@@ -336,11 +319,6 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	var v interface{}
 	var ok bool
 	switch typedObj := obj.(type) {
-	case Values:
-		v, ok = typedObj[keys[0]]
-		if !ok {
-			return defSet, nil
-		}
 	case map[string]interface{}:
 		v, ok = typedObj[keys[0]]
 		if !ok {
