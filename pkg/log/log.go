@@ -11,6 +11,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// Settings stores configuration for logger.
 type Settings struct {
 	level  string
 	format string
@@ -18,6 +19,7 @@ type Settings struct {
 	width  int
 }
 
+// Flags returns CLI flags for logger settings.
 func (l *Settings) Flags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
@@ -51,10 +53,12 @@ func (l *Settings) Flags() []cli.Flag {
 	}
 }
 
+// Run initializes logger.
 func (l *Settings) Run(c *cli.Context) error {
 	return l.Init()
 }
 
+// Init initializes logger and sets up hacks for other loggers (used by 3rd party libraries).
 func (l *Settings) Init() error {
 	// Skip various low-level k8s client errors
 	// There are a lot of context deadline errors being logged

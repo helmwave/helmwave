@@ -7,12 +7,18 @@ import (
 )
 
 const (
+	// ReleaseSuccess is a ReleaseStatus for success release.
 	ReleaseSuccess ReleaseStatus = iota
+
+	// ReleaseFailed is a ReleaseStatus for failed release.
 	ReleaseFailed
 )
 
+// ReleaseStatus is used to code release status - success or failed.
+// Please use ReleaseSuccess and ReleaseFailed contants.
 type ReleaseStatus int
 
+// ReleasePubSub is a structure for simple handling pub/sub for release dependencies.
 type ReleasePubSub struct {
 	subs map[uniqname.UniqName][]chan ReleaseStatus
 	mu   sync.RWMutex

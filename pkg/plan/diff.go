@@ -13,6 +13,7 @@ import (
 	live "helm.sh/helm/v3/pkg/release"
 )
 
+// ErrPlansAreTheSame is returned when trying to compare plan with itself.
 var ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
 // DiffPlan show diff between 2 plans.
@@ -87,6 +88,7 @@ func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k
 	}
 }
 
+// GetLiveOf returns instance of deployed helm release by name.
 func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
 	for _, rel := range p.body.Releases {
 		if rel.Uniq() == name {

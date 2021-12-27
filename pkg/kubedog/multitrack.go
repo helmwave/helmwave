@@ -9,6 +9,7 @@ import (
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 )
 
+// MakeSpecs creates *multitrack.MultitrackSpecs for Resource slice in provided namespace.
 func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
@@ -46,6 +47,7 @@ func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	return specs, nil
 }
 
+// MakeMultiTrackSpec creates *multitrack.MultitrackSpec for current resource.
 //nolint:funlen,gocognit,cyclop // TODO: split this function
 func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, error) {
 	// Default spec

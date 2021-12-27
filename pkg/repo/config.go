@@ -19,4 +19,5 @@ func (c *config) URL() string {
 	return c.Entry.URL
 }
 
+// ErrNotFound is an error for not declared repository name.
 var ErrNotFound = errors.New("repository not found")

@@ -5,10 +5,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// List is struct for running 'list' command.
 type List struct {
 	plandir string
 }
 
+// Run is main function for 'list' command.
 func (l *List) Run() error {
 	p := plan.New(l.plandir)
 	if err := p.Import(); err != nil {
@@ -18,6 +20,7 @@ func (l *List) Run() error {
 	return p.List()
 }
 
+// Cmd returns 'list' *cli.Command.
 func (l *List) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "list",

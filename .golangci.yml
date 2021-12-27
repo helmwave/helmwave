@@ -20,7 +20,6 @@ linters:
     - gomnd # we want to keep magic numbers
     - interfacer # deprecated
     - maligned # deprecated
-    - revive # we need a lot of documentation for exported things
     - scopelint # deprecated
     - varnamelen # I don't think short names are bad
     - wrapcheck # TODO: need to wrap all external errors into our own

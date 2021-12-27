@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Status renders status table for list of releases names.
 func (p *Plan) Status(names []string) error {
 	return status(p.body.Releases, names)
 }

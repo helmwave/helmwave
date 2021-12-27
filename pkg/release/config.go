@@ -48,6 +48,7 @@ func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
 }
 
+// Chart is structure for chart download options.
 type Chart struct {
 	Name                    string
 	action.ChartPathOptions `yaml:",inline"`
@@ -109,9 +110,14 @@ func (rel *config) newUpgrade() *action.Upgrade {
 }
 
 var (
-	ErrNotFound      = driver.ErrReleaseNotFound
+	// ErrNotFound is an error for not found release.
+	ErrNotFound = driver.ErrReleaseNotFound
+
+	// ErrFoundMultiple is an error for multiple releases found by name.
 	ErrFoundMultiple = errors.New("found multiple releases o_0")
-	ErrDepFailed     = errors.New("dependency failed")
+
+	// ErrDepFailed is an error thrown when dependency release fails.
+	ErrDepFailed = errors.New("dependency failed")
 )
 
 // Uniq redis@my-namespace.

@@ -8,12 +8,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// DiffLocalPlan is struct for running 'diff plan' command.
 type DiffLocalPlan struct {
 	diff     *Diff
 	plandir1 string
 	plandir2 string
 }
 
+// Run is main function for 'diff plan' command.
 func (d *DiffLocalPlan) Run() error {
 	if d.plandir1 == d.plandir2 {
 		log.Warn(plan.ErrPlansAreTheSame)
@@ -40,6 +42,7 @@ func (d *DiffLocalPlan) Run() error {
 	return nil
 }
 
+// Cmd returns 'diff plan' *cli.Command.
 func (d *DiffLocalPlan) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "plan",

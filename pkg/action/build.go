@@ -9,6 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Build is struct for running 'build' CLI command.
 type Build struct {
 	yml      *Yml
 	diff     *Diff
@@ -27,6 +28,7 @@ var (
 	diffModeLocal = "local"
 )
 
+// Run is main function for 'build' CLI command.
 func (i *Build) Run() error {
 	if i.autoYml {
 		if err := i.yml.Run(); err != nil {
@@ -75,6 +77,7 @@ func (i *Build) Run() error {
 	return nil
 }
 
+// Cmd returns 'build' *cli.Command.
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "build",

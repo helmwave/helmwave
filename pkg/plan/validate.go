@@ -10,8 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// ErrValidateFailed is returned for failed values validation.
 var ErrValidateFailed = errors.New("validate failed")
 
+// ValidateValues checkes whether all values files exist.
 func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
@@ -33,6 +35,7 @@ func (p *Plan) ValidateValues() error {
 	return ErrValidateFailed
 }
 
+// Validate validates releases and repositories in plan.
 func (p *planBody) Validate() error {
 	if len(p.Releases) == 0 && len(p.Repositories) == 0 {
 		return errors.New("releases and repositories are empty")
@@ -49,6 +52,7 @@ func (p *planBody) Validate() error {
 	return nil
 }
 
+// ValidateRepositories validates all repositories.
 func (p *planBody) ValidateRepositories() error {
 	a := make(map[string]int8)
 	for _, r := range p.Repositories {
@@ -73,6 +77,7 @@ func (p *planBody) ValidateRepositories() error {
 	return nil
 }
 
+// ValidateReleases validates all releases.
 func (p *planBody) ValidateReleases() error {
 	a := make(map[uniqname.UniqName]int8)
 	for _, r := range p.Releases {
