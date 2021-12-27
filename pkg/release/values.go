@@ -10,6 +10,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
 // ErrSkipValues is returned when values cannot be used and are skipped.
@@ -21,11 +22,11 @@ type ValuesReference struct {
 	dst string
 }
 
-// UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v2.
-func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+// UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
+func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
 	m := make(map[string]string)
-	if err := unmarshal(&m); err != nil {
-		return unmarshal(&v.Src)
+	if err := node.Decode(&m); err != nil {
+		return node.Decode(&v.Src)
 	}
 
 	v.Src = m["src"]
@@ -34,7 +35,7 @@ func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error
 	return nil
 }
 
-// MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v2.
+// MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v3.
 func (v ValuesReference) MarshalYAML() (interface{}, error) {
 	return struct {
 		Src string
