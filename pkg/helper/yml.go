@@ -10,7 +10,7 @@ func SaveInterface(file string, in interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // TODO: need to check error
 
 	data := Byte(in)
 

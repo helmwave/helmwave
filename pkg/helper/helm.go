@@ -30,8 +30,8 @@ func NewHelm(ns string) (*helm.EnvSettings, error) {
 	fs := &pflag.FlagSet{}
 	env.AddFlags(fs)
 	flag := fs.Lookup("namespace")
-	err := flag.Value.Set(ns)
-	if err != nil {
+
+	if err := flag.Value.Set(ns); err != nil {
 		return nil, err
 	}
 

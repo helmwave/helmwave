@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Templater is interface for using different template function groups.
 type Templater interface {
 	Name() string
 	Render(string, interface{}) ([]byte, error)
@@ -24,6 +25,7 @@ func getTemplater(name string) (Templater, error) { //nolint:ireturn
 	}
 }
 
+// Tpl2yml renders 'tpl' file to 'yml' file as go template.
 func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
