@@ -118,31 +118,34 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 	components := strings.Split(path, ".")
 	pathToMap := components[:len(components)-1]
 	key := components[len(components)-1]
-	for _, k := range pathToMap {
-		var elem interface{}
 
+	for _, k := range pathToMap {
 		switch typedCurrent := current.(type) {
+		case Values:
+			v, exists := typedCurrent[k]
+			if !exists {
+				return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" does not exist", path, k)
+			}
+			current = v
 		case map[string]interface{}:
 			v, exists := typedCurrent[k]
 			if !exists {
 				return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" does not exist", path, k)
 			}
-			elem = v
+			current = v
 		case map[interface{}]interface{}:
 			v, exists := typedCurrent[k]
 			if !exists {
 				return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" does not exist", path, k)
 			}
-			elem = v
+			current = v
 		default:
-			return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" was not a map", path, k)
-		}
-
-		switch typedElem := elem.(type) {
-		case map[string]interface{}, map[interface{}]interface{}:
-			current = typedElem
-		default:
-			return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" was not a map", path, k)
+			return nil, fmt.Errorf(
+				"failed to walk over path \"%s\": value for key \"%s\" is not a map: %+v",
+				path,
+				k,
+				reflect.TypeOf(current),
+			)
 		}
 	}
 
@@ -151,8 +154,15 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 		typedCurrent[key] = value
 	case map[interface{}]interface{}:
 		typedCurrent[key] = value
+	case Values:
+		typedCurrent[key] = value
 	default:
-		return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" was not a map", path, key)
+		return nil, fmt.Errorf(
+			"failed to set value at path \"%s\": value for key \"%s\" is not a map: %+v",
+			path,
+			key,
+			reflect.TypeOf(current),
+		)
 	}
 
 	return values, nil
@@ -236,6 +246,15 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	var v interface{}
 	var ok bool
 	switch typedObj := obj.(type) {
+	case Values:
+		v, ok = typedObj[keys[0]]
+		if !ok {
+			if defSet {
+				return def, nil
+			}
+
+			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
+		}
 	case map[string]interface{}:
 		v, ok = typedObj[keys[0]]
 		if !ok {
@@ -317,6 +336,11 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	var v interface{}
 	var ok bool
 	switch typedObj := obj.(type) {
+	case Values:
+		v, ok = typedObj[keys[0]]
+		if !ok {
+			return defSet, nil
+		}
 	case map[string]interface{}:
 		v, ok = typedObj[keys[0]]
 		if !ok {
