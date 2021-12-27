@@ -207,6 +207,10 @@ type noValueError struct {
 	msg string
 }
 
+func newNoValueError(key string, obj interface{}) *noValueError {
+	return &noValueError{fmt.Sprintf("no value exist for key %q in %v", key, obj)}
+}
+
 func (e *noValueError) Error() string {
 	return e.msg
 }
@@ -216,55 +220,41 @@ func (e *noValueError) Error() string {
 // Second argument is default value if key not found and is optional.
 // Third argument is map to search in.
 // Used as custom template function.
+//nolint:gocognit
 func Get(path string, varArgs ...interface{}) (interface{}, error) {
-	var defSet bool
-	var def interface{}
-	var obj interface{}
-	switch len(varArgs) {
-	case 1:
-		defSet = false
-		def = nil
-		obj = varArgs[0]
-	case 2:
-		defSet = true
-		def = varArgs[0]
-		obj = varArgs[1]
-	default:
-		return nil, fmt.Errorf(
-			"unexpected number of args passed to the template function get(path, [def, ]obj): "+
-				"expected 1 or 2, got %d, args was %v",
-			len(varArgs),
-			varArgs,
-		)
+	defSet, def, obj, err := parseGetVarArgs(varArgs)
+	if err != nil {
+		return nil, err
 	}
 
 	if path == "" {
 		return obj, nil
 	}
 	keys := strings.Split(path, ".")
+	key := keys[0]
 	var v interface{}
 	var ok bool
 	switch typedObj := obj.(type) {
 	case map[string]interface{}:
-		v, ok = typedObj[keys[0]]
+		v, ok = typedObj[key]
 		if !ok {
 			if defSet {
 				return def, nil
 			}
 
-			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
+			return nil, newNoValueError(key, obj)
 		}
 	case map[interface{}]interface{}:
-		v, ok = typedObj[keys[0]]
+		v, ok = typedObj[key]
 		if !ok {
 			if defSet {
 				return def, nil
 			}
 
-			return nil, &noValueError{fmt.Sprintf("no value exist for key %q in %v", keys[0], typedObj)}
+			return nil, newNoValueError(key, obj)
 		}
 	default:
-		r, err := tryReflectGet(obj, keys[0], defSet, def)
+		r, err := tryReflectGet(obj, key, defSet, def)
 		if err != nil {
 			return nil, err
 		}
@@ -289,7 +279,7 @@ func tryReflectGet(obj interface{}, key string, defSet bool, def interface{}) (i
 			),
 		}
 	} else if maybeStruct.NumField() < 1 {
-		return nil, &noValueError{fmt.Sprintf("no accessible struct fields for key %q", key)}
+		return nil, newNoValueError(key, obj)
 	}
 	f := maybeStruct.FieldByName(key)
 	if !f.IsValid() {
@@ -297,7 +287,7 @@ func tryReflectGet(obj interface{}, key string, defSet bool, def interface{}) (i
 			return def, nil
 		}
 
-		return nil, &noValueError{fmt.Sprintf("no field named %q exist in %v", key, obj)}
+		return nil, newNoValueError(key, obj)
 	}
 
 	return f.Interface(), nil
@@ -305,27 +295,10 @@ func tryReflectGet(obj interface{}, key string, defSet bool, def interface{}) (i
 
 // HasKey searches for any value by dot-separated key path in map.
 // Used as custom template function.
-//nolint:funlen // TODO: split this function
 func HasKey(path string, varArgs ...interface{}) (bool, error) {
-	var defSet bool
-	var def interface{}
-	var obj interface{}
-	switch len(varArgs) {
-	case 1:
-		defSet = false
-		def = nil
-		obj = varArgs[0]
-	case 2:
-		defSet = true
-		def = varArgs[0]
-		obj = varArgs[1]
-	default:
-		return false, fmt.Errorf(
-			"unexpected number of args passed to the template function get(path, [def, ]obj): "+
-				"expected 1 or 2, got %d, args was %v",
-			len(varArgs),
-			varArgs,
-		)
+	defSet, def, obj, err := parseGetVarArgs(varArgs)
+	if err != nil {
+		return false, err
 	}
 
 	if path == "" {
@@ -346,23 +319,15 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 			return defSet, nil
 		}
 	default:
-		maybeStruct := reflect.ValueOf(typedObj)
-		if maybeStruct.Kind() != reflect.Struct {
-			return false, &noValueError{
-				fmt.Sprintf(
-					"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
-					reflect.TypeOf(obj),
-					keys[0],
-				),
-			}
-		} else if maybeStruct.NumField() < 1 {
-			return false, &noValueError{fmt.Sprintf("no accessible struct fields for key %q", keys[0])}
+		found, f, err := tryReflectHasKey(obj, keys[0], defSet, def)
+		if err != nil {
+			return false, err
 		}
-		f := maybeStruct.FieldByName(keys[0])
-		if !f.IsValid() {
-			return defSet, nil
+		if f == nil {
+			return found, nil
 		}
-		v = f.Interface()
+
+		v = f
 	}
 
 	if defSet {
@@ -370,4 +335,51 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	}
 
 	return HasKey(strings.Join(keys[1:], "."), v)
+}
+
+func tryReflectHasKey(obj interface{}, key string, defSet bool, def interface{}) (bool, interface{}, error) {
+	maybeStruct := reflect.ValueOf(obj)
+	if maybeStruct.Kind() != reflect.Struct {
+		return false, nil, &noValueError{
+			fmt.Sprintf(
+				"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
+				reflect.TypeOf(obj),
+				key,
+			),
+		}
+	} else if maybeStruct.NumField() < 1 {
+		return false, nil, &noValueError{fmt.Sprintf("no accessible struct fields for key %q", key)}
+	}
+	f := maybeStruct.FieldByName(key)
+	if !f.IsValid() {
+		if defSet {
+			return true, def, nil
+		}
+
+		return false, nil, &noValueError{fmt.Sprintf("no field named %q exist in %v", key, obj)}
+	}
+
+	return true, f.Interface(), nil
+}
+
+func parseGetVarArgs(varArgs []interface{}) (defSet bool, def, obj interface{}, err error) {
+	switch len(varArgs) {
+	case 1:
+		defSet = false
+		def = nil
+		obj = varArgs[0]
+	case 2:
+		defSet = true
+		def = varArgs[0]
+		obj = varArgs[1]
+	default:
+		err = fmt.Errorf(
+			"unexpected number of args passed to the template function (path, [def, ]obj): "+
+				"expected 1 or 2, got %d, args was %v",
+			len(varArgs),
+			varArgs,
+		)
+	}
+
+	return
 }

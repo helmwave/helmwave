@@ -30,7 +30,7 @@ linters-settings:
 
   cyclop:
     # the maximal code complexity to report
-    max-complexity: 15
+    max-complexity: 13
     # the maximal average package complexity. If it's higher than 0.0 (float) the check is enabled (default 0.0)
     package-average: 0.0
     # should ignore tests (default false)
@@ -97,7 +97,7 @@ linters-settings:
 
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 20
+    min-complexity: 15
 
   nestif:
     # minimal complexity of if statements to report, 5 by default

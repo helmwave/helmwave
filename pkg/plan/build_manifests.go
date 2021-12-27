@@ -16,42 +16,43 @@ func (p *Plan) buildManifest() error {
 	mu := &sync.Mutex{}
 
 	for _, rel := range p.body.Releases {
-		go func(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
-			defer wg.Done()
-
-			err := rel.ChartDepsUpd()
-			if err != nil {
-				log.Warnf("❌ %s cant get dependencies : %v", rel.Uniq(), err)
-			}
-
-			rel.DryRun(true)
-
-			r, err := rel.Sync()
-			rel.DryRun(false)
-			if err != nil || r == nil {
-				log.Errorf("❌ %s cant get manifests : %v", rel.Uniq(), err)
-				wg.ErrChan() <- err
-			}
-
-			hm := ""
-			for _, h := range r.Hooks {
-				hm += fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest)
-			}
-
-			document := r.Manifest
-			if len(r.Hooks) > 0 {
-				document += "# ========= HOOKS ========\n" + hm
-			}
-
-			log.Trace(document)
-
-			mu.Lock()
-			p.manifests[rel.Uniq()] = document
-			mu.Unlock()
-
-			log.Infof("✅ %s manifest done", rel.Uniq())
-		}(wg, rel, mu)
+		go p.buildReleaseManifest(wg, rel, mu)
 	}
 
 	return wg.Wait()
+}
+
+func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
+	defer wg.Done()
+
+	if err := rel.ChartDepsUpd(); err != nil {
+		log.Warnf("❌ %s cant get dependencies : %v", rel.Uniq(), err)
+	}
+
+	rel.DryRun(true)
+
+	r, err := rel.Sync()
+	rel.DryRun(false)
+	if err != nil || r == nil {
+		log.Errorf("❌ %s cant get manifests : %v", rel.Uniq(), err)
+		wg.ErrChan() <- err
+	}
+
+	hm := ""
+	for _, h := range r.Hooks {
+		hm += fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest)
+	}
+
+	document := r.Manifest
+	if len(r.Hooks) > 0 {
+		document += "# ========= HOOKS ========\n" + hm
+	}
+
+	log.Trace(document)
+
+	mu.Lock()
+	p.manifests[rel.Uniq()] = document
+	mu.Unlock()
+
+	log.Infof("✅ %s manifest done", rel.Uniq())
 }
