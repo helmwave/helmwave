@@ -4,27 +4,26 @@ run:
   build-tags:
     - integration
 
+output:
+  # sorts results by: filepath, line and column
+  sort-results: true
+
 linters:
   enable-all: true
   disable:
-    - cyclop
-    - funlen
-    - gci
     - gochecknoglobals # TODO: get rid of globals
-    - gocognit
-    - gocyclo
-    - godox
-    - goerr113
+    - gocyclo # we use cyclop
+    - godox # TODO: get rid of TODOs
+    - goerr113 # need to create wrapped static errors
     - goimports # we already lint with gofumpt
     - golint # deprecated
     - gomnd # we want to keep magic numbers
-    - ifshort
     - interfacer # deprecated
     - maligned # deprecated
+    - revive # we need a lot of documentation for exported things
     - scopelint # deprecated
-    - tagliatelle
-    - varnamelen
-    - wrapcheck
+    - varnamelen # I don't think short names are bad
+    - wrapcheck # TODO: need to wrap all external errors into our own
     - wsl # lots of style checks
 
 # all available settings of specific linters
@@ -32,11 +31,11 @@ linters-settings:
 
   cyclop:
     # the maximal code complexity to report
-    max-complexity: 10
+    max-complexity: 20
     # the maximal average package complexity. If it's higher than 0.0 (float) the check is enabled (default 0.0)
     package-average: 0.0
     # should ignore tests (default false)
-    skip-tests: false
+    skip-tests: true
 
   dogsled:
     # checks assignments with too many blank identifiers; default is 2
@@ -99,7 +98,7 @@ linters-settings:
 
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
+    min-complexity: 20
 
   nestif:
     # minimal complexity of if statements to report, 5 by default
@@ -160,10 +159,6 @@ linters-settings:
       unnamedResult:
         # whether to check exported functions
         checkExported: true
-
-  gocyclo:
-    # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
 
   gofmt:
     # simplify code: gofmt with `-s` option, true by default
@@ -315,6 +310,16 @@ linters-settings:
     # https://staticcheck.io/docs/options#http_status_code_whitelist
     http-status-code-whitelist: [ "200", "400", "404", "500" ]
 
+  tagliatelle:
+    # check the struck tag name case
+    case:
+      # use the struct field name to check the name of the struct tag
+      use-field-name: false
+      rules:
+        # any struct tag type can be used.
+        # support string case: `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`
+        yaml: snake
+
   testpackage:
     # regexp pattern to skip files
     skip-regexp: (export|internal)_test\.go
@@ -349,6 +354,27 @@ linters-settings:
     multi-if: false   # Enforces newlines (or comments) after every multi-line if statement
     multi-func: false # Enforces newlines (or comments) after every multi-line function signature
 
+issues:
+  # Independently from option `exclude` we use default exclude patterns,
+  # it can be disabled by this option. To list all
+  # excluded by default patterns execute `golangci-lint run --help`.
+  # Default value for this option is true.
+  exclude-use-default: false
+
+  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0
+
+  # Show only new issues: if there are unstaged changes or untracked files,
+  # only those changes are analyzed, else only changes in HEAD~ are analyzed.
+  # It's a super-useful option for integration of golangci-lint into existing
+  # large codebase. It's not practical to fix all existing issues at the moment
+  # of integration: much better don't allow issues in new code.
+  # Default is false.
+  new: false
+
 severity:
   # Default value is empty string.
   # Set the default severity for issues. If severity rules are defined and the issues
@@ -363,3 +389,13 @@ severity:
   # The default value is false.
   # If set to true severity-rules regular expressions become case sensitive.
   case-sensitive: false
+
+  # Default value is empty list.
+  # When a list of severity rules are provided, severity information will be added to lint
+  # issues. Severity rules have the same filtering capability as exclude rules except you
+  # are allowed to specify one matcher per severity rule.
+  # Only affects out formats that support setting severity information.
+  rules:
+    - linters:
+      - godox
+      severity: notice

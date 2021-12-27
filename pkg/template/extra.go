@@ -33,6 +33,7 @@ func FromYaml(str string) (Values, error) {
 	return m, nil
 }
 
+//nolint:funlen,gocognit // TODO: split this function
 func Exec(command string, args []interface{}, inputs ...string) (string, error) {
 	var input string
 	if len(inputs) > 0 {
@@ -61,7 +62,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 		}
 
 		g.Go(func() error {
-			defer stdin.Close()
+			defer stdin.Close() //nolint:errcheck // TODO: need to check error
 
 			size := len(input)
 
@@ -185,6 +186,7 @@ func (e *noValueError) Error() string {
 	return e.msg
 }
 
+//nolint:funlen,gocognit // TODO: split this function
 func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	var defSet bool
 	var def interface{}
@@ -263,6 +265,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	return Get(strings.Join(keys[1:], "."), v)
 }
 
+//nolint:funlen // TODO: split this function
 func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	var defSet bool
 	var def interface{}

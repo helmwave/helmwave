@@ -1,15 +1,32 @@
 package template
 
 import (
-	"bytes"
+	"errors"
 	"os"
-	"text/template"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 )
 
-func Tpl2yml(tpl, yml string, data interface{}, gomplateConfig *GomplateConfig) error {
+// Templater is interface for using different template function groups.
+type Templater interface {
+	Name() string
+	Render(string, interface{}) ([]byte, error)
+}
+
+func getTemplater(name string) (Templater, error) { //nolint:ireturn
+	switch name {
+	case gomplateTemplater{}.Name():
+		return gomplateTemplater{}, nil
+	case sprigTemplater{}.Name():
+		return sprigTemplater{}, nil
+	default:
+		return nil, errors.New("Templater not found")
+	}
+}
+
+// Tpl2yml renders 'tpl' file to 'yml' file as go template.
+func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
@@ -24,27 +41,25 @@ func Tpl2yml(tpl, yml string, data interface{}, gomplateConfig *GomplateConfig) 
 		return err
 	}
 
-	// Template
-	funcs := FuncMap(gomplateConfig)
-	t, err := template.New("tpl").Funcs(funcs).Parse(string(src))
+	templater, err := getTemplater(templaterName)
+	if err != nil {
+		return err
+	}
+	log.WithField("template engine", templater.Name()).Debug("Loaded template engine")
+
+	d, err := templater.Render(string(src), data)
 	if err != nil {
 		return err
 	}
 
-	var buf bytes.Buffer
-	err = t.Execute(&buf, data)
-	if err != nil {
-		return err
-	}
-
-	log.Trace(yml, " contents\n", buf.String())
+	log.Trace(yml, " contents\n", d)
 
 	f, err := helper.CreateFile(yml)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.WriteString(buf.String())
+	_, err = f.Write(d)
 	if err != nil {
 		return err
 	}

@@ -30,8 +30,7 @@ func main() {
 
 	defer recoverPanic()
 
-	err := c.Run(os.Args)
-	if err != nil {
+	if err := c.Run(os.Args); err != nil {
 		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regural command errors
 	}
 }

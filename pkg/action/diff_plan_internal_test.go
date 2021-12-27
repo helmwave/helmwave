@@ -37,8 +37,9 @@ func (ts *DiffPlanTestSuite) TestRun() {
 		plandir: ts.T().TempDir(),
 		tags:    cli.StringSlice{},
 		yml: &Yml{
-			filepath.Join(tests.Root, "02_helmwave.yml"),
-			filepath.Join(tests.Root, "02_helmwave.yml"),
+			tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
+			file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+			templater: "sprig",
 		},
 		diff:     &Diff{},
 		diffMode: diffModeLive,
@@ -48,8 +49,9 @@ func (ts *DiffPlanTestSuite) TestRun() {
 		plandir: ts.T().TempDir(),
 		tags:    cli.StringSlice{},
 		yml: &Yml{
-			filepath.Join(tests.Root, "03_helmwave.yml"),
-			filepath.Join(tests.Root, "03_helmwave.yml"),
+			tpl:       filepath.Join(tests.Root, "03_helmwave.yml"),
+			file:      filepath.Join(tests.Root, "03_helmwave.yml"),
+			templater: "sprig",
 		},
 		diff:     &Diff{},
 		diffMode: diffModeLive,

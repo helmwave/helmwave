@@ -14,9 +14,18 @@ type BuildValuesTestSuite struct {
 	suite.Suite
 }
 
+func (s *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
+	s.T().Helper()
+
+	p := New(filepath.Join(tmpDir, Dir))
+	p.templater = "sprig" //nolint:goconst
+
+	return p
+}
+
 func (s *BuildValuesTestSuite) TestValuesEmpty() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := s.createPlan(tmpDir)
 
 	p.body = &planBody{}
 
@@ -25,7 +34,7 @@ func (s *BuildValuesTestSuite) TestValuesEmpty() {
 
 func (s *BuildValuesTestSuite) TestValuesBuildError() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := s.createPlan(tmpDir)
 
 	tmpValues := filepath.Join(tmpDir, "blablavalues.yaml")
 	s.Require().NoError(os.WriteFile(tmpValues, []byte("a: b"), 0o600))
@@ -47,7 +56,7 @@ func (s *BuildValuesTestSuite) TestValuesBuildError() {
 
 func (s *BuildValuesTestSuite) TestSuccess() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := s.createPlan(tmpDir)
 
 	valuesName := "blablavalues.yaml"
 	valuesContents := []byte("a: b")

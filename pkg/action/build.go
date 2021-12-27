@@ -35,7 +35,7 @@ func (i *Build) Run() error {
 	}
 
 	newPlan := plan.New(i.plandir)
-	err := newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll)
+	err := newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
 	if err != nil {
 		return err
 	}

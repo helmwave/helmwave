@@ -8,10 +8,11 @@ import (
 
 type Yml struct {
 	tpl, file string
+	templater string
 }
 
 func (i *Yml) Run() error {
-	err := template.Tpl2yml(i.tpl, i.file, nil, &template.GomplateConfig{Enabled: false})
+	err := template.Tpl2yml(i.tpl, i.file, nil, i.templater)
 	if err != nil {
 		return err
 	}
@@ -37,5 +38,6 @@ func (i *Yml) flags() []cli.Flag {
 	return []cli.Flag{
 		flagTplFile(&i.tpl),
 		flagYmlFile(&i.file),
+		flagTemplateEngine(&i.templater),
 	}
 }

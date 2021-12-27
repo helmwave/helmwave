@@ -46,6 +46,7 @@ func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	return specs, nil
 }
 
+//nolint:funlen,gocognit,cyclop // TODO: split this function
 func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, error) {
 	// Default spec
 	spec := &multitrack.MultitrackSpec{

@@ -23,7 +23,7 @@ func Download(file, uri string) error {
 		return err
 	}
 
-	defer r.Body.Close()
+	defer r.Body.Close() //nolint:errcheck // TODO: need to check error
 
 	if r.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad status: %s", r.Status)
