@@ -3,6 +3,7 @@ package repo
 import (
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
@@ -14,6 +15,7 @@ type Config interface {
 	Install(*helm.EnvSettings, *repo.File) error
 	Name() string
 	URL() string
+	Logger() *log.Entry
 }
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.

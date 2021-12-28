@@ -10,7 +10,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -89,11 +88,9 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
 	v.SetUniq(dir, rel.Uniq())
 
-	log.WithFields(log.Fields{
-		"release": rel.Uniq(),
-		"src":     v.Src,
-		"dst":     v.dst,
-	}).Trace("Building values reference")
+	l := rel.Logger().WithField("values src", v.Src).WithField("values dst", v.dst)
+
+	l.Trace("Building values reference")
 
 	data := struct {
 		Release Config
@@ -104,24 +101,24 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	if v.isURL() {
 		err := v.Download()
 		if err != nil {
-			log.WithError(err).Warnf("%s skipping: cant download", v.Src)
+			l.WithError(err).Warnf("%q skipping: cant download", v.Src)
 
 			return ErrSkipValues
 		}
 
 		if err := template.Tpl2yml(v.dst, v.dst, data, templater); err != nil {
-			return fmt.Errorf("failed to render %s values: %w", v.Src, err)
+			return fmt.Errorf("failed to render %q values: %w", v.Src, err)
 		}
 
 		return nil
 	} else if !helper.IsExists(v.Src) {
-		log.Warnf("%s skipping: local not found", v.Src)
+		l.Warn("skipping: local file not found")
 
 		return ErrSkipValues
 	}
 
 	if err := template.Tpl2yml(v.Src, v.dst, data, templater); err != nil {
-		return fmt.Errorf("failed to render %s values: %w", v.Src, err)
+		return fmt.Errorf("failed to render %q values: %w", v.Src, err)
 	}
 
 	return nil
@@ -133,11 +130,7 @@ func (rel *config) BuildValues(dir, templater string) error {
 		if errors.Is(ErrSkipValues, err) {
 			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
 		} else if err != nil {
-			log.WithFields(log.Fields{
-				"release": rel.Uniq(),
-				"err":     err,
-				"values":  rel.Values()[i],
-			}).Fatal("Values failed")
+			rel.Logger().WithError(err).WithField("values", rel.Values()[i]).Fatal("failed to build values")
 
 			return err
 		}

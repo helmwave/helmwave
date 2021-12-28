@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -29,14 +28,14 @@ func (rel *config) GetChart() (*chart.Chart, error) {
 		return nil, fmt.Errorf("failed to load chart %s: %w", rel.Chart().Name, err)
 	}
 
-	if err := chartCheck(c); err != nil {
+	if err := rel.chartCheck(c); err != nil {
 		return nil, err
 	}
 
 	return c, nil
 }
 
-func chartCheck(ch *chart.Chart) error {
+func (rel *config) chartCheck(ch *chart.Chart) error {
 	if req := ch.Metadata.Dependencies; req != nil {
 		if err := action.CheckDependencies(ch, req); err != nil {
 			return fmt.Errorf("failed to check chart %s dependencies: %w", ch.Name(), err)
@@ -44,7 +43,7 @@ func chartCheck(ch *chart.Chart) error {
 	}
 
 	if !(ch.Metadata.Type == "" || ch.Metadata.Type == "application") {
-		log.Warnf("%s charts are not installable \n", ch.Metadata.Type)
+		rel.Logger().Warnf("%s charts are not installable", ch.Metadata.Type)
 	}
 
 	if ch.Metadata.Deprecated {

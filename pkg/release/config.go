@@ -6,6 +6,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/pubsub"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/storage/driver"
@@ -15,6 +16,7 @@ type config struct {
 	cfg                      *action.Configuration
 	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
 	helm                     *helm.EnvSettings
+	log                      *log.Entry
 	Store                    map[string]interface{}
 	ChartF                   Chart `yaml:"chart"`
 	uniqName                 uniqname.UniqName
@@ -166,4 +168,12 @@ func (rel *config) Tags() []string {
 
 func (rel *config) Values() []ValuesReference {
 	return rel.ValuesF
+}
+
+func (rel *config) Logger() *log.Entry {
+	if rel.log == nil {
+		rel.log = log.WithField("release", rel.Uniq())
+	}
+
+	return rel.log
 }

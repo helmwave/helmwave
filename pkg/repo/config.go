@@ -3,10 +3,12 @@ package repo
 import (
 	"errors"
 
+	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/repo"
 )
 
 type config struct {
+	log        *log.Entry
 	repo.Entry `yaml:",inline"`
 	Force      bool
 }
@@ -17,6 +19,14 @@ func (c *config) Name() string {
 
 func (c *config) URL() string {
 	return c.Entry.URL
+}
+
+func (c *config) Logger() *log.Entry {
+	if c.log == nil {
+		c.log = log.WithField("repository", c.Name())
+	}
+
+	return c.log
 }
 
 // ErrNotFound is an error for not declared repository name.

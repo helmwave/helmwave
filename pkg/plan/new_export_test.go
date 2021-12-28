@@ -7,6 +7,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/template"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 	helm "helm.sh/helm/v3/pkg/cli"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -115,6 +116,10 @@ func (r *mockReleaseConfig) Values() []release.ValuesReference {
 	return r.Called().Get(0).([]release.ValuesReference)
 }
 
+func (r *mockReleaseConfig) Logger() *log.Entry {
+	panic("not implemented") // TODO: Implement
+}
+
 type mockRepoConfig struct {
 	mock.Mock
 }
@@ -133,4 +138,8 @@ func (r *mockRepoConfig) Name() string {
 
 func (r *mockRepoConfig) URL() string {
 	return r.Called().String(0)
+}
+
+func (r *mockRepoConfig) Logger() *log.Entry {
+	panic("not implemented") // TODO: Implement
 }

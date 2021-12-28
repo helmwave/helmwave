@@ -6,7 +6,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/pubsub"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	log "github.com/sirupsen/logrus"
 )
 
 // TODO: we need to move this out of global context.
@@ -25,7 +24,7 @@ func (rel *config) NotifyFailed() {
 	}
 
 	if rel.AllowFailure {
-		log.Warnf("%s failed but is allowed to fail", rel.Uniq())
+		rel.Logger().Warn("failed but is allowed to fail")
 		releasePubSub.PublishSuccess(rel.Uniq())
 
 		return
@@ -71,10 +70,10 @@ F:
 
 			break F
 		case <-ticker.C:
-			log.Infof("release %s is waiting for dependency %s", rel.Uniq(), name)
+			rel.Logger().Infof("waiting for dependency %s", name)
 		}
 	}
-	log.Infof("dependency %s of release %s done", name, rel.Uniq())
+	rel.Logger().Infof("dependency %s done", name)
 
 	return status
 }
@@ -94,7 +93,7 @@ func (rel *config) HandleDependencies(releases []Config) {
 
 	for _, dep := range rel.DependsOn() {
 		if !depsAdded[dep] {
-			log.Warnf("cannot find dependency %s in plan, skipping it", dep)
+			rel.Logger().Warnf("cannot find dependency %s in plan, skipping it", dep)
 		}
 	}
 }
