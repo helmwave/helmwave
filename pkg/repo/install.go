@@ -26,7 +26,7 @@ func (rep *config) Install(settings *helm.EnvSettings, f *repo.File) error {
 
 	chartRepo, err := repo.NewChartRepository(&rep.Entry, getter.All(settings))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to install repository %s: %w", rep.Name(), err)
 	}
 
 	chartRepo.CachePath = settings.RepositoryCache
@@ -35,7 +35,7 @@ func (rep *config) Install(settings *helm.EnvSettings, f *repo.File) error {
 	log.Debugf("Download IndexFile for %q", chartRepo.Config.Name)
 	_, err = chartRepo.DownloadIndexFile()
 	if err != nil {
-		log.Warnf("⚠️ looks like %v is not a valid chart repository or cannot be reached", rep.URL())
+		log.WithError(err).Warnf("⚠️ looks like %v is not a valid chart repository or cannot be reached", rep.URL())
 	}
 
 	f.Update(&rep.Entry)

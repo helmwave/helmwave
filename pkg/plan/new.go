@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -93,12 +94,12 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 
 	src, err := os.ReadFile(file)
 	if err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
 
 	err = yaml.Unmarshal(src, b)
 	if err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}
 
 	// Setup dev version

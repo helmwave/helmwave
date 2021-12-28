@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -73,7 +74,7 @@ func syncRepositories(repositories repoConfigs) (err error) {
 	} else {
 		f, err = helmRepo.LoadFile(helper.Helm.RepositoryConfig)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to load helm repositories file: %w", err)
 		}
 	}
 
@@ -85,7 +86,7 @@ func syncRepositories(repositories repoConfigs) (err error) {
 
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
 	if err != nil && !locked {
-		return err
+		return fmt.Errorf("failed to get lock %s: %w", fileLock.Path(), err)
 	}
 
 	// We cannot parallel repositories installation as helm manages single repositories.yaml.
@@ -93,17 +94,21 @@ func syncRepositories(repositories repoConfigs) (err error) {
 	for i := range repositories {
 		err := repositories[i].Install(helper.Helm, f)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to install %s repository: %w", repositories[i].Name(), err)
 		}
 	}
 
 	err = f.WriteFile(helper.Helm.RepositoryConfig, os.FileMode(0o644))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to write repositories file: %w", err)
 	}
 
 	// Unlock
-	return fileLock.Unlock()
+	if err := fileLock.Unlock(); err != nil {
+		return fmt.Errorf("failed to unlock %s: %w", fileLock.Path(), err)
+	}
+
+	return nil
 }
 
 func (p *Plan) syncReleases() (err error) {
@@ -118,10 +123,11 @@ func (p *Plan) syncReleases() (err error) {
 		p.body.Releases[i].HandleDependencies(p.body.Releases)
 		go func(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
 			defer wg.Done()
-			log.Infof("🛥 %q deploying... ", rel.Uniq())
+			l := log.WithField("release", rel.Uniq())
+			l.Info("🛥 deploying... ")
 			_, err = rel.Sync()
 			if err != nil {
-				log.Errorf("❌ %s: %v", rel.Uniq(), err)
+				l.WithError(err).Error("❌")
 
 				rel.NotifyFailed()
 
@@ -132,7 +138,7 @@ func (p *Plan) syncReleases() (err error) {
 				wg.ErrChan() <- err
 			} else {
 				rel.NotifySuccess()
-				log.Infof("✅ %s", rel.Uniq())
+				l.Info("✅")
 			}
 		}(wg, p.body.Releases[i], mu)
 	}
@@ -199,7 +205,7 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) error {
 	// KubeInit
 	err = kube.Init(kube.InitOptions{})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize kubernetes config: %w", err)
 	}
 
 	err = runMultiracks(ctx, mapSpecs, kubedogConfig, wg)

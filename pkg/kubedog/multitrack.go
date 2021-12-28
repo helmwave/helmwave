@@ -111,7 +111,7 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 func (*Resource) handleAnnotationSkipLogs(value string, spec *multitrack.MultitrackSpec) error {
 	v, err := strconv.ParseBool(value)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse %s as boolean: %w", value, err)
 	}
 	spec.SkipLogs = v
 
@@ -121,7 +121,7 @@ func (*Resource) handleAnnotationSkipLogs(value string, spec *multitrack.Multitr
 func (*Resource) handleAnnotationShowEvents(value string, spec *multitrack.MultitrackSpec) error {
 	v, err := strconv.ParseBool(value)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse %s as boolean: %w", value, err)
 	}
 	spec.ShowServiceMessages = v
 
@@ -131,7 +131,7 @@ func (*Resource) handleAnnotationShowEvents(value string, spec *multitrack.Multi
 func (*Resource) handleAnnotationLogRegex(value string, spec *multitrack.MultitrackSpec) error {
 	v, err := regexp.Compile(value)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to compile %s as regexp: %w", value, err)
 	}
 	spec.LogRegex = v
 
@@ -145,7 +145,7 @@ func (r *Resource) handleAnnotationFailuresAllowedPerReplica(value string, spec 
 
 	v, err := strconv.ParseUint(value, 10, 32)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse %s as uint: %w", value, err)
 	}
 
 	replicas := 1
@@ -223,7 +223,7 @@ func (*Resource) handleAnnotationLogRegexFor(name, value string, spec *multitrac
 
 	regexpValue, err := regexp.Compile(value)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse %s as uint: %w", value, err)
 	}
 
 	spec.LogRegexByContainerName[containerName] = regexpValue

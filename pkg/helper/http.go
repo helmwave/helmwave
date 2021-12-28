@@ -17,11 +17,11 @@ func Download(file, uri string) error {
 
 	req, err := http.NewRequestWithContext(context.TODO(), "GET", uri, http.NoBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create request to %s: %w", uri, err)
 	}
 	r, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to download %s: %w", uri, err)
 	}
 
 	defer r.Body.Close() //nolint:errcheck // TODO: need to check error
@@ -32,7 +32,7 @@ func Download(file, uri string) error {
 
 	_, err = io.Copy(f, r.Body)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to copy body of %s: %w", uri, err)
 	}
 
 	return nil

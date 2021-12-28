@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -33,9 +34,10 @@ func (p *Plan) Import() error {
 }
 
 func (p *Plan) importManifest() error {
-	ls, err := os.ReadDir(filepath.Join(p.dir, Manifest))
+	d := filepath.Join(p.dir, Manifest)
+	ls, err := os.ReadDir(d)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read manifest dir %s: %w", d, err)
 	}
 
 	if len(ls) == 0 {
@@ -43,16 +45,19 @@ func (p *Plan) importManifest() error {
 	}
 
 	for _, l := range ls {
-		if !l.IsDir() {
-			c, err := os.ReadFile(filepath.Join(p.dir, Manifest, l.Name()))
-			if err != nil {
-				return err
-			}
-
-			n := l.Name()[:len(l.Name())-4]
-
-			p.manifests[uniqname.UniqName(n)] = string(c)
+		if l.IsDir() {
+			continue
 		}
+
+		f := filepath.Join(p.dir, Manifest, l.Name())
+		c, err := os.ReadFile(f)
+		if err != nil {
+			return fmt.Errorf("failed to read manifest %s: %w", f, err)
+		}
+
+		n := l.Name()[:len(l.Name())-4]
+
+		p.manifests[uniqname.UniqName(n)] = string(c)
 	}
 
 	return nil

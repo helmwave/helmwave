@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"fmt"
+
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -17,10 +19,14 @@ func SaveInterface(file string, in interface{}) error {
 
 	_, err = f.Write(data)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to marshal to %s: %w", file, err)
 	}
 
-	return f.Sync()
+	if err = f.Sync(); err != nil {
+		return fmt.Errorf("failed to sync file %s: %w", file, err)
+	}
+
+	return nil
 }
 
 // Byte marshals input to YAML and returns YAML byte slice.

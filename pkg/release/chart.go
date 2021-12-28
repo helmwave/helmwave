@@ -1,7 +1,7 @@
 package release
 
 import (
-	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -21,12 +21,12 @@ func (rel *config) GetChart() (*chart.Chart, error) {
 
 	ch, err := client.ChartPathOptions.LocateChart(rel.Chart().Name, rel.Helm())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to locate chart %s: %w", rel.Chart().Name, err)
 	}
 
 	c, err := loader.Load(ch)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load chart %s: %w", rel.Chart().Name, err)
 	}
 
 	if err := chartCheck(c); err != nil {
@@ -39,7 +39,7 @@ func (rel *config) GetChart() (*chart.Chart, error) {
 func chartCheck(ch *chart.Chart) error {
 	if req := ch.Metadata.Dependencies; req != nil {
 		if err := action.CheckDependencies(ch, req); err != nil {
-			return err
+			return fmt.Errorf("failed to check chart %s dependencies: %w", ch.Name(), err)
 		}
 	}
 
@@ -48,7 +48,7 @@ func chartCheck(ch *chart.Chart) error {
 	}
 
 	if ch.Metadata.Deprecated {
-		return errors.New("⚠️ This locateChart is deprecated")
+		return fmt.Errorf("⚠️ Chart %s is deprecated", ch.Name())
 	}
 
 	return nil
@@ -78,5 +78,9 @@ func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 		man.Out = os.Stdout
 	}
 
-	return man.Update()
+	if err := man.Update(); err != nil {
+		return fmt.Errorf("failed to update %s chart dependencies: %w", name, err)
+	}
+
+	return nil
 }

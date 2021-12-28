@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -14,7 +15,7 @@ import (
 )
 
 // ErrSkipValues is returned when values cannot be used and are skipped.
-var ErrSkipValues = errors.New("values has been skip")
+var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
@@ -26,7 +27,9 @@ type ValuesReference struct {
 func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
 	m := make(map[string]string)
 	if err := node.Decode(&m); err != nil {
-		return node.Decode(&v.Src)
+		if err := node.Decode(&v.Src); err != nil {
+			return fmt.Errorf("failed to decode values reference from YAML: %w", err)
+		}
 	}
 
 	v.Src = m["src"]
@@ -52,7 +55,11 @@ func (v *ValuesReference) isURL() bool {
 
 // Download downloads values by source URL and places to destination path.
 func (v *ValuesReference) Download() error {
-	return helper.Download(v.dst, v.Src)
+	if err := helper.Download(v.dst, v.Src); err != nil {
+		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, v.dst, err)
+	}
+
+	return nil
 }
 
 // Get returns destination path of values.
@@ -97,19 +104,27 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	if v.isURL() {
 		err := v.Download()
 		if err != nil {
-			log.Warnf("%s skipping: cant download %v", v.Src, err)
+			log.WithError(err).Warnf("%s skipping: cant download", v.Src)
 
 			return ErrSkipValues
 		}
 
-		return template.Tpl2yml(v.dst, v.dst, data, templater)
+		if err := template.Tpl2yml(v.dst, v.dst, data, templater); err != nil {
+			return fmt.Errorf("failed to render %s values: %w", v.Src, err)
+		}
+
+		return nil
 	} else if !helper.IsExists(v.Src) {
 		log.Warnf("%s skipping: local not found", v.Src)
 
 		return ErrSkipValues
 	}
 
-	return template.Tpl2yml(v.Src, v.dst, data, templater)
+	if err := template.Tpl2yml(v.Src, v.dst, data, templater); err != nil {
+		return fmt.Errorf("failed to render %s values: %w", v.Src, err)
+	}
+
+	return nil
 }
 
 func (rel *config) BuildValues(dir, templater string) error {

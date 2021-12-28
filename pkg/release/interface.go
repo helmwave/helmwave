@@ -1,6 +1,8 @@
 package release
 
 import (
+	"fmt"
+
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
@@ -36,7 +38,7 @@ type Config interface {
 func UnmarshalYAML(node *yaml.Node) ([]Config, error) {
 	r := make([]*config, 0)
 	if err := node.Decode(&r); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode release config from YAML: %w", err)
 	}
 
 	res := make([]Config, len(r))

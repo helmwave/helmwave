@@ -1,6 +1,7 @@
 package parallel
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/hashicorp/go-multierror"
@@ -47,7 +48,11 @@ func (wg *WaitGroup) Wait() error {
 	wg.closeMutex.Lock()
 	defer wg.closeMutex.Unlock()
 
-	return wg.err.ErrorOrNil()
+	if err := wg.err.ErrorOrNil(); err != nil {
+		return fmt.Errorf("one of goroutines in waitgroup sent error: %w", err)
+	}
+
+	return nil
 }
 
 // Add adds delta to WaitGroup counter.
