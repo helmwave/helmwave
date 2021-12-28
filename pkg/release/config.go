@@ -70,6 +70,7 @@ func (rel *config) newInstall() *action.Install {
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
 	client.Wait = rel.Wait
+	client.WaitForJobs = rel.WaitForJobs
 	client.Atomic = rel.Atomic
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
@@ -90,7 +91,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.MaxHistory = rel.MaxHistory
 	client.Recreate = rel.Recreate
 	client.ReuseValues = rel.ReuseValues
-	client.ResetValues = rel.ReuseValues
+	client.ResetValues = rel.ResetValues
 
 	// Common Part
 	client.DryRun = rel.dryRun
@@ -101,6 +102,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
 	client.Wait = rel.Wait
+	client.WaitForJobs = rel.WaitForJobs
 	client.Atomic = rel.Atomic
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
