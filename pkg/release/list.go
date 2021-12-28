@@ -14,7 +14,7 @@ func (rel *config) List() (*release.Release, error) {
 
 	result, err := client.Run()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list release %s: %w", rel.Uniq(), err)
 	}
 
 	switch len(result) {

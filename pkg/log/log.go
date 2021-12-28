@@ -1,6 +1,8 @@
 package log
 
 import (
+	"fmt"
+
 	"github.com/bombsimon/logrusr"
 	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
@@ -79,7 +81,7 @@ func (l *Settings) Init() error {
 func (l *Settings) setLevel() error {
 	level, err := log.ParseLevel(l.level)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse log level %s: %w", l.level, err)
 	}
 	log.SetLevel(level)
 	if level >= log.DebugLevel {
@@ -113,5 +115,5 @@ func (l *Settings) setFormat() {
 }
 
 func logKubernetesClientError(err error) {
-	log.Debugf("kubernetes client error %q", err.Error())
+	log.WithError(err).Debug("kubernetes client error")
 }

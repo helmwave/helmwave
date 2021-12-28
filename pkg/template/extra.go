@@ -21,7 +21,7 @@ type Values = map[string]interface{}
 func ToYaml(v interface{}) (string, error) {
 	data, err := yaml.Marshal(v)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to marshal %v to YAML: %w", v, err)
 	}
 
 	return string(data), nil
@@ -33,7 +33,7 @@ func FromYaml(str string) (Values, error) {
 	m := Values{}
 
 	if err := yaml.Unmarshal([]byte(str), &m); err != nil {
-		return nil, fmt.Errorf("%w, offending yaml: %s", err, str)
+		return nil, fmt.Errorf("failed to unmarshal %s from YAML: %w", str, err)
 	}
 
 	return m, nil
@@ -64,7 +64,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create stdin pipe for command: %w", err)
 	}
 
 	wg.Add(1)
@@ -75,7 +75,7 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 	go getCommandOutput(cmd, output, wg)
 
 	if err := wg.Wait(); err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to run command: %w", err)
 	}
 
 	return output.String(), nil
@@ -93,7 +93,7 @@ func writeCommandInput(stdin io.WriteCloser, input string, wg *parallel.WaitGrou
 	for i < size {
 		n, err := io.WriteString(stdin, input[i:])
 		if err != nil {
-			wg.ErrChan() <- fmt.Errorf("failed while writing %d bytes to stdin: %w", len(input), err)
+			wg.ErrChan() <- fmt.Errorf("failed while writing %d bytes to stdin: %w", size, err)
 
 			return
 		}
@@ -107,14 +107,14 @@ func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGrou
 
 	bs, err := cmd.Output()
 	if err != nil {
-		wg.ErrChan() <- err
+		wg.ErrChan() <- fmt.Errorf("failed to get command output: %w", err)
 
 		return
 	}
 
 	_, err = output.Write(bs)
 	if err != nil {
-		wg.ErrChan() <- err
+		wg.ErrChan() <- fmt.Errorf("failed while copying %d bytes from stdout: %w", len(bs), err)
 	}
 }
 
@@ -143,7 +143,7 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 			current = v
 		default:
 			return nil, fmt.Errorf(
-				"failed to walk over path \"%s\": value for key \"%s\" is not a map: %+v",
+				"failed to walk over path \"%s\": value for key \"%s\" is not a map: %v",
 				path,
 				k,
 				reflect.TypeOf(current),
@@ -158,7 +158,7 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 		typedCurrent[key] = value
 	default:
 		return nil, fmt.Errorf(
-			"failed to set value at path \"%s\": value for key \"%s\" is not a map: %+v",
+			"failed to set value at path \"%s\": value for key \"%s\" is not a map: %v",
 			path,
 			key,
 			reflect.TypeOf(current),
@@ -197,22 +197,14 @@ func Required(warn string, val interface{}) (interface{}, error) {
 func ReadFile(file string) (string, error) {
 	b, err := os.ReadFile(file)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to read file %s: %w", file, err)
 	}
 
 	return string(b), nil
 }
 
-type noValueError struct {
-	msg string
-}
-
-func newNoValueError(key string, obj interface{}) *noValueError {
-	return &noValueError{fmt.Sprintf("no value exist for key %q in %v", key, obj)}
-}
-
-func (e *noValueError) Error() string {
-	return e.msg
+func noKeyError(key string, obj interface{}) error {
+	return fmt.Errorf("key '%q' is not present in %v", key, obj)
 }
 
 // Get returns value in map by dot-separated key path.
@@ -242,7 +234,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 				return def, nil
 			}
 
-			return nil, newNoValueError(key, obj)
+			return nil, noKeyError(key, obj)
 		}
 	case map[interface{}]interface{}:
 		v, ok = typedObj[key]
@@ -251,7 +243,7 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 				return def, nil
 			}
 
-			return nil, newNoValueError(key, obj)
+			return nil, noKeyError(key, obj)
 		}
 	default:
 		r, err := tryReflectGet(obj, key, defSet, def)
@@ -271,15 +263,13 @@ func Get(path string, varArgs ...interface{}) (interface{}, error) {
 func tryReflectGet(obj interface{}, key string, defSet bool, def interface{}) (interface{}, error) {
 	maybeStruct := reflect.ValueOf(obj)
 	if maybeStruct.Kind() != reflect.Struct {
-		return nil, &noValueError{
-			fmt.Sprintf(
-				"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
-				reflect.TypeOf(obj),
-				key,
-			),
-		}
+		return nil, fmt.Errorf(
+			"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
+			reflect.TypeOf(obj),
+			key,
+		)
 	} else if maybeStruct.NumField() < 1 {
-		return nil, newNoValueError(key, obj)
+		return nil, noKeyError(key, obj)
 	}
 	f := maybeStruct.FieldByName(key)
 	if !f.IsValid() {
@@ -287,7 +277,7 @@ func tryReflectGet(obj interface{}, key string, defSet bool, def interface{}) (i
 			return def, nil
 		}
 
-		return nil, newNoValueError(key, obj)
+		return nil, noKeyError(key, obj)
 	}
 
 	return f.Interface(), nil
@@ -340,15 +330,13 @@ func HasKey(path string, varArgs ...interface{}) (bool, error) {
 func tryReflectHasKey(obj interface{}, key string, defSet bool, def interface{}) (bool, interface{}, error) {
 	maybeStruct := reflect.ValueOf(obj)
 	if maybeStruct.Kind() != reflect.Struct {
-		return false, nil, &noValueError{
-			fmt.Sprintf(
-				"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
-				reflect.TypeOf(obj),
-				key,
-			),
-		}
+		return false, nil, fmt.Errorf(
+			"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
+			reflect.TypeOf(obj),
+			key,
+		)
 	} else if maybeStruct.NumField() < 1 {
-		return false, nil, &noValueError{fmt.Sprintf("no accessible struct fields for key %q", key)}
+		return false, nil, noKeyError(key, obj)
 	}
 	f := maybeStruct.FieldByName(key)
 	if !f.IsValid() {
@@ -356,7 +344,7 @@ func tryReflectHasKey(obj interface{}, key string, defSet bool, def interface{})
 			return true, def, nil
 		}
 
-		return false, nil, &noValueError{fmt.Sprintf("no field named %q exist in %v", key, obj)}
+		return false, nil, noKeyError(key, obj)
 	}
 
 	return true, f.Interface(), nil

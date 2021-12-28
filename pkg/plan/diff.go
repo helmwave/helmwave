@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/databus23/helm-diff/diff"
@@ -92,7 +93,12 @@ func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k
 func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
 	for _, rel := range p.body.Releases {
 		if rel.Uniq() == name {
-			return rel.Get()
+			r, err := rel.Get()
+			if err != nil {
+				return nil, fmt.Errorf("failed to get release %s: %w", rel.Uniq(), err)
+			}
+
+			return r, nil
 		}
 	}
 

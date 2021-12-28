@@ -1,7 +1,7 @@
 package template
 
 import (
-	"errors"
+	"fmt"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -21,7 +21,7 @@ func getTemplater(name string) (Templater, error) { //nolint:ireturn
 	case sprigTemplater{}.Name():
 		return sprigTemplater{}, nil
 	default:
-		return nil, errors.New("Templater not found")
+		return nil, fmt.Errorf("templater %s is not registered", name)
 	}
 }
 
@@ -38,31 +38,36 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 
 	src, err := os.ReadFile(tpl)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read template file %s: %w", tpl, err)
 	}
 
 	templater, err := getTemplater(templaterName)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get templater: %w", err)
 	}
 	log.WithField("template engine", templater.Name()).Debug("Loaded template engine")
 
 	d, err := templater.Render(string(src), data)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to render template: %w", err)
 	}
 
 	log.Trace(yml, " contents\n", d)
 
 	f, err := helper.CreateFile(yml)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create destination file %s: %w", yml, err)
 	}
 
 	_, err = f.Write(d)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to write to destination file %s: %w", yml, err)
 	}
 
-	return f.Close()
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close destination file %s: %w", yml, err)
+	}
+
+	return nil
 }

@@ -2,6 +2,7 @@ package template
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
@@ -18,13 +19,13 @@ func (t sprigTemplater) Render(src string, data interface{}) ([]byte, error) {
 	funcs := t.funcMap()
 	tpl, err := template.New("tpl").Funcs(funcs).Parse(src)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	var buf bytes.Buffer
 	err = tpl.Execute(&buf, data)
 
-	return buf.Bytes(), err
+	return buf.Bytes(), fmt.Errorf("failed to render template: %w", err)
 }
 
 func (t sprigTemplater) funcMap() template.FuncMap {

@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -21,7 +22,7 @@ func NewCfg(ns string) (*action.Configuration, error) {
 	config.Namespace = &ns
 	err := cfg.Init(config, ns, helmDriver, log.Debugf)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create helm configuration for %s namespace: %w", ns, err)
 	}
 
 	return cfg, nil
@@ -35,7 +36,7 @@ func NewHelm(ns string) (*helm.EnvSettings, error) {
 	flag := fs.Lookup("namespace")
 
 	if err := flag.Value.Set(ns); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to set namespace %s for helm: %w", ns, err)
 	}
 
 	return env, nil

@@ -52,7 +52,7 @@ func (r *mockReleaseConfig) In(a []release.Config) bool {
 func (r *mockReleaseConfig) BuildValues(dir, templater string) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
-		return errReturn
+		return errReturn //nolint:wrapcheck
 	}
 
 	for i := len(r.Values()) - 1; i >= 0; i-- {

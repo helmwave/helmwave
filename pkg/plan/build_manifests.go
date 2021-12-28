@@ -25,8 +25,10 @@ func (p *Plan) buildManifest() error {
 func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
 	defer wg.Done()
 
+	l := log.WithField("release", rel.Uniq())
+
 	if err := rel.ChartDepsUpd(); err != nil {
-		log.Warnf("❌ %s cant get dependencies : %v", rel.Uniq(), err)
+		l.Warnf("❌ cant get dependencies : %v", err)
 	}
 
 	rel.DryRun(true)
@@ -34,7 +36,7 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 	r, err := rel.Sync()
 	rel.DryRun(false)
 	if err != nil || r == nil {
-		log.Errorf("❌ %s cant get manifests : %v", rel.Uniq(), err)
+		l.Errorf("❌ cant get manifests: %v", err)
 		wg.ErrChan() <- err
 	}
 
@@ -48,11 +50,11 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 		document += "# ========= HOOKS ========\n" + hm
 	}
 
-	log.Trace(document)
+	l.Trace(document)
 
 	mu.Lock()
 	p.manifests[rel.Uniq()] = document
 	mu.Unlock()
 
-	log.Infof("✅ %s manifest done", rel.Uniq())
+	l.Info("✅ manifest done")
 }
