@@ -3,7 +3,6 @@ package release
 import (
 	"errors"
 
-	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
@@ -18,7 +17,7 @@ func (rel *config) isInstalled() bool {
 	case err == nil:
 		return true
 	default:
-		log.WithError(err).Fatalf("i can't check %q is installed", rel.Uniq())
+		rel.Logger().WithError(err).Fatal("I can't check if release is installed")
 
 		return false
 	}

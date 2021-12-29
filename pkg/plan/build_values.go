@@ -22,7 +22,12 @@ func (p *Plan) buildValues() error {
 				for i := range rel.Values() {
 					vals = append(vals, rel.Values()[i].Get())
 				}
-				log.WithField("values", vals).Infof("✅ %s values count %d", rel.Uniq(), len(rel.Values()))
+
+				if len(vals) == 0 {
+					log.WithField("release", rel.Uniq()).Info("no values provided")
+				} else {
+					log.WithField("release", rel.Uniq()).WithField("values", vals).Infof("✅ found %d values count", len(vals))
+				}
 			}
 		}(wg, rel)
 	}

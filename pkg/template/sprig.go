@@ -24,8 +24,11 @@ func (t sprigTemplater) Render(src string, data interface{}) ([]byte, error) {
 
 	var buf bytes.Buffer
 	err = tpl.Execute(&buf, data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to render template: %w", err)
+	}
 
-	return buf.Bytes(), fmt.Errorf("failed to render template: %w", err)
+	return buf.Bytes(), nil
 }
 
 func (t sprigTemplater) funcMap() template.FuncMap {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
 )
@@ -32,6 +33,8 @@ type Config interface {
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
+
+	Logger() *log.Entry
 }
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.

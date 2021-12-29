@@ -28,7 +28,7 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 	l := log.WithField("release", rel.Uniq())
 
 	if err := rel.ChartDepsUpd(); err != nil {
-		l.Warnf("❌ cant get dependencies : %v", err)
+		l.Warnf("❌ can't get dependencies : %v", err)
 	}
 
 	rel.DryRun(true)
@@ -36,7 +36,7 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 	r, err := rel.Sync()
 	rel.DryRun(false)
 	if err != nil || r == nil {
-		l.Errorf("❌ cant get manifests: %v", err)
+		l.Errorf("❌ can't get manifests: %v", err)
 		wg.ErrChan() <- err
 	}
 

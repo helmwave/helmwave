@@ -84,8 +84,8 @@ func Exec(command string, args []interface{}, inputs ...string) (string, error) 
 func writeCommandInput(stdin io.WriteCloser, input string, wg *parallel.WaitGroup) {
 	defer func(stdin io.WriteCloser, wg *parallel.WaitGroup) {
 		wg.ErrChan() <- stdin.Close()
+		wg.Done()
 	}(stdin, wg)
-	defer wg.Done()
 
 	i := 0
 	size := len(input)
@@ -132,18 +132,18 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 		case map[string]interface{}:
 			v, exists := typedCurrent[k]
 			if !exists {
-				return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" does not exist", path, k)
+				return nil, fmt.Errorf("failed to set value at path %q: value for key %q does not exist", path, k)
 			}
 			current = v
 		case map[interface{}]interface{}:
 			v, exists := typedCurrent[k]
 			if !exists {
-				return nil, fmt.Errorf("failed to set value at path \"%s\": value for key \"%s\" does not exist", path, k)
+				return nil, fmt.Errorf("failed to set value at path %q: value for key %q does not exist", path, k)
 			}
 			current = v
 		default:
 			return nil, fmt.Errorf(
-				"failed to walk over path \"%s\": value for key \"%s\" is not a map: %v",
+				"failed to walk over path %q: value for key %q is not a map: %v",
 				path,
 				k,
 				reflect.TypeOf(current),
@@ -158,7 +158,7 @@ func SetValueAtPath(path string, value interface{}, values Values) (Values, erro
 		typedCurrent[key] = value
 	default:
 		return nil, fmt.Errorf(
-			"failed to set value at path \"%s\": value for key \"%s\" is not a map: %v",
+			"failed to set value at path %q: value for key %q is not a map: %v",
 			path,
 			key,
 			reflect.TypeOf(current),
@@ -175,7 +175,7 @@ func RequiredEnv(name string) (string, error) {
 		return val, nil
 	}
 
-	return "", fmt.Errorf("required env var `%s` is not set", name)
+	return "", fmt.Errorf("required env var %q is not set", name)
 }
 
 // Required returns error if val is nil of empty string. Otherwise it returns the same val.
@@ -197,14 +197,14 @@ func Required(warn string, val interface{}) (interface{}, error) {
 func ReadFile(file string) (string, error) {
 	b, err := os.ReadFile(file)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file %s: %w", file, err)
+		return "", fmt.Errorf("failed to read file %q: %w", file, err)
 	}
 
 	return string(b), nil
 }
 
 func noKeyError(key string, obj interface{}) error {
-	return fmt.Errorf("key '%q' is not present in %v", key, obj)
+	return fmt.Errorf("key %q is not present in %v", key, obj)
 }
 
 // Get returns value in map by dot-separated key path.
@@ -363,7 +363,7 @@ func parseGetVarArgs(varArgs []interface{}) (defSet bool, def, obj interface{}, 
 	default:
 		err = fmt.Errorf(
 			"unexpected number of args passed to the template function (path, [def, ]obj): "+
-				"expected 1 or 2, got %d, args was %v",
+				"expected 1 or 2, got %d, args was %q",
 			len(varArgs),
 			varArgs,
 		)
