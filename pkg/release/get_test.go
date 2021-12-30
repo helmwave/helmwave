@@ -4,12 +4,44 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/stretchr/testify/suite"
+	"gopkg.in/yaml.v3"
+	helmRepo "helm.sh/helm/v3/pkg/repo"
 )
 
 type GetTestSuite struct {
 	suite.Suite
+}
+
+func (s *GetTestSuite) SetupSuite() {
+	var rs rt
+	str := `
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+`
+	err := yaml.Unmarshal([]byte(str), &rs)
+
+	s.Require().NoError(err)
+	s.Require().Len(rs, 1)
+
+	r := rs[0]
+
+	var f *helmRepo.File
+	// Create if not exits
+	if !helper.IsExists(helper.Helm.RepositoryConfig) {
+		f = helmRepo.NewFile()
+
+		_, err = helper.CreateFile(helper.Helm.RepositoryConfig)
+		s.Require().NoError(err)
+	} else {
+		f, err = helmRepo.LoadFile(helper.Helm.RepositoryConfig)
+		s.Require().NoError(err)
+	}
+
+	err = r.Install(helper.Helm, f)
+	s.Require().NoError(err)
 }
 
 func (s *GetTestSuite) TestGetNotInstalled() {

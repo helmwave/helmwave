@@ -151,7 +151,6 @@ type NonParallelBuildTestSuite struct {
 	suite.Suite
 }
 
-//nolint:dupl
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
@@ -176,7 +175,6 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
-//nolint:dupl
 func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{

@@ -22,7 +22,6 @@ linters:
     - maligned # deprecated
     - scopelint # deprecated
     - varnamelen # I don't think short names are bad
-    #- wrapcheck # TODO: need to wrap all external errors into our own
     - wsl # lots of style checks
 
 # all available settings of specific linters
@@ -389,6 +388,11 @@ linters-settings:
     strict-append: true
 
 issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
   # excluded by default patterns execute `golangci-lint run --help`.
