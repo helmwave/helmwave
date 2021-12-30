@@ -34,13 +34,14 @@ func (s *ExportTestSuite) TestValuesOneRelease() {
 	tmpValues := filepath.Join(tmpDir, valuesName)
 	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},
 	})
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("BuildValues").Return(nil)
+	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{
 		Releases: releaseConfigs{mockedRelease},

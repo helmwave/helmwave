@@ -2,7 +2,6 @@ package plan
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"os"
 	"regexp"
@@ -22,11 +21,11 @@ func (p *Plan) ValidateValues() error {
 			p := rel.Values()[i].Get()
 			_, err := os.Stat(p)
 			if os.IsNotExist(err) {
-				log.Errorf("❌ %s values (%s): %v", rel.Uniq(), rel.Values()[i].Src, err)
 				f = true
-			} else {
-				// FatalError
-				return fmt.Errorf("failed to open values %s: %w", p, err)
+				log.WithError(err).Errorf("❌ %s values (%s)", rel.Uniq(), rel.Values()[i].Src)
+			} else if err != nil {
+				f = true
+				log.WithError(err).Errorf("failed to open values %s", p)
 			}
 		}
 	}

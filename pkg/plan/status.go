@@ -11,7 +11,7 @@ import (
 )
 
 // Status renders status table for list of releases names.
-func (p *Plan) Status(names []string) error {
+func (p *Plan) Status(names ...string) error {
 	return status(p.body.Releases, names)
 }
 
@@ -47,14 +47,14 @@ func status(all []release.Config, names []string) error {
 			"last deployed": s.Info.LastDeployed,
 			"status":        s.Info.Status,
 			"revision":      s.Version,
-		}).Infof("General s of %s", rel.Uniq())
+		}).Infof("General status of %s", rel.Uniq())
 
 		log.WithFields(log.Fields{
 			"notes":         s.Info.Notes,
 			"labels":        string(labels),
 			"chart sources": s.Chart.Metadata.Sources,
 			"values":        string(values),
-		}).Debugf("Debug s of %s", rel.Uniq())
+		}).Debugf("Debug status of %s", rel.Uniq())
 
 		log.WithFields(log.Fields{
 			"hooks":    s.Hooks,
