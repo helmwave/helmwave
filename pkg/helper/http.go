@@ -14,6 +14,7 @@ func Download(file, uri string) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close() //nolint:errcheck // TODO: need to check error
 
 	req, err := http.NewRequestWithContext(context.TODO(), "GET", uri, http.NoBody)
 	if err != nil {

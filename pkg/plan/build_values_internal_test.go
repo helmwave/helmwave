@@ -18,7 +18,7 @@ func (s *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
 	s.T().Helper()
 
 	p := New(filepath.Join(tmpDir, Dir))
-	p.templater = "sprig" //nolint:goconst
+	p.templater = "sprig"
 
 	return p
 }
@@ -39,9 +39,10 @@ func (s *BuildValuesTestSuite) TestValuesBuildError() {
 	tmpValues := filepath.Join(tmpDir, "blablavalues.yaml")
 	s.Require().NoError(os.WriteFile(tmpValues, []byte("a: b"), 0o600))
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("Uniq").Return()
 
 	errBuildValues := errors.New("values build error")
 	mockedRelease.On("BuildValues").Return(errBuildValues)
@@ -63,13 +64,14 @@ func (s *BuildValuesTestSuite) TestSuccess() {
 	tmpValues := filepath.Join(tmpDir, valuesName)
 	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},
 	})
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("BuildValues").Return(nil)
+	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{
 		Releases: releaseConfigs{mockedRelease},

@@ -11,11 +11,21 @@ type HelmTestSuite struct {
 	suite.Suite
 }
 
-func (s *HelmTestSuite) TestHelmNS() {
-	h1, err := helper.NewHelm("my")
+func (s *HelmTestSuite) TestNewCfg() {
+	ns := s.T().Name()
+	cfg, err := helper.NewCfg(ns)
 
 	s.Require().NoError(err)
-	s.Require().Equal("my", h1.Namespace())
+	s.Require().NotNil(cfg)
+}
+
+func (s *HelmTestSuite) TestNewHelmNS() {
+	ns := s.T().Name()
+	h1, err := helper.NewHelm(ns)
+
+	s.Require().NoError(err)
+	s.Require().NotNil(h1)
+	s.Require().Equal(ns, h1.Namespace())
 }
 
 func TestHelmTestSuite(t *testing.T) {

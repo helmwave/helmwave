@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/version"
@@ -55,7 +56,7 @@ func (p *Plan) importManifest() error {
 			return fmt.Errorf("failed to read manifest %s: %w", f, err)
 		}
 
-		n := l.Name()[:len(l.Name())-4]
+		n := strings.TrimSuffix(l.Name(), filepath.Ext(l.Name())) // drop extension of file
 
 		p.manifests[uniqname.UniqName(n)] = string(c)
 	}

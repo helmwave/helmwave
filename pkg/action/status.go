@@ -18,7 +18,7 @@ func (l *Status) Run() error {
 		return err
 	}
 
-	return p.Status(l.names.Value())
+	return p.Status(l.names.Value()...)
 }
 
 // Cmd returns 'status' *cli.Command.

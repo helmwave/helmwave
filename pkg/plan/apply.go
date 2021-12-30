@@ -62,6 +62,18 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 func syncRepositories(repositories repoConfigs) (err error) {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
+	// we need to get a flock first
+	lockPath := helper.Helm.RepositoryConfig + ".lock"
+	fileLock := flock.New(lockPath)
+	lockCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	// We need to unlock in deferred mode in case of any other errors returned
+	defer fileLock.Unlock() //nolint:errcheck // TODO: add error checking
+	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
+	if err != nil && !locked {
+		return fmt.Errorf("failed to get lock %s: %w", fileLock.Path(), err)
+	}
+
 	var f *helmRepo.File
 	// Create if not exits
 	if !helper.IsExists(helper.Helm.RepositoryConfig) {
@@ -78,17 +90,6 @@ func syncRepositories(repositories repoConfigs) (err error) {
 		}
 	}
 
-	// Flock
-	lockPath := helper.Helm.RepositoryConfig + ".lock"
-	fileLock := flock.New(lockPath)
-	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
-	if err != nil && !locked {
-		return fmt.Errorf("failed to get lock %s: %w", fileLock.Path(), err)
-	}
-
 	// We cannot parallel repositories installation as helm manages single repositories.yaml.
 	// To prevent data race we need either make helm use futex or not parallel at all
 	for i := range repositories {
@@ -103,7 +104,7 @@ func syncRepositories(repositories repoConfigs) (err error) {
 		return fmt.Errorf("failed to write repositories file: %w", err)
 	}
 
-	// Unlock
+	// If we haven't met any errors yet unlock the repository file. Deferred unlock will exit quickly after this.
 	if err := fileLock.Unlock(); err != nil {
 		return fmt.Errorf("failed to unlock %s: %w", fileLock.Path(), err)
 	}
