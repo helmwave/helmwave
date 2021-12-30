@@ -59,8 +59,19 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	return p.syncReleasesKubedog(kubedogConfig)
 }
 
-func syncRepositories(repositories repoConfigs) (err error) {
+func syncRepositories(repositories repoConfigs) error {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
+
+	// Create if not exits
+	if !helper.IsExists(helper.Helm.RepositoryConfig) {
+		f, err := helper.CreateFile(helper.Helm.RepositoryConfig)
+		if err != nil {
+			return err
+		}
+		if err := f.Close(); err != nil {
+			return fmt.Errorf("failed to close fresh helm repository.yaml: %w", err)
+		}
+	}
 
 	// we need to get a flock first
 	lockPath := helper.Helm.RepositoryConfig + ".lock"
@@ -74,20 +85,9 @@ func syncRepositories(repositories repoConfigs) (err error) {
 		return fmt.Errorf("failed to get lock %s: %w", fileLock.Path(), err)
 	}
 
-	var f *helmRepo.File
-	// Create if not exits
-	if !helper.IsExists(helper.Helm.RepositoryConfig) {
-		f = helmRepo.NewFile()
-
-		_, err = helper.CreateFile(helper.Helm.RepositoryConfig)
-		if err != nil {
-			return err
-		}
-	} else {
-		f, err = helmRepo.LoadFile(helper.Helm.RepositoryConfig)
-		if err != nil {
-			return fmt.Errorf("failed to load helm repositories file: %w", err)
-		}
+	f, err := helmRepo.LoadFile(helper.Helm.RepositoryConfig)
+	if err != nil {
+		return fmt.Errorf("failed to load helm repositories file: %w", err)
 	}
 
 	// We cannot parallel repositories installation as helm manages single repositories.yaml.
