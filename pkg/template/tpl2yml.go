@@ -43,13 +43,13 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 
 	templater, err := getTemplater(templaterName)
 	if err != nil {
-		return fmt.Errorf("failed to get templater: %w", err)
+		return err
 	}
 	log.WithField("template engine", templater.Name()).Debug("Loaded template engine")
 
 	d, err := templater.Render(string(src), data)
 	if err != nil {
-		return fmt.Errorf("failed to render template: %w", err)
+		return err //nolint:wrapcheck // we control the interface
 	}
 
 	log.Trace(yml, " contents\n", d)
