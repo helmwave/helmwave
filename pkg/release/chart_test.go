@@ -4,12 +4,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
-	helmRepo "helm.sh/helm/v3/pkg/repo"
 )
 
 type ChartTestSuite struct {
@@ -36,22 +35,7 @@ func (s *ChartTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().Len(rs, 1)
 
-	r := rs[0]
-
-	var f *helmRepo.File
-	// Create if not exits
-	if !helper.IsExists(helper.Helm.RepositoryConfig) {
-		f = helmRepo.NewFile()
-
-		_, err = helper.CreateFile(helper.Helm.RepositoryConfig)
-		s.Require().NoError(err)
-	} else {
-		f, err = helmRepo.LoadFile(helper.Helm.RepositoryConfig)
-		s.Require().NoError(err)
-	}
-
-	err = r.Install(helper.Helm, f)
-	s.Require().NoError(err)
+	s.Require().NoError(plan.SyncRepositories([]repo.Config(rs)))
 }
 
 func (s *ChartTestSuite) TestLocateChartLocal() {
@@ -79,7 +63,8 @@ func (s *ChartTestSuite) TestLoadChartLocal() {
 	s.Require().Nil(c)
 }
 
+//nolint:paralleltest // uses helm repository.yaml flock
 func TestChartTestSuite(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	suite.Run(t, new(ChartTestSuite))
 }

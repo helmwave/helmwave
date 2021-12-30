@@ -42,7 +42,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool, templater string)
 	}
 
 	// Sync All
-	err = syncRepositories(p.body.Repositories)
+	err = SyncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}

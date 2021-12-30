@@ -28,7 +28,7 @@ var ErrDeploy = errors.New("deploy failed")
 // Apply syncs repositories and releases.
 func (p *Plan) Apply() (err error) {
 	log.Info("🗄 Sync repositories...")
-	err = syncRepositories(p.body.Repositories)
+	err = SyncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (p *Plan) Apply() (err error) {
 // ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
 func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	log.Info("🗄 Sync repositories...")
-	err = syncRepositories(p.body.Repositories)
+	err = SyncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,8 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	return p.syncReleasesKubedog(kubedogConfig)
 }
 
-func syncRepositories(repositories repoConfigs) error {
+// SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
+func SyncRepositories(repositories repoConfigs) error {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exits
