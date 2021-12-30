@@ -18,21 +18,29 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src string
-	dst string
+	Src string `yaml:"src"`
+	dst string `yaml:"dst"`
 }
 
 // UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
 func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
-	m := make(map[string]string)
-	if err := node.Decode(&m); err != nil {
+	switch node.Kind {
+	// single value or reference to another value
+	case yaml.ScalarNode, yaml.AliasNode:
 		if err := node.Decode(&v.Src); err != nil {
-			return fmt.Errorf("failed to decode values reference from YAML: %w", err)
+			return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
 		}
-	}
+	case yaml.MappingNode:
+		var m map[string]string
+		if err := node.Decode(&m); err != nil {
+			return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
+		}
 
-	v.Src = m["src"]
-	v.dst = m["dst"]
+		v.Src = m["src"]
+		v.dst = m["dst"]
+	default:
+		return fmt.Errorf("failed to decode values reference %q from YAML: unknown format", node.Value)
+	}
 
 	return nil
 }
