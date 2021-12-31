@@ -33,7 +33,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 		tags:     cli.StringSlice{},
 		yml:      y,
 		diff:     &Diff{},
-		diffMode: diffModeLive,
+		diffMode: DiffModeLive,
 	}
 
 	d := DiffLive{diff: s.diff, plandir: s.plandir}

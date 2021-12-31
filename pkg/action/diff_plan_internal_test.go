@@ -42,7 +42,7 @@ func (ts *DiffPlanTestSuite) TestRun() {
 			templater: "sprig",
 		},
 		diff:     &Diff{},
-		diffMode: diffModeLive,
+		diffMode: DiffModeLive,
 	}
 
 	s2 := &Build{
@@ -54,7 +54,7 @@ func (ts *DiffPlanTestSuite) TestRun() {
 			templater: "sprig",
 		},
 		diff:     &Diff{},
-		diffMode: diffModeLive,
+		diffMode: DiffModeLive,
 	}
 
 	d := DiffLocalPlan{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}

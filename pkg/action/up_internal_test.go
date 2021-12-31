@@ -41,7 +41,6 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	}
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
-	ts.T().Setenv("PROJECT_NAME", value)
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(u.Run())

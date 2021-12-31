@@ -2,6 +2,7 @@ package action
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -135,7 +136,7 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 		autoYml:  true,
 		yml:      y,
 		diff:     &Diff{},
-		diffMode: diffModeLocal,
+		diffMode: DiffModeLocal,
 	}
 
 	ts.Require().NoError(s.Run(), "build should not fail without diffing")
@@ -167,8 +168,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 		yml:      y,
 	}
 
-	value := "test01"
-	ts.T().Setenv("PROJECT_NAME", value)
+	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(s.Run())
@@ -190,10 +190,6 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 		autoYml:  true,
 		yml:      y,
 	}
-
-	value := "test08"
-	ts.T().Setenv("PROJECT_NAME", value)
-	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(s.Run())
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
