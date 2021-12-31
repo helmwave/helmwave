@@ -6,6 +6,13 @@ coverage:
   round: down
   range: "30...100"
 
+  status:
+    project:
+      default:
+        informational: true # do not fail check
+        only_pulls: true
+    patch: false
+
 ignore:
   - "pkg/action/flags.go"
 
