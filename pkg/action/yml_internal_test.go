@@ -29,6 +29,7 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 
 	value := "test01"
 	ts.T().Setenv("NAMESPACE", value)
+	ts.T().Setenv("PROJECT_NAME", value)
 
 	ts.Require().NoError(y.Run())
 
