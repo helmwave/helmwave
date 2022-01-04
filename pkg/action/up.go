@@ -88,7 +88,7 @@ func (i *Up) flags() []cli.Flag {
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-timeout",
-			Usage:       "Timout of kubedog multitrackers",
+			Usage:       "Timeout of kubedog multitrackers",
 			Value:       5 * time.Minute,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &i.dog.Timeout,
