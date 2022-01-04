@@ -21,7 +21,9 @@ type MockReleaseConfig struct {
 func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	r.Called()
 
-	return uniqname.UniqName(r.Name() + uniqname.Separator + r.Namespace())
+	u, _ := uniqname.Generate(r.Name(), r.Namespace())
+
+	return u
 }
 
 func (r *MockReleaseConfig) HandleDependencies(_ []release.Config) {

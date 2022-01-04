@@ -94,7 +94,7 @@ func (p *planBody) ValidateReleases() error {
 			return errors.New("bad namespace: " + r.Namespace())
 		}
 
-		if !r.Uniq().Validate() {
+		if err := r.Uniq().Validate(); err != nil {
 			return errors.New("bad uniqname: " + string(r.Uniq()))
 		}
 

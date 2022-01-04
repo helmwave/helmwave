@@ -16,7 +16,7 @@ func (s *ConfigTestSuite) TestConfigUniq() {
 	r.NameF = "redis"
 	r.NamespaceF = "test"
 
-	s.Require().True(r.Uniq().Validate())
+	s.Require().NoError(r.Uniq().Validate())
 }
 
 func TestConfigTestSuite(t *testing.T) {
