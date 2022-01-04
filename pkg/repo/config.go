@@ -8,9 +8,9 @@ import (
 )
 
 type config struct {
-	log        *log.Entry
+	log        *log.Entry `yaml:"-"`
 	repo.Entry `yaml:",inline"`
-	Force      bool
+	Force      bool `yaml:"force"`
 }
 
 func (c *config) Name() string {

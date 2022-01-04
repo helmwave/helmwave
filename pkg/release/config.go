@@ -13,37 +13,37 @@ import (
 )
 
 type config struct {
-	cfg                      *action.Configuration
-	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus
-	helm                     *helm.EnvSettings
-	log                      *log.Entry
-	Store                    map[string]interface{}
-	ChartF                   Chart `yaml:"chart"`
-	uniqName                 uniqname.UniqName
-	NameF                    string            `yaml:"name"`
-	NamespaceF               string            `yaml:"namespace"`
-	DescriptionF             string            `yaml:"description"`
-	DependsOnF               []string          `yaml:"depends_on"`
-	ValuesF                  []ValuesReference `yaml:"values"`
-	TagsF                    []string          `yaml:"tags"`
-	Timeout                  time.Duration     `yaml:"timeout"`
-	MaxHistory               int
-	AllowFailure             bool `yaml:"allow_failure"`
-	CreateNamespace          bool
-	ResetValues              bool
-	Recreate                 bool
-	Force                    bool
-	Atomic                   bool
-	CleanupOnFail            bool
-	SubNotes                 bool
-	DisableHooks             bool
-	DisableOpenAPIValidation bool
-	WaitForJobs              bool
-	Wait                     bool
-	SkipCRDs                 bool
-	dryRun                   bool
-	Devel                    bool
-	ReuseValues              bool
+	cfg                      *action.Configuration                             `yaml:"-"`
+	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus `yaml:"-"`
+	helm                     *helm.EnvSettings                                 `yaml:"-"`
+	log                      *log.Entry                                        `yaml:"-"`
+	Store                    map[string]interface{}                            `yaml:"store,omitempty"`
+	ChartF                   Chart                                             `yaml:"chart,omitempty"`
+	uniqName                 uniqname.UniqName                                 `yaml:"-"`
+	NameF                    string                                            `yaml:"name,omitempty"`
+	NamespaceF               string                                            `yaml:"namespace,omitempty"`
+	DescriptionF             string                                            `yaml:"description,omitempty"`
+	DependsOnF               []string                                          `yaml:"depends_on,omitempty"`
+	ValuesF                  []ValuesReference                                 `yaml:"values,omitempty"`
+	TagsF                    []string                                          `yaml:"tags,omitempty"`
+	Timeout                  time.Duration                                     `yaml:"timeout,omitempty"`
+	MaxHistory               int                                               `yaml:"maxhistory,omitempty"`
+	AllowFailure             bool                                              `yaml:"allow_failure,omitempty"`
+	Atomic                   bool                                              `yaml:"atomic,omitempty"`
+	CleanupOnFail            bool                                              `yaml:"cleanuponfail,omitempty"`
+	CreateNamespace          bool                                              `yaml:"createnamespace,omitempty"`
+	Devel                    bool                                              `yaml:"devel,omitempty"`
+	DisableHooks             bool                                              `yaml:"disablehooks,omitempty"`
+	DisableOpenAPIValidation bool                                              `yaml:"disableopenapivalidation,omitempty"`
+	dryRun                   bool                                              `yaml:"dryrun,omitempty"`
+	Force                    bool                                              `yaml:"force,omitempty"`
+	Recreate                 bool                                              `yaml:"recreate,omitempty"`
+	ResetValues              bool                                              `yaml:"resetvalues,omitempty"`
+	ReuseValues              bool                                              `yaml:"reusevalues,omitempty"`
+	SkipCRDs                 bool                                              `yaml:"skipcrds,omitempty"`
+	SubNotes                 bool                                              `yaml:"subnotes,omitempty"`
+	Wait                     bool                                              `yaml:"wait,omitempty"`
+	WaitForJobs              bool                                              `yaml:"waitforjobs,omitempty"`
 }
 
 func (rel *config) DryRun(b bool) {
@@ -127,7 +127,15 @@ var (
 // Uniq redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
-		rel.uniqName = uniqname.UniqName(rel.Name() + uniqname.Separator + rel.Namespace())
+		var err error
+		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace())
+		if err != nil {
+			rel.log.WithFields(log.Fields{
+				"name":       rel.Name(),
+				"namespace":  rel.Namespace(),
+				log.ErrorKey: err,
+			}).Error("failed to generate valid uniqname")
+		}
 	}
 
 	return rel.uniqName
