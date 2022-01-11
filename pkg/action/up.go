@@ -3,6 +3,7 @@ package action
 import (
 	"time"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
@@ -92,6 +93,13 @@ func (i *Up) flags() []cli.Flag {
 			Value:       5 * time.Minute,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &i.dog.Timeout,
+		},
+		&cli.BoolFlag{
+			Name:        "progress",
+			Usage:       "Enable progress logs of helm (INFO log level)",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_PROGRESS"},
+			Destination: &helper.Helm.Debug,
 		},
 	}
 
