@@ -12,7 +12,7 @@ jobs:
     runs-on: "ubuntu-18.04"
     steps:
       - name: Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0769bbf0d2a77b3c15b3b57fbcdd2edd25a1c3f0
+        uses: aquasecurity/trivy-action@8f4c7160b470bafe4299efdc1c8a1fb495f8325a
         with:
           image-ref: 'ghcr.io/helmwave/helmwave:latest'
           format: 'template'
