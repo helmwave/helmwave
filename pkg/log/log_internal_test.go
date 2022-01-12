@@ -120,7 +120,8 @@ func (s *LogTestSuite) TestFormatter() {
 				level:  "info",
 			},
 			formatter: &log.TextFormatter{
-				PadLevelText: true,
+				PadLevelText:     true,
+				DisableTimestamp: true,
 			},
 			msg: "should use pad formatter",
 		},
@@ -137,8 +138,10 @@ func (s *LogTestSuite) TestFormatter() {
 				format: "text",
 				level:  "info",
 			},
-			formatter: &log.TextFormatter{},
-			msg:       "should use text formatter",
+			formatter: &log.TextFormatter{
+				DisableTimestamp: true,
+			},
+			msg: "should use text formatter",
 		},
 	}
 
