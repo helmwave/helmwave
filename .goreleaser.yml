@@ -12,7 +12,7 @@ builds:
       - darwin
     ignore:
       - goos: darwin
-        goarch: 386
+        goarch: "386"
     main: ./cmd/helmwave
     ldflags:
       - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}
