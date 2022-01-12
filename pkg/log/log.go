@@ -108,9 +108,10 @@ func (l *Settings) setFormat() {
 		})
 	case "pad":
 		log.SetFormatter(&log.TextFormatter{
-			PadLevelText:  true,
-			ForceColors:   l.color,
-			FullTimestamp: l.timestamps,
+			PadLevelText:     true,
+			ForceColors:      l.color,
+			FullTimestamp:    l.timestamps,
+			DisableTimestamp: !l.timestamps,
 		})
 	case "emoji":
 		cfg := &formatter.Config{
@@ -123,8 +124,9 @@ func (l *Settings) setFormat() {
 		log.SetFormatter(cfg)
 	case "text":
 		log.SetFormatter(&log.TextFormatter{
-			ForceColors:   l.color,
-			FullTimestamp: l.timestamps,
+			ForceColors:      l.color,
+			FullTimestamp:    l.timestamps,
+			DisableTimestamp: !l.timestamps,
 		})
 	}
 }
