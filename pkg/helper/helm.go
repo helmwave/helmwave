@@ -14,13 +14,19 @@ import (
 // Helm is an instance of helm CLI.
 var Helm = helm.New()
 
+// Default logLevel for helm logs
+var helmLogLevel = log.Debugf
+
 // NewCfg creates helm internal configuration for provided namespace.
 func NewCfg(ns string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER") // TODO: get rid of getenv in runtime
 	config := genericclioptions.NewConfigFlags(false)
 	config.Namespace = &ns
-	err := cfg.Init(config, ns, helmDriver, log.Debugf)
+	if Helm.Debug {
+		helmLogLevel = log.Infof
+	}
+	err := cfg.Init(config, ns, helmDriver, helmLogLevel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create helm configuration for %s namespace: %w", ns, err)
 	}
