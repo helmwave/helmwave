@@ -7,7 +7,7 @@ on:
     types:
       - closed
   push:
-    tags: ['*']
+    tags: ['v*']
 
 permissions:
   contents: write
