@@ -1,4 +1,4 @@
-name: Make release
+name: Goreleaser
 
 on:
   pull_request:
