@@ -1,17 +1,14 @@
-name: Cats 😺
+name: Gif
 
-on:
-  pull_request:
-#  pull_request_target:
-#    types:
-#    - opened
-#    - reopened
-
+on: pull_request
 jobs:
-  cats:
-    name: A cat for your effort!
+  gif:
     runs-on: ubuntu-latest
     steps:
+    - uses: jzweifel/pr-status-giphy-action@master
+      env:
+        GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: ruairidhwm/action-cats@1.0.1
-      with:
+      env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
