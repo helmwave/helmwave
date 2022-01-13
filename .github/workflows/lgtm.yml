@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: micnncim/action-lgtm-reaction@master # Set some version.
+    - uses: micnncim/action-lgtm-reaction@v0.6.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
