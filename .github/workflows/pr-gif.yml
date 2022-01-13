@@ -2,21 +2,6 @@ name: Gif
 
 on: pull_request
 jobs:
-  thumbs:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: jzweifel/pr-status-giphy-action@master
-      env:
-        GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  cats:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: ruairidhwm/action-cats@1.0.2
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   dogs:
     runs-on: ubuntu-latest
     steps:
