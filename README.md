@@ -28,18 +28,6 @@ HelmWave is like docker-compose for helm.
 - Template values
 - Step by Step deployment.
 
-See our [docs](https://helmwave.github.io/docs)
-
-
-### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
-
-```
-$ docker run ghcr.io/helmwave/helmwave:scratch version
-0.16.5
-$ docker run --entrypoint=ash -it --rm ghcr.io/helmwave/helmwave:latest
-/ # 
-```
-
 
 ## 📖 [Documentation](https://helmwave.github.io/docs)
 
