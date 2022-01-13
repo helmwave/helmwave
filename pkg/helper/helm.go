@@ -14,7 +14,7 @@ import (
 // Helm is an instance of helm CLI.
 var Helm = helm.New()
 
-// Default logLevel for helm logs
+// Default logLevel for helm logs.
 var helmLogLevel = log.Debugf
 
 // NewCfg creates helm internal configuration for provided namespace.
