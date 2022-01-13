@@ -1,0 +1,14 @@
+name: Gif
+
+on:
+  pull_request:
+jobs:
+  pr_check:
+    runs-on: ubuntu-latest
+    name: Congrats
+    steps:
+    - uses: actions/checkout@v2
+    - name: PR Action
+      uses: koushikmohan1996/action-pr-gifs@v1.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
