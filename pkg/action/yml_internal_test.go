@@ -22,13 +22,14 @@ func (ts *YmlTestSuite) TestImplementsAction() {
 func (ts *YmlTestSuite) TestRenderEnv() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		filepath.Join(tmpDir, "01_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		file:      filepath.Join(tmpDir, "01_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	value := "test01"
-	ts.T().Setenv("PROJECT_NAME", value)
 	ts.T().Setenv("NAMESPACE", value)
+	ts.T().Setenv("PROJECT_NAME", value)
 
 	ts.Require().NoError(y.Run())
 

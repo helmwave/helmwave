@@ -2,6 +2,7 @@ package action
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -22,8 +23,9 @@ func (ts *BuildTestSuite) TestImplementsAction() {
 func (ts *BuildTestSuite) TestManifest() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		filepath.Join(tests.Root, "02_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -54,8 +56,9 @@ func (ts *BuildTestSuite) TestManifest() {
 func (ts *BuildTestSuite) TestRepositories() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		filepath.Join(tests.Root, "02_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -78,8 +81,9 @@ func (ts *BuildTestSuite) TestRepositories() {
 func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		filepath.Join(tests.Root, "03_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		file:      filepath.Join(tests.Root, "03_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	cases := []struct {
@@ -120,8 +124,9 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 func (ts *BuildTestSuite) TestDiffLocal() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "07_helmwave.yml"),
-		filepath.Join(tests.Root, "07_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "07_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "07_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -131,7 +136,7 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 		autoYml:  true,
 		yml:      y,
 		diff:     &Diff{},
-		diffMode: diffModeLocal,
+		diffMode: DiffModeLocal,
 	}
 
 	ts.Require().NoError(s.Run(), "build should not fail without diffing")
@@ -147,12 +152,12 @@ type NonParallelBuildTestSuite struct {
 	suite.Suite
 }
 
-//nolint:dupl
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		file:      filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -163,20 +168,19 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 		yml:      y,
 	}
 
-	value := "test01"
-	ts.T().Setenv("PROJECT_NAME", value)
+	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(s.Run())
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
-//nolint:dupl
 func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "08_helmwave.yml"),
-		filepath.Join(tmpDir, "08_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "08_helmwave.yml"),
+		file:      filepath.Join(tmpDir, "08_helmwave.yml"),
+		templater: "gomplate",
 	}
 
 	s := &Build{
@@ -187,15 +191,11 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 		yml:      y,
 	}
 
-	value := "test08"
-	ts.T().Setenv("PROJECT_NAME", value)
-	ts.T().Setenv("NAMESPACE", value)
-
 	ts.Require().NoError(s.Run())
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
-//nolint:paralleltest // cannot parallel because of setenv
+//nolint:paralleltest // cannot parallel because of setenv and uses helm repository.yaml flock
 func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(NonParallelBuildTestSuite))

@@ -1,7 +1,8 @@
 package release
 
 import (
-	log "github.com/sirupsen/logrus"
+	"fmt"
+
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
@@ -24,23 +25,38 @@ func (rel *config) upgrade() (*release.Release, error) {
 	valOpts := &values.Options{ValueFiles: valuesFiles}
 	vals, err := valOpts.MergeValues(getter.All(rel.Helm()))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to merge values for release %q: %w", rel.Uniq(), err)
 	}
 
 	// Template
 	if rel.dryRun {
-		log.Debugf("📄 %q template manifest ", rel.Uniq())
+		rel.Logger().Debug("📄 template manifest")
 
-		return rel.newInstall().Run(ch, vals)
+		r, err := rel.newInstall().Run(ch, vals)
+		if err != nil {
+			return nil, fmt.Errorf("failed to dry-run install %q: %w", rel.Uniq(), err)
+		}
+
+		return r, nil
 	}
 
 	// Install
 	if !rel.isInstalled() {
-		log.Debugf("🧐 Release %q does not exist. Installing it now.", rel.Uniq())
+		rel.Logger().Debug("🧐 Release does not exist. Installing it now.")
 
-		return rel.newInstall().Run(ch, vals)
+		r, err := rel.newInstall().Run(ch, vals)
+		if err != nil {
+			return nil, fmt.Errorf("failed to install %q: %w", rel.Uniq(), err)
+		}
+
+		return r, nil
 	}
 
 	// Upgrade
-	return client.Run(rel.Name(), ch, vals)
+	r, err := client.Run(rel.Name(), ch, vals)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upgrade %s: %w", rel.Uniq(), err)
+	}
+
+	return r, nil
 }

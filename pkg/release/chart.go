@@ -1,12 +1,11 @@
 package release
 
 import (
-	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -21,34 +20,34 @@ func (rel *config) GetChart() (*chart.Chart, error) {
 
 	ch, err := client.ChartPathOptions.LocateChart(rel.Chart().Name, rel.Helm())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to locate chart %s: %w", rel.Chart().Name, err)
 	}
 
 	c, err := loader.Load(ch)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load chart %s: %w", rel.Chart().Name, err)
 	}
 
-	if err := chartCheck(c); err != nil {
+	if err := rel.chartCheck(c); err != nil {
 		return nil, err
 	}
 
 	return c, nil
 }
 
-func chartCheck(ch *chart.Chart) error {
+func (rel *config) chartCheck(ch *chart.Chart) error {
 	if req := ch.Metadata.Dependencies; req != nil {
 		if err := action.CheckDependencies(ch, req); err != nil {
-			return err
+			return fmt.Errorf("failed to check chart %s dependencies: %w", ch.Name(), err)
 		}
 	}
 
 	if !(ch.Metadata.Type == "" || ch.Metadata.Type == "application") {
-		log.Warnf("%s charts are not installable \n", ch.Metadata.Type)
+		rel.Logger().Warnf("%s charts are not installable", ch.Metadata.Type)
 	}
 
 	if ch.Metadata.Deprecated {
-		return errors.New("⚠️ This locateChart is deprecated")
+		return fmt.Errorf("⚠️ Chart %s is deprecated", ch.Name())
 	}
 
 	return nil
@@ -78,5 +77,9 @@ func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 		man.Out = os.Stdout
 	}
 
-	return man.Update()
+	if err := man.Update(); err != nil {
+		return fmt.Errorf("failed to update %s chart dependencies: %w", name, err)
+	}
+
+	return nil
 }

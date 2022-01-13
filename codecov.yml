@@ -1,12 +1,20 @@
 codecov:
   require_ci_to_pass: true
-  allow_pseudo_compare: true
-  allow_coverage_offsets: true
 
 coverage:
   precision: 2
   round: down
   range: "30...100"
+
+  status:
+    project:
+      default:
+        informational: true # do not fail check
+        only_pulls: true
+    patch: false
+
+ignore:
+  - "pkg/action/flags.go"
 
 parsers:
   gcov:
@@ -20,11 +28,3 @@ comment:
   layout: "reach,diff,flags,files,footer"
   behavior: default
   require_changes: false
-
-flag_management:
-  default_rules:
-    carryforward: true
-
-flags:
-  integration:
-    carryforward: true

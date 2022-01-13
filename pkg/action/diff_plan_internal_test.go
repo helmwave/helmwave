@@ -37,22 +37,24 @@ func (ts *DiffPlanTestSuite) TestRun() {
 		plandir: ts.T().TempDir(),
 		tags:    cli.StringSlice{},
 		yml: &Yml{
-			filepath.Join(tests.Root, "02_helmwave.yml"),
-			filepath.Join(tests.Root, "02_helmwave.yml"),
+			tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
+			file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+			templater: "sprig",
 		},
 		diff:     &Diff{},
-		diffMode: diffModeLive,
+		diffMode: DiffModeLive,
 	}
 
 	s2 := &Build{
 		plandir: ts.T().TempDir(),
 		tags:    cli.StringSlice{},
 		yml: &Yml{
-			filepath.Join(tests.Root, "03_helmwave.yml"),
-			filepath.Join(tests.Root, "03_helmwave.yml"),
+			tpl:       filepath.Join(tests.Root, "03_helmwave.yml"),
+			file:      filepath.Join(tests.Root, "03_helmwave.yml"),
+			templater: "sprig",
 		},
 		diff:     &Diff{},
-		diffMode: diffModeLive,
+		diffMode: DiffModeLive,
 	}
 
 	d := DiffLocalPlan{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
@@ -72,7 +74,7 @@ func (ts *DiffPlanTestSuite) TestRun() {
 	ts.Require().Contains(output, "memcached-a-redis, Secret (v1) has been removed")
 }
 
-//nolint:paralleltest // we capture output for global logger
+//nolint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
 func TestDiffPlanTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DiffPlanTestSuite))

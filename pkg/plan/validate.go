@@ -10,19 +10,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// ErrValidateFailed is returned for failed values validation.
 var ErrValidateFailed = errors.New("validate failed")
 
+// ValidateValues checkes whether all values files exist.
 func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
 		for i := range rel.Values() {
-			_, err := os.Stat(rel.Values()[i].Get())
+			p := rel.Values()[i].Get()
+			_, err := os.Stat(p)
 			if os.IsNotExist(err) {
-				log.Errorf("❌ %s values (%s): %v", rel.Uniq(), rel.Values()[i].Src, err)
 				f = true
-			} else {
-				// FatalError
-				return err
+				log.WithError(err).Errorf("❌ %s values (%s)", rel.Uniq(), rel.Values()[i].Src)
+			} else if err != nil {
+				f = true
+				log.WithError(err).Errorf("failed to open values %s", p)
 			}
 		}
 	}
@@ -33,6 +36,7 @@ func (p *Plan) ValidateValues() error {
 	return ErrValidateFailed
 }
 
+// Validate validates releases and repositories in plan.
 func (p *planBody) Validate() error {
 	if len(p.Releases) == 0 && len(p.Repositories) == 0 {
 		return errors.New("releases and repositories are empty")
@@ -49,6 +53,7 @@ func (p *planBody) Validate() error {
 	return nil
 }
 
+// ValidateRepositories validates all repositories.
 func (p *planBody) ValidateRepositories() error {
 	a := make(map[string]int8)
 	for _, r := range p.Repositories {
@@ -73,6 +78,7 @@ func (p *planBody) ValidateRepositories() error {
 	return nil
 }
 
+// ValidateReleases validates all releases.
 func (p *planBody) ValidateReleases() error {
 	a := make(map[uniqname.UniqName]int8)
 	for _, r := range p.Releases {
@@ -88,7 +94,7 @@ func (p *planBody) ValidateReleases() error {
 			return errors.New("bad namespace: " + r.Namespace())
 		}
 
-		if !r.Uniq().Validate() {
+		if err := r.Uniq().Validate(); err != nil {
 			return errors.New("bad uniqname: " + string(r.Uniq()))
 		}
 

@@ -2,7 +2,6 @@ package release
 
 import (
 	"github.com/helmwave/helmwave/pkg/helper"
-	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
@@ -22,7 +21,7 @@ func (rel *config) Cfg() *action.Configuration {
 		var err error
 		rel.cfg, err = helper.NewCfg(rel.Namespace())
 		if err != nil {
-			log.Fatal(err)
+			rel.Logger().Fatal(err)
 
 			return nil
 		}
@@ -36,7 +35,7 @@ func (rel *config) Helm() *helm.EnvSettings {
 		var err error
 		rel.helm, err = helper.NewHelm(rel.Namespace())
 		if err != nil {
-			log.Fatal(err)
+			rel.Logger().Fatal(err)
 
 			return nil
 		}

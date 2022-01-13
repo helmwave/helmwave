@@ -1,15 +1,32 @@
 package template
 
 import (
-	"bytes"
+	"fmt"
 	"os"
-	"text/template"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 )
 
-func Tpl2yml(tpl, yml string, data interface{}, gomplateConfig *GomplateConfig) error {
+// Templater is interface for using different template function groups.
+type Templater interface {
+	Name() string
+	Render(string, interface{}) ([]byte, error)
+}
+
+func getTemplater(name string) (Templater, error) { //nolint:ireturn
+	switch name {
+	case gomplateTemplater{}.Name():
+		return gomplateTemplater{}, nil
+	case sprigTemplater{}.Name():
+		return sprigTemplater{}, nil
+	default:
+		return nil, fmt.Errorf("templater %s is not registered", name)
+	}
+}
+
+// Tpl2yml renders 'tpl' file to 'yml' file as go template.
+func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
@@ -21,33 +38,36 @@ func Tpl2yml(tpl, yml string, data interface{}, gomplateConfig *GomplateConfig) 
 
 	src, err := os.ReadFile(tpl)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read template file %s: %w", tpl, err)
 	}
 
-	// Template
-	funcs := FuncMap(gomplateConfig)
-	t, err := template.New("tpl").Funcs(funcs).Parse(string(src))
+	templater, err := getTemplater(templaterName)
 	if err != nil {
 		return err
 	}
+	log.WithField("template engine", templater.Name()).Debug("Loaded template engine")
 
-	var buf bytes.Buffer
-	err = t.Execute(&buf, data)
+	d, err := templater.Render(string(src), data)
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck // we control the interface
 	}
 
-	log.Trace(yml, " contents\n", buf.String())
+	log.Trace(yml, " contents\n", d)
 
 	f, err := helper.CreateFile(yml)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create destination file %s: %w", yml, err)
 	}
 
-	_, err = f.WriteString(buf.String())
+	_, err = f.Write(d)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to write to destination file %s: %w", yml, err)
 	}
 
-	return f.Close()
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close destination file %s: %w", yml, err)
+	}
+
+	return nil
 }

@@ -5,7 +5,9 @@ import (
 )
 
 // Build plan with yml and tags/matchALL options.
-func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
+func (p *Plan) Build(yml string, tags []string, matchAll bool, templater string) error {
+	p.templater = templater
+
 	// Create Body
 	body, err := NewBody(yml)
 	if err != nil {
@@ -40,7 +42,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool) error {
 	}
 
 	// Sync All
-	err = syncRepositories(p.body.Repositories)
+	err = SyncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}

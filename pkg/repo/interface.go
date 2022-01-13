@@ -1,6 +1,9 @@
 package repo
 
 import (
+	"fmt"
+
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
@@ -12,13 +15,14 @@ type Config interface {
 	Install(*helm.EnvSettings, *repo.File) error
 	Name() string
 	URL() string
+	Logger() *log.Entry
 }
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.
 func UnmarshalYAML(node *yaml.Node) ([]Config, error) {
 	r := make([]*config, 0)
 	if err := node.Decode(&r); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode repository config from YAML: %w", err)
 	}
 
 	res := make([]Config, len(r))

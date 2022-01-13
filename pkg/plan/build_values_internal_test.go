@@ -14,9 +14,18 @@ type BuildValuesTestSuite struct {
 	suite.Suite
 }
 
+func (s *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
+	s.T().Helper()
+
+	p := New(filepath.Join(tmpDir, Dir))
+	p.templater = "sprig"
+
+	return p
+}
+
 func (s *BuildValuesTestSuite) TestValuesEmpty() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := s.createPlan(tmpDir)
 
 	p.body = &planBody{}
 
@@ -25,14 +34,15 @@ func (s *BuildValuesTestSuite) TestValuesEmpty() {
 
 func (s *BuildValuesTestSuite) TestValuesBuildError() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := s.createPlan(tmpDir)
 
 	tmpValues := filepath.Join(tmpDir, "blablavalues.yaml")
 	s.Require().NoError(os.WriteFile(tmpValues, []byte("a: b"), 0o600))
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("Uniq").Return()
 
 	errBuildValues := errors.New("values build error")
 	mockedRelease.On("BuildValues").Return(errBuildValues)
@@ -47,20 +57,21 @@ func (s *BuildValuesTestSuite) TestValuesBuildError() {
 
 func (s *BuildValuesTestSuite) TestSuccess() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := s.createPlan(tmpDir)
 
 	valuesName := "blablavalues.yaml"
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, valuesName)
 	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},
 	})
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("BuildValues").Return(nil)
+	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{
 		Releases: releaseConfigs{mockedRelease},

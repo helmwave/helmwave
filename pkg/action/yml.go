@@ -6,12 +6,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Yml is struct for running 'yml' command.
 type Yml struct {
 	tpl, file string
+	templater string
 }
 
+// Run is main function for 'yml' command.
 func (i *Yml) Run() error {
-	err := template.Tpl2yml(i.tpl, i.file, nil, &template.GomplateConfig{Enabled: false})
+	err := template.Tpl2yml(i.tpl, i.file, nil, i.templater)
 	if err != nil {
 		return err
 	}
@@ -24,6 +27,7 @@ func (i *Yml) Run() error {
 	return nil
 }
 
+// Cmd returns 'yml' *cli.Command.
 func (i *Yml) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "yml",
@@ -37,5 +41,6 @@ func (i *Yml) flags() []cli.Flag {
 	return []cli.Flag{
 		flagTplFile(&i.tpl),
 		flagYmlFile(&i.file),
+		flagTemplateEngine(&i.templater),
 	}
 }

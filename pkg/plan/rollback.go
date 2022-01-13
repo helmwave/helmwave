@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Rollback rollbacks helm release.
 func (p *Plan) Rollback() error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))

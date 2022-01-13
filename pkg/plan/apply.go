@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -21,11 +22,13 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// ErrDeploy is returned when deploy is failed for whatever reason.
 var ErrDeploy = errors.New("deploy failed")
 
+// Apply syncs repositories and releases.
 func (p *Plan) Apply() (err error) {
 	log.Info("🗄 Sync repositories...")
-	err = syncRepositories(p.body.Repositories)
+	err = SyncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}
@@ -39,9 +42,10 @@ func (p *Plan) Apply() (err error) {
 	return p.syncReleases()
 }
 
+// ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
 func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	log.Info("🗄 Sync repositories...")
-	err = syncRepositories(p.body.Repositories)
+	err = SyncRepositories(p.body.Repositories)
 	if err != nil {
 		return err
 	}
@@ -55,34 +59,36 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	return p.syncReleasesKubedog(kubedogConfig)
 }
 
-func syncRepositories(repositories repoConfigs) (err error) {
+// SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
+func SyncRepositories(repositories repoConfigs) error {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
-	var f *helmRepo.File
 	// Create if not exits
 	if !helper.IsExists(helper.Helm.RepositoryConfig) {
-		f = helmRepo.NewFile()
-
-		_, err = helper.CreateFile(helper.Helm.RepositoryConfig)
+		f, err := helper.CreateFile(helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
-	} else {
-		f, err = helmRepo.LoadFile(helper.Helm.RepositoryConfig)
-		if err != nil {
-			return err
+		if err := f.Close(); err != nil {
+			return fmt.Errorf("failed to close fresh helm repository.yaml: %w", err)
 		}
 	}
 
-	// Flock
+	// we need to get a flock first
 	lockPath := helper.Helm.RepositoryConfig + ".lock"
 	fileLock := flock.New(lockPath)
-	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	lockCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-
+	// We need to unlock in deferred mode in case of any other errors returned
+	defer fileLock.Unlock() //nolint:errcheck // TODO: add error checking
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
 	if err != nil && !locked {
-		return err
+		return fmt.Errorf("failed to get lock %s: %w", fileLock.Path(), err)
+	}
+
+	f, err := helmRepo.LoadFile(helper.Helm.RepositoryConfig)
+	if err != nil {
+		return fmt.Errorf("failed to load helm repositories file: %w", err)
 	}
 
 	// We cannot parallel repositories installation as helm manages single repositories.yaml.
@@ -90,17 +96,21 @@ func syncRepositories(repositories repoConfigs) (err error) {
 	for i := range repositories {
 		err := repositories[i].Install(helper.Helm, f)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to install %s repository: %w", repositories[i].Name(), err)
 		}
 	}
 
 	err = f.WriteFile(helper.Helm.RepositoryConfig, os.FileMode(0o644))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to write repositories file: %w", err)
 	}
 
-	// Unlock
-	return fileLock.Unlock()
+	// If we haven't met any errors yet unlock the repository file. Deferred unlock will exit quickly after this.
+	if err := fileLock.Unlock(); err != nil {
+		return fmt.Errorf("failed to unlock %s: %w", fileLock.Path(), err)
+	}
+
+	return nil
 }
 
 func (p *Plan) syncReleases() (err error) {
@@ -115,10 +125,11 @@ func (p *Plan) syncReleases() (err error) {
 		p.body.Releases[i].HandleDependencies(p.body.Releases)
 		go func(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
 			defer wg.Done()
-			log.Infof("🛥 %q deploying... ", rel.Uniq())
+			l := log.WithField("release", rel.Uniq())
+			l.Info("🛥 deploying... ")
 			_, err = rel.Sync()
 			if err != nil {
-				log.Errorf("❌ %s: %v", rel.Uniq(), err)
+				l.WithError(err).Error("❌")
 
 				rel.NotifyFailed()
 
@@ -129,7 +140,7 @@ func (p *Plan) syncReleases() (err error) {
 				wg.ErrChan() <- err
 			} else {
 				rel.NotifySuccess()
-				log.Infof("✅ %s", rel.Uniq())
+				l.Info("✅")
 			}
 		}(wg, p.body.Releases[i], mu)
 	}
@@ -196,7 +207,7 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) error {
 	// KubeInit
 	err = kube.Init(kube.InitOptions{})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize kubernetes config: %w", err)
 	}
 
 	err = runMultiracks(ctx, mapSpecs, kubedogConfig, wg)

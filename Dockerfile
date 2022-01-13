@@ -25,7 +25,7 @@ FROM base-release as goreleaser
 COPY helmwave /bin/
 
 ### Build in docker
-FROM base-release
+FROM base-release as release
 COPY --from=builder /helmwave /bin/
 
 ### Scratch with build in docker

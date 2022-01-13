@@ -86,3 +86,13 @@ func flagDiffShowSecret(v *bool) *cli.BoolFlag {
 		Destination: v,
 	}
 }
+
+func flagTemplateEngine(v *string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:        "templater",
+		Value:       "sprig",
+		Usage:       "Select template engine: sprig or gomplate",
+		EnvVars:     []string{"HELMWAVE_TEMPLATER", "HELMWAVE_TEMPLATE_ENGINE"},
+		Destination: v,
+	}
+}

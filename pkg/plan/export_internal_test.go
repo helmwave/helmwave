@@ -16,6 +16,7 @@ type ExportTestSuite struct {
 func (s *ExportTestSuite) TestValuesEmpty() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
+	p.templater = "sprig"
 
 	p.body = &planBody{}
 
@@ -26,19 +27,21 @@ func (s *ExportTestSuite) TestValuesEmpty() {
 func (s *ExportTestSuite) TestValuesOneRelease() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
+	p.templater = "sprig"
 
 	valuesName := "blablavalues.yaml"
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, valuesName)
 	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},
 	})
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("BuildValues").Return(nil)
+	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{
 		Releases: releaseConfigs{mockedRelease},

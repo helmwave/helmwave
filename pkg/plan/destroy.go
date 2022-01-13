@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Destroy destroys all releases that exist in plan.
 func (p *Plan) Destroy() error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))

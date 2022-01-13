@@ -9,6 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Build is struct for running 'build' CLI command.
 type Build struct {
 	yml      *Yml
 	diff     *Diff
@@ -22,11 +23,15 @@ type Build struct {
 	// diffLocal *DiffLocalPlan
 }
 
-var (
-	diffModeLive  = "live"
-	diffModeLocal = "local"
+const (
+	// DiffModeLive is a subcommand name for diffing manifests in plan with actually running manifests in k8s.
+	DiffModeLive = "live"
+
+	// DiffModeLocal is a subcommand name for diffing manifests in two plans.
+	DiffModeLocal = "local"
 )
 
+// Run is main function for 'build' CLI command.
 func (i *Build) Run() error {
 	if i.autoYml {
 		if err := i.yml.Run(); err != nil {
@@ -35,7 +40,7 @@ func (i *Build) Run() error {
 	}
 
 	newPlan := plan.New(i.plandir)
-	err := newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll)
+	err := newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
 	if err != nil {
 		return err
 	}
@@ -44,7 +49,7 @@ func (i *Build) Run() error {
 	newPlan.PrettyPlan()
 
 	switch i.diffMode {
-	case diffModeLocal:
+	case DiffModeLocal:
 		oldPlan := plan.New(i.plandir)
 		if oldPlan.IsExist() {
 			log.Info("🆚 Diff with previous local plan")
@@ -55,7 +60,7 @@ func (i *Build) Run() error {
 			newPlan.DiffPlan(oldPlan, i.diff.ShowSecret, i.diff.Wide)
 		}
 
-	case diffModeLive:
+	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
 		newPlan.DiffLive(i.diff.ShowSecret, i.diff.Wide)
 	default:
@@ -75,6 +80,7 @@ func (i *Build) Run() error {
 	return nil
 }
 
+// Cmd returns 'build' *cli.Command.
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "build",

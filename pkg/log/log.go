@@ -1,6 +1,8 @@
 package log
 
 import (
+	"fmt"
+
 	"github.com/bombsimon/logrusr"
 	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
@@ -11,13 +13,16 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// Settings stores configuration for logger.
 type Settings struct {
-	level  string
-	format string
-	color  bool
-	width  int
+	level      string
+	format     string
+	color      bool
+	timestamps bool
+	width      int
 }
 
+// Flags returns CLI flags for logger settings.
 func (l *Settings) Flags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
@@ -48,13 +53,22 @@ func (l *Settings) Flags() []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
 			Destination: &l.width,
 		},
+		&cli.BoolFlag{
+			Name:        "log-timestamps",
+			Usage:       "Add timestamps to log messages",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_LOG_TIMESTAMPS"},
+			Destination: &l.timestamps,
+		},
 	}
 }
 
+// Run initializes logger.
 func (l *Settings) Run(c *cli.Context) error {
 	return l.Init()
 }
 
+// Init initializes logger and sets up hacks for other loggers (used by 3rd party libraries).
 func (l *Settings) Init() error {
 	// Skip various low-level k8s client errors
 	// There are a lot of context deadline errors being logged
@@ -75,7 +89,7 @@ func (l *Settings) Init() error {
 func (l *Settings) setLevel() error {
 	level, err := log.ParseLevel(l.level)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse log level %s: %w", l.level, err)
 	}
 	log.SetLevel(level)
 	if level >= log.DebugLevel {
@@ -94,20 +108,29 @@ func (l *Settings) setFormat() {
 		})
 	case "pad":
 		log.SetFormatter(&log.TextFormatter{
-			PadLevelText: true,
-			ForceColors:  l.color,
+			PadLevelText:     true,
+			ForceColors:      l.color,
+			FullTimestamp:    l.timestamps,
+			DisableTimestamp: !l.timestamps,
 		})
 	case "emoji":
-		log.SetFormatter(&formatter.Config{
+		cfg := &formatter.Config{
 			Color: l.color,
-		})
+		}
+		if l.timestamps {
+			cfg.LogFormat = "[%time%] [%emoji% aka %lvl%]: %msg%"
+		}
+
+		log.SetFormatter(cfg)
 	case "text":
 		log.SetFormatter(&log.TextFormatter{
-			ForceColors: l.color,
+			ForceColors:      l.color,
+			FullTimestamp:    l.timestamps,
+			DisableTimestamp: !l.timestamps,
 		})
 	}
 }
 
 func logKubernetesClientError(err error) {
-	log.Debugf("kubernetes client error %q", err.Error())
+	log.WithError(err).Debug("kubernetes client error")
 }

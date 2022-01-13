@@ -4,6 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Check compares helmwave versions and logs difference.
 func Check(a, b string) {
 	if a != b {
 		log.Warn("⚠️ Unsupported version ", b)
@@ -11,4 +12,5 @@ func Check(a, b string) {
 	}
 }
 
+// Version is helmwave binary version. It is overrided by goreleaser during release.
 var Version = "dev"

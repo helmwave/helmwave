@@ -7,11 +7,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// DiffLive is struct for running 'diff live' command.
 type DiffLive struct {
 	diff    *Diff
 	plandir string
 }
 
+// Run is main function for 'diff live' command.
 func (d *DiffLive) Run() error {
 	p := plan.New(d.plandir)
 	if err := p.Import(); err != nil {
@@ -26,6 +28,7 @@ func (d *DiffLive) Run() error {
 	return nil
 }
 
+// Cmd returns 'diff live' *cli.Command.
 func (d *DiffLive) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:  "live",
