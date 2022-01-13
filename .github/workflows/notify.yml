@@ -5,7 +5,7 @@ on:
     types: [published]
 
 jobs:
-  notify-telegram:
+  telegram:
     runs-on: ubuntu-latest
     steps:
     - name: Set GITHUB_TAG

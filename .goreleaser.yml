@@ -12,7 +12,7 @@ builds:
       - darwin
     ignore:
       - goos: darwin
-        goarch: 386
+        goarch: "386"
     main: ./cmd/helmwave
     ldflags:
       - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}
@@ -34,16 +34,30 @@ release:
   prerelease: auto
 
 changelog:
+  skip: false
+  use: github
   sort: asc
+
+  groups:
+    - title: "Linter"
+      regexp: "^.*linter.*$"
+      order: 0
+    - title: "Tests"
+      regexp: "^.*tests?.*$"
+      order: 1
+    - title: "Documentation"
+      regexp: "^.*(documentation|docs?).*$"
+      order: 2
+    - title: "Other"
+      order: 999
+
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
       - '^WIP:'
       - Merge pull request
       - Merge branch
       - go mod tidy
-
+      - typo
 
 dockers:
   - dockerfile: Dockerfile
@@ -98,8 +112,15 @@ brews:
   - tap:
       owner: helmwave
       name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     description: "HelmWave is like docker-compose for helm"
     license: "MIT"
     folder: formula
 
-
+milestones:
+  - repo:
+      owner: helmwave
+      name: helmwave
+    close: true
+    fail_on_error: false
+    name_template: "{{.Tag}}"
