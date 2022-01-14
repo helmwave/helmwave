@@ -19,7 +19,9 @@ import (
 	"github.com/werf/kubedog/pkg/tracker"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	helmRepo "helm.sh/helm/v3/pkg/repo"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // ErrDeploy is returned when deploy is failed for whatever reason.
@@ -205,9 +207,25 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) error {
 	defer cancel()
 
 	// KubeInit
-	err = kube.Init(kube.InitOptions{})
+	kubeconfigPath := os.Getenv("KUBECONFIG")
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to initialize kubernetes config: %w", err)
+	}
+
+	if config != nil {
+		clientset, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			return fmt.Errorf("failed to initialize kubernetes config: %w", err)
+		}
+		kube.Kubernetes = clientset
+		kube.Client = clientset
+
+		dynamicClient, err := dynamic.NewForConfig(config)
+		if err != nil {
+			return fmt.Errorf("failed to initialize kubernetes config: %w", err)
+		}
+		kube.DynamicClient = dynamicClient
 	}
 
 	err = runMultiracks(ctx, mapSpecs, kubedogConfig, wg)
