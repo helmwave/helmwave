@@ -28,38 +28,6 @@ HelmWave is like docker-compose for helm.
 - Template values
 - Step by Step deployment.
 
-Look at  the examples in our [docs](https://helmwave.github.io/docs)
-
-
-## Comparison
-
-🚀 Features  | 🌊 HelmWave   | helmfile
--------------| :------------:|:-----------:
-Docker | ![Docker Image Size helmwave (latest by date)](https://img.shields.io/docker/image-size/diamon/helmwave) | ![Docker Image Size helmfile (latest by date)](https://img.shields.io/docker/image-size/chatwork/helmfile)
-[Kubedog](https://github.com/werf/kubedog) |✅|❌
-Without helm binary |✅|❌
-All options helm|✅|partially
-Helm 3 |✅|✅
-Helm 2 |❌|✅
-Parallel helm install/upgrade |✅|❌
-Repository Skipping|✅|❌
-Tags|✅| You can use labels
-Store|✅| You can use labels
-Planfile|✅|❌
-remote values | ✅ | ❌
-Sprig | ✅|✅
-helm-diff  | ✅  in-compile |✅ as plugin
-Call helm | via Golang Module | Shell Executor
-
-
-### Run as a container ![Docker Pulls](https://img.shields.io/docker/pulls/diamon/helmwave)
-
-```
-$ docker run ghcr.io/helmwave/helmwave:scratch version
-0.16.5
-$ docker run --entrypoint=ash -it --rm ghcr.io/helmwave/helmwave:latest
-/ # 
-```
 
 ## 📖 [Documentation](https://helmwave.github.io/docs)
 
@@ -77,5 +45,3 @@ Documentation available at https://helmwave.github.io/docs
 ## Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/helmwave/helmwave.svg)](https://starchart.cc/helmwave/helmwave)
-
-
