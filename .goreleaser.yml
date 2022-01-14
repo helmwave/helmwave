@@ -23,14 +23,14 @@ archives:
         format: zip
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 
 snapshot:
   name_template: "{{ .Tag }}-next"
 
 release:
   name_template: "v{{.Version}}"
-#  draft: true
+  #  draft: true
   prerelease: auto
 
 changelog:
@@ -53,7 +53,7 @@ changelog:
 
   filters:
     exclude:
-      - '^WIP:'
+      - "^WIP:"
       - Merge pull request
       - Merge branch
       - go mod tidy
@@ -62,24 +62,24 @@ changelog:
 dockers:
   - dockerfile: Dockerfile
     image_templates:
-    - "ghcr.io/helmwave/helmwave:{{ .Version }}-scratch"
-    - "ghcr.io/helmwave/helmwave:scratch"
+      - "ghcr.io/helmwave/helmwave:{{ .Version }}-scratch"
+      - "ghcr.io/helmwave/helmwave:scratch"
 
-    - "diamon/helmwave:{{ .Version }}-scratch"
-    - "diamon/helmwave:scratch"
+      - "diamon/helmwave:{{ .Version }}-scratch"
+      - "diamon/helmwave:scratch"
     build_flag_templates:
-    - "--pull"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    - "--label=org.opencontainers.image.licenses=MIT"
-    - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
-    - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
-    - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
+      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
+      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
 
-    - "--platform=linux/amd64"
-    - "--target=scratch-goreleaser"
+      - "--platform=linux/amd64"
+      - "--target=scratch-goreleaser"
     goos: linux
     goarch: amd64
     use: buildx
@@ -101,7 +101,6 @@ dockers:
       - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
       - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
 
-
       - "--platform=linux/amd64"
       - "--target=goreleaser"
     goos: linux
@@ -116,6 +115,7 @@ brews:
     description: "HelmWave is like docker-compose for helm"
     license: "MIT"
     folder: formula
+    skip_upload: auto
 
 milestones:
   - repo:
