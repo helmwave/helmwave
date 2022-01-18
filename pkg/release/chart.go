@@ -55,16 +55,16 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 }
 
 func (rel *config) ChartDepsUpd() error {
-	return rel.chartDepsUpd(rel.Chart().Name, rel.Helm())
-}
-
-func (rel *config) chartDepsUpd(name string, settings *helm.EnvSettings) error {
-	if !helper.IsExists(filepath.Clean(name)) {
+	if !helper.IsExists(filepath.Clean(rel.Chart().Name)) {
 		rel.Logger().Info("skipping updating dependencies for remote chart")
 
 		return nil
 	}
 
+	return chartDepsUpd(rel.Chart().Name, rel.Helm())
+}
+
+func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              io.Discard,
