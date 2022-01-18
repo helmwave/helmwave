@@ -26,7 +26,7 @@ func (s *BuildRepositoriesTestSuite) TestUnusedRepo() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	mockedRepo := &mockRepoConfig{}
+	mockedRepo := &MockRepoConfig{}
 
 	p.body = &planBody{
 		Repositories: repoConfigs{mockedRepo},
@@ -45,12 +45,13 @@ func (s *BuildRepositoriesTestSuite) TestSuccess() {
 
 	repoName := "blablanami"
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(repoName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("Uniq").Return()
 
-	mockedRepo := &mockRepoConfig{}
+	mockedRepo := &MockRepoConfig{}
 	mockedRepo.On("Name").Return(repoName)
 
 	p.body = &planBody{
@@ -73,10 +74,11 @@ func (s *BuildRepositoriesTestSuite) TestMissingRepo() {
 
 	repoName := "blablanami"
 
-	mockedRelease := &mockReleaseConfig{}
+	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(repoName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{
 		Releases: releaseConfigs{mockedRelease},

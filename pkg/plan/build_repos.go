@@ -19,16 +19,17 @@ func (p *Plan) buildRepositories() (out []repo.Config, err error) {
 func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []repo.Config, err error) {
 	for rep, releases := range m {
 		rm := releaseNames(releases)
-		log.WithField(rep, rm).Debug("🗄 repo dependencies")
+
+		l := log.WithField("repository", rep)
+		l.WithField("releases", rm).Debug("🗄 found releases that depend on repository")
 
 		if repoIsLocal(rep) {
-			log.Infof("🗄 %q is local repo", rep)
+			l.Info("🗄 it is local repo")
 		} else if index, found := repo.IndexOfName(in, rep); found {
 			out = append(out, in[index])
-			log.Infof("🗄 %q has been added to the plan", rep)
+			l.Info("🗄 repo has been added to the plan")
 		} else {
-			log.WithField("releases", rm).
-				Warn("🗄 you will not be able to install this")
+			l.WithField("releases", rm).Warn("🗄 some releases depend on repository that is not defined")
 
 			return nil, errors.New("🗄 not found " + rep)
 		}

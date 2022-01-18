@@ -2,31 +2,44 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
 const (
-	Dir      = ".helmwave/"
-	File     = "planfile"
-	Body     = "helmwave.yml"
+	// Dir is default directory for generated files.
+	Dir = ".helmwave/"
+
+	// File is default file name for planfile.
+	File = "planfile"
+
+	// Body is default file name for main config.
+	Body = "helmwave.yml"
+
+	// Manifest is default directory under Dir for manifests.
 	Manifest = "manifest/"
-	Values   = "values/"
+
+	// Values is default directory for values.
+	Values = "values/"
 )
 
 var (
+	// ErrManifestDirNotFound is an error for nonexisting manifest dir.
 	ErrManifestDirNotFound = errors.New(Manifest + " dir not found")
-	ErrManifestDirEmpty    = errors.New(Manifest + " is empty")
+
+	// ErrManifestDirEmpty is an error for empty manifest dir.
+	ErrManifestDirEmpty = errors.New(Manifest + " is empty")
 )
 
+// Plan contains full helmwave state.
 type Plan struct {
 	body     *planBody
 	dir      string
@@ -37,6 +50,8 @@ type Plan struct {
 	manifests map[uniqname.UniqName]string
 
 	graphMD string
+
+	templater string
 }
 
 type repoConfigs []repo.Config
@@ -68,7 +83,6 @@ func (r *releaseConfigs) UnmarshalYAML(node *yaml.Node) error {
 type planBody struct {
 	Project      string
 	Version      string
-	Template     *template.Config
 	Repositories repoConfigs
 	Releases     releaseConfigs
 }
@@ -80,12 +94,12 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 
 	src, err := os.ReadFile(file)
 	if err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
 
 	err = yaml.Unmarshal(src, b)
 	if err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}
 
 	// Setup dev version
@@ -100,6 +114,7 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 	return b, nil
 }
 
+// New returns empty *Plan for provided directory.
 func New(dir string) *Plan {
 	// if dir[len(dir)-1:] != "/" {
 	//	dir += "/"
@@ -115,6 +130,7 @@ func New(dir string) *Plan {
 	return plan
 }
 
+// PrettyPlan logs releases and repositories names.
 func (p *Plan) PrettyPlan() {
 	a := make([]string, 0, len(p.body.Releases))
 	for _, r := range p.body.Releases {

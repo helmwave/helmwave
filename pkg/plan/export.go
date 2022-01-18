@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -12,7 +13,7 @@ import (
 // Export allows save plan to file.
 func (p *Plan) Export() error {
 	if err := os.RemoveAll(p.dir); err != nil {
-		return err
+		return fmt.Errorf("failed to clean plan directory %s: %w", p.dir, err)
 	}
 
 	wg := parallel.NewWaitGroup()
@@ -60,12 +61,12 @@ func (p *Plan) exportManifest() error {
 
 		_, err = f.WriteString(v)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to write manifest %s: %w", f.Name(), err)
 		}
 
 		err = f.Close()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to close manifest %s: %w", f.Name(), err)
 		}
 	}
 
@@ -98,10 +99,14 @@ func (p *Plan) exportGraphMD() error {
 
 	_, err = f.WriteString(p.graphMD)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to write graph file %s: %w", f.Name(), err)
 	}
 
-	return f.Close()
+	if err := f.Close(); err != nil {
+		return fmt.Errorf("failed to close graph file %s: %w", f.Name(), err)
+	}
+
+	return nil
 }
 
 func (p *Plan) exportValues() error {
@@ -128,10 +133,15 @@ func (p *Plan) exportValues() error {
 		filepath.Join(p.dir, Values),
 	)
 	if err != nil {
-		return dir.Copy(
+		err = dir.Copy(
 			filepath.Join(p.tmpDir, Values),
 			filepath.Join(p.dir, Values),
 		)
+		if err != nil {
+			return fmt.Errorf("failed to copy values from %s to %s: %w", p.tmpDir, p.dir, err)
+		}
+
+		return nil
 	}
 
 	return nil

@@ -3,12 +3,14 @@ package action
 import (
 	"time"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
+// Up is struct for running 'up' command.
 type Up struct {
 	build *Build
 	dog   *kubedog.Config
@@ -17,6 +19,7 @@ type Up struct {
 	kubedogEnabled bool
 }
 
+// Run is main function for 'up' command.
 func (i *Up) Run() error {
 	if i.autoBuild {
 		if err := i.build.Run(); err != nil {
@@ -40,6 +43,7 @@ func (i *Up) Run() error {
 	return p.Apply()
 }
 
+// Cmd returns 'up' *cli.Command.
 func (i *Up) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "up",
@@ -85,10 +89,17 @@ func (i *Up) flags() []cli.Flag {
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-timeout",
-			Usage:       "Timout of kubedog multitrackers",
+			Usage:       "Timeout of kubedog multitrackers",
 			Value:       5 * time.Minute,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &i.dog.Timeout,
+		},
+		&cli.BoolFlag{
+			Name:        "progress",
+			Usage:       "Enable progress logs of helm (INFO log level)",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_PROGRESS"},
+			Destination: &helper.Helm.Debug,
 		},
 	}
 

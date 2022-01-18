@@ -1,4 +1,4 @@
-name: Make release
+name: Goreleaser
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
     types:
       - closed
   push:
-    tags: ['*']
+    tags: ['v*']
 
 permissions:
   contents: write

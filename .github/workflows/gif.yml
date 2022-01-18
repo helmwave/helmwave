@@ -1,0 +1,15 @@
+name: Gif
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  dogs:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Doggoes as an Action
+      uses: stanleynguyen/action-dogs@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

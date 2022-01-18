@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/databus23/helm-diff/diff"
@@ -13,6 +14,7 @@ import (
 	live "helm.sh/helm/v3/pkg/release"
 )
 
+// ErrPlansAreTheSame is returned when trying to compare plan with itself.
 var ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
 // DiffPlan show diff between 2 plans.
@@ -87,10 +89,16 @@ func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k
 	}
 }
 
+// GetLiveOf returns instance of deployed helm release by name.
 func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
 	for _, rel := range p.body.Releases {
 		if rel.Uniq() == name {
-			return rel.Get()
+			r, err := rel.Get()
+			if err != nil {
+				return nil, fmt.Errorf("failed to get release %s: %w", rel.Uniq(), err)
+			}
+
+			return r, nil
 		}
 	}
 

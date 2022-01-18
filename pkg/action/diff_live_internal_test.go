@@ -23,8 +23,9 @@ func (ts *DiffLiveTestSuite) TestImplementsAction() {
 func (ts *DiffLiveTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "02_helmwave.yml"),
-		filepath.Join(tests.Root, "02_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -32,7 +33,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 		tags:     cli.StringSlice{},
 		yml:      y,
 		diff:     &Diff{},
-		diffMode: diffModeLive,
+		diffMode: DiffModeLive,
 	}
 
 	d := DiffLive{diff: s.diff, plandir: s.plandir}
@@ -42,7 +43,8 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	ts.Require().NoError(d.Run())
 }
 
+//nolint:paralleltest // uses helm repository.yaml flock
 func TestDiffLiveTestSuite(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	suite.Run(t, new(DiffLiveTestSuite))
 }

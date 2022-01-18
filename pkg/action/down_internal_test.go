@@ -24,8 +24,9 @@ func (ts *DownTestSuite) TestImplementsAction() {
 func (ts *DownTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		filepath.Join(tests.Root, "02_helmwave.yml"),
-		filepath.Join(tests.Root, "02_helmwave.yml"),
+		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -48,7 +49,8 @@ func (ts *DownTestSuite) TestRun() {
 	ts.Require().NoError(d.Run())
 }
 
+//nolint:paralleltest // uses helm repository.yaml flock
 func TestDownTestSuite(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	suite.Run(t, new(DownTestSuite))
 }
