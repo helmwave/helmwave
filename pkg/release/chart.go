@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -54,10 +55,16 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 }
 
 func (rel *config) ChartDepsUpd() error {
-	return chartDepsUpd(rel.Chart().Name, rel.Helm())
+	return rel.chartDepsUpd(rel.Chart().Name, rel.Helm())
 }
 
-func chartDepsUpd(name string, settings *helm.EnvSettings) error {
+func (rel *config) chartDepsUpd(name string, settings *helm.EnvSettings) error {
+	if !helper.IsExists(filepath.Clean(name)) {
+		rel.Logger().Info("skipping updating dependencies for remote chart")
+
+		return nil
+	}
+
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              io.Discard,
