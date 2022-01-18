@@ -1,6 +1,7 @@
 package helper_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -15,7 +16,7 @@ type KubedogTestSuite struct {
 
 func (s *KubedogTestSuite) TestKubeInit() {
 
-	s.T().Setenv("KUBECONFIG", tests.Root+"kubeconfig")
+	s.T().Setenv("KUBECONFIG", filepath.Join(tests.Root, "kubeconfig"))
 	err := helper.KubeInit()
 
 	s.Require().NoError(err)

@@ -9,8 +9,8 @@ import (
 
 func KubeInit() error {
 	opts := kube.InitOptions{}
-	kubeconfigPath, IsExist := os.LookupEnv("KUBECONFIG")
-	if IsExist {
+	kubeconfigPath, IsExists := os.LookupEnv("KUBECONFIG")
+	if IsExists {
 		opts.ConfigPath = kubeconfigPath
 	}
 
