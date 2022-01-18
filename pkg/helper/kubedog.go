@@ -7,6 +7,7 @@ import (
 	"github.com/werf/kubedog/pkg/kube"
 )
 
+// Init kubeconfig for kubedog
 func KubeInit() error {
 	opts := kube.InitOptions{}
 	kubeconfigPath, IsExists := os.LookupEnv("KUBECONFIG")
