@@ -15,7 +15,6 @@ type KubedogTestSuite struct {
 }
 
 func (s *KubedogTestSuite) TestKubeInit() {
-
 	s.T().Setenv("KUBECONFIG", filepath.Join(tests.Root, "kubeconfig"))
 	err := helper.KubeInit()
 
@@ -24,5 +23,6 @@ func (s *KubedogTestSuite) TestKubeInit() {
 }
 
 func TestKubedogTestSuite(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(KubedogTestSuite))
 }
