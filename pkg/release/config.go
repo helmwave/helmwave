@@ -130,7 +130,7 @@ func (rel *config) Uniq() uniqname.UniqName {
 		var err error
 		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace())
 		if err != nil {
-			rel.log.WithFields(log.Fields{
+			rel.Logger().WithFields(log.Fields{
 				"name":       rel.Name(),
 				"namespace":  rel.Namespace(),
 				log.ErrorKey: err,

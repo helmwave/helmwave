@@ -42,7 +42,7 @@ func recoverPanic() {
 			log.Error(r)
 			log.Exit(127)
 		default:
-			log.Fatal(r)
+			log.Panic(r)
 		}
 	}
 }
