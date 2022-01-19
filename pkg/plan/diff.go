@@ -101,11 +101,7 @@ func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 			continue
 		}
 
-		if parsed.Metadata.Annotations == nil {
-			continue
-		}
-
-		for anno := range SkippedAnnotations {
+		for anno := range parsed.Metadata.Annotations {
 			if SkippedAnnotations[anno] == parsed.Metadata.Annotations[anno] {
 				log.WithFields(log.Fields{
 					"resource":   manifests[k].Name,
