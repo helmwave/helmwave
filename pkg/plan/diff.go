@@ -11,11 +11,20 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	live "helm.sh/helm/v3/pkg/release"
 )
 
-// ErrPlansAreTheSame is returned when trying to compare plan with itself.
-var ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
+var (
+	// ErrPlansAreTheSame is returned when trying to compare plan with itself.
+	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
+
+	// SkippedAnnotations is a map with all annotations to be skipped by differ.
+	SkippedAnnotations = map[string]string{
+		live.HookAnnotation:      string(live.HookTest),
+		"helmwave.dev/skip-diff": "true",
+	}
+)
 
 // DiffPlan show diff between 2 plans.
 func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
@@ -28,8 +37,8 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 		}
 		visited[rel.Uniq()] = true
 
-		oldSpecs := manifest.Parse(b.manifests[rel.Uniq()], rel.Namespace())
-		newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace())
+		oldSpecs := parseManifests(b.manifests[rel.Uniq()], rel.Namespace())
+		newSpecs := parseManifests(p.manifests[rel.Uniq()], rel.Namespace())
 
 		change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, log.StandardLogger().Out)
 		if !change {
@@ -60,8 +69,8 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 		if active, ok := alive[rel.Uniq()]; ok {
 			// I dont use manifest.ParseRelease
 			// Because Structs are different.
-			oldSpecs := manifest.Parse(active.Manifest, rel.Namespace())
-			newSpecs := manifest.Parse(p.manifests[rel.Uniq()], rel.Namespace())
+			oldSpecs := parseManifests(active.Manifest, rel.Namespace())
+			newSpecs := parseManifests(p.manifests[rel.Uniq()], rel.Namespace())
 
 			change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, log.StandardLogger().Out)
 			if !change {
@@ -72,6 +81,44 @@ func (p *Plan) DiffLive(showSecret bool, diffWide int) {
 	}
 
 	showChangesReport(p.body.Releases, visited, k)
+}
+
+func parseManifests(m, ns string) map[string]*manifest.MappingResult {
+	manifests := manifest.Parse(m, ns)
+
+	type annotationManifest struct {
+		Metadata struct {
+			Annotations map[string]string
+		}
+	}
+
+	for k := range manifests {
+		parsed := annotationManifest{}
+
+		if err := yaml.Unmarshal([]byte(manifests[k].Content), &parsed); err != nil {
+			log.WithError(err).WithField("content", manifests[k].Content).Debug("failed to decode manifest")
+
+			continue
+		}
+
+		if parsed.Metadata.Annotations == nil {
+			continue
+		}
+
+		for anno := range SkippedAnnotations {
+			if SkippedAnnotations[anno] == parsed.Metadata.Annotations[anno] {
+				log.WithFields(log.Fields{
+					"resource":   manifests[k].Name,
+					"annotation": anno,
+				}).Debug("resource diff is skipped due to annotation")
+				delete(manifests, k)
+
+				continue
+			}
+		}
+	}
+
+	return manifests
 }
 
 // showChangesReport help function for reporting helm-diff.
