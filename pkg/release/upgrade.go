@@ -28,21 +28,11 @@ func (rel *config) upgrade() (*release.Release, error) {
 		return nil, fmt.Errorf("failed to merge values for release %q: %w", rel.Uniq(), err)
 	}
 
-	// Template
-	if rel.dryRun {
-		rel.Logger().Debug("📄 template manifest")
-
-		r, err := rel.newInstall().Run(ch, vals)
-		if err != nil {
-			return nil, fmt.Errorf("failed to dry-run install %q: %w", rel.Uniq(), err)
-		}
-
-		return r, nil
-	}
-
 	// Install
 	if !rel.isInstalled() {
-		rel.Logger().Debug("🧐 Release does not exist. Installing it now.")
+		if !rel.dryRun {
+			rel.Logger().Debug("🧐 Release does not exist. Installing it now.")
+		}
 
 		r, err := rel.newInstall().Run(ch, vals)
 		if err != nil {
