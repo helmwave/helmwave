@@ -38,6 +38,8 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 	if err != nil || r == nil {
 		l.Errorf("❌ can't get manifests: %v", err)
 		wg.ErrChan() <- err
+
+		return
 	}
 
 	hm := ""
@@ -47,7 +49,7 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 
 	document := r.Manifest
 	if len(r.Hooks) > 0 {
-		document += "# ========= HOOKS ========\n" + hm
+		document += hm
 	}
 
 	l.Trace(document)
