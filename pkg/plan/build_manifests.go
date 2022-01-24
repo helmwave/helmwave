@@ -48,10 +48,6 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 	}
 
 	document := r.Manifest
-	if len(r.Hooks) > 0 {
-		document += "# ========= HOOKS ========\n" + hm
-	}
-
 	l.Trace(document)
 
 	mu.Lock()
