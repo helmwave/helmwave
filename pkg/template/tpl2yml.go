@@ -52,7 +52,7 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 		return err //nolint:wrapcheck // we control the interface
 	}
 
-	log.Trace(yml, " contents\n", d)
+	log.Trace(yml, " contents\n", string(d))
 
 	f, err := helper.CreateFile(yml)
 	if err != nil {
