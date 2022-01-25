@@ -7,6 +7,7 @@ import (
 
 	"github.com/databus23/helm-diff/diff"
 	"github.com/databus23/helm-diff/manifest"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -20,9 +21,9 @@ var (
 	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
 	// SkippedAnnotations is a map with all annotations to be skipped by differ.
-	SkippedAnnotations = map[string]string{
-		live.HookAnnotation:      string(live.HookTest),
-		"helmwave.dev/skip-diff": "true",
+	SkippedAnnotations = map[string][]string{
+		live.HookAnnotation:      {string(live.HookTest), "test-success", "test-failure"},
+		"helmwave.dev/skip-diff": {"true"},
 	}
 )
 
@@ -102,7 +103,7 @@ func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 		}
 
 		for anno := range parsed.Metadata.Annotations {
-			if SkippedAnnotations[anno] == parsed.Metadata.Annotations[anno] {
+			if helper.Contains(parsed.Metadata.Annotations[anno], SkippedAnnotations[anno]) {
 				log.WithFields(log.Fields{
 					"resource":   manifests[k].Name,
 					"annotation": anno,
