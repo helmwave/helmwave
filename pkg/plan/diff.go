@@ -22,8 +22,8 @@ var (
 
 	// SkippedAnnotations is a map with all annotations to be skipped by differ.
 	SkippedAnnotations = map[string][]string{
-		live.HookAnnotation:      {string(live.HookTest), "test-success", "test-failure"},
-		"helmwave.dev/skip-diff": {"true"},
+		live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
+		helper.RootAnnoName + "skip-diff": {"true"},
 	}
 )
 
