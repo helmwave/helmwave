@@ -68,7 +68,7 @@ dockers:
       - "diamon/helmwave:{{ .Version }}-scratch"
       - "diamon/helmwave:scratch"
     build_flag_templates:
-      - "--pull"
+      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
@@ -80,6 +80,7 @@ dockers:
 
       - "--platform=linux/amd64"
       - "--target=scratch-goreleaser"
+      - "--pull"
     goos: linux
     goarch: amd64
     use: buildx
@@ -91,7 +92,7 @@ dockers:
       - "diamon/helmwave:{{ .Version }}"
       - "diamon/helmwave:latest"
     build_flag_templates:
-      - "--pull"
+      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
@@ -103,6 +104,7 @@ dockers:
 
       - "--platform=linux/amd64"
       - "--target=goreleaser"
+      - "--pull"
     goos: linux
     goarch: amd64
     use: buildx
