@@ -8,18 +8,42 @@ jobs:
   telegram:
     runs-on: ubuntu-latest
     steps:
-    - name: Set GITHUB_TAG
-      id: vars
-      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Get tag
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
 
-    - name: Telegram
-      uses: appleboy/telegram-action@master
-      env:
-        GITHUB_TAG: ${{ steps.vars.outputs.tag }}
-      with:
-        to: ${{ secrets.CHAT }}
-        token: ${{ secrets.BOT_TOKEN }}
-        format: markdown
-        message: |
-          Helmwave *${{ env.GITHUB_TAG }}* is ready!
-          See more: https://github.com/helmwave/helmwave/releases/tag/${{ env.GITHUB_TAG }}
+      - name: Telegram
+        uses: appleboy/telegram-action@master
+        env:
+          GITHUB_TAG: ${{ steps.vars.outputs.tag }}
+        with:
+          to: ${{ secrets.CHAT }}
+          token: ${{ secrets.BOT_TOKEN }}
+          format: markdown
+          message: |
+            Helmwave *${{ env.GITHUB_TAG }}* is ready!
+            See more: https://github.com/helmwave/helmwave/releases/tag/${{ env.GITHUB_TAG }}
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tag
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+      - name: Trigger helmwave/docs workflow
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GH_DOCS_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "generate-new-version.yml",
+              ref: "main",
+              inputs: {
+                tag: process.env.GITHUB_TAG,
+              },
+            })
+        env:
+          GITHUB_TAG: ${{ steps.vars.outputs.tag }}

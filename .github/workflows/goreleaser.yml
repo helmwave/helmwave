@@ -7,7 +7,7 @@ on:
     types:
       - closed
   push:
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
   contents: write
@@ -27,11 +27,11 @@ jobs:
           github-token: ${{ github.token }}
           script: |
             const tag = context.payload.pull_request.head.ref.replace("release-", "v")
-            github.rest.git.createRef({
+            await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: "refs/tags/" + tag,
-              sha: context.payload.pull_request.merge_commit_sha
+              sha: context.payload.pull_request.merge_commit_sha,
             })
             return tag
           result-encoding: string
