@@ -1,6 +1,6 @@
 # Security Policy
 
-This document provides the details on the Helm security policy and details the processes surrounding security handling including a how to guide on reporting a security vulnerability for anything within the Helm organization.
+This document provides the details on the Helm security policy and details the processes surrounding security handling including a how to guide on reporting a security vulnerability for anything within the Helmwave organization.
 
 
 ## Reporting a Vulnerability
