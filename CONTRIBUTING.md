@@ -27,8 +27,9 @@ When don't affect any `*.go` files we use [githubFlow](https://docs.github.com/e
 
 `some branch --> main`
 
+### Documentation update
 
-
+After merging new release branch (minor or major) a new branch and PR in [helmwave/docs](https://github.com/helmwave/docs) will be created automatically. You will need to update documentation (if necessary) and merge this PR into main branch.
 
 ## How to build?
 
