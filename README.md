@@ -43,7 +43,7 @@ Documentation available at https://helmwave.github.io/docs
 ## Community, discussion, contribution, and support
 
 - <a href="https://t.me/helmwave" ><img src="https://img.shields.io/badge/telegram-chat-179cde.svg?logo=telegram" /></a>
-- [kanban](https://github.com/orgs/helmwave/projects/1)
+- [kanban](https://github.com/orgs/helmwave/projects/3)
 - [contribution guide](https://github.com/helmwave/helmwave/blob/main/CONTRIBUTING.md)
 - [security and vulnerabilities](https://github.com/helmwave/helmwave/blob/main/SECURITY.md)
 
