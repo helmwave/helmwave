@@ -34,7 +34,7 @@ jobs:
       - name: Trigger helmwave/docs workflow
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GH_DOCS_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
