@@ -2,6 +2,7 @@ package template
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -182,10 +183,10 @@ func RequiredEnv(name string) (string, error) {
 // Used as custom template function.
 func Required(warn string, val interface{}) (interface{}, error) {
 	if val == nil {
-		return nil, fmt.Errorf(warn)
+		return nil, errors.New(warn)
 	} else if _, ok := val.(string); ok {
 		if val == "" {
-			return nil, fmt.Errorf(warn)
+			return nil, errors.New(warn)
 		}
 	}
 

@@ -11,9 +11,8 @@ import (
 )
 
 func buildGraphMD(releases []release.Config) string {
-	md :=
-		"# Depends On\n\n" +
-			"```mermaid\ngraph RL\n"
+	md := "# Depends On\n\n" +
+		"```mermaid\ngraph RL\n"
 
 	for _, r := range releases {
 		for _, dep := range r.DependsOn() {

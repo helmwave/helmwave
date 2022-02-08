@@ -52,8 +52,8 @@ func (rel *config) DryRun(b bool) {
 
 // Chart is structure for chart download options.
 type Chart struct {
+	action.ChartPathOptions `yaml:",inline"` //nolint:tagliatelle
 	Name                    string
-	action.ChartPathOptions `yaml:",inline"`
 }
 
 func (rel *config) newInstall() *action.Install {
