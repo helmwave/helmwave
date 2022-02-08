@@ -18,8 +18,8 @@ We use [semver](https://semver.org/)
 
 **Example:**
 
-- my-feature --> release-0.15.0 --> main
-- my-fix --> release-0.15.1 --> main
+- my-feature --> release-0.17.0 --> main
+- my-fix --> release-0.17.1 --> main
 
 ### Non product update
 
@@ -33,7 +33,7 @@ After merging new release branch (minor or major) a new branch and PR in [helmwa
 
 ## How to build?
 
-https://helmwave.github.io/docs/0.16.x/install/#compile-from-source
+https://helmwave.github.io/docs/0.17.x/install/#compile-from-source
 
 ### Pre commit
 
