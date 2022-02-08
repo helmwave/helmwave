@@ -27,23 +27,23 @@ type config struct {
 	ValuesF                  []ValuesReference                                 `yaml:"values,omitempty"`
 	TagsF                    []string                                          `yaml:"tags,omitempty"`
 	Timeout                  time.Duration                                     `yaml:"timeout,omitempty"`
-	MaxHistory               int                                               `yaml:"maxhistory,omitempty"`
+	MaxHistory               int                                               `yaml:"max_history,omitempty"`
 	AllowFailure             bool                                              `yaml:"allow_failure,omitempty"`
 	Atomic                   bool                                              `yaml:"atomic,omitempty"`
-	CleanupOnFail            bool                                              `yaml:"cleanuponfail,omitempty"`
-	CreateNamespace          bool                                              `yaml:"createnamespace,omitempty"`
+	CleanupOnFail            bool                                              `yaml:"cleanup_on_fail,omitempty"`
+	CreateNamespace          bool                                              `yaml:"create_namespace,omitempty"`
 	Devel                    bool                                              `yaml:"devel,omitempty"`
-	DisableHooks             bool                                              `yaml:"disablehooks,omitempty"`
-	DisableOpenAPIValidation bool                                              `yaml:"disableopenapivalidation,omitempty"`
-	dryRun                   bool                                              `yaml:"dryrun,omitempty"`
+	DisableHooks             bool                                              `yaml:"disable_hooks,omitempty"`
+	DisableOpenAPIValidation bool                                              `yaml:"disable_open_api_validation,omitempty"`
+	dryRun                   bool                                              `yaml:"dry_run,omitempty"`
 	Force                    bool                                              `yaml:"force,omitempty"`
 	Recreate                 bool                                              `yaml:"recreate,omitempty"`
-	ResetValues              bool                                              `yaml:"resetvalues,omitempty"`
-	ReuseValues              bool                                              `yaml:"reusevalues,omitempty"`
-	SkipCRDs                 bool                                              `yaml:"skipcrds,omitempty"`
-	SubNotes                 bool                                              `yaml:"subnotes,omitempty"`
+	ResetValues              bool                                              `yaml:"reset_values,omitempty"`
+	ReuseValues              bool                                              `yaml:"reuse_values,omitempty"`
+	SkipCRDs                 bool                                              `yaml:"skip_crds,omitempty"`
+	SubNotes                 bool                                              `yaml:"sub_notes,omitempty"`
 	Wait                     bool                                              `yaml:"wait,omitempty"`
-	WaitForJobs              bool                                              `yaml:"waitforjobs,omitempty"`
+	WaitForJobs              bool                                              `yaml:"wait_for_jobs,omitempty"`
 }
 
 func (rel *config) DryRun(b bool) {
@@ -52,8 +52,8 @@ func (rel *config) DryRun(b bool) {
 
 // Chart is structure for chart download options.
 type Chart struct {
+	action.ChartPathOptions `yaml:",inline"` //nolint:tagliatelle
 	Name                    string
-	action.ChartPathOptions `yaml:",inline"`
 }
 
 func (rel *config) newInstall() *action.Install {

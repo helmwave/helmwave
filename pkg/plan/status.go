@@ -30,15 +30,24 @@ func status(all []release.Config, names []string) error {
 	}
 
 	for _, rel := range r {
+		l := log.WithField("release", rel.Uniq())
+
 		s, err := rel.Status()
 		if err != nil {
-			log.Errorf("Failed to get s of %s: %v", rel.Uniq(), err)
+			l.Errorf("Failed to get status: %v", err)
 
 			continue
 		}
 
-		labels, _ := json.Marshal(s.Labels)
-		values, _ := json.Marshal(s.Config)
+		labels, err := json.Marshal(s.Labels)
+		if err != nil {
+			l.Errorf("Failed to get labels: %v", err)
+		}
+
+		values, err := json.Marshal(s.Config)
+		if err != nil {
+			l.Errorf("Failed to get values: %v", err)
+		}
 
 		log.WithFields(log.Fields{
 			"name":          s.Name,

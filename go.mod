@@ -11,19 +11,20 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/logrus-emoji-formatter v1.0.1
 	github.com/lempiy/dgraph v0.0.0-20190713130529-88f0f7cdb48e
+	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.7.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/werf/kubedog v0.6.2
+	github.com/werf/kubedog v0.6.3
 	github.com/werf/logboek v0.5.4
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	helm.sh/helm/v3 v3.8.0
-	k8s.io/apimachinery v0.23.1
-	k8s.io/cli-runtime v0.23.1
-	k8s.io/client-go v0.23.1
+	k8s.io/apimachinery v0.23.3
+	k8s.io/cli-runtime v0.23.3
+	k8s.io/client-go v0.23.3
 	k8s.io/klog/v2 v2.30.0
 )
 
@@ -149,7 +150,6 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
-	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
@@ -216,18 +216,18 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e // indirect
-	k8s.io/api v0.23.1 // indirect
+	k8s.io/api v0.23.3 // indirect
 	k8s.io/apiextensions-apiserver v0.23.1 // indirect
 	k8s.io/apiserver v0.23.1 // indirect
 	k8s.io/component-base v0.23.1 // indirect
 	k8s.io/helm v2.17.0+incompatible // indirect
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
 	k8s.io/kubectl v0.23.1 // indirect
-	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
+	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	oras.land/oras-go v1.1.0 // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 	sigs.k8s.io/kustomize/api v0.10.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.13.0 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
