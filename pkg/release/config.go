@@ -52,8 +52,8 @@ func (rel *config) DryRun(b bool) {
 
 // Chart is structure for chart download options.
 type Chart struct {
-	Name                    string
 	action.ChartPathOptions `yaml:",inline"`
+	Name                    string
 }
 
 func (rel *config) newInstall() *action.Install {
