@@ -12,4 +12,4 @@ releases:
   chart:
     name: bitnami/nginx
   namespace: {{ requiredEnv "NAMESPACE" }}
-  createnamespace: true
+  create_namespace: true
