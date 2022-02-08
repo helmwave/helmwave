@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"github.com/mgutz/ansi"
 
 	"github.com/bombsimon/logrusr/v2"
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -101,6 +102,9 @@ func (l *Settings) setLevel() error {
 }
 
 func (l *Settings) setFormat() {
+	// Helm diff also use it
+	ansi.DisableColors(!l.color)
+
 	switch l.format {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{
