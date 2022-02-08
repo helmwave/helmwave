@@ -3,7 +3,7 @@ package log
 import (
 	"fmt"
 
-	"github.com/bombsimon/logrusr"
+	"github.com/bombsimon/logrusr/v2"
 	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
@@ -75,7 +75,7 @@ func (l *Settings) Init() error {
 	utilruntime.ErrorHandlers = []func(error){
 		logKubernetesClientError,
 	}
-	klog.SetLogger(logrusr.NewLogger(log.StandardLogger()))
+	klog.SetLogger(logrusr.New(log.StandardLogger()))
 
 	if l.width > 0 {
 		logboek.DefaultLogger().Streams().SetWidth(l.width)
