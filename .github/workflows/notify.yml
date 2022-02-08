@@ -2,7 +2,10 @@ name: Notify
 
 on:
   release:
-    types: [published]
+    types:
+      - released
+#     - published
+#     - created
 
 jobs:
   telegram:
@@ -38,7 +41,7 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo: "docs",
               workflow_id: "generate-new-version.yml",
               ref: "main",
               inputs: {
