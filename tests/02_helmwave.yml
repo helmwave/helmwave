@@ -10,4 +10,4 @@ releases:
   chart:
     name: bitnami/nginx
   namespace: test
-  createnamespace: true
+  create_namespace: true
