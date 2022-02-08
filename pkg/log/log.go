@@ -2,11 +2,11 @@ package log
 
 import (
 	"fmt"
-	"github.com/mgutz/ansi"
 
 	"github.com/bombsimon/logrusr/v2"
 	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
+	"github.com/mgutz/ansi"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/werf/logboek"
