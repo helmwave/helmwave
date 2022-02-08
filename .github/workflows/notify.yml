@@ -3,9 +3,10 @@ name: Notify
 on:
   release:
     types: 
-    - published
-    - released
-    - created 
+      - released
+#     - published
+#     - created 
+
 
 jobs:
   telegram:
