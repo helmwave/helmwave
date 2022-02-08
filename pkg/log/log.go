@@ -121,7 +121,12 @@ func (l *Settings) setFormat() {
 		cfg := &formatter.Config{
 			Color: l.color,
 		}
-		if l.timestamps {
+
+		if !l.color && l.timestamps {
+			cfg.LogFormat = "[%time%] [%lvl%]: %msg%"
+		} else if !l.color {
+			cfg.LogFormat = "[%lvl%]: %msg%"
+		} else if l.timestamps {
 			cfg.LogFormat = "[%time%] [%emoji% aka %lvl%]: %msg%"
 		}
 
