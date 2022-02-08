@@ -26,7 +26,6 @@ linters:
 
 # all available settings of specific linters
 linters-settings:
-
   cyclop:
     # the maximal code complexity to report
     max-complexity: 13
@@ -79,8 +78,8 @@ linters-settings:
     # The matching patterns can use matching syntax from https://pkg.go.dev/path#Match
     # If this list is empty, all structs are tested.
     struct-patterns:
-      - '*.Test'
-      - 'example.com/package.ExampleStruct'
+      - "*.Test"
+      - "example.com/package.ExampleStruct"
 
   forbidigo:
     # Forbid the following identifiers (identifiers are written using regexp):
@@ -147,7 +146,7 @@ linters-settings:
         skipTestFuncs: true
       ruleguard:
         # path to a gorules file for the ruleguard checker
-        rules: ''
+        rules: ""
       truncateCmp:
         # whether to skip int/uint/uintptr types (default true)
         skipArchDependent: true
@@ -206,7 +205,7 @@ linters-settings:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17"
     # https://staticcheck.io/docs/options#checks
-    checks: [ "all" ]
+    checks: ["all"]
 
   govet:
     # report about shadowed variables
@@ -228,7 +227,7 @@ linters-settings:
   lll:
     # max line length, lines longer will be reported. Default is 120.
     # '\t' is counted as 1 character by default, and can be changed with the tab-width option
-    line-length: 120
+    line-length: 125
     # tab width in spaces. Default to 1.
     tab-width: 1
 
@@ -293,20 +292,69 @@ linters-settings:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17"
     # https://staticcheck.io/docs/options#checks
-    checks: [ "all" ]
+    checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17"
     # https://staticcheck.io/docs/options#checks
-    checks: [ "all", "-ST1000", "-ST1003", "-ST1016", "-ST1017", "-ST1020", "-ST1021", "-ST1022" ]
+    checks:
+      [
+        "all",
+        "-ST1000",
+        "-ST1003",
+        "-ST1016",
+        "-ST1017",
+        "-ST1020",
+        "-ST1021",
+        "-ST1022",
+      ]
     # https://staticcheck.io/docs/options#dot_import_whitelist
     dot-import-whitelist:
       - fmt
     # https://staticcheck.io/docs/options#initialisms
-    initialisms: [ "ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS" ]
+    initialisms:
+      [
+        "ACL",
+        "API",
+        "ASCII",
+        "CPU",
+        "CSS",
+        "DNS",
+        "EOF",
+        "GUID",
+        "HTML",
+        "HTTP",
+        "HTTPS",
+        "ID",
+        "IP",
+        "JSON",
+        "QPS",
+        "RAM",
+        "RPC",
+        "SLA",
+        "SMTP",
+        "SQL",
+        "SSH",
+        "TCP",
+        "TLS",
+        "TTL",
+        "UDP",
+        "UI",
+        "GID",
+        "UID",
+        "UUID",
+        "URI",
+        "URL",
+        "UTF8",
+        "VM",
+        "XML",
+        "XMPP",
+        "XSRF",
+        "XSS",
+      ]
     # https://staticcheck.io/docs/options#http_status_code_whitelist
-    http-status-code-whitelist: [ "200", "400", "404", "500" ]
+    http-status-code-whitelist: ["200", "400", "404", "500"]
 
   tagliatelle:
     # check the struck tag name case
@@ -349,7 +397,7 @@ linters-settings:
     go: "1.17"
 
   whitespace:
-    multi-if: false   # Enforces newlines (or comments) after every multi-line if statement
+    multi-if: false # Enforces newlines (or comments) after every multi-line if statement
     multi-func: false # Enforces newlines (or comments) after every multi-line function signature
 
   wrapcheck:
@@ -394,6 +442,7 @@ issues:
         - dupl
         - goconst
         - wrapcheck
+        - forcetypeassert
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
@@ -437,5 +486,5 @@ severity:
   # Only affects out formats that support setting severity information.
   rules:
     - linters:
-      - godox
+        - godox
       severity: notice

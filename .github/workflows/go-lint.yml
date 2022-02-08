@@ -3,10 +3,9 @@ name: Go lint
 on:
   push:
     paths:
-      - '**.go'
+      - "**.go"
       - .github/workflows/go-lint.yml
       - .golangci.yml
-
 
 jobs:
   lint:
@@ -21,5 +20,4 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.43.0
-
+          version: v1.44.0

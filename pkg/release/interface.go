@@ -25,7 +25,6 @@ type Config interface {
 	List() (*release.Release, error)
 	Rollback() error
 	Status() (*release.Release, error)
-
 	Name() string
 	Namespace() string
 	Chart() Chart
@@ -33,7 +32,6 @@ type Config interface {
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
-
 	Logger() *log.Entry
 }
 
