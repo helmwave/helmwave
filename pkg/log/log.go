@@ -122,7 +122,7 @@ func (l *Settings) setFormat() {
 			Color: l.color,
 		}
 
-		if !l.color && l.timestamps {
+		if !l.color && l.timestamps { // nolint:gocritic
 			cfg.LogFormat = "[%time%] [%lvl%]: %msg%"
 		} else if !l.color {
 			cfg.LogFormat = "[%lvl%]: %msg%"
