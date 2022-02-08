@@ -205,7 +205,8 @@ linters-settings:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17"
     # https://staticcheck.io/docs/options#checks
-    checks: ["all"]
+    checks:
+      - all
 
   govet:
     # report about shadowed variables
@@ -260,7 +261,7 @@ linters-settings:
     # Enable strict mode will also include the errors caused by failing to parse the args.
     strict: false
     # Please refer to https://github.com/yeya24/promlinter#usage for detailed usage.
-    disabled-linters:
+    disabled-linters: []
     #  - "Help"
     #  - "MetricUnits"
     #  - "Counter"
@@ -279,12 +280,6 @@ linters-settings:
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: false
-    # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    allow-leading-space: true
-    # Exclude following linters from requiring an explanation.  Default is [].
-    allow-no-explanation: []
-    # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
-    require-explanation: false
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
     require-specific: true
 
@@ -292,69 +287,70 @@ linters-settings:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17"
     # https://staticcheck.io/docs/options#checks
-    checks: ["all"]
+    checks:
+      - all
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17"
     # https://staticcheck.io/docs/options#checks
     checks:
-      [
-        "all",
-        "-ST1000",
-        "-ST1003",
-        "-ST1016",
-        "-ST1017",
-        "-ST1020",
-        "-ST1021",
-        "-ST1022",
-      ]
+      - all
+      - -ST1000
+      - -ST1003
+      - -ST1016
+      - -ST1017
+      - -ST1020
+      - -ST1021
+      - -ST1022
     # https://staticcheck.io/docs/options#dot_import_whitelist
     dot-import-whitelist:
       - fmt
     # https://staticcheck.io/docs/options#initialisms
     initialisms:
-      [
-        "ACL",
-        "API",
-        "ASCII",
-        "CPU",
-        "CSS",
-        "DNS",
-        "EOF",
-        "GUID",
-        "HTML",
-        "HTTP",
-        "HTTPS",
-        "ID",
-        "IP",
-        "JSON",
-        "QPS",
-        "RAM",
-        "RPC",
-        "SLA",
-        "SMTP",
-        "SQL",
-        "SSH",
-        "TCP",
-        "TLS",
-        "TTL",
-        "UDP",
-        "UI",
-        "GID",
-        "UID",
-        "UUID",
-        "URI",
-        "URL",
-        "UTF8",
-        "VM",
-        "XML",
-        "XMPP",
-        "XSRF",
-        "XSS",
-      ]
+      - ACL
+      - API
+      - ASCII
+      - CPU
+      - CSS
+      - DNS
+      - EOF
+      - GUID
+      - HTML
+      - HTTP
+      - HTTPS
+      - ID
+      - IP
+      - JSON
+      - QPS
+      - RAM
+      - RPC
+      - SLA
+      - SMTP
+      - SQL
+      - SSH
+      - TCP
+      - TLS
+      - TTL
+      - UDP
+      - UI
+      - GID
+      - UID
+      - UUID
+      - URI
+      - URL
+      - UTF8
+      - VM
+      - XML
+      - XMPP
+      - XSRF
+      - XSS
     # https://staticcheck.io/docs/options#http_status_code_whitelist
-    http-status-code-whitelist: ["200", "400", "404", "500"]
+    http-status-code-whitelist:
+      - "200"
+      - "400"
+      - "404"
+      - "500"
 
   tagliatelle:
     # check the struck tag name case
