@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Create tag
         id: tag
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         if: github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release-')
         with:
           github-token: ${{ github.token }}
