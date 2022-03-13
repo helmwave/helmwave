@@ -48,6 +48,9 @@ changelog:
     - title: "Documentation"
       regexp: "^.*(documentation|docs?).*$"
       order: 2
+    - title: "Bump"
+      regexp: "^.*[bB]ump?.*$"
+      order: 3
     - title: "Other"
       order: 999
 
