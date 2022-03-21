@@ -24,9 +24,7 @@ func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []r
 		l := log.WithField("repository", rep)
 		l.WithField("releases", rm).Debug("🗄 found releases that depend on repository")
 
-		if repoIsLocal(rep) {
-			l.Info("🗄 it is local repo")
-		} else if index, found := repo.IndexOfName(in, rep); found {
+		if index, found := repo.IndexOfName(in, rep); found {
 			out = append(out, in[index])
 			l.Info("🗄 repo has been added to the plan")
 		} else {
@@ -67,8 +65,6 @@ func buildRepoMapTop(releases []release.Config) map[string][]release.Config {
 		// Added to map if is not OCI
 		if !registry.IsOCI(rel.Chart().Name) {
 			m[rel.Repo()] = append(m[rel.Repo()], rel)
-		} else {
-			rel.Logger().Debugln("OCI")
 		}
 	}
 

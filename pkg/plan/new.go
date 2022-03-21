@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/registry"
 	"os"
 	"path/filepath"
 
@@ -32,7 +33,7 @@ const (
 )
 
 var (
-	// ErrManifestDirNotFound is an error for nonexisting manifest dir.
+	// ErrManifestDirNotFound is an error for nonexistent manifest dir.
 	ErrManifestDirNotFound = errors.New(Manifest + " dir not found")
 
 	// ErrManifestDirEmpty is an error for empty manifest dir.
@@ -52,6 +53,19 @@ type Plan struct {
 	graphMD string
 
 	templater string
+}
+
+type registryConfigs []registry.Config
+
+func (r *registryConfigs) UnmarshalYAML(node *yaml.Node) error {
+	if r == nil {
+		r = new(registryConfigs)
+	}
+	var err error
+
+	*r, err = registry.UnmarshalYAML(node)
+
+	return err
 }
 
 type repoConfigs []repo.Config
@@ -84,6 +98,7 @@ type planBody struct {
 	Project      string
 	Version      string
 	Repositories repoConfigs
+	Registries   registryConfigs
 	Releases     releaseConfigs
 }
 
@@ -142,8 +157,14 @@ func (p *Plan) PrettyPlan() {
 		b = append(b, r.Name())
 	}
 
+	c := make([]string, 0, len(p.body.Registries))
+	for _, r := range p.body.Registries {
+		c = append(b, r.Host())
+	}
+
 	log.WithFields(log.Fields{
 		"releases":     a,
 		"repositories": b,
+		"registries":   c,
 	}).Info("🏗 Plan")
 }

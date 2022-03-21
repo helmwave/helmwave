@@ -2,23 +2,20 @@ package repo
 
 import (
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/registry"
-
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
 )
 
+//func (rep *config) Install(settings *helm.EnvSettings, f *repo.File) error {
+//	if rep.OCI {
+//		return rep.installOCI()
+//	}
+//
+//	return rep.install(settings, f)
+//}
+
 func (rep *config) Install(settings *helm.EnvSettings, f *repo.File) error {
-	if rep.OCI {
-		return rep.installOCI()
-	}
-
-	return rep.install(settings, f)
-}
-
-func (rep *config) install(settings *helm.EnvSettings, f *repo.File) error {
 	if !rep.Force && f.Has(rep.Name()) {
 		existing := f.Get(rep.Name())
 		if rep.Entry != *existing {
@@ -52,9 +49,9 @@ func (rep *config) install(settings *helm.EnvSettings, f *repo.File) error {
 	return nil
 }
 
-func (rep *config) installOCI() error {
-	return helper.HelmRegistryClient.Login(
-		rep.Name(),
-		registry.LoginOptBasicAuth(rep.Username, rep.Password),
-		registry.LoginOptInsecure(rep.InsecureSkipTLSverify))
-}
+//func (rep *config) installOCI() error {
+//	return helper.HelmRegistryClient.Login(
+//		rep.Name(),
+//		registry.LoginOptBasicAuth(rep.Username, rep.Password),
+//		registry.LoginOptInsecure(rep.InsecureSkipTLSverify))
+//}
