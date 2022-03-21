@@ -2,13 +2,13 @@ package helper
 
 import (
 	"fmt"
-	"helm.sh/helm/v3/pkg/registry"
 	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/registry"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -18,9 +18,10 @@ var Helm = helm.New()
 // Default logLevel for helm logs.
 var helmLogLevel = log.Debugf
 
+// HelmRegistryClient  is an instance of helm registry client.
 var HelmRegistryClient *registry.Client
 
-func init() {
+func init() { //nolint:gochecknoinits
 	var err error
 	HelmRegistryClient, err = registry.NewClient(
 		registry.ClientOptDebug(Helm.Debug),

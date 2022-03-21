@@ -2,12 +2,12 @@ package plan
 
 import (
 	"errors"
-	"helm.sh/helm/v3/pkg/registry"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
+	"helm.sh/helm/v3/pkg/registry"
 )
 
 func (p *Plan) buildRepositories() (out []repo.Config, err error) {
@@ -24,7 +24,9 @@ func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []r
 		l := log.WithField("repository", rep)
 		l.WithField("releases", rm).Debug("🗄 found releases that depend on repository")
 
-		if index, found := repo.IndexOfName(in, rep); found {
+		if repoIsLocal(rep) {
+			l.Info("🗄 it is local repo")
+		} else if index, found := repo.IndexOfName(in, rep); found {
 			out = append(out, in[index])
 			l.Info("🗄 repo has been added to the plan")
 		} else {

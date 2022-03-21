@@ -1,8 +1,9 @@
 package release
 
 import (
-	"helm.sh/helm/v3/pkg/registry"
 	"strings"
+
+	"helm.sh/helm/v3/pkg/registry"
 )
 
 // // RepoDeps returns repository for release

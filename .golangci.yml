@@ -90,7 +90,7 @@ linters-settings:
     exclude_godoc_examples: false
 
   funlen:
-    lines: 60
+    lines: 62
     statements: 40
 
   gocognit:

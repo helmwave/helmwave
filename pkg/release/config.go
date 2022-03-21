@@ -52,7 +52,7 @@ func (rel *config) DryRun(b bool) {
 
 // Chart is structure for chart download options.
 type Chart struct {
-	action.ChartPathOptions `yaml:",inline"` //nolint:tagliatelle
+	action.ChartPathOptions `yaml:",inline"` //nolint:nolintlint
 	Name                    string
 }
 
@@ -69,7 +69,7 @@ func (rel *config) newInstall() *action.Install {
 	client.Namespace = rel.Namespace()
 
 	// I hate private field without normal New(...Options)
-	//client.ChartPathOptions = rel.Chart().ChartPathOptions
+	// client.ChartPathOptions = rel.Chart().ChartPathOptions
 	client.ChartPathOptions.CaFile = rel.Chart().ChartPathOptions.CaFile
 	client.ChartPathOptions.CertFile = rel.Chart().ChartPathOptions.CertFile
 	client.ChartPathOptions.KeyFile = rel.Chart().ChartPathOptions.KeyFile
@@ -115,7 +115,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.Namespace = rel.Namespace()
 
 	// I hate private field without normal New(...Options)
-	//client.ChartPathOptions = rel.Chart().ChartPathOptions
+	// client.ChartPathOptions = rel.Chart().ChartPathOptions
 
 	client.ChartPathOptions.CaFile = rel.Chart().ChartPathOptions.CaFile
 	client.ChartPathOptions.CertFile = rel.Chart().ChartPathOptions.CertFile

@@ -6,7 +6,7 @@ import (
 )
 
 func (reg *config) Install() error {
-	return helper.HelmRegistryClient.Login(
+	return helper.HelmRegistryClient.Login( //nolint:wrapcheck
 		reg.Host(),
 		registry.LoginOptBasicAuth(reg.Username, reg.Password),
 		registry.LoginOptInsecure(reg.Insecure),

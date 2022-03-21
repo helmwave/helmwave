@@ -3,10 +3,10 @@ package plan
 import (
 	"errors"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/registry"
 	"os"
 	"path/filepath"
 
+	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -159,7 +159,7 @@ func (p *Plan) PrettyPlan() {
 
 	c := make([]string, 0, len(p.body.Registries))
 	for _, r := range p.body.Registries {
-		c = append(b, r.Host())
+		c = append(c, r.Host())
 	}
 
 	log.WithFields(log.Fields{
