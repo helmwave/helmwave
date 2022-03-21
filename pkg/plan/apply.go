@@ -256,7 +256,8 @@ func runMultiracks(
 	ctx context.Context,
 	mapSpecs map[string]*multitrack.MultitrackSpecs,
 	kubedogConfig *kubedog.Config,
-	wg *parallel.WaitGroup) error {
+	wg *parallel.WaitGroup,
+) error {
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogConfig.StatusInterval,
 		Options: tracker.Options{
