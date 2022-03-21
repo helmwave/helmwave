@@ -67,7 +67,21 @@ func (rel *config) newInstall() *action.Install {
 	client.DryRun = rel.dryRun
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
-	client.ChartPathOptions = rel.Chart().ChartPathOptions
+
+	// I hate private field without normal New(...Options)
+	//client.ChartPathOptions = rel.Chart().ChartPathOptions
+	client.ChartPathOptions.CaFile = rel.Chart().ChartPathOptions.CaFile
+	client.ChartPathOptions.CertFile = rel.Chart().ChartPathOptions.CertFile
+	client.ChartPathOptions.KeyFile = rel.Chart().ChartPathOptions.KeyFile
+	client.ChartPathOptions.InsecureSkipTLSverify = rel.Chart().ChartPathOptions.InsecureSkipTLSverify
+	client.ChartPathOptions.Keyring = rel.Chart().ChartPathOptions.Keyring
+	client.ChartPathOptions.Password = rel.Chart().ChartPathOptions.Password
+	client.ChartPathOptions.PassCredentialsAll = rel.Chart().ChartPathOptions.PassCredentialsAll
+	client.ChartPathOptions.RepoURL = rel.Chart().ChartPathOptions.RepoURL
+	client.ChartPathOptions.Username = rel.Chart().ChartPathOptions.Username
+	client.ChartPathOptions.Verify = rel.Chart().ChartPathOptions.Verify
+	client.ChartPathOptions.Version = rel.Chart().ChartPathOptions.Version
+
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
@@ -99,7 +113,22 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.DryRun = rel.dryRun
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
-	client.ChartPathOptions = rel.Chart().ChartPathOptions
+
+	// I hate private field without normal New(...Options)
+	//client.ChartPathOptions = rel.Chart().ChartPathOptions
+
+	client.ChartPathOptions.CaFile = rel.Chart().ChartPathOptions.CaFile
+	client.ChartPathOptions.CertFile = rel.Chart().ChartPathOptions.CertFile
+	client.ChartPathOptions.KeyFile = rel.Chart().ChartPathOptions.KeyFile
+	client.ChartPathOptions.InsecureSkipTLSverify = rel.Chart().ChartPathOptions.InsecureSkipTLSverify
+	client.ChartPathOptions.Keyring = rel.Chart().ChartPathOptions.Keyring
+	client.ChartPathOptions.Password = rel.Chart().ChartPathOptions.Password
+	client.ChartPathOptions.PassCredentialsAll = rel.Chart().ChartPathOptions.PassCredentialsAll
+	client.ChartPathOptions.RepoURL = rel.Chart().ChartPathOptions.RepoURL
+	client.ChartPathOptions.Username = rel.Chart().ChartPathOptions.Username
+	client.ChartPathOptions.Verify = rel.Chart().ChartPathOptions.Verify
+	client.ChartPathOptions.Version = rel.Chart().ChartPathOptions.Version
+
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout

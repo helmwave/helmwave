@@ -67,6 +67,8 @@ func buildRepoMapTop(releases []release.Config) map[string][]release.Config {
 		// Added to map if is not OCI
 		if !registry.IsOCI(rel.Chart().Name) {
 			m[rel.Repo()] = append(m[rel.Repo()], rel)
+		} else {
+			rel.Logger().Debugln("OCI")
 		}
 	}
 

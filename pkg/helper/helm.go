@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"helm.sh/helm/v3/pkg/registry"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -30,6 +31,17 @@ func NewCfg(ns string) (*action.Configuration, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create helm configuration for %s namespace: %w", ns, err)
 	}
+
+	registryClient, err := registry.NewClient(
+		registry.ClientOptDebug(Helm.Debug),
+		registry.ClientOptWriter(os.Stdout),
+		registry.ClientOptCredentialsFile(Helm.RegistryConfig),
+	)
+	if err != nil {
+		return cfg, err
+	}
+
+	cfg.RegistryClient = registryClient
 
 	return cfg, nil
 }
