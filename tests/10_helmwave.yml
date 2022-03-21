@@ -4,7 +4,8 @@ project: Test02
 releases:
 - name: my
   chart:
-    name: oci://localhost:5555/my-chart:0.1.0
+    name: oci://localhost:5555/my-chart
+    version: 0.1.0
 
   namespace: test
   create_namespace: true
