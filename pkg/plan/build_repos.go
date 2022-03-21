@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"helm.sh/helm/v3/pkg/registry"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -63,7 +64,10 @@ func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []r
 func buildRepoMapTop(releases []release.Config) map[string][]release.Config {
 	m := make(map[string][]release.Config)
 	for _, rel := range releases {
-		m[rel.Repo()] = append(m[rel.Repo()], rel)
+		// Added to map if is not OCI
+		if !registry.IsOCI(rel.Chart().Name) {
+			m[rel.Repo()] = append(m[rel.Repo()], rel)
+		}
 	}
 
 	return m
