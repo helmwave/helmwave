@@ -18,6 +18,20 @@ var Helm = helm.New()
 // Default logLevel for helm logs.
 var helmLogLevel = log.Debugf
 
+var HelmRegistryClient *registry.Client
+
+func init() {
+	var err error
+	HelmRegistryClient, err = registry.NewClient(
+		registry.ClientOptDebug(Helm.Debug),
+		registry.ClientOptWriter(log.StandardLogger().Writer()),
+		registry.ClientOptCredentialsFile(Helm.RegistryConfig),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 // NewCfg creates helm internal configuration for provided namespace.
 func NewCfg(ns string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
@@ -32,16 +46,7 @@ func NewCfg(ns string) (*action.Configuration, error) {
 		return nil, fmt.Errorf("failed to create helm configuration for %s namespace: %w", ns, err)
 	}
 
-	registryClient, err := registry.NewClient(
-		registry.ClientOptDebug(Helm.Debug),
-		registry.ClientOptWriter(os.Stdout),
-		registry.ClientOptCredentialsFile(Helm.RegistryConfig),
-	)
-	if err != nil {
-		return cfg, err
-	}
-
-	cfg.RegistryClient = registryClient
+	cfg.RegistryClient = HelmRegistryClient
 
 	return cfg, nil
 }

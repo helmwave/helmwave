@@ -11,6 +11,7 @@ type config struct {
 	log        *log.Entry       `yaml:"-"`
 	repo.Entry `yaml:",inline"` //nolint:tagliatelle
 	Force      bool             `yaml:"force"`
+	OCI        bool             `yaml:"oci"`
 }
 
 func (c *config) Name() string {
