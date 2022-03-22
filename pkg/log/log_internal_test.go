@@ -130,8 +130,10 @@ func (s *LogTestSuite) TestFormatter() {
 				format: "emoji",
 				level:  "info",
 			},
-			formatter: &formatter.Config{},
-			msg:       "should use emoji formatter",
+			formatter: &formatter.Config{
+				LogFormat: "[%lvl%]: %msg%",
+			},
+			msg: "should use emoji formatter",
 		},
 		{
 			s: &Settings{
