@@ -2,11 +2,10 @@ package release
 
 import (
 	"fmt"
-	"io"
-	"os"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -67,7 +66,7 @@ func (rel *config) ChartDepsUpd() error {
 func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
-		Out:              io.Discard,
+		Out:              log.StandardLogger().Writer(),
 		ChartPath:        filepath.Clean(name),
 		Keyring:          client.Keyring,
 		SkipUpdate:       client.SkipRefresh,
@@ -78,10 +77,6 @@ func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	}
 	if client.Verify {
 		man.Verify = downloader.VerifyAlways
-	}
-
-	if settings.Debug {
-		man.Out = os.Stdout
 	}
 
 	if err := man.Update(); err != nil {

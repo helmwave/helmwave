@@ -158,7 +158,7 @@ func (r *MockRepoConfig) Logger() *log.Entry {
 	return r.Called().Get(0).(*log.Entry)
 }
 
-func (p *Plan) NewBody() *planBody {
+func (p *Plan) NewBody() *planBody { //nolint:revive
 	p.body = &planBody{}
 
 	return p.body

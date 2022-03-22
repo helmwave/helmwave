@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/pflag"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/registry"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -16,6 +17,21 @@ var Helm = helm.New()
 
 // Default logLevel for helm logs.
 var helmLogLevel = log.Debugf
+
+// HelmRegistryClient  is an instance of helm registry client.
+var HelmRegistryClient *registry.Client
+
+func init() { //nolint:gochecknoinits
+	var err error
+	HelmRegistryClient, err = registry.NewClient(
+		registry.ClientOptDebug(Helm.Debug),
+		registry.ClientOptWriter(log.StandardLogger().Writer()),
+		registry.ClientOptCredentialsFile(Helm.RegistryConfig),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // NewCfg creates helm internal configuration for provided namespace.
 func NewCfg(ns string) (*action.Configuration, error) {
@@ -30,6 +46,8 @@ func NewCfg(ns string) (*action.Configuration, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create helm configuration for %s namespace: %w", ns, err)
 	}
+
+	cfg.RegistryClient = HelmRegistryClient
 
 	return cfg, nil
 }

@@ -41,8 +41,21 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool, templater string)
 		return err
 	}
 
-	// Sync All
+	// Sync Repositories
 	err = SyncRepositories(p.body.Repositories)
+	if err != nil {
+		return err
+	}
+
+	// Build Registries
+	log.Info("Building registries...")
+	_, err = p.buildRegistries()
+	if err != nil {
+		return err
+	}
+
+	// Sync Registries
+	err = p.syncRegistries()
 	if err != nil {
 		return err
 	}

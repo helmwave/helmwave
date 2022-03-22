@@ -9,8 +9,9 @@ import (
 
 type config struct {
 	log        *log.Entry       `yaml:"-"`
-	repo.Entry `yaml:",inline"` //nolint:tagliatelle
+	repo.Entry `yaml:",inline"` //nolint:nolintlint
 	Force      bool             `yaml:"force"`
+	// OCI        bool             `yaml:"oci"`
 }
 
 func (c *config) Name() string {

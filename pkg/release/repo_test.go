@@ -11,6 +11,17 @@ type RepoTestSuite struct {
 	suite.Suite
 }
 
+func (s *RepoTestSuite) TestRepoOCI() {
+	const host = "ghcr.io"
+	r := release.NewConfig()
+	r.ChartF = release.Chart{
+		Name: "oci://" + host + "/helmwave/unit-test-oci",
+	}
+	r.ChartF.Version = "0.1.0"
+
+	s.Require().Equal(host, r.Repo())
+}
+
 func (s *RepoTestSuite) TestRepoWithSlash() {
 	const bitnami = "bitnami"
 	r := release.NewConfig()

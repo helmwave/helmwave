@@ -12,6 +12,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
+	regi "github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
@@ -29,6 +30,12 @@ var ErrDeploy = errors.New("deploy failed")
 func (p *Plan) Apply() (err error) {
 	log.Info("🗄 Sync repositories...")
 	err = SyncRepositories(p.body.Repositories)
+	if err != nil {
+		return err
+	}
+
+	log.Info("🗄 Sync registries...")
+	err = p.syncRegistries()
 	if err != nil {
 		return err
 	}
@@ -57,6 +64,27 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 	log.Info("🛥 Sync releases...")
 
 	return p.syncReleasesKubedog(kubedogConfig)
+}
+
+func (p *Plan) syncRegistries() (err error) {
+	wg := parallel.NewWaitGroup()
+	wg.Add(len(p.body.Registries))
+
+	for i := range p.body.Registries {
+		go func(wg *parallel.WaitGroup, reg regi.Config) {
+			defer wg.Done()
+			err := reg.Install()
+			if err != nil {
+				wg.ErrChan() <- err
+			}
+		}(wg, p.body.Registries[i])
+	}
+
+	if err := wg.Wait(); err != nil {
+		return err
+	}
+
+	return err
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
@@ -228,7 +256,8 @@ func runMultiracks(
 	ctx context.Context,
 	mapSpecs map[string]*multitrack.MultitrackSpecs,
 	kubedogConfig *kubedog.Config,
-	wg *parallel.WaitGroup) error {
+	wg *parallel.WaitGroup,
+) error {
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogConfig.StatusInterval,
 		Options: tracker.Options{

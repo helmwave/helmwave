@@ -2,6 +2,8 @@ package release
 
 import (
 	"strings"
+
+	"helm.sh/helm/v3/pkg/registry"
 )
 
 // // RepoDeps returns repository for release
@@ -27,5 +29,10 @@ import (
 // }
 
 func (rel *config) Repo() string {
-	return strings.Split(rel.Chart().Name, "/")[0]
+	s := rel.Chart().Name
+	if registry.IsOCI(s) {
+		s = strings.TrimPrefix(s, registry.OCIScheme+"://")
+	}
+
+	return strings.Split(s, "/")[0]
 }

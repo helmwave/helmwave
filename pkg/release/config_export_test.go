@@ -9,7 +9,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 )
 
-func NewConfig() *config {
+func NewConfig() *config { //nolint:revive
 	return &config{
 		NameF:      "blabla" + strconv.Itoa(rand.Int()),
 		NamespaceF: "blabla",
