@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"os"
 	"regexp"
@@ -13,7 +14,7 @@ import (
 // ErrValidateFailed is returned for failed values validation.
 var ErrValidateFailed = errors.New("validate failed")
 
-// ValidateValues checkes whether all values files exist.
+// ValidateValues checks whether all values files exist.
 func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
@@ -40,6 +41,10 @@ func (p *Plan) ValidateValues() error {
 func (p *planBody) Validate() error {
 	if len(p.Releases) == 0 && len(p.Repositories) == 0 {
 		return errors.New("releases and repositories are empty")
+	}
+
+	if err := p.ValidateRegistries(); err != nil {
+		return err
 	}
 
 	if err := p.ValidateRepositories(); err != nil {
@@ -71,7 +76,23 @@ func (p *planBody) ValidateRepositories() error {
 
 		a[r.Name()]++
 		if a[r.Name()] > 1 {
-			return errors.New("repository name duplicate: " + r.Name())
+			return fmt.Errorf("repository %s duplicate", r.Name())
+		}
+	}
+
+	return nil
+}
+
+func (p *planBody) ValidateRegistries() error {
+	a := make(map[string]int8)
+	for _, r := range p.Registries {
+		if r.Host() == "" {
+			return errors.New("registry name is empty")
+		}
+
+		a[r.Host()]++
+		if a[r.Host()] > 1 {
+			return fmt.Errorf("registry %s duplicate", r.Host())
 		}
 	}
 

@@ -16,9 +16,17 @@ func (c *config) Host() string {
 	return c.HostF
 }
 
+//func (c *config) Username() string {
+//	return c.UsernameF
+//}
+//
+//func (c *config) Password() string {
+//	return c.PasswordF
+//}
+
 func (c *config) Logger() *log.Entry {
 	if c.log == nil {
-		c.log = log.WithField("registry", c.Host)
+		c.log = log.WithField("registry", c.Host())
 	}
 
 	return c.log
