@@ -59,13 +59,7 @@ func (i *Up) flags() []cli.Flag {
 	i.build = &Build{}
 
 	self := []cli.Flag{
-		&cli.BoolFlag{
-			Name:        "build",
-			Usage:       "auto build",
-			Value:       false,
-			EnvVars:     []string{"HELMWAVE_AUTO_BUILD"},
-			Destination: &i.autoBuild,
-		},
+		flagAutoBuild(&i.autoBuild),
 		&cli.BoolFlag{
 			Name:        "kubedog",
 			Usage:       "Enable/Disable kubedog",

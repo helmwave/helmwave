@@ -96,3 +96,13 @@ func flagTemplateEngine(v *string) *cli.StringFlag {
 		Destination: v,
 	}
 }
+
+func flagAutoBuild(v *bool) *cli.BoolFlag {
+	return &cli.BoolFlag{
+		Name:        "build",
+		Usage:       "auto build",
+		Value:       false,
+		EnvVars:     []string{"HELMWAVE_AUTO_BUILD"},
+		Destination: v,
+	}
+}
