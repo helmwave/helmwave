@@ -24,11 +24,15 @@ func (l *Status) Run() error {
 // Cmd returns 'status' *cli.Command.
 func (l *Status) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "status",
-		Usage: "👁️ Status of deployed releases",
-		Flags: []cli.Flag{
-			flagPlandir(&l.plandir),
-		},
+		Name:   "status",
+		Usage:  "👁️ Status of deployed releases",
+		Flags:  l.flags(),
 		Action: toCtx(l.Run),
+	}
+}
+
+func (l *Status) flags() []cli.Flag {
+	return []cli.Flag{
+		flagPlandir(&l.plandir),
 	}
 }

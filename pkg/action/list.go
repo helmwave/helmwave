@@ -26,9 +26,13 @@ func (l *List) Cmd() *cli.Command {
 		Name:    "list",
 		Aliases: []string{"ls"},
 		Usage:   "👀 List of deployed releases",
-		Flags: []cli.Flag{
-			flagPlandir(&l.plandir),
-		},
-		Action: toCtx(l.Run),
+		Flags:   l.flags(),
+		Action:  toCtx(l.Run),
+	}
+}
+
+func (l *List) flags() []cli.Flag {
+	return []cli.Flag{
+		flagPlandir(&l.plandir),
 	}
 }

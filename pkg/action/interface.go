@@ -6,6 +6,7 @@ import "github.com/urfave/cli/v2"
 type Action interface {
 	Run() error
 	Cmd() *cli.Command
+	flags() []cli.Flag
 }
 
 // toCtx is a wrapper for urfave v2.

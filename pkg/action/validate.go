@@ -23,11 +23,15 @@ func (l *Validate) Run() error {
 // Cmd returns 'validate' *cli.Command.
 func (l *Validate) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "validate",
-		Usage: "🛂 Validate your plan",
-		Flags: []cli.Flag{
-			flagPlandir(&l.plandir),
-		},
+		Name:   "validate",
+		Usage:  "🛂 Validate your plan",
+		Flags:  l.flags(),
 		Action: toCtx(l.Run),
+	}
+}
+
+func (l *Validate) flags() []cli.Flag {
+	return []cli.Flag{
+		flagPlandir(&l.plandir),
 	}
 }

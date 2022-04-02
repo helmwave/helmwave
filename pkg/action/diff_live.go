@@ -31,11 +31,15 @@ func (d *DiffLive) Run() error {
 // Cmd returns 'diff live' *cli.Command.
 func (d *DiffLive) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "live",
-		Usage: "plan 🆚 live",
-		Flags: []cli.Flag{
-			flagPlandir(&d.plandir),
-		},
+		Name:   "live",
+		Usage:  "plan 🆚 live",
+		Flags:  d.flags(),
 		Action: toCtx(d.Run),
+	}
+}
+
+func (d *DiffLive) flags() []cli.Flag {
+	return []cli.Flag{
+		flagPlandir(&d.plandir),
 	}
 }
