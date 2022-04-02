@@ -9,7 +9,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool, templater string)
 	p.templater = templater
 
 	// Create Body
-	body, err := NewBody(yml)
+	body, err := NewBody(p.fsys, yml)
 	if err != nil {
 		return err
 	}

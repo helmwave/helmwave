@@ -3,9 +3,15 @@ package plan
 import (
 	"errors"
 	"fmt"
+	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 
+	"github.com/hairyhenderson/go-fsimpl"
+	"github.com/hairyhenderson/go-fsimpl/blobfs"
+	"github.com/hairyhenderson/go-fsimpl/filefs"
+	"github.com/hairyhenderson/go-fsimpl/gitfs"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -42,10 +48,10 @@ var (
 
 // Plan contains full helmwave state.
 type Plan struct {
-	body     *planBody
-	dir      string
-	fullPath string
+	body *planBody
 
+	fsys   fs.FS
+	url    *url.URL
 	tmpDir string
 
 	manifests map[uniqname.UniqName]string
@@ -53,6 +59,40 @@ type Plan struct {
 	graphMD string
 
 	templater string
+}
+
+func New(src string) (*Plan, error) {
+	URL, err := url.Parse(src)
+	if err != nil {
+		return nil, err
+	}
+
+	// Allowed FS
+	mux := fsimpl.NewMux()
+	mux.Add(filefs.FS)
+	mux.Add(blobfs.FS)
+	mux.Add(gitfs.FS)
+
+	// Looking for FS
+	fsys, err := mux.Lookup(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Plan{
+		fsys:      fsys,
+		url:       URL,
+		tmpDir:    os.TempDir(),
+		manifests: make(map[uniqname.UniqName]string),
+	}, nil
+}
+
+func (p *Plan) File() string {
+	return filepath.Join(p.Dir(), File)
+}
+
+func (p *Plan) Dir() string {
+	return p.url.Path
 }
 
 type registryConfigs []registry.Config
@@ -102,12 +142,21 @@ type planBody struct {
 	Releases     releaseConfigs
 }
 
-func NewBody(file string) (*planBody, error) { // nolint:revive
+//func (p* Plan) NewBody() (err error) {
+//	p.body, err = NewBody(p.fsys, p.file)
+//	if err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}
+
+func NewBody(fsys fs.FS, file string) (*planBody, error) { // nolint:revive
 	b := &planBody{
 		Version: version.Version,
 	}
 
-	src, err := os.ReadFile(file)
+	src, err := fs.ReadFile(fsys, file)
 	if err != nil {
 		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
@@ -130,20 +179,20 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 }
 
 // New returns empty *Plan for provided directory.
-func New(dir string) *Plan {
-	// if dir[len(dir)-1:] != "/" {
-	//	dir += "/"
-	// }
-
-	plan := &Plan{
-		tmpDir:    os.TempDir(),
-		dir:       dir,
-		fullPath:  filepath.Join(dir, File),
-		manifests: make(map[uniqname.UniqName]string),
-	}
-
-	return plan
-}
+//func New(dir string) *Plan {
+//	// if dir[len(dir)-1:] != "/" {
+//	//	dir += "/"
+//	// }
+//
+//	plan := &Plan{
+//		tmpDir:    os.TempDir(),
+//		dir:       dir,
+//		fullPath:  filepath.Join(dir, File),
+//		manifests: make(map[uniqname.UniqName]string),
+//	}
+//
+//	return plan
+//}
 
 // PrettyPlan logs releases and repositories names.
 func (p *Plan) PrettyPlan() {

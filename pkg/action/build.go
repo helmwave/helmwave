@@ -32,15 +32,18 @@ const (
 )
 
 // Run is main function for 'build' CLI command.
-func (i *Build) Run() error {
+func (i *Build) Run() (err error) {
 	if i.autoYml {
-		if err := i.yml.Run(); err != nil {
+		if err = i.yml.Run(); err != nil {
 			return err
 		}
 	}
 
-	newPlan := plan.New(i.plandir)
-	err := newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
+	newPlan, err := plan.New(i.plandir)
+	if err != nil {
+		return err
+	}
+	err = newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
 	if err != nil {
 		return err
 	}
@@ -50,7 +53,10 @@ func (i *Build) Run() error {
 
 	switch i.diffMode {
 	case DiffModeLocal:
-		oldPlan := plan.New(i.plandir)
+		oldPlan, err := plan.New(i.plandir)
+		if err != nil {
+			return err
+		}
 		if oldPlan.IsExist() {
 			log.Info("🆚 Diff with previous local plan")
 			if err := oldPlan.Import(); err != nil {
