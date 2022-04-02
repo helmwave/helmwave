@@ -12,7 +12,7 @@ type List struct {
 
 // Run is main function for 'list' command.
 func (l *List) Run() error {
-	p := plan.New(l.plandir)
+	p, err := plan.New(l.plandir)
 	if err := p.Import(); err != nil {
 		return err
 	}

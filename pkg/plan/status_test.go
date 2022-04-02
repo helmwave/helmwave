@@ -17,7 +17,7 @@ type StatusTestSuite struct {
 
 func (s *StatusTestSuite) TestStatusByName() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -33,7 +33,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Status(string(mockedRelease.Uniq()))
+	err = p.Status(string(mockedRelease.Uniq()))
 	s.Require().NoError(err)
 
 	err = p.Status()
@@ -45,7 +45,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 // TestStatusFailedRelease tests that Status method should just skip releases that fail Status method.
 func (s *StatusTestSuite) TestStatusFailedRelease() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -55,7 +55,7 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Status()
+	err = p.Status()
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -63,10 +63,10 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 
 func (s *StatusTestSuite) TestStatusNoReleases() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Status()
+	err = p.Status()
 	s.Require().NoError(err)
 }
 

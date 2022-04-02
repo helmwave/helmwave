@@ -11,7 +11,6 @@ import (
 	"github.com/hairyhenderson/go-fsimpl"
 	"github.com/hairyhenderson/go-fsimpl/blobfs"
 	"github.com/hairyhenderson/go-fsimpl/filefs"
-	"github.com/hairyhenderson/go-fsimpl/gitfs"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -62,22 +61,23 @@ type Plan struct {
 }
 
 func New(src string) (*Plan, error) {
-	URL, err := url.Parse(src)
-	if err != nil {
-		return nil, err
-	}
 
 	// Allowed FS
 	mux := fsimpl.NewMux()
 	mux.Add(filefs.FS)
 	mux.Add(blobfs.FS)
-	mux.Add(gitfs.FS)
 
 	// Looking for FS
 	fsys, err := mux.Lookup(src)
 	if err != nil {
-		return nil, err
+		src = "file://" + src
+		fsys, err = mux.Lookup(src)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	URL, _ := url.Parse(src)
 
 	return &Plan{
 		fsys:      fsys,

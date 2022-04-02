@@ -13,7 +13,8 @@ type BuildRepositoriesTestSuite struct {
 
 func (s *BuildRepositoriesTestSuite) TestReposEmpty() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p, err := New(filepath.Join(tmpDir, Dir))
+	s.Require().NoError(err)
 
 	p.body = &planBody{}
 
@@ -24,7 +25,8 @@ func (s *BuildRepositoriesTestSuite) TestReposEmpty() {
 
 func (s *BuildRepositoriesTestSuite) TestUnusedRepo() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p, err := New(filepath.Join(tmpDir, Dir))
+	s.Require().NoError(err)
 
 	mockedRepo := &MockRepoConfig{}
 
@@ -41,7 +43,8 @@ func (s *BuildRepositoriesTestSuite) TestUnusedRepo() {
 
 func (s *BuildRepositoriesTestSuite) TestSuccess() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p, err := New(filepath.Join(tmpDir, Dir))
+	s.Require().NoError(err)
 
 	repoName := "blablanami"
 
@@ -70,7 +73,8 @@ func (s *BuildRepositoriesTestSuite) TestSuccess() {
 
 func (s *BuildRepositoriesTestSuite) TestMissingRepo() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p, err := New(filepath.Join(tmpDir, Dir))
+	s.Require().NoError(err)
 
 	repoName := "blablanami"
 

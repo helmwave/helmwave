@@ -27,7 +27,7 @@ func (i *Up) Run() error {
 		}
 	}
 
-	p := plan.New(i.build.plandir)
+	p, err := plan.New(i.build.plandir)
 	if err := p.Import(); err != nil {
 		return err
 	}

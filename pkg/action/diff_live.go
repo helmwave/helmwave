@@ -15,7 +15,7 @@ type DiffLive struct {
 
 // Run is main function for 'diff live' command.
 func (d *DiffLive) Run() error {
-	p := plan.New(d.plandir)
+	p, err := plan.New(d.plandir)
 	if err := p.Import(); err != nil {
 		return err
 	}

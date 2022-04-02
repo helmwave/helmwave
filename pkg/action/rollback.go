@@ -20,7 +20,7 @@ func (i *Rollback) Run() error {
 			return err
 		}
 	}
-	p := plan.New(i.plandir)
+	p, err := plan.New(i.plandir)
 	if err := p.Import(); err != nil {
 		return err
 	}

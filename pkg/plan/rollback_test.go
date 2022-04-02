@@ -15,7 +15,8 @@ type RollbackTestSuite struct {
 
 func (s *RollbackTestSuite) TestRollback() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return(s.T().Name())
@@ -25,7 +26,7 @@ func (s *RollbackTestSuite) TestRollback() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback()
+	err = p.Rollback()
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -33,7 +34,8 @@ func (s *RollbackTestSuite) TestRollback() {
 
 func (s *RollbackTestSuite) TestRollbackError() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	e := errors.New(s.T().Name())
@@ -44,7 +46,7 @@ func (s *RollbackTestSuite) TestRollbackError() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback()
+	err = p.Rollback()
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -52,10 +54,10 @@ func (s *RollbackTestSuite) TestRollbackError() {
 
 func (s *RollbackTestSuite) TestRollbackNoReleases() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Rollback()
+	err = p.Rollback()
 	s.Require().NoError(err)
 }
 

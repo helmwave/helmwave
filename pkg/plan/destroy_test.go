@@ -16,7 +16,8 @@ type DestroyTestSuite struct {
 
 func (s *DestroyTestSuite) TestDestroy() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -26,7 +27,7 @@ func (s *DestroyTestSuite) TestDestroy() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Destroy()
+	err = p.Destroy()
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -34,7 +35,8 @@ func (s *DestroyTestSuite) TestDestroy() {
 
 func (s *DestroyTestSuite) TestDestroyFailedRelease() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -45,7 +47,7 @@ func (s *DestroyTestSuite) TestDestroyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Destroy()
+	err = p.Destroy()
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -53,10 +55,11 @@ func (s *DestroyTestSuite) TestDestroyFailedRelease() {
 
 func (s *DestroyTestSuite) TestDestroyNoReleases() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 	p.NewBody()
 
-	err := p.Destroy()
+	err = p.Destroy()
 	s.Require().NoError(err)
 }
 

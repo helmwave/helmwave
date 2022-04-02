@@ -17,7 +17,8 @@ type BuildValuesTestSuite struct {
 func (s *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
 	s.T().Helper()
 
-	p := New(filepath.Join(tmpDir, Dir))
+	p, err := New(filepath.Join(tmpDir, Dir))
+	s.Require().NoError(err)
 	p.templater = "sprig"
 
 	return p

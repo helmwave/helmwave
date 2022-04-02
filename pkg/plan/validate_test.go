@@ -17,7 +17,8 @@ type ValidateTestSuite struct {
 
 func (s *ValidateTestSuite) TestValidateValues() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, "valuesName")
@@ -41,7 +42,8 @@ func (s *ValidateTestSuite) TestValidateValues() {
 
 func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, "valuesName")
@@ -63,7 +65,8 @@ func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 
 func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	p.NewBody()
 
@@ -72,7 +75,9 @@ func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
 
 func (s *ValidateTestSuite) TestValidateRepositoryName() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRepo := &plan.MockRepoConfig{}
@@ -88,7 +93,9 @@ func (s *ValidateTestSuite) TestValidateRepositoryName() {
 
 func (s *ValidateTestSuite) TestValidateRepositoryURLEmpty() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRepo := &plan.MockRepoConfig{}
@@ -105,7 +112,9 @@ func (s *ValidateTestSuite) TestValidateRepositoryURLEmpty() {
 
 func (s *ValidateTestSuite) TestValidateRepositoryURL() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRepo := &plan.MockRepoConfig{}
@@ -122,7 +131,9 @@ func (s *ValidateTestSuite) TestValidateRepositoryURL() {
 
 func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRepo := &plan.MockRepoConfig{}
@@ -139,7 +150,9 @@ func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 
 func (s *ValidateTestSuite) TestValidateRepository() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRepo := &plan.MockRepoConfig{}
@@ -156,7 +169,9 @@ func (s *ValidateTestSuite) TestValidateRepository() {
 
 func (s *ValidateTestSuite) TestValidateReleaseName() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -172,7 +187,9 @@ func (s *ValidateTestSuite) TestValidateReleaseName() {
 
 func (s *ValidateTestSuite) TestValidateReleaseNamespace() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -189,7 +206,9 @@ func (s *ValidateTestSuite) TestValidateReleaseNamespace() {
 
 func (s *ValidateTestSuite) TestValidateReleaseUniq() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -207,7 +226,9 @@ func (s *ValidateTestSuite) TestValidateReleaseUniq() {
 
 func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -225,10 +246,12 @@ func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
 
 func (s *ValidateTestSuite) TestValidateEmpty() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	body := p.NewBody()
 
-	err := body.Validate()
+	err = body.Validate()
 	s.Require().Error(err)
 }
 

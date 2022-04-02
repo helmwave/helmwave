@@ -13,7 +13,7 @@ type Status struct {
 
 // Run is main function for 'status' command.
 func (l *Status) Run() error {
-	p := plan.New(l.plandir)
+	p, err := plan.New(l.plandir)
 	if err := p.Import(); err != nil {
 		return err
 	}

@@ -15,18 +15,21 @@ type ExportTestSuite struct {
 
 func (s *ExportTestSuite) TestValuesEmpty() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p, err := New(filepath.Join(tmpDir, Dir))
+	s.Require().NoError(err)
+
 	p.templater = "sprig"
 
 	p.body = &planBody{}
 
-	err := p.exportValues()
+	err = p.exportValues()
 	s.Require().NoError(err)
 }
 
 func (s *ExportTestSuite) TestValuesOneRelease() {
 	tmpDir := s.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p, err := New(filepath.Join(tmpDir, Dir))
+	s.Require().NoError(err)
 	p.templater = "sprig"
 
 	valuesName := "blablavalues.yaml"

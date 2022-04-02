@@ -6,47 +6,40 @@ import (
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/parallel"
 	dir "github.com/otiai10/copy"
 )
 
+type Exporter interface {
+	Export(p *Plan) error
+}
+
+type ExporterS3 struct {
+}
+
+func (e *ExporterS3) Export(p *Plan) error {
+	return nil
+}
+
+type ExporterLocal struct {
+}
+
+func (e *ExporterLocal) Export(p *Plan) error {
+	return nil
+}
+
+var Exporters = map[string]Exporter{
+	"s3://":   &ExporterS3{},
+	"file://": &ExporterLocal{},
+}
+
 // Export allows save plan to file.
 func (p *Plan) Export() error {
-
-	if helper.IsExists(p.Dir()) { // local fs
-		if err := os.RemoveAll(p.Dir()); err != nil {
-			return fmt.Errorf("failed to clean plan directory %s: %w", p.Dir(), err)
-		}
+	exporter, found := Exporters[p.url.Scheme]
+	if !found {
+		return fmt.Errorf("plan export to '%s' is not supported", p.url.Scheme)
 	}
 
-	wg := parallel.NewWaitGroup()
-	wg.Add(3)
-
-	go func() {
-		defer wg.Done()
-		if err := p.exportManifest(); err != nil {
-			wg.ErrChan() <- err
-		}
-	}()
-	go func() {
-		defer wg.Done()
-		if err := p.exportValues(); err != nil {
-			wg.ErrChan() <- err
-		}
-
-		// Save Planfile after values
-		if err := helper.SaveInterface(p.File(), p.body); err != nil {
-			wg.ErrChan() <- err
-		}
-	}()
-	go func() {
-		defer wg.Done()
-		if err := p.exportGraphMD(); err != nil {
-			wg.ErrChan() <- err
-		}
-	}()
-
-	return wg.Wait()
+	return exporter.Export(p)
 }
 
 func (p *Plan) exportManifest() error {

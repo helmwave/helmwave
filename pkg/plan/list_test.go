@@ -17,7 +17,7 @@ type ListTestSuite struct {
 
 func (s *ListTestSuite) TestList() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	r := &helmRelease.Release{
@@ -30,7 +30,7 @@ func (s *ListTestSuite) TestList() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.List()
+	err = p.List()
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -39,7 +39,8 @@ func (s *ListTestSuite) TestList() {
 // TestListError tests that List method should just skip releases that fail List method.
 func (s *ListTestSuite) TestListError() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return(s.T().Name())
@@ -49,7 +50,7 @@ func (s *ListTestSuite) TestListError() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.List()
+	err = p.List()
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -57,10 +58,12 @@ func (s *ListTestSuite) TestListError() {
 
 func (s *ListTestSuite) TestListNoReleases() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	p.NewBody()
 
-	err := p.List()
+	err = p.List()
 	s.Require().NoError(err)
 }
 

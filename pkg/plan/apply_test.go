@@ -16,7 +16,8 @@ type ApplyTestSuite struct {
 
 func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	repoName := "blablanami"
 
@@ -27,7 +28,7 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Apply()
+	err = p.Apply()
 	s.Require().ErrorIs(err, e)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -35,14 +36,15 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 func (s *ApplyTestSuite) TestApplyNoReleases() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRepo := &plan.MockRepoConfig{}
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Apply()
+	err = p.Apply()
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -50,7 +52,8 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 
 func (s *ApplyTestSuite) TestApplyFailedRelease() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -63,7 +66,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Apply()
+	err = p.Apply()
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -71,7 +74,8 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 
 func (s *ApplyTestSuite) TestApply() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -87,7 +91,7 @@ func (s *ApplyTestSuite) TestApply() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	err := p.Apply()
+	err = p.Apply()
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())

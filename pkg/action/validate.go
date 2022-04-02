@@ -12,7 +12,7 @@ type Validate struct {
 
 // Run is main function for 'validate' command.
 func (l *Validate) Run() error {
-	p := plan.New(l.plandir)
+	p, err := plan.New(l.plandir)
 	if err := p.Import(); err != nil {
 		return err
 	}

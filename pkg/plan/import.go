@@ -35,7 +35,7 @@ func (p *Plan) Import() error {
 }
 
 func (p *Plan) importManifest() error {
-	d := filepath.Join(p.URL.Path, Manifest)
+	d := filepath.Join(p.Dir(), Manifest)
 	ls, err := fs.ReadDir(p.fsys, p.Dir())
 	if err != nil {
 		return fmt.Errorf("failed to read manifest dir %s: %w", d, err)
