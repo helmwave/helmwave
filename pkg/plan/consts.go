@@ -18,7 +18,7 @@ const (
 	// Values is default directory for values.
 	Values = "values/"
 
-	// GraphFilename is default filename of markdown graph
+	// GraphFilename is default filename of markdown graph.
 	GraphFilename = "graph.md"
 )
 
