@@ -7,8 +7,6 @@ import (
 
 // Down is struct for running 'down' command.
 type Down struct {
-	plandir string
-
 	autoBuild bool
 	build     *Build
 }
@@ -21,7 +19,7 @@ func (i *Down) Run() error {
 		}
 	}
 
-	p, err := plan.NewAndImport(i.plandir)
+	p, err := plan.NewAndImport(i.build.plandir)
 	if err != nil {
 		return err
 	}

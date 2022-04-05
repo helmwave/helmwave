@@ -7,8 +7,6 @@ import (
 
 // Rollback is struct for running 'rollback' command.
 type Rollback struct {
-	plandir string
-
 	autoBuild bool
 	build     *Build
 }
@@ -20,7 +18,7 @@ func (i *Rollback) Run() error {
 			return err
 		}
 	}
-	p, err := plan.NewAndImport(i.plandir)
+	p, err := plan.NewAndImport(i.build.plandir)
 	if err != nil {
 		return err
 	}
@@ -45,7 +43,7 @@ func (i *Rollback) flags() []cli.Flag {
 
 	self := []cli.Flag{
 		flagAutoBuild(&i.autoBuild),
-		flagPlandir(&i.plandir),
+		flagPlandir(&i.build.plandir),
 	}
 
 	return append(self, i.build.flags()...)
