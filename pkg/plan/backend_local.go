@@ -198,7 +198,7 @@ func (e *BackendLocal) exportGraphMD(p *Plan) (err error) {
 
 	//f, err := helper.CreateFile(filepath.Join(p.URL.Path, filename))
 
-	f, err := p.fsys.Open(filepath.Join(p.Dir(), GraphFilename))
+	f, err := p.fsys.Open(p.GraphPath())
 
 	if err != nil {
 		return err
@@ -210,7 +210,7 @@ func (e *BackendLocal) exportGraphMD(p *Plan) (err error) {
 	//}
 
 	if err = f.Close(); err != nil {
-		return fmt.Errorf("failed to close graph file %s: %w", filename, err)
+		return fmt.Errorf("failed to close graph file %s: %w", p.GraphPath(), err)
 	}
 
 	return nil
