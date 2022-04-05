@@ -38,6 +38,7 @@ func (i *Rollback) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (i *Rollback) flags() []cli.Flag {
 	// Init sub-structures
 	i.build = &Build{}

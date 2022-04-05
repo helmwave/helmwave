@@ -198,7 +198,7 @@ func (e *BackendLocal) exportGraphMD(p *Plan) (err error) {
 
 	//f, err := helper.CreateFile(filepath.Join(p.URL.Path, filename))
 
-	f, err := p.fsys.Open(filepath.Join(p.Dir(), filename))
+	f, err := p.fsys.Open(filepath.Join(p.Dir(), GraphFilename))
 
 	if err != nil {
 		return err

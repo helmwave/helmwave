@@ -97,6 +97,7 @@ func flagTemplateEngine(v *string) *cli.StringFlag {
 	}
 }
 
+// flagAutoBuild pass val to urfave flag
 func flagAutoBuild(v *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Name:        "build",

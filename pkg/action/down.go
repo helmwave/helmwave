@@ -39,6 +39,7 @@ func (i *Down) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (i *Down) flags() []cli.Flag {
 	// Init sub-structures
 	i.build = &Build{}

@@ -55,6 +55,7 @@ func (d *DiffLocalPlan) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (d *DiffLocalPlan) flags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{

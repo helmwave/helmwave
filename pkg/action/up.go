@@ -53,6 +53,7 @@ func (i *Up) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (i *Up) flags() []cli.Flag {
 	// Init sub-structures
 	i.dog = &kubedog.Config{}

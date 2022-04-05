@@ -30,6 +30,7 @@ func (l *Validate) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (l *Validate) flags() []cli.Flag {
 	return []cli.Flag{
 		flagPlandir(&l.plandir),

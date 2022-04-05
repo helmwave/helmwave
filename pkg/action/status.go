@@ -31,6 +31,7 @@ func (l *Status) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (l *Status) flags() []cli.Flag {
 	return []cli.Flag{
 		flagPlandir(&l.plandir),
