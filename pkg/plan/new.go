@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"errors"
 	"io/fs"
 	"net/url"
 	"os"
@@ -10,18 +9,8 @@ import (
 	"github.com/hairyhenderson/go-fsimpl"
 	"github.com/hairyhenderson/go-fsimpl/blobfs"
 	"github.com/hairyhenderson/go-fsimpl/filefs"
-	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
-)
-
-var (
-	// ErrManifestDirNotFound is an error for nonexistent manifest dir.
-	ErrManifestDirNotFound = errors.New(Manifest + " dir not found")
-
-	// ErrManifestDirEmpty is an error for empty manifest dir.
-	ErrManifestDirEmpty = errors.New(Manifest + " is empty")
 )
 
 // Plan contains full helmwave state.
@@ -53,6 +42,7 @@ func NewAndImport(src string) (p *Plan, err error) {
 	return p, nil
 }
 
+// New create Plan
 func New(src string) (*Plan, error) {
 
 	// Allowed FS
@@ -80,29 +70,19 @@ func New(src string) (*Plan, error) {
 	}, nil
 }
 
+// File is path to planfile
 func (p *Plan) File() string {
 	return filepath.Join(p.Dir(), File)
 }
 
+// GraphPath is path to graph.md
 func (p *Plan) GraphPath() string {
 	return filepath.Join(p.Dir(), GraphFilename)
 }
 
+// Dir is path to plandir
 func (p *Plan) Dir() string {
 	return p.url.Path
-}
-
-type releaseConfigs []release.Config
-
-func (r *releaseConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(releaseConfigs)
-	}
-	var err error
-
-	*r, err = release.UnmarshalYAML(node)
-
-	return err
 }
 
 // PrettyPlan logs releases and repositories names.

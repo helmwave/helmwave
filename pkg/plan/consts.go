@@ -1,5 +1,7 @@
 package plan
 
+import "errors"
+
 const (
 	// Dir is default directory for generated files.
 	Dir = ".helmwave/"
@@ -18,4 +20,12 @@ const (
 
 	// GraphFilename is default filename of markdown graph
 	GraphFilename = "graph.md"
+)
+
+var (
+	// ErrManifestDirNotFound is an error for nonexistent manifest dir.
+	ErrManifestDirNotFound = errors.New(Manifest + " dir not found")
+
+	// ErrManifestDirEmpty is an error for empty manifest dir.
+	ErrManifestDirEmpty = errors.New(Manifest + " is empty")
 )

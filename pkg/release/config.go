@@ -2,6 +2,7 @@ package release
 
 import (
 	"errors"
+	"gopkg.in/yaml.v3"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/pubsub"
@@ -11,6 +12,19 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
+
+type Configs []Config
+
+func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
+	if r == nil {
+		r = new(Configs)
+	}
+	var err error
+
+	*r, err = UnmarshalYAML(node)
+
+	return err
+}
 
 type config struct {
 	cfg                      *action.Configuration                             `yaml:"-"`
