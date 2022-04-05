@@ -2,7 +2,6 @@ package plan
 
 import (
 	"errors"
-	"fmt"
 	"io/fs"
 	"net/url"
 	"os"
@@ -11,30 +10,10 @@ import (
 	"github.com/hairyhenderson/go-fsimpl"
 	"github.com/hairyhenderson/go-fsimpl/blobfs"
 	"github.com/hairyhenderson/go-fsimpl/filefs"
-	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	"github.com/helmwave/helmwave/pkg/repo"
-	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
-)
-
-const (
-	// Dir is default directory for generated files.
-	Dir = ".helmwave/"
-
-	// File is default file name for planfile.
-	File = "planfile"
-
-	// Body is default file name for main config.
-	Body = "helmwave.yml"
-
-	// Manifest is default directory under Dir for manifests.
-	Manifest = "manifest/"
-
-	// Values is default directory for values.
-	Values = "values/"
 )
 
 var (
@@ -58,6 +37,20 @@ type Plan struct {
 	graphMD string
 
 	templater string
+}
+
+// NewAndImport wrapper for New and Import in one
+func NewAndImport(src string) (p *Plan, err error) {
+	p, err = New(src)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = p.Import(); err != nil {
+		return p, err
+	}
+
+	return p, nil
 }
 
 func New(src string) (*Plan, error) {
@@ -91,34 +84,12 @@ func (p *Plan) File() string {
 	return filepath.Join(p.Dir(), File)
 }
 
+func (p *Plan) GraphPath() string {
+	return filepath.Join(p.Dir(), GraphFilename)
+}
+
 func (p *Plan) Dir() string {
 	return p.url.Path
-}
-
-type registryConfigs []registry.Config
-
-func (r *registryConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(registryConfigs)
-	}
-	var err error
-
-	*r, err = registry.UnmarshalYAML(node)
-
-	return err
-}
-
-type repoConfigs []repo.Config
-
-func (r *repoConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(repoConfigs)
-	}
-	var err error
-
-	*r, err = repo.UnmarshalYAML(node)
-
-	return err
 }
 
 type releaseConfigs []release.Config
@@ -133,66 +104,6 @@ func (r *releaseConfigs) UnmarshalYAML(node *yaml.Node) error {
 
 	return err
 }
-
-type planBody struct {
-	Project      string
-	Version      string
-	Repositories repoConfigs
-	Registries   registryConfigs
-	Releases     releaseConfigs
-}
-
-//func (p* Plan) NewBody() (err error) {
-//	p.body, err = NewBody(p.fsys, p.file)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
-
-func NewBody(fsys fs.FS, file string) (*planBody, error) { // nolint:revive
-	b := &planBody{
-		Version: version.Version,
-	}
-
-	src, err := fs.ReadFile(fsys, file)
-	if err != nil {
-		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
-	}
-
-	err = yaml.Unmarshal(src, b)
-	if err != nil {
-		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
-	}
-
-	// Setup dev version
-	// if b.Version == "" {
-	// 	 b.Version = version.Version
-	// }
-
-	if err := b.Validate(); err != nil {
-		return nil, err
-	}
-
-	return b, nil
-}
-
-// New returns empty *Plan for provided directory.
-//func New(dir string) *Plan {
-//	// if dir[len(dir)-1:] != "/" {
-//	//	dir += "/"
-//	// }
-//
-//	plan := &Plan{
-//		tmpDir:    os.TempDir(),
-//		dir:       dir,
-//		fullPath:  filepath.Join(dir, File),
-//		manifests: make(map[uniqname.UniqName]string),
-//	}
-//
-//	return plan
-//}
 
 // PrettyPlan logs releases and repositories names.
 func (p *Plan) PrettyPlan() {

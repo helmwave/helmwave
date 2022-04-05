@@ -27,6 +27,7 @@ func (d *Diff) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (d *Diff) flags() []cli.Flag {
 	return []cli.Flag{
 		flagDiffWide(&d.Wide),

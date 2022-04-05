@@ -21,8 +21,8 @@ func (i *Down) Run() error {
 		}
 	}
 
-	p, err := plan.New(i.plandir)
-	if err := p.Import(); err != nil {
+	p, err := plan.NewAndImport(i.plandir)
+	if err != nil {
 		return err
 	}
 

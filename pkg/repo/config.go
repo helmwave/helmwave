@@ -2,16 +2,29 @@ package repo
 
 import (
 	"errors"
+	"gopkg.in/yaml.v3"
 
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/repo"
 )
 
+type Configs []Config
+
+func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
+	if r == nil {
+		r = new(Configs)
+	}
+	var err error
+
+	*r, err = UnmarshalYAML(node)
+
+	return err
+}
+
 type config struct {
 	log        *log.Entry       `yaml:"-"`
 	repo.Entry `yaml:",inline"` //nolint:nolintlint
 	Force      bool             `yaml:"force"`
-	// OCI        bool             `yaml:"oci"`
 }
 
 func (c *config) Name() string {

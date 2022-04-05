@@ -13,8 +13,8 @@ type Status struct {
 
 // Run is main function for 'status' command.
 func (l *Status) Run() error {
-	p, err := plan.New(l.plandir)
-	if err := p.Import(); err != nil {
+	p, err := plan.NewAndImport(l.plandir)
+	if err != nil {
 		return err
 	}
 
