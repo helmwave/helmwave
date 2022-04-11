@@ -92,7 +92,7 @@ func (r *MockReleaseConfig) List() (*helmRelease.Release, error) {
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) Rollback() error {
+func (r *MockReleaseConfig) Rollback(n int) error {
 	return r.Called().Error(0)
 }
 

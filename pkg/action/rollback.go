@@ -9,6 +9,7 @@ import (
 type Rollback struct {
 	build     *Build
 	autoBuild bool
+	revision  int
 }
 
 // Run is main function for 'rollback' command.
@@ -23,7 +24,7 @@ func (i *Rollback) Run() error {
 		return err
 	}
 
-	return p.Rollback()
+	return p.Rollback(i.revision)
 }
 
 // Cmd returns 'rollback' *cli.Command.
@@ -43,6 +44,12 @@ func (i *Rollback) flags() []cli.Flag {
 
 	self := []cli.Flag{
 		flagAutoBuild(&i.autoBuild),
+		&cli.IntFlag{
+			Name:        "revision",
+			Value:       -1,
+			Usage:       "Rollback all releases to this revision",
+			Destination: &i.revision,
+		},
 	}
 
 	return append(self, i.build.flags()...)

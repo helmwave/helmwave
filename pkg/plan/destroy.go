@@ -7,7 +7,7 @@ import (
 )
 
 // Destroy destroys all releases that exist in plan.
-func (p *Plan) Destroy() error {
+func (p *Plan) Destroy() error { //nolint:dupl
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
