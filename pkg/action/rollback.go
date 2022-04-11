@@ -43,7 +43,6 @@ func (i *Rollback) flags() []cli.Flag {
 
 	self := []cli.Flag{
 		flagAutoBuild(&i.autoBuild),
-		flagPlandir(&i.build.plandir),
 	}
 
 	return append(self, i.build.flags()...)

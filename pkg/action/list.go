@@ -44,7 +44,6 @@ func (l *List) flags() []cli.Flag {
 
 	self := []cli.Flag{
 		flagAutoBuild(&l.autoBuild),
-		flagPlandir(&l.build.plandir),
 	}
 
 	return append(self, l.build.flags()...)
