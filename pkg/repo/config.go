@@ -2,14 +2,16 @@ package repo
 
 import (
 	"errors"
-	"gopkg.in/yaml.v3"
 
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/repo"
 )
 
+// Configs type of array Config.
 type Configs []Config
 
+// UnmarshalYAML parse Config.
 func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	if r == nil {
 		r = new(Configs)

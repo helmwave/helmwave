@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/repo"
 	"os"
 	"sync"
 	"time"
@@ -88,7 +89,7 @@ func (p *Plan) syncRegistries() (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
-func SyncRepositories(repositories repoConfigs) error {
+func SyncRepositories(repositories repo.Configs) error {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exists

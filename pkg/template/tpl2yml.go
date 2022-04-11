@@ -37,7 +37,7 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 	}
 
 	src, err := os.ReadFile(tpl)
-	//src, err := fs.ReadFile(fsys, tpl)
+	// src, err := fs.ReadFile(fsys, tpl)
 	if err != nil {
 		return fmt.Errorf("failed to read template file %s: %w", tpl, err)
 	}

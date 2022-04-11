@@ -2,19 +2,21 @@ package release
 
 import (
 	"errors"
-	"gopkg.in/yaml.v3"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/pubsub"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
+// Configs type of array Config.
 type Configs []Config
 
+// UnmarshalYAML parse Config.
 func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	if r == nil {
 		r = new(Configs)

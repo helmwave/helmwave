@@ -71,7 +71,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 	ts.Require().NoError(s.Run())
 
 	const rep = "bitnami"
-	b, _ := plan.NewBody(filepath.Join(s.plandir, plan.File))
+	b, err := plan.NewBody(filepath.Join(s.plandir, plan.File))
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
 		ts.Failf("%q not found", rep)

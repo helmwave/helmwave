@@ -36,7 +36,11 @@ func (ts *DownTestSuite) TestRun() {
 		yml:     y,
 	}
 
-	d := Down{plandir: s.plandir}
+	d := Down{
+		build: {
+			plandir: s.plandir,
+		},
+	}
 	ts.Require().ErrorIs(d.Run(), os.ErrNotExist, "down should fail before build")
 	ts.Require().NoError(s.Run())
 

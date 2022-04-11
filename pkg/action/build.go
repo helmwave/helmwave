@@ -96,6 +96,7 @@ func (i *Build) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave
 func (i *Build) flags() []cli.Flag {
 	// Init sub-structures
 	i.yml = &Yml{}
@@ -122,12 +123,12 @@ func (i *Build) flags() []cli.Flag {
 	return self
 }
 
+// normalizeTags is wrapper for normalizeTagList
 func (i *Build) normalizeTags() []string {
 	return normalizeTagList(i.tags.Value())
 }
 
-// normalizeTags normalizes and splits comma-separated tag list.
-// ["c", " b ", "a "] -> ["a", "b", "c"].
+// normalizeTagList normalizes and splits comma-separated tag list: ["c", " b ", "a "] -> ["a", "b", "c"].
 func normalizeTagList(tags []string) []string {
 	m := make([]string, len(tags))
 	for i, t := range tags {

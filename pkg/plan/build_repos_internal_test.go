@@ -1,6 +1,8 @@
 package plan
 
 import (
+	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/repo"
 	"path/filepath"
 	"testing"
 
@@ -31,7 +33,7 @@ func (s *BuildRepositoriesTestSuite) TestUnusedRepo() {
 	mockedRepo := &MockRepoConfig{}
 
 	p.body = &planBody{
-		Repositories: repoConfigs{mockedRepo},
+		Repositories: repo.Configs{mockedRepo},
 	}
 
 	repos, err := p.buildRepositories()
@@ -58,8 +60,8 @@ func (s *BuildRepositoriesTestSuite) TestSuccess() {
 	mockedRepo.On("Name").Return(repoName)
 
 	p.body = &planBody{
-		Repositories: repoConfigs{mockedRepo},
-		Releases:     releaseConfigs{mockedRelease},
+		Repositories: repo.Configs{mockedRepo},
+		Releases:     release.Configs{mockedRelease},
 	}
 
 	repos, err := p.buildRepositories()
@@ -85,7 +87,7 @@ func (s *BuildRepositoriesTestSuite) TestMissingRepo() {
 	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{
-		Releases: releaseConfigs{mockedRelease},
+		Releases: release.Configs{mockedRelease},
 	}
 
 	repos, err := p.buildRepositories()

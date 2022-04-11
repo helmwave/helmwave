@@ -55,6 +55,8 @@ func (s *RollbackTestSuite) TestRollbackError() {
 func (s *RollbackTestSuite) TestRollbackNoReleases() {
 	tmpDir := s.T().TempDir()
 	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	p.NewBody()
 
 	err = p.Rollback()

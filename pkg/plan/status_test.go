@@ -46,6 +46,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 func (s *StatusTestSuite) TestStatusFailedRelease() {
 	tmpDir := s.T().TempDir()
 	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -64,6 +65,8 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 func (s *StatusTestSuite) TestStatusNoReleases() {
 	tmpDir := s.T().TempDir()
 	p, err := plan.New(filepath.Join(tmpDir, plan.Dir))
+	s.Require().NoError(err)
+
 	p.NewBody()
 
 	err = p.Status()

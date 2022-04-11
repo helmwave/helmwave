@@ -53,7 +53,7 @@ func New(src string) (*Plan, error) {
 	// Looking for FS
 	fsys, err := mux.Lookup(src)
 	if err != nil {
-		src = "file://" + src
+		src = "fs://" + src
 		fsys, err = mux.Lookup(src)
 		if err != nil {
 			return nil, err
@@ -70,17 +70,17 @@ func New(src string) (*Plan, error) {
 	}, nil
 }
 
-// File is path to planfile
+// File is path to planfile.
 func (p *Plan) File() string {
 	return filepath.Join(p.Dir(), File)
 }
 
-// GraphPath is path to graph.md
+// GraphPath is path to graph.md.
 func (p *Plan) GraphPath() string {
 	return filepath.Join(p.Dir(), GraphFilename)
 }
 
-// Dir is path to plandir
+// Dir is path to plandir.
 func (p *Plan) Dir() string {
 	return p.url.Path
 }
