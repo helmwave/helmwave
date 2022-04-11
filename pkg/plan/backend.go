@@ -5,7 +5,9 @@ type Backend interface {
 	Export(p *Plan) error
 }
 
+const LocalScheme = "fs://"
+
 var Backends = map[string]Backend{
-	"s3://":   &BackendS3{},
-	"file://": &BackendLocal{},
+	"s3://":     &BackendS3{},
+	LocalScheme: &BackendLocal{},
 }

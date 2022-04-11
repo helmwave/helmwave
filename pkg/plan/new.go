@@ -1,16 +1,16 @@
 package plan
 
 import (
+	"go.beyondstorage.io/v5/services"
 	"io/fs"
 	"net/url"
 	"os"
 	"path/filepath"
 
-	"github.com/hairyhenderson/go-fsimpl"
-	"github.com/hairyhenderson/go-fsimpl/blobfs"
-	"github.com/hairyhenderson/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
+	_ "go.beyondstorage.io/services/fs/v4"
+	storage "go.beyondstorage.io/v5/types"
 )
 
 // Plan contains full helmwave state.
@@ -18,6 +18,7 @@ type Plan struct {
 	body *planBody
 
 	fsys   fs.FS
+	store  storage.Storager
 	url    *url.URL
 	tmpDir string
 
@@ -43,27 +44,27 @@ func NewAndImport(src string) (p *Plan, err error) {
 }
 
 // New create Plan
-func New(src string) (*Plan, error) {
-
-	// Allowed FS
-	mux := fsimpl.NewMux()
-	mux.Add(filefs.FS)
-	mux.Add(blobfs.FS)
-
-	// Looking for FS
-	fsys, err := mux.Lookup(src)
+// src is can be:
+// fs://./<workdir>
+// fs://<workdir>
+// fs:///<workdir>
+func New(plandir string) (p *Plan, err error) {
+	URL, err := url.Parse(plandir)
 	if err != nil {
-		src = "fs://" + src
-		fsys, err = mux.Lookup(src)
+		plandir = LocalScheme + plandir
+		URL, err = url.Parse(plandir)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	URL, _ := url.Parse(src)
+	store, err := services.NewStoragerFromString(plandir)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Plan{
-		fsys:      fsys,
+		store:     store,
 		url:       URL,
 		tmpDir:    os.TempDir(),
 		manifests: make(map[uniqname.UniqName]string),
@@ -82,7 +83,7 @@ func (p *Plan) GraphPath() string {
 
 // Dir is path to plandir.
 func (p *Plan) Dir() string {
-	return p.url.Path
+	return filepath.Dir(filepath.Join(p.url.Host, p.url.Path))
 }
 
 // PrettyPlan logs releases and repositories names.

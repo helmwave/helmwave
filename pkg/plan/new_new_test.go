@@ -18,7 +18,7 @@ func TestNew(t *testing.T) {
 
 	_, err := mux.Lookup(src)
 	if err != nil {
-		src = "file://" + src
+		src = "fs://" + src
 		_, err = mux.Lookup(src)
 		require.NoError(t, err)
 	}
@@ -26,3 +26,5 @@ func TestNew(t *testing.T) {
 	require.NoError(t, err)
 
 }
+
+func Test(t *testing.T) {}
