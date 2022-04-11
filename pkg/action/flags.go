@@ -5,6 +5,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// flagPlandir pass val to urfave flag.
 func flagPlandir(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "plandir",
@@ -16,6 +17,7 @@ func flagPlandir(v *string) *cli.StringFlag {
 	}
 }
 
+// flagTags pass val to urfave flag.
 func flagTags(v *cli.StringSlice) *cli.StringSliceFlag {
 	return &cli.StringSliceFlag{
 		Name:        "tags",
@@ -26,6 +28,7 @@ func flagTags(v *cli.StringSlice) *cli.StringSliceFlag {
 	}
 }
 
+// flagTemplateEngine pass val to urfave flag.
 func flagMatchAllTags(v *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Name:        "match-all-tags",
@@ -36,6 +39,7 @@ func flagMatchAllTags(v *bool) *cli.BoolFlag {
 	}
 }
 
+// flagYmlFile pass val to urfave flag.
 func flagYmlFile(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "file",
@@ -47,6 +51,7 @@ func flagYmlFile(v *string) *cli.StringFlag {
 	}
 }
 
+// flagTplFile pass val to urfave flag.
 func flagTplFile(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "tpl",
@@ -57,6 +62,7 @@ func flagTplFile(v *string) *cli.StringFlag {
 	}
 }
 
+// flagDiffMode pass val to urfave flag.
 func flagDiffMode(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "diff-mode",
@@ -67,6 +73,7 @@ func flagDiffMode(v *string) *cli.StringFlag {
 	}
 }
 
+// flagDiffWide pass val to urfave flag.
 func flagDiffWide(v *int) *cli.IntFlag {
 	return &cli.IntFlag{
 		Name:        "wide",
@@ -77,6 +84,7 @@ func flagDiffWide(v *int) *cli.IntFlag {
 	}
 }
 
+// flagDiffShowSecret pass val to urfave flag.
 func flagDiffShowSecret(v *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Name:        "show-secret",
@@ -87,6 +95,7 @@ func flagDiffShowSecret(v *bool) *cli.BoolFlag {
 	}
 }
 
+// flagTemplateEngine pass val to urfave flag.
 func flagTemplateEngine(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "templater",
@@ -97,6 +106,7 @@ func flagTemplateEngine(v *string) *cli.StringFlag {
 	}
 }
 
+// flagAutoBuild pass val to urfave flag.
 func flagAutoBuild(v *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Name:        "build",

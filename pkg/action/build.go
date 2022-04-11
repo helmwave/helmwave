@@ -32,15 +32,16 @@ const (
 )
 
 // Run is main function for 'build' CLI command.
-func (i *Build) Run() error {
+func (i *Build) Run() (err error) {
 	if i.autoYml {
-		if err := i.yml.Run(); err != nil {
+		err = i.yml.Run()
+		if err != nil {
 			return err
 		}
 	}
 
 	newPlan := plan.New(i.plandir)
-	err := newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
+	err = newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
 	if err != nil {
 		return err
 	}
@@ -90,6 +91,7 @@ func (i *Build) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (i *Build) flags() []cli.Flag {
 	// Init sub-structures
 	i.yml = &Yml{}
@@ -116,6 +118,7 @@ func (i *Build) flags() []cli.Flag {
 	return self
 }
 
+// normalizeTags is wrapper for normalizeTagList.
 func (i *Build) normalizeTags() []string {
 	return normalizeTagList(i.tags.Value())
 }

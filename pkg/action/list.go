@@ -7,13 +7,19 @@ import (
 
 // List is struct for running 'list' command.
 type List struct {
-	plandir string
+	build     *Build
+	autoBuild bool
 }
 
 // Run is main function for 'list' command.
 func (l *List) Run() error {
-	p := plan.New(l.plandir)
-	if err := p.Import(); err != nil {
+	if l.autoBuild {
+		if err := l.build.Run(); err != nil {
+			return err
+		}
+	}
+	p, err := plan.NewAndImport(l.build.plandir)
+	if err != nil {
 		return err
 	}
 
@@ -31,8 +37,15 @@ func (l *List) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (l *List) flags() []cli.Flag {
-	return []cli.Flag{
-		flagPlandir(&l.plandir),
+	// Init sub-structures
+	l.build = &Build{}
+
+	self := []cli.Flag{
+		flagAutoBuild(&l.autoBuild),
+		flagPlandir(&l.build.plandir),
 	}
+
+	return append(self, l.build.flags()...)
 }

@@ -55,51 +55,24 @@ type Plan struct {
 	templater string
 }
 
-type registryConfigs []registry.Config
+// NewAndImport wrapper for New and Import in one.
+func NewAndImport(src string) (p *Plan, err error) {
+	p = New(src)
 
-func (r *registryConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(registryConfigs)
+	err = p.Import()
+	if err != nil {
+		return p, err
 	}
-	var err error
 
-	*r, err = registry.UnmarshalYAML(node)
-
-	return err
-}
-
-type repoConfigs []repo.Config
-
-func (r *repoConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(repoConfigs)
-	}
-	var err error
-
-	*r, err = repo.UnmarshalYAML(node)
-
-	return err
-}
-
-type releaseConfigs []release.Config
-
-func (r *releaseConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(releaseConfigs)
-	}
-	var err error
-
-	*r, err = release.UnmarshalYAML(node)
-
-	return err
+	return p, nil
 }
 
 type planBody struct {
 	Project      string
 	Version      string
-	Repositories repoConfigs
-	Registries   registryConfigs
-	Releases     releaseConfigs
+	Repositories repo.Configs
+	Registries   registry.Configs
+	Releases     release.Configs
 }
 
 func NewBody(file string) (*planBody, error) { // nolint:revive
@@ -131,10 +104,6 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 
 // New returns empty *Plan for provided directory.
 func New(dir string) *Plan {
-	// if dir[len(dir)-1:] != "/" {
-	//	dir += "/"
-	// }
-
 	plan := &Plan{
 		tmpDir:    os.TempDir(),
 		dir:       dir,

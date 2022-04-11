@@ -12,8 +12,8 @@ type Validate struct {
 
 // Run is main function for 'validate' command.
 func (l *Validate) Run() error {
-	p := plan.New(l.plandir)
-	if err := p.Import(); err != nil {
+	p, err := plan.NewAndImport(l.plandir)
+	if err != nil {
 		return err
 	}
 
@@ -30,6 +30,7 @@ func (l *Validate) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (l *Validate) flags() []cli.Flag {
 	return []cli.Flag{
 		flagPlandir(&l.plandir),

@@ -48,7 +48,7 @@ func (s *BuildValuesTestSuite) TestValuesBuildError() {
 	mockedRelease.On("BuildValues").Return(errBuildValues)
 
 	p.body = &planBody{
-		Releases: releaseConfigs{mockedRelease},
+		Releases: release.Configs{mockedRelease},
 	}
 
 	s.Require().ErrorIs(p.buildValues(), errBuildValues)
@@ -74,7 +74,7 @@ func (s *BuildValuesTestSuite) TestSuccess() {
 	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{
-		Releases: releaseConfigs{mockedRelease},
+		Releases: release.Configs{mockedRelease},
 	}
 
 	s.Require().NoError(p.buildValues())

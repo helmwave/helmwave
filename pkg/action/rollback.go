@@ -7,10 +7,8 @@ import (
 
 // Rollback is struct for running 'rollback' command.
 type Rollback struct {
-	plandir string
-
-	autoBuild bool
 	build     *Build
+	autoBuild bool
 }
 
 // Run is main function for 'rollback' command.
@@ -20,8 +18,8 @@ func (i *Rollback) Run() error {
 			return err
 		}
 	}
-	p := plan.New(i.plandir)
-	if err := p.Import(); err != nil {
+	p, err := plan.NewAndImport(i.build.plandir)
+	if err != nil {
 		return err
 	}
 
@@ -38,13 +36,14 @@ func (i *Rollback) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (i *Rollback) flags() []cli.Flag {
 	// Init sub-structures
 	i.build = &Build{}
 
 	self := []cli.Flag{
 		flagAutoBuild(&i.autoBuild),
-		flagPlandir(&i.plandir),
+		flagPlandir(&i.build.plandir),
 	}
 
 	return append(self, i.build.flags()...)

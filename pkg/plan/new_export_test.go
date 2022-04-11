@@ -168,7 +168,7 @@ func (p *Plan) SetReleases(r ...*MockReleaseConfig) {
 	if p.body == nil {
 		p.NewBody()
 	}
-	c := make(releaseConfigs, len(r))
+	c := make(release.Configs, len(r))
 	for i := range r {
 		c[i] = r[i]
 	}
@@ -179,7 +179,7 @@ func (p *Plan) SetRepositories(r ...*MockRepoConfig) {
 	if p.body == nil {
 		p.NewBody()
 	}
-	c := make(repoConfigs, len(r))
+	c := make(repo.Configs, len(r))
 	for i := range r {
 		c[i] = r[i]
 	}

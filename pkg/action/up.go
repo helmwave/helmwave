@@ -27,8 +27,8 @@ func (i *Up) Run() error {
 		}
 	}
 
-	p := plan.New(i.build.plandir)
-	if err := p.Import(); err != nil {
+	p, err := plan.NewAndImport(i.build.plandir)
+	if err != nil {
 		return err
 	}
 
@@ -53,6 +53,7 @@ func (i *Up) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (i *Up) flags() []cli.Flag {
 	// Init sub-structures
 	i.dog = &kubedog.Config{}

@@ -2,8 +2,25 @@ package registry
 
 import (
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
+// Configs type of array Config.
+type Configs []Config
+
+// UnmarshalYAML parse Config.
+func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
+	if r == nil {
+		r = new(Configs)
+	}
+	var err error
+
+	*r, err = UnmarshalYAML(node)
+
+	return err
+}
+
+// config is main registry config.
 type config struct {
 	log      *log.Entry `yaml:"-"`
 	HostF    string     `yaml:"host"`
@@ -12,17 +29,18 @@ type config struct {
 	Insecure bool       `yaml:"insecure"`
 }
 
+// Host return Host value.
 func (c *config) Host() string {
 	return c.HostF
 }
 
-//func (c *config) Username() string {
+// func (c *config) Username() string {
 //	return c.UsernameF
-//}
+// }
 //
-//func (c *config) Password() string {
+// func (c *config) Password() string {
 //	return c.PasswordF
-//}
+// }
 
 func (c *config) Logger() *log.Entry {
 	if c.log == nil {

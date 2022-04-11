@@ -21,16 +21,18 @@ func (d *DiffLocalPlan) Run() error {
 		log.Warn(plan.ErrPlansAreTheSame)
 	}
 
-	plan1 := plan.New(d.plandir1)
-	if err := plan1.Import(); err != nil {
+	// Plan 1
+	plan1, err := plan.NewAndImport(d.plandir1)
+	if err != nil {
 		return err
 	}
 	if ok := plan1.IsManifestExist(); !ok {
 		return os.ErrNotExist
 	}
 
-	plan2 := plan.New(d.plandir2)
-	if err := plan2.Import(); err != nil {
+	// Plan 2
+	plan2, err := plan.NewAndImport(d.plandir2)
+	if err != nil {
 		return err
 	}
 	if ok := plan2.IsManifestExist(); !ok {
@@ -52,6 +54,7 @@ func (d *DiffLocalPlan) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (d *DiffLocalPlan) flags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{

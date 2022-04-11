@@ -15,10 +15,11 @@ type DiffLive struct {
 
 // Run is main function for 'diff live' command.
 func (d *DiffLive) Run() error {
-	p := plan.New(d.plandir)
-	if err := p.Import(); err != nil {
+	p, err := plan.NewAndImport(d.plandir)
+	if err != nil {
 		return err
 	}
+
 	if ok := p.IsManifestExist(); !ok {
 		return os.ErrNotExist
 	}
@@ -38,6 +39,7 @@ func (d *DiffLive) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (d *DiffLive) flags() []cli.Flag {
 	return []cli.Flag{
 		flagPlandir(&d.plandir),

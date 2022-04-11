@@ -7,10 +7,8 @@ import (
 
 // Down is struct for running 'down' command.
 type Down struct {
-	plandir string
-
-	autoBuild bool
 	build     *Build
+	autoBuild bool
 }
 
 // Run is main function for 'down' command.
@@ -21,8 +19,8 @@ func (i *Down) Run() error {
 		}
 	}
 
-	p := plan.New(i.plandir)
-	if err := p.Import(); err != nil {
+	p, err := plan.NewAndImport(i.build.plandir)
+	if err != nil {
 		return err
 	}
 
@@ -39,6 +37,7 @@ func (i *Down) Cmd() *cli.Command {
 	}
 }
 
+// flags return flag set of CLI urfave.
 func (i *Down) flags() []cli.Flag {
 	// Init sub-structures
 	i.build = &Build{}
