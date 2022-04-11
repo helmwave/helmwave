@@ -52,6 +52,7 @@ func (s *BuildRepositoriesTestSuite) TestSuccess() {
 	mockedRelease.On("Repo").Return(repoName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("Chart").Return(release.Chart{})
 
 	mockedRepo := &MockRepoConfig{}
 	mockedRepo.On("Name").Return(repoName)
@@ -81,6 +82,7 @@ func (s *BuildRepositoriesTestSuite) TestMissingRepo() {
 	mockedRelease.On("Repo").Return(repoName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("Chart").Return(release.Chart{})
 
 	p.body = &planBody{
 		Releases: release.Configs{mockedRelease},
