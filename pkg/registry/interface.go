@@ -12,6 +12,8 @@ type Config interface {
 	Install() error
 	Logger() *log.Entry
 	Host() string
+	// Username() string
+	// Password() string
 }
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.

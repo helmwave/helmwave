@@ -55,51 +55,48 @@ type Plan struct {
 	templater string
 }
 
-type registryConfigs []registry.Config
+// NewAndImport wrapper for New and Import in one.
+func NewAndImport(src string) (p *Plan, err error) {
+	p = New(src)
 
-func (r *registryConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(registryConfigs)
+	err = p.Import()
+	if err != nil {
+		return p, err
 	}
-	var err error
 
-	*r, err = registry.UnmarshalYAML(node)
-
-	return err
+	return p, nil
 }
 
-type repoConfigs []repo.Config
-
-func (r *repoConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(repoConfigs)
+// Logger will pretty build log.Entry.
+func (p *Plan) Logger() *log.Entry {
+	a := make([]string, 0, len(p.body.Releases))
+	for _, r := range p.body.Releases {
+		a = append(a, string(r.Uniq()))
 	}
-	var err error
 
-	*r, err = repo.UnmarshalYAML(node)
-
-	return err
-}
-
-type releaseConfigs []release.Config
-
-func (r *releaseConfigs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(releaseConfigs)
+	b := make([]string, 0, len(p.body.Repositories))
+	for _, r := range p.body.Repositories {
+		b = append(b, r.Name())
 	}
-	var err error
 
-	*r, err = release.UnmarshalYAML(node)
+	c := make([]string, 0, len(p.body.Registries))
+	for _, r := range p.body.Registries {
+		c = append(c, r.Host())
+	}
 
-	return err
+	return log.WithFields(log.Fields{
+		"releases":     a,
+		"repositories": b,
+		"registries":   c,
+	})
 }
 
 type planBody struct {
 	Project      string
 	Version      string
-	Repositories repoConfigs
-	Registries   registryConfigs
-	Releases     releaseConfigs
+	Repositories repo.Configs
+	Registries   registry.Configs
+	Releases     release.Configs
 }
 
 func NewBody(file string) (*planBody, error) { // nolint:revive
@@ -131,10 +128,6 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 
 // New returns empty *Plan for provided directory.
 func New(dir string) *Plan {
-	// if dir[len(dir)-1:] != "/" {
-	//	dir += "/"
-	// }
-
 	plan := &Plan{
 		tmpDir:    os.TempDir(),
 		dir:       dir,
@@ -147,24 +140,5 @@ func New(dir string) *Plan {
 
 // PrettyPlan logs releases and repositories names.
 func (p *Plan) PrettyPlan() {
-	a := make([]string, 0, len(p.body.Releases))
-	for _, r := range p.body.Releases {
-		a = append(a, string(r.Uniq()))
-	}
-
-	b := make([]string, 0, len(p.body.Repositories))
-	for _, r := range p.body.Repositories {
-		b = append(b, r.Name())
-	}
-
-	c := make([]string, 0, len(p.body.Registries))
-	for _, r := range p.body.Registries {
-		c = append(c, r.Host())
-	}
-
-	log.WithFields(log.Fields{
-		"releases":     a,
-		"repositories": b,
-		"registries":   c,
-	}).Info("🏗 Plan")
+	p.Logger().Info("🏗 Plan")
 }

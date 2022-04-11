@@ -36,7 +36,7 @@ func (ts *StatusTestSuite) TestRun() {
 	ts.Require().NoError(r.Run())
 
 	s := &Status{
-		plandir: r.plandir,
+		build: r,
 	}
 
 	ts.Require().NoError(s.Run())

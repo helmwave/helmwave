@@ -7,14 +7,20 @@ import (
 
 // Status is struct for running 'status' command.
 type Status struct {
-	plandir string
-	names   cli.StringSlice
+	build     *Build
+	names     cli.StringSlice
+	autoBuild bool
 }
 
 // Run is main function for 'status' command.
 func (l *Status) Run() error {
-	p := plan.New(l.plandir)
-	if err := p.Import(); err != nil {
+	if l.autoBuild {
+		if err := l.build.Run(); err != nil {
+			return err
+		}
+	}
+	p, err := plan.NewAndImport(l.build.plandir)
+	if err != nil {
 		return err
 	}
 
@@ -24,11 +30,21 @@ func (l *Status) Run() error {
 // Cmd returns 'status' *cli.Command.
 func (l *Status) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "status",
-		Usage: "👁️ Status of deployed releases",
-		Flags: []cli.Flag{
-			flagPlandir(&l.plandir),
-		},
+		Name:   "status",
+		Usage:  "👁️ Status of deployed releases",
+		Flags:  l.flags(),
 		Action: toCtx(l.Run),
 	}
+}
+
+// flags return flag set of CLI urfave.
+func (l *Status) flags() []cli.Flag {
+	// Init sub-structures
+	l.build = &Build{}
+
+	self := []cli.Flag{
+		flagAutoBuild(&l.autoBuild),
+	}
+
+	return append(self, l.build.flags()...)
 }
