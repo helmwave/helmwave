@@ -47,3 +47,8 @@ We use https://pre-commit.com for git hooks
 1. [Dockerfile](Dockerfile): GOLANG_VERSION=1.18
 2. [ci](.github/workflows/goreleaser.yml)
 
+## How to upgrade alpine version?
+
+> change version in next files:
+
+1. [Dockerfile](Dockerfile): ALPINE_VERSION=3.15
