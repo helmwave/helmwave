@@ -5,7 +5,6 @@ FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 ENV GO111MODULE=on
 ENV CGO_ENABLED=0
 ENV PROJECT=helmwave
-ENV ASSUME_NO_MOVING_GC_UNSAFE_RISK_IT_WITH=${GOLANG_VERSION}
 
 WORKDIR ${PROJECT}
 
@@ -15,6 +14,7 @@ RUN go mod download
 # Copy src code from the host and compile it
 COPY cmd cmd
 COPY pkg pkg
+ENV ASSUME_NO_MOVING_GC_UNSAFE_RISK_IT_WITH=go${GOLANG_VERSION}
 RUN go build -a -o /${PROJECT} ./cmd/${PROJECT}
 
 ### Base image with shell
