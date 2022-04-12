@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/bombsimon/logrusr/v2"
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -77,6 +78,10 @@ func (l *Settings) Init() error {
 		logKubernetesClientError,
 	}
 	klog.SetLogger(logrusr.New(log.StandardLogger()))
+	klog.SetOutputBySeverity("INFO", io.Discard)
+	klog.SetOutputBySeverity("WARNING", io.Discard)
+	klog.SetOutputBySeverity("ERROR", io.Discard)
+	// klog.SetOutputBySeverity("FATAL", logboek.DefaultLogger().ErrStream())
 
 	if l.width > 0 {
 		logboek.DefaultLogger().Streams().SetWidth(l.width)

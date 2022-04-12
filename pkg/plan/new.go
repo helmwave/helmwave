@@ -119,7 +119,8 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 	// 	 b.Version = version.Version
 	// }
 
-	if err := b.Validate(); err != nil {
+	err = b.Validate()
+	if err != nil {
 		return nil, err
 	}
 
@@ -136,9 +137,4 @@ func New(dir string) *Plan {
 	}
 
 	return plan
-}
-
-// PrettyPlan logs releases and repositories names.
-func (p *Plan) PrettyPlan() {
-	p.Logger().Info("🏗 Plan")
 }

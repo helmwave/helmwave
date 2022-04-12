@@ -24,7 +24,7 @@ func (p *Plan) buildValues() error {
 				}
 
 				if len(vals) == 0 {
-					log.WithField("release", rel.Uniq()).Info("no values provided")
+					rel.Logger().Info("no values provided")
 				} else {
 					log.WithField("release", rel.Uniq()).WithField("values", vals).Infof("✅ found %d values count", len(vals))
 				}

@@ -47,7 +47,7 @@ func (i *Build) Run() (err error) {
 	}
 
 	// Show current plan
-	newPlan.PrettyPlan()
+	newPlan.Logger().Info("🏗 Plan")
 
 	switch i.diffMode {
 	case DiffModeLocal:

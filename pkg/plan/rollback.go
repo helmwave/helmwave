@@ -3,11 +3,11 @@ package plan
 import (
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
-	log "github.com/sirupsen/logrus"
 )
 
 // Rollback rollbacks helm release.
-func (p *Plan) Rollback(version int) error { //nolint:dupl
+// nolint:nolintlint
+func (p *Plan) Rollback(version int) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -16,10 +16,10 @@ func (p *Plan) Rollback(version int) error { //nolint:dupl
 			defer wg.Done()
 			err := rel.Rollback(version)
 			if err != nil {
-				log.Errorf("❌ %s: %v", rel.Uniq(), err)
+				rel.Logger().WithError(err).Error("❌ rollback")
 				wg.ErrChan() <- err
 			} else {
-				log.Infof("✅ %s rollback!", rel.Uniq())
+				rel.Logger().Info("✅ rollback!")
 			}
 		}(wg, p.body.Releases[i])
 	}

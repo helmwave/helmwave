@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	log "github.com/sirupsen/logrus"
 )
 
 // ErrValidateFailed is returned for failed values validation.
@@ -19,14 +18,14 @@ func (p *Plan) ValidateValues() error {
 	f := false
 	for _, rel := range p.body.Releases {
 		for i := range rel.Values() {
-			p := rel.Values()[i].Get()
-			_, err := os.Stat(p)
+			y := rel.Values()[i].Get()
+			_, err := os.Stat(y)
 			if os.IsNotExist(err) {
 				f = true
-				log.WithError(err).Errorf("❌ %s values (%s)", rel.Uniq(), rel.Values()[i].Src)
+				rel.Logger().Errorf("❌ values %q", rel.Values()[i].Src)
 			} else if err != nil {
 				f = true
-				log.WithError(err).Errorf("failed to open values %s", p)
+				rel.Logger().WithError(err).Errorf("failed to open values %s", y)
 			}
 		}
 	}
@@ -108,7 +107,7 @@ func (p *planBody) ValidateReleases() error {
 		}
 
 		if r.Namespace() == "" {
-			log.Warnf("namespace for %q is empty. I will use the namespace of your k8s context.", r.Uniq())
+			r.Logger().Warnf("namespace is empty. I will use the namespace of your k8s context.")
 		}
 
 		if !validateNS(r.Namespace()) {
