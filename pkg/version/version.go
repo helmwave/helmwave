@@ -12,5 +12,6 @@ func Check(a, b string) {
 	}
 }
 
-// Version is helmwave binary version. It is overrided by goreleaser during release.
+// Version is helmwave binary version.
+// It will override by goreleaser during release.
 var Version = "dev"

@@ -32,7 +32,7 @@ func (i *Up) Run() error {
 		return err
 	}
 
-	p.PrettyPlan()
+	p.Logger().Info("🏗 Plan")
 
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")

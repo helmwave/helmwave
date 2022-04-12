@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func buildGraphMD(releases []release.Config) string {
+func buildGraphMD(releases release.Configs) string {
 	md := "# Depends On\n\n" +
 		"```mermaid\ngraph RL\n"
 
@@ -29,7 +29,7 @@ func buildGraphMD(releases []release.Config) string {
 	return md
 }
 
-func buildGraphASCII(releases []release.Config) string {
+func buildGraphASCII(releases release.Configs) string {
 	list := make([]core.NodeInput, 0, len(releases))
 
 	for _, rel := range releases {

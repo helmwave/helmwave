@@ -30,7 +30,7 @@ func status(all []release.Config, names []string) error {
 	}
 
 	for _, rel := range r {
-		l := log.WithField("release", rel.Uniq())
+		l := rel.Logger()
 
 		s, err := rel.Status()
 		if err != nil {

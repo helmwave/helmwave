@@ -30,7 +30,7 @@ func (p *Plan) List() error {
 	for _, rel := range p.body.Releases {
 		r, err := rel.List()
 		if err != nil {
-			log.Errorf("Failed to list %s release, skipping: %v", string(rel.Uniq()), err)
+			rel.Logger().WithError(err).Error("Failed to list. Skipping.")
 
 			continue
 		}

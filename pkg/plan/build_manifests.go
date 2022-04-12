@@ -6,7 +6,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
-	log "github.com/sirupsen/logrus"
 )
 
 func (p *Plan) buildManifest() error {
@@ -25,10 +24,10 @@ func (p *Plan) buildManifest() error {
 func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
 	defer wg.Done()
 
-	l := log.WithField("release", rel.Uniq())
+	l := rel.Logger()
 
 	if err := rel.ChartDepsUpd(); err != nil {
-		l.Warnf("❌ can't get dependencies : %v", err)
+		l.WithError(err).Warn("❌ can't get dependencies")
 	}
 
 	rel.DryRun(true)
