@@ -110,4 +110,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
           # IDK
-          ASSUME_NO_MOVING_GC_UNSAFE_RISK_IT_WITH: 1.18
+          ASSUME_NO_MOVING_GC_UNSAFE_RISK_IT_WITH: go1.18
