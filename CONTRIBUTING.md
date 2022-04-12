@@ -35,6 +35,15 @@ After merging new release branch (minor or major) a new branch and PR in [helmwa
 
 https://helmwave.github.io/docs/0.17.x/install/#compile-from-source
 
-### Pre commit
+## Pre commit
 
 We use https://pre-commit.com for git hooks
+
+## How to upgrade golang version?
+
+> change version in next files:
+
+0. [go.mod](go.mod)
+1. [Dockerfile](Dockerfile): GOLANG_VERSION=1.18
+2. [ci](.github/workflows/goreleaser.yml)
+
