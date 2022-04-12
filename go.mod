@@ -17,7 +17,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
-	github.com/urfave/cli/v2 v2.3.0
+	github.com/urfave/cli/v2 v2.4.0
 	github.com/werf/kubedog v0.6.3
 	github.com/werf/logboek v0.5.4
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
