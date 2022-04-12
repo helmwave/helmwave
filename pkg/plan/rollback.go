@@ -6,7 +6,8 @@ import (
 )
 
 // Rollback rollbacks helm release.
-func (p *Plan) Rollback(version int) error { //nolint:dupl
+// nolint:nolintlint
+func (p *Plan) Rollback(version int) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 

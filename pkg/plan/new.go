@@ -119,7 +119,8 @@ func NewBody(file string) (*planBody, error) { // nolint:revive
 	// 	 b.Version = version.Version
 	// }
 
-	if err = b.Validate(); err != nil {
+	err = b.Validate()
+	if err != nil {
 		return nil, err
 	}
 
