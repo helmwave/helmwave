@@ -28,7 +28,7 @@ jobs:
   snyk:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run Snyk
       continue-on-error: true
       uses: snyk/actions/docker@14818c4695ecc4045f33c9cee9e795a788711ca4
