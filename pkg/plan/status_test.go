@@ -24,6 +24,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	r := &helmRelease.Release{
 		Info: &helmRelease.Info{},
 		Chart: &chart.Chart{
