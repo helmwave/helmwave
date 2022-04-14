@@ -48,9 +48,7 @@ func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
 	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return(s.T().Name())
-	mockedRelease.On("Namespace").Return(s.T().Name())
-	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 

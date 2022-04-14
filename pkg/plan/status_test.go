@@ -50,9 +50,6 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return("redis")
-	mockedRelease.On("Namespace").Return("defaultblabla")
-	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Status").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
