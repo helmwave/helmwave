@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"helm.sh/helm/v3/pkg/chart"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -52,6 +53,7 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Status").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	p.SetReleases(mockedRelease)
 
