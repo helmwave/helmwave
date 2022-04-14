@@ -146,5 +146,5 @@ func (l *Settings) setFormat() {
 }
 
 func logKubernetesClientError(err error) {
-	log.WithError(err).Debug("kubernetes client error")
+	log.WithError(err).Trace("kubernetes client error")
 }
