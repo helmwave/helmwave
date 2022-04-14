@@ -261,6 +261,8 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) (err error) {
 		return err
 	}
 
+	// ? Kubedog soft exit
+	time.Sleep(kubedogConfig.StatusInterval)
 	err = dogroup.Wait()
 	if err != nil {
 		// Ignore kubedog error
