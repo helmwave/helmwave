@@ -292,7 +292,6 @@ func (p *Plan) kubedogSpecs() (s multitrack.MultitrackSpecs) {
 		s.DaemonSets = append(s.DaemonSets, spec.DaemonSets...)
 		s.StatefulSets = append(s.StatefulSets, spec.StatefulSets...)
 		s.Canaries = append(s.Canaries, spec.Canaries...)
-
 	}
 
 	return s
