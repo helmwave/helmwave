@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"github.com/werf/logboek"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/klog/v2"
+	klog_v2 "k8s.io/klog/v2"
 )
 
 // Settings stores configuration for logger.
@@ -77,10 +77,12 @@ func (l *Settings) Init() error {
 	utilruntime.ErrorHandlers = []func(error){
 		logKubernetesClientError,
 	}
-	klog.SetLogger(logrusr.New(log.StandardLogger()))
-	klog.SetOutputBySeverity("INFO", io.Discard)
-	klog.SetOutputBySeverity("WARNING", io.Discard)
-	klog.SetOutputBySeverity("ERROR", io.Discard)
+
+	// https://github.com/werf/werf/blob/main/cmd/werf/common/kubedog.go#L49
+	klog_v2.SetLogger(logrusr.New(log.StandardLogger()))
+	klog_v2.SetOutputBySeverity("INFO", io.Discard)
+	klog_v2.SetOutputBySeverity("WARNING", io.Discard)
+	klog_v2.SetOutputBySeverity("ERROR", io.Discard)
 	// klog.SetOutputBySeverity("FATAL", logboek.DefaultLogger().ErrStream())
 
 	if l.width > 0 {
@@ -146,5 +148,5 @@ func (l *Settings) setFormat() {
 }
 
 func logKubernetesClientError(err error) {
-	log.WithError(err).Debug("kubernetes client error")
+	log.WithError(err).Trace("kubernetes client error")
 }

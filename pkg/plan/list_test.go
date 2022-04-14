@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"helm.sh/helm/v3/pkg/chart"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -42,10 +43,8 @@ func (s *ListTestSuite) TestListError() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return(s.T().Name())
-	mockedRelease.On("Namespace").Return(s.T().Name())
-	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("List").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	p.SetReleases(mockedRelease)
 

@@ -14,7 +14,6 @@ RUN go mod download
 # Copy src code from the host and compile it
 COPY cmd cmd
 COPY pkg pkg
-ENV ASSUME_NO_MOVING_GC_UNSAFE_RISK_IT_WITH=go${GOLANG_VERSION}
 RUN go build -a -o /${PROJECT} ./cmd/${PROJECT}
 
 ### Base image with shell

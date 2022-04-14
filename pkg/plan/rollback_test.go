@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -18,10 +19,8 @@ func (s *RollbackTestSuite) TestRollback() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return(s.T().Name())
-	mockedRelease.On("Namespace").Return(s.T().Name())
-	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Rollback").Return(nil)
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	p.SetReleases(mockedRelease)
 
@@ -37,10 +36,8 @@ func (s *RollbackTestSuite) TestRollbackError() {
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	e := errors.New(s.T().Name())
-	mockedRelease.On("Name").Return(s.T().Name())
-	mockedRelease.On("Namespace").Return(s.T().Name())
-	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Rollback").Return(e)
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	p.SetReleases(mockedRelease)
 

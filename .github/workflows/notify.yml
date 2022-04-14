@@ -5,6 +5,7 @@ on:
     types:
       - created
       - published
+      - released
 
 jobs:
   telegram:
