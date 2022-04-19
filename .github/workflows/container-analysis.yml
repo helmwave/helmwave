@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Run Trivy
-      uses: aquasecurity/trivy-action@40c4ca9e7421287d0c5576712fdff370978f9c3c
+      uses: aquasecurity/trivy-action@2b30463ddb3d11724a04e760e020c7d9af24d8b3
       with:
         image-ref: 'ghcr.io/helmwave/helmwave:latest'
         format: 'template'
