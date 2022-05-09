@@ -1480,8 +1480,8 @@ github.com/vishvananda/netns v0.0.0-20180720170159-13995c7128cc/go.mod h1:ZjcWmF
 github.com/vishvananda/netns v0.0.0-20191106174202-0a2b9b5464df/go.mod h1:JP3t17pCcGlemwknint6hfoeCVQrEMVwxRLRjXpq+BU=
 github.com/vishvananda/netns v0.0.0-20200728191858-db3c7e526aae/go.mod h1:DD4vA1DwXk04H54A1oHXtwZmA0grkVMdPxx/VGLCah0=
 github.com/vishvananda/netns v0.0.0-20210104183010-2eb08e3e575f/go.mod h1:DD4vA1DwXk04H54A1oHXtwZmA0grkVMdPxx/VGLCah0=
-github.com/werf/kubedog v0.6.3 h1:EqenZV0HnSM50329gCu/M1Fic7fLRL4SoFRMDlR/Neo=
-github.com/werf/kubedog v0.6.3/go.mod h1:QQZtZEKQf9HMKjMkbkrrwX9VDf5XKsn4TVmbWjsHn7M=
+github.com/werf/kubedog v0.6.4 h1:9XGRviw6oF/bSpOp1HRcFdTbBadk7tO7bIVm9iZI/2g=
+github.com/werf/kubedog v0.6.4/go.mod h1:QQZtZEKQf9HMKjMkbkrrwX9VDf5XKsn4TVmbWjsHn7M=
 github.com/werf/logboek v0.5.1/go.mod h1:1RKvhO4ulmpD5sUN/9a2XsRjt+Xh8CxJjMbmya85YVA=
 github.com/werf/logboek v0.5.4 h1:BZ2UJlvngf/lSkJ2NDt0DmIY7tI1GyraURC8s8Injlk=
 github.com/werf/logboek v0.5.4/go.mod h1:anq9+mQPKXf67BVtFnXG9wPpMi9Q0RkQ3jFSCzIdquI=
