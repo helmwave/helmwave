@@ -34,7 +34,13 @@ func (t gomplateTemplater) Render(src string, data interface{}) ([]byte, error) 
 }
 
 func (t gomplateTemplater) funcMap() template.FuncMap {
-	log.Debug("Loading gomplate template functions")
+	funcMap := template.FuncMap{}
 
-	return gomplate.CreateFuncs(context.Background(), &gomplateData.Data{})
+	log.Debug("Loading gomplate template functions")
+	gomplateFuncMap := gomplate.CreateFuncs(context.Background(), &gomplateData.Data{})
+
+	addToMap(funcMap, gomplateFuncMap)
+	addToMap(funcMap, customFuncs)
+
+	return funcMap
 }
