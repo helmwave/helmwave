@@ -1,11 +1,9 @@
 name: Notify
 
 on:
-  release:
-    types:
-      - created
-      - published
-      - released
+  push:
+    tags:
+    - "v*"
 
 jobs:
   telegram:
