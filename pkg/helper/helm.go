@@ -39,6 +39,8 @@ func NewCfg(ns string) (*action.Configuration, error) {
 	helmDriver := os.Getenv("HELM_DRIVER") // TODO: get rid of getenv in runtime
 	config := genericclioptions.NewConfigFlags(false)
 	config.Namespace = &ns
+	config.Context = &Helm.KubeContext
+
 	if Helm.Debug {
 		helmLogLevel = log.Infof
 	}
