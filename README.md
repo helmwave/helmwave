@@ -10,8 +10,6 @@
   <a href="https://bestpractices.coreinfrastructure.org/projects/5426"><img src="https://bestpractices.coreinfrastructure.org/projects/5426/badge"></a>
   <a href="https://www.codacy.com/gh/helmwave/helmwave/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=helmwave/helmwave&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/200ca37690b7463b976f1ece36b53a4e"/></a>
   <a href="https://www.codefactor.io/repository/github/helmwave/helmwave"><img src="https://www.codefactor.io/repository/github/helmwave/helmwave/badge" alt="CodeFactor" /></a>
-  <a href="https://requires.io/github/helmwave/helmwave/requirements/?branch=main"><img src="https://requires.io/github/helmwave/helmwave/requirements.svg?branch=main" alt="Requirements Status" /></a>
-  <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/helmwave/helmwave">
   <img alt="GitHub" src="https://img.shields.io/github/license/zhilyaev/helmwave">
   <img alt="GitHub tag (latest SemVer)" src="https://img.shields.io/github/v/tag/zhilyaev/helmwave?label=latest">
 </p>
