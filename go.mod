@@ -16,11 +16,11 @@ require (
 	github.com/otiai10/copy v1.7.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.7.5
 	github.com/urfave/cli/v2 v2.6.0
 	github.com/werf/kubedog v0.6.4
 	github.com/werf/logboek v0.5.4
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.9.0
 	k8s.io/apimachinery v0.24.0
 	k8s.io/cli-runtime v0.24.0
@@ -184,7 +184,7 @@ require (
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/cobra v1.4.0 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
