@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func NewConfig() *config { //nolint:revive
+func NewConfig() *config {
 	return &config{
 		NameF:      "blabla" + strconv.Itoa(rand.Int()),
 		NamespaceF: "blabla",

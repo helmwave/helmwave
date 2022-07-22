@@ -11,7 +11,7 @@ type Graph[K comparable, N any] struct {
 }
 
 // NewGraph returns empty graph.
-func NewGraph[K comparable, N any]() *Graph[K, N] { //nolint:gocritic // false positive with generics
+func NewGraph[K comparable, N any]() *Graph[K, N] {
 	return &Graph[K, N]{
 		Nodes:        make(map[K]*Node[N]),
 		dependencies: make([][2]K, 0),
