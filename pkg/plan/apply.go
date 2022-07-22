@@ -148,24 +148,33 @@ func SyncRepositories(repositories repo.Configs) error {
 	return nil
 }
 
-func (p *Plan) syncReleases() (err error) {
+func (p *Plan) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
 	dependenciesGraph := dependency.NewGraph[uniqname.UniqName, release.Config]()
 
 	for i := range p.body.Releases {
-		release := p.body.Releases[i]
-		err = dependenciesGraph.NewNode(release.Uniq(), release)
+		rel := p.body.Releases[i]
+		err := dependenciesGraph.NewNode(rel.Uniq(), rel)
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		for _, dep := range release.DependsOn() {
-			dependenciesGraph.AddDependency(release.Uniq(), uniqname.UniqName(dep))
+		for _, dep := range rel.DependsOn() {
+			dependenciesGraph.AddDependency(rel.Uniq(), uniqname.UniqName(dep))
 		}
 	}
 
-	err = dependenciesGraph.Build()
+	err := dependenciesGraph.Build()
 	if err != nil {
-		return
+		return nil, err
+	}
+
+	return dependenciesGraph, nil
+}
+
+func (p *Plan) syncReleases() (err error) {
+	dependenciesGraph, err := p.generateDependencyGraph()
+	if err != nil {
+		return err
 	}
 
 	nodesChan := dependenciesGraph.Run()
