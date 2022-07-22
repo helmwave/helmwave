@@ -153,7 +153,11 @@ func (p *Plan) syncReleases() (err error) {
 
 	for i := range p.body.Releases {
 		release := p.body.Releases[i]
-		dependenciesGraph.NewNode(release.Uniq(), release)
+		err = dependenciesGraph.NewNode(release.Uniq(), release)
+		if err != nil {
+			return
+		}
+
 		for _, dep := range release.DependsOn() {
 			dependenciesGraph.AddDependency(release.Uniq(), uniqname.UniqName(dep))
 		}
@@ -161,7 +165,7 @@ func (p *Plan) syncReleases() (err error) {
 
 	err = dependenciesGraph.Build()
 	if err != nil {
-		return err
+		return
 	}
 
 	nodesChan := dependenciesGraph.Run()
