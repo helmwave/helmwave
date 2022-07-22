@@ -22,7 +22,7 @@ require (
 	github.com/werf/logboek v0.5.4
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.9.2
-	k8s.io/apimachinery v0.24.2
+	k8s.io/apimachinery v0.24.3
 	k8s.io/cli-runtime v0.24.2
 	k8s.io/klog/v2 v2.60.1
 )
