@@ -4,9 +4,6 @@ package release
 import (
 	"math/rand"
 	"strconv"
-
-	"github.com/helmwave/helmwave/pkg/pubsub"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 )
 
 func NewConfig() *config { //nolint:revive
@@ -14,12 +11,4 @@ func NewConfig() *config { //nolint:revive
 		NameF:      "blabla" + strconv.Itoa(rand.Int()),
 		NamespaceF: "blabla",
 	}
-}
-
-func (rel *config) GetDependencies() map[uniqname.UniqName]<-chan pubsub.ReleaseStatus {
-	return rel.dependencies
-}
-
-func (rel *config) WaitForDependencies() error {
-	return rel.waitForDependencies()
 }

@@ -14,6 +14,8 @@ import (
 	"github.com/helmwave/helmwave/pkg/parallel"
 	regi "github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/dependency"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
@@ -147,6 +149,23 @@ func SyncRepositories(repositories repo.Configs) error {
 }
 
 func (p *Plan) syncReleases() (err error) {
+	dependenciesGraph := dependency.NewGraph[uniqname.UniqName, release.Config]()
+
+	for i := range p.body.Releases {
+		release := p.body.Releases[i]
+		dependenciesGraph.NewNode(release.Uniq(), release)
+		for _, dep := range release.DependsOn() {
+			dependenciesGraph.AddDependency(release.Uniq(), uniqname.UniqName(dep))
+		}
+	}
+
+	err = dependenciesGraph.Build()
+	if err != nil {
+		return err
+	}
+
+	nodesChan := dependenciesGraph.Run()
+
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -154,17 +173,23 @@ func (p *Plan) syncReleases() (err error) {
 
 	mu := &sync.Mutex{}
 
-	for i := range p.body.Releases {
-		p.body.Releases[i].HandleDependencies(p.body.Releases)
-		go func(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
+	for n := range nodesChan {
+		go func(wg *parallel.WaitGroup, node *dependency.Node[release.Config], mu *sync.Mutex) {
 			defer wg.Done()
-			l := log.WithField("release", rel.Uniq())
+			rel := node.Data
+
+			l := rel.Logger()
 			l.Info("🛥 deploying... ")
 			_, err = rel.Sync()
 			if err != nil {
 				l.WithError(err).Error("❌")
 
-				rel.NotifyFailed()
+				if rel.AllowFailure() {
+					l.Errorf("release is allowed to fail, markind as succeeded to dependencies")
+					node.SetSucceeded()
+				} else {
+					node.SetFailed()
+				}
 
 				mu.Lock()
 				fails[rel] = err
@@ -172,10 +197,10 @@ func (p *Plan) syncReleases() (err error) {
 
 				wg.ErrChan() <- err
 			} else {
-				rel.NotifySuccess()
+				node.SetSucceeded()
 				l.Info("✅")
 			}
-		}(wg, p.body.Releases[i], mu)
+		}(wg, n, mu)
 	}
 
 	if err := wg.Wait(); err != nil {
