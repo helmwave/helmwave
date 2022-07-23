@@ -440,9 +440,11 @@ issues:
     - path: _test\.go
       linters:
         - dupl
-        - goconst
-        - wrapcheck
         - forcetypeassert
+        - goconst
+        - godot
+        - revive
+        - wrapcheck
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
