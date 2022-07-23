@@ -109,9 +109,6 @@ func (s *GraphTestSuite) TestFailedDependencies() {
 }
 
 func (s *GraphTestSuite) TestCycles() {
-	// TODO: enable test
-	s.T().SkipNow()
-
 	graph := dependency.NewGraph[string, string]()
 
 	s.Require().NoError(graph.NewNode("1", "1"))

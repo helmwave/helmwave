@@ -59,7 +59,40 @@ func (graph *Graph[K, N]) Build() error {
 }
 
 func (graph *Graph[K, N]) detectCycle() error {
-	// TODO: actually detect cycles
+	visited := make(map[*Node[N]]int)
+
+	for _, node := range graph.Nodes {
+		err := graph.dfs(node, visited)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// dfs is Depth First Search.
+func (graph *Graph[K, N]) dfs(node *Node[N], visited map[*Node[N]]int) error {
+	// This means that during recursion we hit node that is already being dfs'd
+	if visited[node] == -1 {
+		return fmt.Errorf("graph loop detected (starts with %v)", node)
+	}
+
+	if visited[node] == 1 {
+		return nil
+	}
+
+	visited[node] = -1
+
+	for _, dep := range node.dependencies {
+		err := graph.dfs(dep, visited)
+		if err != nil {
+			return err
+		}
+	}
+
+	visited[node] = 1
+
 	return nil
 }
 
