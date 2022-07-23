@@ -93,7 +93,7 @@ func (graph *Graph[K, N]) runChan(ch chan<- *Node[N]) {
 // Run returns channel for data and runs goroutine that handles dependency graph
 // and populates channel with ready to install releases.
 func (graph *Graph[K, N]) Run() <-chan *Node[N] {
-	ch := make(chan *Node[N])
+	ch := make(chan *Node[N], len(graph.Nodes))
 	go graph.runChan(ch)
 
 	return ch

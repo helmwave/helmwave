@@ -51,6 +51,11 @@ func (node *Node[N]) IsReady() bool {
 		if !dependency.IsDone() {
 			return false
 		}
+
+		if dependency.IsFailed() {
+			node.SetFailed()
+			return false
+		}
 	}
 
 	return true
