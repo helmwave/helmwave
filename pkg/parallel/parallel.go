@@ -1,10 +1,12 @@
 package parallel
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
 	"github.com/hashicorp/go-multierror"
+	"github.com/pkg/errors"
 )
 
 // WaitGroup is an extension to sync.WaitGroup that provided channel for errors.
@@ -53,6 +55,23 @@ func (wg *WaitGroup) Wait() error {
 	}
 
 	return nil
+}
+
+// WaitWithContext is the same Wait but respects context.
+// If context is canceled waitgroups will not be waited and canceled error will be immediately returned.
+func (wg *WaitGroup) WaitWithContext(ctx context.Context) error {
+	ch := make(chan error, 1)
+	go func(wg *WaitGroup, ch chan<- error) {
+		ch <- wg.Wait()
+		close(ch)
+	}(wg, ch)
+
+	select {
+	case <-ctx.Done():
+		return errors.WithStack(ctx.Err())
+	case err := <-ch:
+		return err
+	}
 }
 
 // Add adds delta to WaitGroup counter.

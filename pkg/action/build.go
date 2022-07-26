@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"sort"
 	"strings"
 
@@ -41,7 +42,8 @@ func (i *Build) Run() (err error) {
 	}
 
 	newPlan := plan.New(i.plandir)
-	err = newPlan.Build(i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
+	ctx := context.TODO()
+	err = newPlan.Build(ctx, i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
 	if err != nil {
 		return err
 	}
@@ -63,7 +65,7 @@ func (i *Build) Run() (err error) {
 
 	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
-		newPlan.DiffLive(i.diff.ShowSecret, i.diff.Wide)
+		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide)
 	default:
 		log.Warnf("I dont know what is %q. I am skiping diff.", i.diffMode)
 	}

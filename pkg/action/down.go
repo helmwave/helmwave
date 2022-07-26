@@ -1,6 +1,8 @@
 package action
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
@@ -24,7 +26,9 @@ func (i *Down) Run() error {
 		return err
 	}
 
-	return p.Destroy()
+	ctx := context.TODO()
+
+	return p.Destroy(ctx)
 }
 
 // Cmd returns 'down' *cli.Command.

@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
@@ -12,7 +13,7 @@ import (
 // Config is an interface to manage particular helm repository.
 type Config interface {
 	In([]Config) bool
-	Install(*helm.EnvSettings, *repo.File) error
+	Install(context.Context, *helm.EnvSettings, *repo.File) error
 	Name() string
 	URL() string
 	Logger() *log.Entry

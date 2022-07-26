@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -26,13 +27,13 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	return u
 }
 
-func (r *MockReleaseConfig) Sync() (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) Sync(context.Context) (*helmRelease.Release, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) DryRun(_ bool) {
+func (r *MockReleaseConfig) DryRun(bool) {
 	r.Called()
 }
 
@@ -40,7 +41,7 @@ func (r *MockReleaseConfig) ChartDepsUpd() error {
 	return r.Called().Error(0)
 }
 
-func (r *MockReleaseConfig) In(a []release.Config) bool {
+func (r *MockReleaseConfig) In([]release.Config) bool {
 	return r.Called().Bool(0)
 }
 
@@ -62,7 +63,7 @@ func (r *MockReleaseConfig) BuildValues(dir, templater string) error {
 	return nil
 }
 
-func (r *MockReleaseConfig) Uninstall() (*helmRelease.UninstallReleaseResponse, error) {
+func (r *MockReleaseConfig) Uninstall(context.Context) (*helmRelease.UninstallReleaseResponse, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.UninstallReleaseResponse), args.Error(1)
@@ -80,7 +81,7 @@ func (r *MockReleaseConfig) List() (*helmRelease.Release, error) {
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) Rollback(n int) error {
+func (r *MockReleaseConfig) Rollback(int) error {
 	return r.Called().Error(0)
 }
 
@@ -130,11 +131,11 @@ type MockRepoConfig struct {
 	mock.Mock
 }
 
-func (r *MockRepoConfig) In(_ []repo.Config) bool {
+func (r *MockRepoConfig) In([]repo.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockRepoConfig) Install(_ *helm.EnvSettings, _ *helmRepo.File) error {
+func (r *MockRepoConfig) Install(context.Context, *helm.EnvSettings, *helmRepo.File) error {
 	return r.Called().Error(0)
 }
 

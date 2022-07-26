@@ -1,6 +1,7 @@
 package plan_test
 
 import (
+	"context"
 	"errors"
 	"path/filepath"
 	"testing"
@@ -26,7 +27,7 @@ func (s *DestroyTestSuite) TestDestroy() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Destroy()
+	err := p.Destroy(context.Background())
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -45,7 +46,7 @@ func (s *DestroyTestSuite) TestDestroyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Destroy()
+	err := p.Destroy(context.Background())
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -56,7 +57,7 @@ func (s *DestroyTestSuite) TestDestroyNoReleases() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Destroy()
+	err := p.Destroy(context.Background())
 	s.Require().NoError(err)
 }
 
