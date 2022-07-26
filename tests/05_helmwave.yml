@@ -1,3 +1,4 @@
+
 project: Test05
 
 repositories:
@@ -12,5 +13,6 @@ releases:
   chart:
     name: bitnami/nginx
   namespace: test
+  create_namespace: true
   values:
-    - tests/05_values.yaml
+  - tests/05_values.yaml

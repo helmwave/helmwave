@@ -67,7 +67,24 @@ func (rel *config) DryRun(b bool) {
 // Chart is structure for chart download options.
 type Chart struct {
 	action.ChartPathOptions `yaml:",inline"` //nolint:nolintlint
-	Name                    string
+	Name                    string           `yaml:"name"`
+}
+
+// UnmarshalYAML flexible config
+func (u *Chart) UnmarshalYAML(n *yaml.Node) (err error) {
+	type raw Chart
+	var name string
+
+	if err = n.Decode(&name); err == nil {
+		u.Name = name
+		return nil
+	}
+
+	if err = n.Decode((*raw)(u)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (rel *config) newInstall() *action.Install {
