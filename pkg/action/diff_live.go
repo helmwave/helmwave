@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -24,7 +25,8 @@ func (d *DiffLive) Run() error {
 		return os.ErrNotExist
 	}
 
-	p.DiffLive(d.diff.ShowSecret, d.diff.Wide)
+	ctx := context.TODO()
+	p.DiffLive(ctx, d.diff.ShowSecret, d.diff.Wide)
 
 	return nil
 }

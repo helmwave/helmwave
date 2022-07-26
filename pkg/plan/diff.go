@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -57,8 +58,8 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
-func (p *Plan) DiffLive(showSecret bool, diffWide int) {
-	alive, _, err := p.GetLive()
+func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
+	alive, _, err := p.GetLive(ctx)
 	if err != nil {
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
 	}
@@ -150,7 +151,9 @@ func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
 }
 
 // GetLive returns maps of releases in a k8s-cluster.
-func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []uniqname.UniqName, err error) {
+func (p *Plan) GetLive(
+	ctx context.Context,
+) (found map[uniqname.UniqName]*live.Release, notFound []uniqname.UniqName, err error) {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -175,7 +178,7 @@ func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []
 		}(wg, mu, p.body.Releases[i])
 	}
 
-	if err := wg.Wait(); err != nil {
+	if err := wg.WaitWithContext(ctx); err != nil {
 		return nil, nil, err
 	}
 

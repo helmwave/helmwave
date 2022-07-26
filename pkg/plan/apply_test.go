@@ -1,6 +1,7 @@
 package plan_test
 
 import (
+	"context"
 	"errors"
 	"path/filepath"
 	"testing"
@@ -28,7 +29,7 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Apply()
+	err := p.Apply(context.Background())
 	s.Require().ErrorIs(err, e)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -43,7 +44,7 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Apply()
+	err := p.Apply(context.Background())
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -65,7 +66,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Apply()
+	err := p.Apply(context.Background())
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -89,7 +90,7 @@ func (s *ApplyTestSuite) TestApply() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	err := p.Apply()
+	err := p.Apply(context.Background())
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())

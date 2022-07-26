@@ -1,11 +1,13 @@
 package plan
 
 import (
+	"context"
+
 	log "github.com/sirupsen/logrus"
 )
 
 // Build plan with yml and tags/matchALL options.
-func (p *Plan) Build(yml string, tags []string, matchAll bool, templater string) error {
+func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bool, templater string) error {
 	p.templater = templater
 
 	// Create Body
@@ -42,7 +44,7 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool, templater string)
 	}
 
 	// Sync Repositories
-	err = SyncRepositories(p.body.Repositories)
+	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
@@ -55,14 +57,14 @@ func (p *Plan) Build(yml string, tags []string, matchAll bool, templater string)
 	}
 
 	// Sync Registries
-	err = p.syncRegistries()
+	err = p.syncRegistries(ctx)
 	if err != nil {
 		return err
 	}
 
 	// Build Manifest
 	log.Info("Building manifests...")
-	err = p.buildManifest()
+	err = p.buildManifest(ctx)
 	if err != nil {
 		return err
 	}

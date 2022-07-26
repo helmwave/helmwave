@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -8,20 +9,20 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 )
 
-func (p *Plan) buildManifest() error {
+func (p *Plan) buildManifest(ctx context.Context) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
 	mu := &sync.Mutex{}
 
 	for _, rel := range p.body.Releases {
-		go p.buildReleaseManifest(wg, rel, mu)
+		go p.buildReleaseManifest(ctx, wg, rel, mu)
 	}
 
 	return wg.Wait()
 }
 
-func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
+func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
 	defer wg.Done()
 
 	l := rel.Logger()
@@ -32,7 +33,7 @@ func (p *Plan) buildReleaseManifest(wg *parallel.WaitGroup, rel release.Config, 
 
 	rel.DryRun(true)
 
-	r, err := rel.Sync()
+	r, err := rel.Sync(ctx)
 	rel.DryRun(false)
 	if err != nil || r == nil {
 		l.Errorf("❌ can't get manifests: %v", err)

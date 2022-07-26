@@ -1,6 +1,7 @@
 package release_test
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -26,7 +27,7 @@ func (s *GetTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().Len(rs, 1)
 
-	s.Require().NoError(plan.SyncRepositories([]repo.Config(rs)))
+	s.Require().NoError(plan.SyncRepositories(context.Background(), []repo.Config(rs)))
 }
 
 func (s *GetTestSuite) TestGetNotInstalled() {
@@ -51,7 +52,7 @@ func (s *GetTestSuite) TestGet() {
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 
-	r1, err := rel.Sync()
+	r1, err := rel.Sync(context.Background())
 	s.Require().NoError(err)
 	s.Require().NotNil(r1)
 

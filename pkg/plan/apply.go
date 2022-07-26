@@ -29,15 +29,15 @@ import (
 var ErrDeploy = errors.New("deploy failed")
 
 // Apply syncs repositories and releases.
-func (p *Plan) Apply() (err error) {
+func (p *Plan) Apply(ctx context.Context) (err error) {
 	log.Info("🗄 Sync repositories...")
-	err = SyncRepositories(p.body.Repositories)
+	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
 	log.Info("🗄 Sync registries...")
-	err = p.syncRegistries()
+	err = p.syncRegistries(ctx)
 	if err != nil {
 		return err
 	}
@@ -48,18 +48,18 @@ func (p *Plan) Apply() (err error) {
 
 	log.Info("🛥 Sync releases...")
 
-	return p.syncReleases()
+	return p.syncReleases(ctx)
 }
 
 // ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
-func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
+func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Config) (err error) {
 	log.Info("🗄 Sync repositories...")
-	err = SyncRepositories(p.body.Repositories)
+	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	err = p.syncRegistries()
+	err = p.syncRegistries(ctx)
 	if err != nil {
 		return err
 	}
@@ -70,10 +70,10 @@ func (p *Plan) ApplyWithKubedog(kubedogConfig *kubedog.Config) (err error) {
 
 	log.Info("🛥 Sync releases...")
 
-	return p.syncReleasesKubedog(kubedogConfig)
+	return p.syncReleasesKubedog(ctx, kubedogConfig)
 }
 
-func (p *Plan) syncRegistries() (err error) {
+func (p *Plan) syncRegistries(ctx context.Context) (err error) {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Registries))
 
@@ -87,7 +87,7 @@ func (p *Plan) syncRegistries() (err error) {
 		}(wg, p.body.Registries[i])
 	}
 
-	if err := wg.Wait(); err != nil {
+	if err := wg.WaitWithContext(ctx); err != nil {
 		return err
 	}
 
@@ -95,7 +95,7 @@ func (p *Plan) syncRegistries() (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
-func SyncRepositories(repositories repo.Configs) error {
+func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exists
@@ -112,7 +112,7 @@ func SyncRepositories(repositories repo.Configs) error {
 	// we need to get a flock first
 	lockPath := helper.Helm.RepositoryConfig + ".lock"
 	fileLock := flock.New(lockPath)
-	lockCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	lockCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 	// We need to unlock in deferred mode in case of any other errors returned
 	defer fileLock.Unlock() //nolint:errcheck // TODO: add error checking
@@ -129,7 +129,7 @@ func SyncRepositories(repositories repo.Configs) error {
 	// We cannot parallel repositories installation as helm manages single repositories.yaml.
 	// To prevent data race we need either make helm use futex or not parallel at all
 	for i := range repositories {
-		err := repositories[i].Install(helper.Helm, f)
+		err := repositories[i].Install(ctx, helper.Helm, f)
 		if err != nil {
 			return fmt.Errorf("failed to install %s repository: %w", repositories[i].Name(), err)
 		}
@@ -171,7 +171,7 @@ func (p *Plan) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, r
 	return dependenciesGraph, nil
 }
 
-func (p *Plan) syncReleases() (err error) {
+func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	dependenciesGraph, err := p.generateDependencyGraph()
 	if err != nil {
 		return err
@@ -187,13 +187,13 @@ func (p *Plan) syncReleases() (err error) {
 	mu := &sync.Mutex{}
 
 	for n := range nodesChan {
-		go func(wg *parallel.WaitGroup, node *dependency.Node[release.Config], mu *sync.Mutex) {
+		go func(ctx context.Context, wg *parallel.WaitGroup, node *dependency.Node[release.Config], mu *sync.Mutex) {
 			defer wg.Done()
 			rel := node.Data
 
 			l := rel.Logger()
 			l.Info("🛥 deploying... ")
-			_, err = rel.Sync()
+			_, err = rel.Sync(ctx)
 			if err != nil {
 				l.WithError(err).Error("❌")
 
@@ -213,10 +213,10 @@ func (p *Plan) syncReleases() (err error) {
 				node.SetSucceeded()
 				l.Info("✅")
 			}
-		}(wg, n, mu)
+		}(ctx, wg, n, mu)
 	}
 
-	if err := wg.Wait(); err != nil {
+	if err := wg.WaitWithContext(ctx); err != nil {
 		return err
 	}
 
@@ -262,7 +262,7 @@ func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 	return nil
 }
 
-func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) (err error) {
+func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.Config) (err error) {
 	err = helper.KubeInit()
 	if err != nil {
 		return err
@@ -270,13 +270,13 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) (err error) {
 	// kube.Context = helper.Helm.KubeContext
 	// kube.DefaultNamespace = helper.Helm.Namespace()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Dont forget!
 
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogConfig.StatusInterval,
 		Options: tracker.Options{
-			ParentContext: ctx,
+			ParentContext: ctxCancel,
 			Timeout:       kubedogConfig.Timeout,
 			LogsFromTime:  time.Now(),
 		},
@@ -294,14 +294,16 @@ func (p *Plan) syncReleasesKubedog(kubedogConfig *kubedog.Config) (err error) {
 
 	// Run helm
 	time.Sleep(kubedogConfig.StartDelay)
-	err = p.syncReleases()
+	err = p.syncReleases(ctx)
 	if err != nil {
 		return err
 	}
 
+	cancel() // stop kubedog
+
 	// ? Kubedog soft exit
 	time.Sleep(kubedogConfig.StatusInterval)
-	err = dogroup.Wait()
+	err = dogroup.WaitWithContext(ctx)
 	if err != nil {
 		// Ignore kubedog error
 		log.WithError(err).Warn("kubedog has error while watching resources.")

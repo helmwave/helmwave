@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -21,6 +22,7 @@ type Up struct {
 
 // Run is main function for 'up' command.
 func (i *Up) Run() error {
+	ctx := context.TODO()
 	if i.autoBuild {
 		if err := i.build.Run(); err != nil {
 			return err
@@ -37,10 +39,10 @@ func (i *Up) Run() error {
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")
 
-		return p.ApplyWithKubedog(i.dog)
+		return p.ApplyWithKubedog(ctx, i.dog)
 	}
 
-	return p.Apply()
+	return p.Apply(ctx)
 }
 
 // Cmd returns 'up' *cli.Command.

@@ -1,6 +1,7 @@
 package release_test
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
@@ -35,7 +36,7 @@ func (s *ChartTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().Len(rs, 1)
 
-	s.Require().NoError(plan.SyncRepositories([]repo.Config(rs)))
+	s.Require().NoError(plan.SyncRepositories(context.Background(), []repo.Config(rs)))
 }
 
 func (s *ChartTestSuite) TestLocateChartLocal() {

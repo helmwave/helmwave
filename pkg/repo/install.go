@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"fmt"
 
 	helm "helm.sh/helm/v3/pkg/cli"
@@ -8,7 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-func (rep *config) Install(settings *helm.EnvSettings, f *repo.File) error {
+func (rep *config) Install(ctx context.Context, settings *helm.EnvSettings, f *repo.File) error {
 	if !rep.Force && f.Has(rep.Name()) {
 		existing := f.Get(rep.Name())
 		if rep.Entry != *existing {

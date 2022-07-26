@@ -6,6 +6,12 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
+)
+
+const (
+	// HTTPTimeout is a timeout for HTTP requests.
+	HTTPTimeout = 30 * time.Second
 )
 
 // Download downloads uri to file.
@@ -16,7 +22,10 @@ func Download(file, uri string) error {
 	}
 	defer f.Close() //nolint:errcheck // TODO: need to check error
 
-	req, err := http.NewRequestWithContext(context.TODO(), "GET", uri, http.NoBody)
+	ctx, cancel := context.WithTimeout(context.Background(), HTTPTimeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", uri, http.NoBody)
 	if err != nil {
 		return fmt.Errorf("failed to create request to %s: %w", uri, err)
 	}
