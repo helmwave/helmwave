@@ -26,22 +26,10 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	return u
 }
 
-func (r *MockReleaseConfig) HandleDependencies(_ []release.Config) {
-	r.Called()
-}
-
 func (r *MockReleaseConfig) Sync() (*helmRelease.Release, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
-}
-
-func (r *MockReleaseConfig) NotifySuccess() {
-	r.Called()
-}
-
-func (r *MockReleaseConfig) NotifyFailed() {
-	r.Called()
 }
 
 func (r *MockReleaseConfig) DryRun(_ bool) {
@@ -134,6 +122,10 @@ func (r *MockReleaseConfig) Logger() *log.Entry {
 	return r.Called().Get(0).(*log.Entry)
 }
 
+func (r *MockReleaseConfig) AllowFailure() bool {
+	return r.Called().Bool(0)
+}
+
 type MockRepoConfig struct {
 	mock.Mock
 }
@@ -158,7 +150,7 @@ func (r *MockRepoConfig) Logger() *log.Entry {
 	return r.Called().Get(0).(*log.Entry)
 }
 
-func (p *Plan) NewBody() *planBody { //nolint:revive
+func (p *Plan) NewBody() *planBody {
 	p.body = &planBody{}
 
 	return p.body

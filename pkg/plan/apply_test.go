@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 )
@@ -55,11 +56,12 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
-	mockedRelease.On("HandleDependencies").Return()
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("DependsOn").Return([]string{})
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	e := errors.New(s.T().Name())
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, e)
-	mockedRelease.On("NotifyFailed").Return()
+	mockedRelease.On("AllowFailure").Return(false)
 
 	p.SetReleases(mockedRelease)
 
@@ -76,10 +78,10 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
-	mockedRelease.On("HandleDependencies").Return()
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, nil)
-	mockedRelease.On("NotifySuccess").Return()
+	mockedRelease.On("DependsOn").Return([]string{})
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	mockedRepo := &plan.MockRepoConfig{}
 	mockedRepo.On("Install").Return(nil)
