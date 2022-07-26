@@ -12,10 +12,8 @@ import (
 // Config is an interface to manage particular helm release.
 type Config interface {
 	Uniq() uniqname.UniqName
-	HandleDependencies([]Config)
 	Sync() (*release.Release, error)
-	NotifySuccess()
-	NotifyFailed()
+	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error
 	In([]Config) bool

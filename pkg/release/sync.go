@@ -8,11 +8,6 @@ import (
 )
 
 func (rel *config) Sync() (*release.Release, error) {
-	// DependsON
-	if err := rel.waitForDependencies(); err != nil {
-		return nil, err
-	}
-
 	return rel.upgrade()
 }
 
