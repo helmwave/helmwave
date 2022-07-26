@@ -1,3 +1,4 @@
+
 project: Test05
 
 repositories:
@@ -8,17 +9,10 @@ repositories:
 
 
 releases:
-- name: biba
-  chart: bitnami/nginx
+- name: nginx
+  chart:
+    name: bitnami/nginx
   namespace: test
+  create_namespace: true
   values:
-    - tests/05_values.yaml
-
-#- name: pupa
-#  chart:
-#    name: bitnami/nginx
-#    username: admin
-#    password: 12345
-#  namespace: test
-#  values:
-#  - tests/05_values.yaml
+  - tests/05_values.yaml
