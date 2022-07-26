@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/bombsimon/logrusr/v2 v2.0.1
 	github.com/databus23/helm-diff v3.1.1+incompatible
 	github.com/gofrs/flock v0.8.1
 	github.com/hairyhenderson/gomplate/v3 v3.11.1
@@ -24,6 +23,7 @@ require (
 	helm.sh/helm/v3 v3.9.2
 	k8s.io/apimachinery v0.24.3
 	k8s.io/cli-runtime v0.24.3
+	k8s.io/klog v1.0.0
 	k8s.io/klog/v2 v2.70.1
 )
 

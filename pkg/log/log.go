@@ -1,18 +1,17 @@
 package log
 
 import (
+	"context"
 	"fmt"
-	"io"
-
-	"github.com/bombsimon/logrusr/v2"
+	
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	"github.com/mgutz/ansi"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/werf/logboek"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/klog/v2"
 )
 
 // Settings stores configuration for logger.
@@ -78,12 +77,13 @@ func (l *Settings) Init() error {
 		logKubernetesClientError,
 	}
 
-	// https://github.com/werf/werf/blob/main/cmd/werf/common/kubedog.go#L49
-	klog.SetLogger(logrusr.New(log.StandardLogger()))
-	klog.SetOutputBySeverity("INFO", io.Discard)
-	klog.SetOutputBySeverity("WARNING", io.Discard)
-	klog.SetOutputBySeverity("ERROR", io.Discard)
-	// klog.SetOutputBySeverity("FATAL", logboek.DefaultLogger().ErrStream())
+	if err := kubedog.SilenceKlog(context.Background()); err != nil {
+		return err
+	}
+
+	if err := kubedog.SilenceKlogV2(context.Background()); err != nil {
+		return err
+	}
 
 	if l.width > 0 {
 		logboek.DefaultLogger().Streams().SetWidth(l.width)
