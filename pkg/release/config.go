@@ -2,6 +2,7 @@ package release
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -67,7 +68,28 @@ func (rel *config) DryRun(b bool) {
 // Chart is structure for chart download options.
 type Chart struct {
 	action.ChartPathOptions `yaml:",inline"` //nolint:nolintlint
-	Name                    string
+	Name                    string           `yaml:"name,omitempty"`
+}
+
+func (v *Chart) UnmarshalYAML(n *yaml.Node) (err error) {
+	//if err = n.Decode(&v); err != nil {
+	//	if err = n.Decode(&v.Name); err != nil {
+	//		return fmt.Errorf("failed to decode chart %q from YAML: %w", n.Value, err)
+	//	}
+	//}
+
+	switch n.Kind {
+	case yaml.ScalarNode, yaml.AliasNode:
+		if err = n.Decode(&v.Name); err != nil {
+			return fmt.Errorf("failed to decode chart %q from YAML: %w", n.Value, err)
+		}
+	default:
+		if err = n.Decode(&v); err != nil {
+			return fmt.Errorf("failed to decode chart from YAML: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (rel *config) newInstall() *action.Install {
