@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	helm "helm.sh/helm/v3/pkg/cli"
@@ -12,7 +13,7 @@ import (
 
 // Config is an interface to manage particular helm repository.
 type Config interface {
-	In([]Config) bool
+	helper.EqualChecker[Config]
 	Install(context.Context, *helm.EnvSettings, *repo.File) error
 	Name() string
 	URL() string

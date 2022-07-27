@@ -1,14 +1,8 @@
 package repo
 
-// In check that rep in a.
-func (rep *config) In(a []Config) bool {
-	for i := range a {
-		if rep.Name() == a[i].Name() {
-			return true
-		}
-	}
-
-	return false
+// Equal checks repo configs to have equal names.
+func (rep *config) Equal(a Config) bool {
+	return rep.Name() == a.Name()
 }
 
 // IndexOf check that rep in a by name.

@@ -198,15 +198,8 @@ func (rel *config) Uniq() uniqname.UniqName {
 	return rel.uniqName
 }
 
-// In check that 'x' found in 'array'.
-func (rel *config) In(a []Config) bool {
-	for _, r := range a {
-		if rel.Uniq() == r.Uniq() {
-			return true
-		}
-	}
-
-	return false
+func (rel *config) Equal(a Config) bool {
+	return rel.Uniq().Equal(a.Uniq())
 }
 
 func (rel *config) Name() string {

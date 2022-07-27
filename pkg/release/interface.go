@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -12,12 +13,12 @@ import (
 
 // Config is an interface to manage particular helm release.
 type Config interface {
+	helper.EqualChecker[Config]
 	Uniq() uniqname.UniqName
 	Sync(context.Context) (*release.Release, error)
 	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error
-	In([]Config) bool
 	BuildValues(string, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get() (*release.Release, error)
