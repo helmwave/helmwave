@@ -13,20 +13,16 @@ type Configs []Config
 
 // UnmarshalYAML parse Config.
 func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(Configs)
-	}
 	var err error
-
 	*r, err = UnmarshalYAML(node)
 
 	return err
 }
 
 type config struct {
-	log        *log.Entry       `yaml:"-"`
-	repo.Entry `yaml:",inline"` //nolint:nolintlint
-	Force      bool             `yaml:"force"`
+	log        *log.Entry `yaml:"-"`
+	repo.Entry `yaml:",inline"`
+	Force      bool `yaml:"force"`
 }
 
 func (c *config) Name() string {

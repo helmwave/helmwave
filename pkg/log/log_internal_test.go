@@ -2,9 +2,7 @@ package log
 
 import (
 	"bytes"
-	"encoding/json"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -39,16 +37,8 @@ func (s *LogTestSuite) TestKLogHandler() {
 	message := "123"
 	klog.Info(message)
 
-	var received struct {
-		Message string `json:"msg"`
-		Level   string `json:"level"`
-		Time    string `json:"time"`
-	}
-	s.Require().NoError(json.Unmarshal(buf.Bytes(), &received))
+	s.Require().Zero(buf.Len())
 	buf.Reset()
-	s.Require().NotEmpty(received.Time, "message time should be set")
-	s.Require().Equal(message, strings.TrimSpace(received.Message), "message should be the same")
-	s.Require().Equal("info", received.Level, "message level should be kept")
 }
 
 func (s *LogTestSuite) TestLogLevel() {

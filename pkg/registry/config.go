@@ -10,11 +10,7 @@ type Configs []Config
 
 // UnmarshalYAML parse Config.
 func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(Configs)
-	}
 	var err error
-
 	*r, err = UnmarshalYAML(node)
 
 	return err

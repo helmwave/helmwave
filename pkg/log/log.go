@@ -3,7 +3,7 @@ package log
 import (
 	"context"
 	"fmt"
-	
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
