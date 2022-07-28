@@ -34,7 +34,8 @@ func addToPlan(plan []release.Config, rel release.Config,
 		return plan
 	}
 
-	r := append(plan, rel) // nolint:gocritic
+	r := plan
+	r = append(r, rel)
 
 	for _, depName := range rel.DependsOn() {
 		depUN := uniqname.UniqName(depName)

@@ -18,8 +18,8 @@ func buildGraphMD(releases release.Configs) string {
 		for _, dep := range r.DependsOn() {
 			md += fmt.Sprintf(
 				"\t%s[%q] --> %s[%q]\n",
-				strings.Replace(string(r.Uniq()), "@", "_", -1), r.Uniq(), // nolint:gocritic
-				strings.Replace(dep, "@", "_", -1), dep, // nolint:gocritic
+				strings.ReplaceAll(string(r.Uniq()), "@", "_"), r.Uniq(),
+				strings.ReplaceAll(dep, "@", "_"), dep,
 			)
 		}
 	}

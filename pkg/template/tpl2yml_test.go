@@ -38,7 +38,7 @@ func (s *Tpl2YmlTestSuite) TestMissingData() {
 	dst := filepath.Join(tmpDir, "values.yaml")
 
 	err := template.Tpl2yml(tpl, dst, nil, "sprig")
-	s.Require().EqualError(err, "failed to parse template: template: tpl:1: function \"include\" not defined")
+	s.Require().EqualError(err, "failed to render template: failed to parse template: template: tpl:1: function \"include\" not defined")
 }
 
 func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {

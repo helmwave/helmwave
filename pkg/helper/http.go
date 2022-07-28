@@ -6,7 +6,10 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -20,7 +23,12 @@ func Download(file, uri string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close() //nolint:errcheck // TODO: need to check error
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			log.Errorf("failed to close file %s: %v", f.Name(), err)
+		}
+	}(f)
 
 	ctx, cancel := context.WithTimeout(context.Background(), HTTPTimeout)
 	defer cancel()
@@ -34,7 +42,12 @@ func Download(file, uri string) error {
 		return fmt.Errorf("failed to download %s: %w", uri, err)
 	}
 
-	defer r.Body.Close() //nolint:errcheck // TODO: need to check error
+	defer func(b io.Closer) {
+		err := b.Close()
+		if err != nil {
+			log.Errorf("failed to close HTTP body: %v", err)
+		}
+	}(r.Body)
 
 	if r.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad status: %s", r.Status)

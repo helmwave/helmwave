@@ -1,7 +1,8 @@
 package release
 
 import (
-	"crypto/sha1"
+	"crypto"
+	_ "crypto/md5" // for crypto.MD5.New to work
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -76,7 +77,7 @@ func (v *ValuesReference) Get() string {
 
 // SetUniq generates unique file path based on provided base directory, release uniqname and sha1 of source path.
 func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
-	h := sha1.New() // nolint:gosec
+	h := crypto.MD5.New()
 	h.Write([]byte(v.Src))
 	hash := h.Sum(nil)
 	s := hex.EncodeToString(hash)

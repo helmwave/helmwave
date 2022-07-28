@@ -95,6 +95,7 @@ func (p *Plan) syncRegistries(ctx context.Context) (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
+//nolint:gocognit // TODO: simplify
 func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
@@ -114,8 +115,15 @@ func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
 	fileLock := flock.New(lockPath)
 	lockCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
+
 	// We need to unlock in deferred mode in case of any other errors returned
-	defer fileLock.Unlock() //nolint:errcheck // TODO: add error checking
+	defer func(fileLock *flock.Flock) {
+		err := fileLock.Unlock()
+		if err != nil {
+			log.Errorf("failed to release flock %s: %v", fileLock.Path(), err)
+		}
+	}(fileLock)
+
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
 	if err != nil && !locked {
 		return fmt.Errorf("failed to get lock %s: %w", fileLock.Path(), err)

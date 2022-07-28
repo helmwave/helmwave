@@ -49,7 +49,7 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 
 	d, err := templater.Render(string(src), data)
 	if err != nil {
-		return err //nolint:wrapcheck // we control the interface
+		return fmt.Errorf("failed to render template: %w", err)
 	}
 
 	log.Trace(yml, " contents\n", string(d))
