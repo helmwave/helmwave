@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	log "github.com/sirupsen/logrus"
+	"github.com/helmwave/helmwave/pkg/log"
 	"gopkg.in/yaml.v3"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
@@ -14,10 +14,10 @@ import (
 // Config is an interface to manage particular helm repository.
 type Config interface {
 	helper.EqualChecker[Config]
+	log.LoggerGetter
 	Install(context.Context, *helm.EnvSettings, *repo.File) error
 	Name() string
 	URL() string
-	Logger() *log.Entry
 }
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.
