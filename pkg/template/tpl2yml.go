@@ -14,7 +14,7 @@ type Templater interface {
 	Render(string, interface{}) ([]byte, error)
 }
 
-func getTemplater(name string) (Templater, error) { //nolint:ireturn
+func getTemplater(name string) (Templater, error) {
 	switch name {
 	case gomplateTemplater{}.Name():
 		return gomplateTemplater{}, nil

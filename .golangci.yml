@@ -21,6 +21,7 @@ linters:
     - golint # deprecated
     - gomnd # we want to keep magic numbers
     - interfacer # deprecated
+    - ireturn # sometimes we need to return interfaces
     - maligned # deprecated
     - nonamedreturns # we do want some named returns
     - scopelint # deprecated
