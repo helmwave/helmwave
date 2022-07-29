@@ -30,11 +30,12 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) (pla
 func addToPlan(plan []release.Config, rel release.Config,
 	releases map[uniqname.UniqName]release.Config,
 ) []release.Config {
-	if rel.In(plan) {
+	if helper.In(rel, plan) {
 		return plan
 	}
 
-	r := append(plan, rel) // nolint:gocritic
+	r := plan
+	r = append(r, rel)
 
 	for _, depName := range rel.DependsOn() {
 		depUN := uniqname.UniqName(depName)

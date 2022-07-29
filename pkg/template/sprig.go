@@ -9,6 +9,26 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//nolint:gochecknoglobals // cannot make these const
+var (
+	sprigAliases = map[string]string{
+		"get":    "sprigGet",
+		"hasKey": "sprigHasKey",
+	}
+
+	customFuncs = map[string]interface{}{
+		"toYaml":         ToYaml,
+		"fromYaml":       FromYaml,
+		"exec":           Exec,
+		"setValueAtPath": SetValueAtPath,
+		"requiredEnv":    RequiredEnv,
+		"required":       Required,
+		"readFile":       ReadFile,
+		"get":            Get,
+		"hasKey":         HasKey,
+	}
+)
+
 type sprigTemplater struct{}
 
 func (t sprigTemplater) Name() string {
@@ -45,25 +65,6 @@ func (t sprigTemplater) funcMap() template.FuncMap {
 
 	return funcMap
 }
-
-var (
-	sprigAliases = map[string]string{
-		"get":    "sprigGet",
-		"hasKey": "sprigHasKey",
-	}
-
-	customFuncs = map[string]interface{}{
-		"toYaml":         ToYaml,
-		"fromYaml":       FromYaml,
-		"exec":           Exec,
-		"setValueAtPath": SetValueAtPath,
-		"requiredEnv":    RequiredEnv,
-		"required":       Required,
-		"readFile":       ReadFile,
-		"get":            Get,
-		"hasKey":         HasKey,
-	}
-)
 
 func addToMap(dst, src template.FuncMap) {
 	for k, v := range src {

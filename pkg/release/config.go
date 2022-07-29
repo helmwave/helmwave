@@ -2,6 +2,7 @@ package release
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -17,11 +18,7 @@ type Configs []Config
 
 // UnmarshalYAML parse Config.
 func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(Configs)
-	}
 	var err error
-
 	*r, err = UnmarshalYAML(node)
 
 	return err
@@ -66,25 +63,25 @@ func (rel *config) DryRun(b bool) {
 
 // Chart is structure for chart download options.
 type Chart struct {
-	action.ChartPathOptions `yaml:",inline"` //nolint:nolintlint
-	Name                    string           `yaml:"name"`
+	action.ChartPathOptions `yaml:",inline"`
+	Name                    string `yaml:"name"`
 }
 
-// UnmarshalYAML flexible config
-func (u *Chart) UnmarshalYAML(n *yaml.Node) (err error) {
+// UnmarshalYAML flexible config.
+func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	type raw Chart
-	var name string
+	var err error
 
-	if err = n.Decode(&name); err == nil {
-		u.Name = name
-		return nil
+	switch node.Kind {
+	case yaml.ScalarNode, yaml.AliasNode:
+		err = node.Decode(&(u.Name))
+	case yaml.MappingNode:
+		err = node.Decode((*raw)(u))
+	default:
+		err = fmt.Errorf("unknown format")
 	}
 
-	if err = n.Decode((*raw)(u)); err != nil {
-		return err
-	}
-
-	return nil
+	return fmt.Errorf("failed to decode chart %q from YAML at %d line: %w", node.Value, node.Line, err)
 }
 
 func (rel *config) newInstall() *action.Install {
@@ -201,15 +198,8 @@ func (rel *config) Uniq() uniqname.UniqName {
 	return rel.uniqName
 }
 
-// In check that 'x' found in 'array'.
-func (rel *config) In(a []Config) bool {
-	for _, r := range a {
-		if rel.Uniq() == r.Uniq() {
-			return true
-		}
-	}
-
-	return false
+func (rel *config) Equal(a Config) bool {
+	return rel.Uniq().Equal(a.Uniq())
 }
 
 func (rel *config) Name() string {

@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -13,7 +14,13 @@ func SaveInterface(file string, in interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close() //nolint:errcheck // TODO: need to check error
+
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			log.Errorf("failed to close file %s: %v", f.Name(), err)
+		}
+	}(f)
 
 	data := Byte(in)
 

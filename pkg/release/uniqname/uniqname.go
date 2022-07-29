@@ -23,26 +23,9 @@ func Generate(name, namespace string) (UniqName, error) {
 	return u, u.Validate()
 }
 
-// Contains searches for uniqname in slice of uniqnames.
-func Contains(t UniqName, a []UniqName) bool {
-	for _, v := range a {
-		if v == t {
-			return true
-		}
-	}
-
-	return false
-}
-
-// In searches for uniqname in slice of uniqnames.
-func (n UniqName) In(a []UniqName) bool {
-	for _, v := range a {
-		if v == n {
-			return true
-		}
-	}
-
-	return false
+// Equal checks whether uniqnames are equal.
+func (n UniqName) Equal(a UniqName) bool {
+	return n == a
 }
 
 // Validate validates this object.

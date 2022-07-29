@@ -3,7 +3,7 @@ package log
 import (
 	"context"
 	"fmt"
-	
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
@@ -129,11 +129,12 @@ func (l *Settings) setFormat() {
 			Color: l.color,
 		}
 
-		if !l.color && l.timestamps { // nolint:gocritic
+		switch {
+		case !l.color && l.timestamps:
 			cfg.LogFormat = "[%time%] [%lvl%]: %msg%"
-		} else if !l.color {
+		case !l.color:
 			cfg.LogFormat = "[%lvl%]: %msg%"
-		} else if l.timestamps {
+		case l.timestamps:
 			cfg.LogFormat = "[%time%] [%emoji% aka %lvl%]: %msg%"
 		}
 

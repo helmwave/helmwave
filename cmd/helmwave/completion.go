@@ -67,6 +67,7 @@ var (
 	ErrNotChose = errors.New("you did not specify a shell")
 )
 
+//nolint:forbidigo // we need to use fmt.Print
 func completion() *cli.Command {
 	return &cli.Command{
 		Name:  "completion",
@@ -82,11 +83,11 @@ func completion() *cli.Command {
 
 			switch c.Args().First() {
 			case "bash":
-				fmt.Print(bash) // nolint:forbidigo
+				fmt.Print(bash)
 
 				return nil
 			case "zsh":
-				fmt.Print(zsh) // nolint:forbidigo
+				fmt.Print(zsh)
 
 				return nil
 			default:

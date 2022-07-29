@@ -9,7 +9,7 @@ import (
 )
 
 // Destroy destroys all releases that exist in plan.
-func (p *Plan) Destroy(ctx context.Context) error { //nolint:nolintlint
+func (p *Plan) Destroy(ctx context.Context) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 

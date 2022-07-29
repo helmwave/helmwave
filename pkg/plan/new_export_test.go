@@ -41,7 +41,7 @@ func (r *MockReleaseConfig) ChartDepsUpd() error {
 	return r.Called().Error(0)
 }
 
-func (r *MockReleaseConfig) In([]release.Config) bool {
+func (r *MockReleaseConfig) Equal(release.Config) bool {
 	return r.Called().Bool(0)
 }
 
@@ -131,7 +131,7 @@ type MockRepoConfig struct {
 	mock.Mock
 }
 
-func (r *MockRepoConfig) In([]repo.Config) bool {
+func (r *MockRepoConfig) Equal(repo.Config) bool {
 	return r.Called().Bool(0)
 }
 

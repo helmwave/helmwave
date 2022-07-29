@@ -13,7 +13,7 @@ linters:
   disable:
     - exhaustivestruct # deprecated
     - exhaustruct # it requires to initialize billions of fields, I ain't monkey to fix these
-    - gochecknoglobals # TODO: get rid of globals
+    - gochecknoinits # we want to use `init()` functions
     - gocyclo # we use cyclop
     - godox # TODO: get rid of TODOs
     - goerr113 # need to create wrapped static errors
@@ -21,6 +21,7 @@ linters:
     - golint # deprecated
     - gomnd # we want to keep magic numbers
     - interfacer # deprecated
+    - ireturn # sometimes we need to return interfaces
     - maligned # deprecated
     - nonamedreturns # we do want some named returns
     - scopelint # deprecated
@@ -441,8 +442,10 @@ issues:
       linters:
         - dupl
         - forcetypeassert
+        - gochecknoglobals
         - goconst
         - godot
+        - lll
         - revive
         - wrapcheck
 
