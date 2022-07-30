@@ -28,6 +28,8 @@ type ValuesReference struct {
 
 // UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
 func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
+	v.Render = true // we render values by default
+
 	type raw ValuesReference
 	var err error
 	switch node.Kind {
