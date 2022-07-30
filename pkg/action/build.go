@@ -67,7 +67,7 @@ func (i *Build) Run() (err error) {
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
 		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide)
 	default:
-		log.Warnf("I dont know what is %q. I am skiping diff.", i.diffMode)
+		log.Warnf("I dont know what is %q diff mode. I am skiping diff.", i.diffMode)
 	}
 
 	err = newPlan.Export()

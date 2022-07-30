@@ -81,7 +81,11 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 		err = fmt.Errorf("unknown format")
 	}
 
-	return fmt.Errorf("failed to decode chart %q from YAML at %d line: %w", node.Value, node.Line, err)
+	if err != nil {
+		return fmt.Errorf("failed to decode chart %q from YAML at %d line: %w", node.Value, node.Line, err)
+	}
+
+	return nil
 }
 
 func (rel *config) newInstall() *action.Install {

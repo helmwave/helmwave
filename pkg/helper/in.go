@@ -13,5 +13,5 @@ func In[T any, C EqualChecker[T]](search C, target []T) bool {
 		}
 	}
 
-	return true
+	return false
 }
