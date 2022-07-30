@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -16,7 +17,7 @@ type DiffLocalPlan struct {
 }
 
 // Run is main function for 'diff plan' command.
-func (d *DiffLocalPlan) Run() error {
+func (d *DiffLocalPlan) Run(ctx context.Context) error {
 	if d.plandir1 == d.plandir2 {
 		log.Warn(plan.ErrPlansAreTheSame)
 	}

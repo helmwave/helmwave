@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -35,7 +36,7 @@ func (ts *BuildTestSuite) TestManifest() {
 		matchAll: true,
 	}
 
-	ts.Require().NoError(s.Run())
+	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
@@ -68,7 +69,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 		matchAll: true,
 	}
 
-	ts.Require().NoError(s.Run())
+	ts.Require().NoError(s.Run(context.Background()))
 
 	const rep = "bitnami"
 	b, _ := plan.NewBody(filepath.Join(s.plandir, plan.File))
@@ -108,7 +109,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 			matchAll: true,
 		}
 
-		ts.Require().NoError(s.Run())
+		ts.Require().NoError(s.Run(context.Background()))
 
 		b, _ := plan.NewBody(filepath.Join(s.plandir, plan.File))
 
@@ -139,8 +140,8 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 		diffMode: DiffModeLocal,
 	}
 
-	ts.Require().NoError(s.Run(), "build should not fail without diffing")
-	ts.Require().NoError(s.Run(), "build should not fail with diffing with previous plan")
+	ts.Require().NoError(s.Run(context.Background()), "build should not fail without diffing")
+	ts.Require().NoError(s.Run(context.Background()), "build should not fail with diffing with previous plan")
 }
 
 func TestBuildTestSuite(t *testing.T) {
@@ -171,7 +172,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
-	ts.Require().NoError(s.Run())
+	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
@@ -191,7 +192,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 		yml:      y,
 	}
 
-	ts.Require().NoError(s.Run())
+	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 

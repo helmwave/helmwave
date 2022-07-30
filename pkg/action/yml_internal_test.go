@@ -3,6 +3,7 @@
 package action
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
@@ -31,7 +32,7 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 	ts.T().Setenv("NAMESPACE", value)
 	ts.T().Setenv("PROJECT_NAME", value)
 
-	ts.Require().NoError(y.Run())
+	ts.Require().NoError(y.Run(context.Background()))
 
 	b, err := plan.NewBody(y.file)
 	ts.Require().NoError(err)

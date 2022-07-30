@@ -33,16 +33,15 @@ const (
 )
 
 // Run is main function for 'build' CLI command.
-func (i *Build) Run() (err error) {
+func (i *Build) Run(ctx context.Context) (err error) {
 	if i.autoYml {
-		err = i.yml.Run()
+		err = i.yml.Run(ctx)
 		if err != nil {
 			return err
 		}
 	}
 
 	newPlan := plan.New(i.plandir)
-	ctx := context.TODO()
 	err = newPlan.Build(ctx, i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
 	if err != nil {
 		return err

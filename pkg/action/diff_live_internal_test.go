@@ -3,6 +3,7 @@
 package action
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -38,9 +39,9 @@ func (ts *DiffLiveTestSuite) TestRun() {
 
 	d := DiffLive{diff: s.diff, plandir: s.plandir}
 
-	ts.Require().ErrorIs(d.Run(), os.ErrNotExist)
-	ts.Require().NoError(s.Run())
-	ts.Require().NoError(d.Run())
+	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
+	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().NoError(d.Run(context.Background()))
 }
 
 //nolint:paralleltest // uses helm repository.yaml flock

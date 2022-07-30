@@ -21,10 +21,9 @@ type Up struct {
 }
 
 // Run is main function for 'up' command.
-func (i *Up) Run() error {
-	ctx := context.TODO()
+func (i *Up) Run(ctx context.Context) error {
 	if i.autoBuild {
-		if err := i.build.Run(); err != nil {
+		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
 	}
@@ -97,6 +96,12 @@ func (i *Up) flags() []cli.Flag {
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_PROGRESS"},
 			Destination: &helper.Helm.Debug,
+		},
+		&cli.IntFlag{
+			Name:    "parallel-limit",
+			Usage:   "Limit amount of parallel releases",
+			EnvVars: []string{"HELMWAVE_PARALLEL_LIMIT"},
+			Value:   0,
 		},
 	}
 
