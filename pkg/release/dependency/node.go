@@ -1,5 +1,7 @@
 package dependency
 
+import "sync"
+
 const (
 	// NodePending is a NodeStatus for pending node.
 	NodePending NodeStatus = iota
@@ -19,6 +21,7 @@ type NodeStatus int
 type Node[N any] struct {
 	Data         N
 	dependencies []*Node[N]
+	lock         sync.RWMutex
 	status       NodeStatus
 }
 
@@ -31,23 +34,39 @@ func newNode[N any](data N) *Node[N] {
 }
 
 func (node *Node[N]) SetSucceeded() {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+
 	node.status = NodeSuccess
 }
 
 func (node *Node[N]) SetFailed() {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+
 	node.status = NodeFailed
 }
 
 func (node *Node[N]) IsDone() bool {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+
 	return node.status != NodePending
 }
 
 func (node *Node[N]) IsFailed() bool {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+
 	return node.status == NodeFailed
 }
 
 func (node *Node[N]) IsReady() bool {
-	for _, dependency := range node.dependencies {
+	node.lock.RLock()
+	deps := node.dependencies
+	node.lock.RUnlock()
+
+	for _, dependency := range deps {
 		if !dependency.IsDone() {
 			return false
 		}
@@ -63,5 +82,8 @@ func (node *Node[N]) IsReady() bool {
 }
 
 func (node *Node[N]) addDependency(dependency *Node[N]) {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+
 	node.dependencies = append(node.dependencies, dependency)
 }
