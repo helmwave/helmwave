@@ -20,6 +20,8 @@ func getTemplater(name string) (Templater, error) {
 		return gomplateTemplater{}, nil
 	case sprigTemplater{}.Name():
 		return sprigTemplater{}, nil
+	case noTemplater{}.Name():
+		return noTemplater{}, nil
 	default:
 		return nil, fmt.Errorf("templater %s is not registered", name)
 	}
