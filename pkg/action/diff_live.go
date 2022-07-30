@@ -15,7 +15,7 @@ type DiffLive struct {
 }
 
 // Run is main function for 'diff live' command.
-func (d *DiffLive) Run() error {
+func (d *DiffLive) Run(ctx context.Context) error {
 	p, err := plan.NewAndImport(d.plandir)
 	if err != nil {
 		return err
@@ -25,7 +25,6 @@ func (d *DiffLive) Run() error {
 		return os.ErrNotExist
 	}
 
-	ctx := context.TODO()
 	p.DiffLive(ctx, d.diff.ShowSecret, d.diff.Wide)
 
 	return nil

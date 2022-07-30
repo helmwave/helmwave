@@ -1,6 +1,8 @@
 package action
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
@@ -13,9 +15,9 @@ type Rollback struct {
 }
 
 // Run is main function for 'rollback' command.
-func (i *Rollback) Run() error {
+func (i *Rollback) Run(ctx context.Context) error {
 	if i.autoBuild {
-		if err := i.build.Run(); err != nil {
+		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
 	}

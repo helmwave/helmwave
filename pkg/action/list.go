@@ -1,6 +1,8 @@
 package action
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
@@ -12,9 +14,9 @@ type List struct {
 }
 
 // Run is main function for 'list' command.
-func (l *List) Run() error {
+func (l *List) Run(ctx context.Context) error {
 	if l.autoBuild {
-		if err := l.build.Run(); err != nil {
+		if err := l.build.Run(ctx); err != nil {
 			return err
 		}
 	}

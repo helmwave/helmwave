@@ -179,11 +179,26 @@ func (p *Plan) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, r
 	return dependenciesGraph, nil
 }
 
+func getParallelLimit(ctx context.Context, releases release.Configs) int {
+	parallelLimit, ok := ctx.Value("parallel-limit").(int)
+	if !ok {
+		parallelLimit = 0
+	}
+	if parallelLimit == 0 {
+		parallelLimit = len(releases)
+	}
+
+	return parallelLimit
+}
+
 func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	dependenciesGraph, err := p.generateDependencyGraph()
 	if err != nil {
 		return err
 	}
+
+	parallelLimit := getParallelLimit(ctx, p.body.Releases)
+	log.WithField("limit", parallelLimit).Info("Deploying releases with limited parallelization")
 
 	nodesChan := dependenciesGraph.Run()
 
@@ -194,34 +209,8 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 
 	mu := &sync.Mutex{}
 
-	for n := range nodesChan {
-		go func(ctx context.Context, wg *parallel.WaitGroup, node *dependency.Node[release.Config], mu *sync.Mutex) {
-			defer wg.Done()
-			rel := node.Data
-
-			l := rel.Logger()
-			l.Info("🛥 deploying... ")
-			_, err = rel.Sync(ctx)
-			if err != nil {
-				l.WithError(err).Error("❌")
-
-				if rel.AllowFailure() {
-					l.Errorf("release is allowed to fail, markind as succeeded to dependencies")
-					node.SetSucceeded()
-				} else {
-					node.SetFailed()
-				}
-
-				mu.Lock()
-				fails[rel] = err
-				mu.Unlock()
-
-				wg.ErrChan() <- err
-			} else {
-				node.SetSucceeded()
-				l.Info("✅")
-			}
-		}(ctx, wg, n, mu)
+	for i := 0; i < parallelLimit; i++ {
+		go p.syncReleasesWorker(ctx, wg, nodesChan, mu, fails)
 	}
 
 	if err := wg.WaitWithContext(ctx); err != nil {
@@ -229,6 +218,52 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	}
 
 	return p.ApplyReport(fails)
+}
+
+func (p *Plan) syncReleasesWorker(
+	ctx context.Context,
+	wg *parallel.WaitGroup,
+	nodesChan <-chan *dependency.Node[release.Config],
+	mu *sync.Mutex,
+	fails map[release.Config]error,
+) {
+	for n := range nodesChan {
+		p.syncRelease(ctx, wg, n, mu, fails)
+	}
+}
+
+func (p *Plan) syncRelease(
+	ctx context.Context,
+	wg *parallel.WaitGroup,
+	node *dependency.Node[release.Config],
+	mu *sync.Mutex,
+	fails map[release.Config]error,
+) {
+	defer wg.Done()
+	rel := node.Data
+
+	l := rel.Logger()
+	l.Info("🛥 deploying... ")
+
+	if _, err := rel.Sync(ctx); err != nil {
+		l.WithError(err).Error("❌")
+
+		if rel.AllowFailure() {
+			l.Errorf("release is allowed to fail, markind as succeeded to dependencies")
+			node.SetSucceeded()
+		} else {
+			node.SetFailed()
+		}
+
+		mu.Lock()
+		fails[rel] = err
+		mu.Unlock()
+
+		wg.ErrChan() <- err
+	} else {
+		node.SetSucceeded()
+		l.Info("✅")
+	}
 }
 
 // ApplyReport renders table report for failed releases.

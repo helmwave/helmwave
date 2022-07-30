@@ -14,9 +14,9 @@ type Down struct {
 }
 
 // Run is main function for 'down' command.
-func (i *Down) Run() error {
+func (i *Down) Run(ctx context.Context) error {
 	if i.autoBuild {
-		if err := i.build.Run(); err != nil {
+		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
 	}
@@ -25,8 +25,6 @@ func (i *Down) Run() error {
 	if err != nil {
 		return err
 	}
-
-	ctx := context.TODO()
 
 	return p.Destroy(ctx)
 }

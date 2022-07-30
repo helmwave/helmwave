@@ -1,6 +1,8 @@
 package action
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
@@ -13,9 +15,9 @@ type Status struct {
 }
 
 // Run is main function for 'status' command.
-func (l *Status) Run() error {
+func (l *Status) Run(ctx context.Context) error {
 	if l.autoBuild {
-		if err := l.build.Run(); err != nil {
+		if err := l.build.Run(ctx); err != nil {
 			return err
 		}
 	}
