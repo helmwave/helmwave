@@ -21,7 +21,7 @@ var ErrSkipValues = errors.New("values have been skipped")
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
 	Src    string `yaml:"src"`
-	Dst    string `yaml:"dst"`
+	dst    string `yaml:"dst"`
 	Strict bool   `yaml:"strict"`
 	Render bool   `yaml:"render"`
 }
@@ -56,7 +56,7 @@ func (v ValuesReference) MarshalYAML() (interface{}, error) {
 		Dst string
 	}{
 		Src: v.Src,
-		Dst: v.Dst,
+		Dst: v.dst,
 	}, nil
 }
 
@@ -66,8 +66,8 @@ func (v *ValuesReference) isURL() bool {
 
 // Download downloads values by source URL and places to destination path.
 func (v *ValuesReference) Download() error {
-	if err := helper.Download(v.Dst, v.Src); err != nil {
-		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, v.Dst, err)
+	if err := helper.Download(v.dst, v.Src); err != nil {
+		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, v.dst, err)
 	}
 
 	return nil
@@ -75,7 +75,7 @@ func (v *ValuesReference) Download() error {
 
 // Get returns destination path of values.
 func (v *ValuesReference) Get() string {
-	return v.Dst
+	return v.dst
 }
 
 // SetUniq generates unique file path based on provided base directory, release uniqname and sha1 of source path.
@@ -85,7 +85,7 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 	hash := h.Sum(nil)
 	s := hex.EncodeToString(hash)
 
-	v.Dst = filepath.Join(dir, "values", string(name), s+".yml")
+	v.dst = filepath.Join(dir, "values", string(name), s+".yml")
 
 	return v
 }
@@ -104,7 +104,7 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 
 	v.SetUniq(dir, rel.Uniq())
 
-	l := rel.Logger().WithField("values src", v.Src).WithField("values dst", v.Dst)
+	l := rel.Logger().WithField("values src", v.Src).WithField("values dst", v.dst)
 
 	l.Trace("Building values reference")
 
@@ -120,9 +120,9 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	}
 
 	if v.isURL() {
-		err = template.Tpl2yml(v.Dst, v.Dst, data, templater)
+		err = template.Tpl2yml(v.dst, v.dst, data, templater)
 	} else {
-		err = template.Tpl2yml(v.Src, v.Dst, data, templater)
+		err = template.Tpl2yml(v.Src, v.dst, data, templater)
 	}
 
 	if err != nil {
