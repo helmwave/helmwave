@@ -13,7 +13,7 @@ import (
 // Used to parse out replicas count.
 type Resource struct {
 	Spec             `yaml:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
-	meta1.TypeMeta   `yaml:",inline"` //nolint:nolintlint
+	meta1.TypeMeta   `yaml:",inline"`
 	meta1.ObjectMeta `yaml:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 }
 

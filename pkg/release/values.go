@@ -1,7 +1,8 @@
 package release
 
 import (
-	"crypto/sha1"
+	"crypto"
+	_ "crypto/md5" // for crypto.MD5.New to work
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -18,28 +20,30 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src string `yaml:"src"`
-	dst string `yaml:"dst"`
+	Src    string `yaml:"src"`
+	Dst    string `yaml:"dst"`
+	Strict bool   `yaml:"strict"`
+	Render bool   `yaml:"render"`
 }
 
 // UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
 func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
+	v.Render = true // we render values by default
+
+	type raw ValuesReference
+	var err error
 	switch node.Kind {
 	// single value or reference to another value
 	case yaml.ScalarNode, yaml.AliasNode:
-		if err := node.Decode(&v.Src); err != nil {
-			return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
-		}
+		err = node.Decode(&v.Src)
 	case yaml.MappingNode:
-		var m map[string]string
-		if err := node.Decode(&m); err != nil {
-			return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
-		}
-
-		v.Src = m["src"]
-		v.dst = m["dst"]
+		err = node.Decode((*raw)(v))
 	default:
-		return fmt.Errorf("failed to decode values reference %q from YAML: unknown format", node.Value)
+		err = fmt.Errorf("unknown format")
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
 	}
 
 	return nil
@@ -52,7 +56,7 @@ func (v ValuesReference) MarshalYAML() (interface{}, error) {
 		Dst string
 	}{
 		Src: v.Src,
-		Dst: v.dst,
+		Dst: v.Dst,
 	}, nil
 }
 
@@ -62,8 +66,8 @@ func (v *ValuesReference) isURL() bool {
 
 // Download downloads values by source URL and places to destination path.
 func (v *ValuesReference) Download() error {
-	if err := helper.Download(v.dst, v.Src); err != nil {
-		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, v.dst, err)
+	if err := helper.Download(v.Dst, v.Src); err != nil {
+		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, v.Dst, err)
 	}
 
 	return nil
@@ -71,17 +75,17 @@ func (v *ValuesReference) Download() error {
 
 // Get returns destination path of values.
 func (v *ValuesReference) Get() string {
-	return v.dst
+	return v.Dst
 }
 
 // SetUniq generates unique file path based on provided base directory, release uniqname and sha1 of source path.
 func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
-	h := sha1.New() // nolint:gosec
+	h := crypto.MD5.New()
 	h.Write([]byte(v.Src))
 	hash := h.Sum(nil)
 	s := hex.EncodeToString(hash)
 
-	v.dst = filepath.Join(dir, "values", string(name), s+".yml")
+	v.Dst = filepath.Join(dir, "values", string(name), s+".yml")
 
 	return v
 }
@@ -94,9 +98,13 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 // SetViaRelease downloads and templates values file.
 // Returns ErrSkipValues if values cannot be downloaded or doesn't exist in local FS.
 func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
+	if !v.Render {
+		templater = "copy"
+	}
+
 	v.SetUniq(dir, rel.Uniq())
 
-	l := rel.Logger().WithField("values src", v.Src).WithField("values dst", v.dst)
+	l := rel.Logger().WithField("values src", v.Src).WithField("values dst", v.Dst)
 
 	l.Trace("Building values reference")
 
@@ -106,27 +114,39 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 		Release: rel,
 	}
 
+	err := v.fetch(l)
+	if err != nil {
+		return err
+	}
+
+	if v.isURL() {
+		err = template.Tpl2yml(v.Dst, v.Dst, data, templater)
+	} else {
+		err = template.Tpl2yml(v.Src, v.Dst, data, templater)
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to render %q values: %w", v.Src, err)
+	}
+
+	return nil
+}
+
+//nolint:nestif // it is still pretty easy to understand
+func (v *ValuesReference) fetch(l *log.Entry) error {
 	if v.isURL() {
 		err := v.Download()
 		if err != nil {
 			l.WithError(err).Warnf("%q skipping: cant download", v.Src)
 
-			return ErrSkipValues
+			if v.Strict {
+				return ErrSkipValues
+			}
 		}
-
-		if err := template.Tpl2yml(v.dst, v.dst, data, templater); err != nil {
-			return fmt.Errorf("failed to render %q values: %w", v.Src, err)
-		}
-
-		return nil
 	} else if !helper.IsExists(v.Src) {
 		l.Warn("skipping: local file not found")
 
 		return ErrSkipValues
-	}
-
-	if err := template.Tpl2yml(v.Src, v.dst, data, templater); err != nil {
-		return fmt.Errorf("failed to render %q values: %w", v.Src, err)
 	}
 
 	return nil

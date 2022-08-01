@@ -14,12 +14,14 @@ type Templater interface {
 	Render(string, interface{}) ([]byte, error)
 }
 
-func getTemplater(name string) (Templater, error) { //nolint:nolintlint,ireturn
+func getTemplater(name string) (Templater, error) {
 	switch name {
 	case gomplateTemplater{}.Name():
 		return gomplateTemplater{}, nil
 	case sprigTemplater{}.Name():
 		return sprigTemplater{}, nil
+	case noTemplater{}.Name():
+		return noTemplater{}, nil
 	default:
 		return nil, fmt.Errorf("templater %s is not registered", name)
 	}
@@ -49,7 +51,7 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 
 	d, err := templater.Render(string(src), data)
 	if err != nil {
-		return err //nolint:wrapcheck // we control the interface
+		return fmt.Errorf("failed to render template: %w", err)
 	}
 
 	log.Trace(yml, " contents\n", string(d))

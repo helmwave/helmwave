@@ -1,6 +1,8 @@
 package action
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -13,7 +15,7 @@ type Yml struct {
 }
 
 // Run is main function for 'yml' command.
-func (i *Yml) Run() error {
+func (i *Yml) Run(ctx context.Context) error {
 	err := template.Tpl2yml(i.tpl, i.file, nil, i.templater)
 	if err != nil {
 		return err

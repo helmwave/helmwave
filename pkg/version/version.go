@@ -4,6 +4,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	// Version is helmwave binary version.
+	// It will override by goreleaser during release.
+	Version = "dev"
+)
+
 // Check compares helmwave versions and logs difference.
 func Check(a, b string) {
 	if a != b {
@@ -11,7 +17,3 @@ func Check(a, b string) {
 		log.Debug("🌊 HelmWave version ", a)
 	}
 }
-
-// Version is helmwave binary version.
-// It will override by goreleaser during release.
-var Version = "dev"

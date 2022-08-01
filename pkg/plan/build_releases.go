@@ -30,11 +30,12 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) (pla
 func addToPlan(plan []release.Config, rel release.Config,
 	releases map[uniqname.UniqName]release.Config,
 ) []release.Config {
-	if rel.In(plan) {
+	if helper.In(rel, plan) {
 		return plan
 	}
 
-	r := append(plan, rel) // nolint:gocritic
+	r := plan
+	r = append(r, rel)
 
 	for _, depName := range rel.DependsOn() {
 		depUN := uniqname.UniqName(depName)
@@ -59,15 +60,31 @@ func releaseNames(a []release.Config) (n []string) {
 
 // checkTagInclusion checks where any of release tags are included in target tags.
 func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
+	if matchAll {
+		return checkAllTagsInclusion(targetTags, releaseTags)
+	}
+
+	return checkAnyTagInclusion(targetTags, releaseTags)
+}
+
+func checkAllTagsInclusion(targetTags, releaseTags []string) bool {
 	for _, t := range targetTags {
 		contains := helper.Contains(t, releaseTags)
-		if matchAll && !contains {
+		if !contains {
 			return false
 		}
-		if !matchAll && contains {
+	}
+
+	return true
+}
+
+func checkAnyTagInclusion(targetTags, releaseTags []string) bool {
+	for _, t := range targetTags {
+		contains := helper.Contains(t, releaseTags)
+		if contains {
 			return true
 		}
 	}
 
-	return matchAll
+	return false
 }

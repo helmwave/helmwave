@@ -12,16 +12,19 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
-// Helm is an instance of helm CLI.
-var Helm = helm.New()
+//nolint:gochecknoglobals // TODO: get rid of globals
+var (
+	// Helm is an instance of helm CLI.
+	Helm = helm.New()
 
-// Default logLevel for helm logs.
-var helmLogLevel = log.Debugf
+	// Default logLevel for helm logs.
+	helmLogLevel = log.Debugf
 
-// HelmRegistryClient  is an instance of helm registry client.
-var HelmRegistryClient *registry.Client
+	// HelmRegistryClient  is an instance of helm registry client.
+	HelmRegistryClient *registry.Client
+)
 
-func init() { //nolint:gochecknoinits
+func init() {
 	var err error
 	HelmRegistryClient, err = registry.NewClient(
 		registry.ClientOptDebug(Helm.Debug),

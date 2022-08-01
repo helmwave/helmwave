@@ -3,6 +3,7 @@
 package action
 
 import (
+	"context"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -43,7 +44,7 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
-	ts.Require().NoError(u.Run())
+	ts.Require().NoError(u.Run(context.Background()))
 }
 
 //nolint:paralleltest // cannot parallel because of setenv

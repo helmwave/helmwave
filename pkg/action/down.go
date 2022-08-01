@@ -1,6 +1,8 @@
 package action
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
@@ -12,9 +14,9 @@ type Down struct {
 }
 
 // Run is main function for 'down' command.
-func (i *Down) Run() error {
+func (i *Down) Run(ctx context.Context) error {
 	if i.autoBuild {
-		if err := i.build.Run(); err != nil {
+		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
 	}
@@ -24,7 +26,7 @@ func (i *Down) Run() error {
 		return err
 	}
 
-	return p.Destroy()
+	return p.Destroy(ctx)
 }
 
 // Cmd returns 'down' *cli.Command.

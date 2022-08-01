@@ -2,9 +2,9 @@ package release
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
-	"github.com/helmwave/helmwave/pkg/pubsub"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -18,48 +18,43 @@ type Configs []Config
 
 // UnmarshalYAML parse Config.
 func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
-	if r == nil {
-		r = new(Configs)
-	}
 	var err error
-
 	*r, err = UnmarshalYAML(node)
 
 	return err
 }
 
 type config struct {
-	cfg                      *action.Configuration                             `yaml:"-"`
-	dependencies             map[uniqname.UniqName]<-chan pubsub.ReleaseStatus `yaml:"-"`
-	helm                     *helm.EnvSettings                                 `yaml:"-"`
-	log                      *log.Entry                                        `yaml:"-"`
-	Store                    map[string]interface{}                            `yaml:"store,omitempty"`
-	ChartF                   Chart                                             `yaml:"chart,omitempty"`
-	uniqName                 uniqname.UniqName                                 `yaml:"-"`
-	NameF                    string                                            `yaml:"name,omitempty"`
-	NamespaceF               string                                            `yaml:"namespace,omitempty"`
-	DescriptionF             string                                            `yaml:"description,omitempty"`
-	DependsOnF               []string                                          `yaml:"depends_on,omitempty"`
-	ValuesF                  []ValuesReference                                 `yaml:"values,omitempty"`
-	TagsF                    []string                                          `yaml:"tags,omitempty"`
-	Timeout                  time.Duration                                     `yaml:"timeout,omitempty"`
-	MaxHistory               int                                               `yaml:"max_history,omitempty"`
-	AllowFailure             bool                                              `yaml:"allow_failure,omitempty"`
-	Atomic                   bool                                              `yaml:"atomic,omitempty"`
-	CleanupOnFail            bool                                              `yaml:"cleanup_on_fail,omitempty"`
-	CreateNamespace          bool                                              `yaml:"create_namespace,omitempty"`
-	Devel                    bool                                              `yaml:"devel,omitempty"`
-	DisableHooks             bool                                              `yaml:"disable_hooks,omitempty"`
-	DisableOpenAPIValidation bool                                              `yaml:"disable_open_api_validation,omitempty"`
-	dryRun                   bool                                              `yaml:"dry_run,omitempty"`
-	Force                    bool                                              `yaml:"force,omitempty"`
-	Recreate                 bool                                              `yaml:"recreate,omitempty"`
-	ResetValues              bool                                              `yaml:"reset_values,omitempty"`
-	ReuseValues              bool                                              `yaml:"reuse_values,omitempty"`
-	SkipCRDs                 bool                                              `yaml:"skip_crds,omitempty"`
-	SubNotes                 bool                                              `yaml:"sub_notes,omitempty"`
-	Wait                     bool                                              `yaml:"wait,omitempty"`
-	WaitForJobs              bool                                              `yaml:"wait_for_jobs,omitempty"`
+	cfg                      *action.Configuration  `yaml:"-"`
+	helm                     *helm.EnvSettings      `yaml:"-"`
+	log                      *log.Entry             `yaml:"-"`
+	Store                    map[string]interface{} `yaml:"store,omitempty"`
+	ChartF                   Chart                  `yaml:"chart,omitempty"`
+	uniqName                 uniqname.UniqName      `yaml:"-"`
+	NameF                    string                 `yaml:"name,omitempty"`
+	NamespaceF               string                 `yaml:"namespace,omitempty"`
+	DescriptionF             string                 `yaml:"description,omitempty"`
+	DependsOnF               []string               `yaml:"depends_on,omitempty"`
+	ValuesF                  []ValuesReference      `yaml:"values,omitempty"`
+	TagsF                    []string               `yaml:"tags,omitempty"`
+	Timeout                  time.Duration          `yaml:"timeout,omitempty"`
+	MaxHistory               int                    `yaml:"max_history,omitempty"`
+	AllowFailureF            bool                   `yaml:"allow_failure,omitempty"`
+	Atomic                   bool                   `yaml:"atomic,omitempty"`
+	CleanupOnFail            bool                   `yaml:"cleanup_on_fail,omitempty"`
+	CreateNamespace          bool                   `yaml:"create_namespace,omitempty"`
+	Devel                    bool                   `yaml:"devel,omitempty"`
+	DisableHooks             bool                   `yaml:"disable_hooks,omitempty"`
+	DisableOpenAPIValidation bool                   `yaml:"disable_open_api_validation,omitempty"`
+	dryRun                   bool                   `yaml:"dry_run,omitempty"`
+	Force                    bool                   `yaml:"force,omitempty"`
+	Recreate                 bool                   `yaml:"recreate,omitempty"`
+	ResetValues              bool                   `yaml:"reset_values,omitempty"`
+	ReuseValues              bool                   `yaml:"reuse_values,omitempty"`
+	SkipCRDs                 bool                   `yaml:"skip_crds,omitempty"`
+	SubNotes                 bool                   `yaml:"sub_notes,omitempty"`
+	Wait                     bool                   `yaml:"wait,omitempty"`
+	WaitForJobs              bool                   `yaml:"wait_for_jobs,omitempty"`
 }
 
 func (rel *config) DryRun(b bool) {
@@ -68,8 +63,29 @@ func (rel *config) DryRun(b bool) {
 
 // Chart is structure for chart download options.
 type Chart struct {
-	action.ChartPathOptions `yaml:",inline"` //nolint:nolintlint
-	Name                    string
+	action.ChartPathOptions `yaml:",inline"`
+	Name                    string `yaml:"name"`
+}
+
+// UnmarshalYAML flexible config.
+func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
+	type raw Chart
+	var err error
+
+	switch node.Kind {
+	case yaml.ScalarNode, yaml.AliasNode:
+		err = node.Decode(&(u.Name))
+	case yaml.MappingNode:
+		err = node.Decode((*raw)(u))
+	default:
+		err = fmt.Errorf("unknown format")
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to decode chart %q from YAML at %d line: %w", node.Value, node.Line, err)
+	}
+
+	return nil
 }
 
 func (rel *config) newInstall() *action.Install {
@@ -186,15 +202,8 @@ func (rel *config) Uniq() uniqname.UniqName {
 	return rel.uniqName
 }
 
-// In check that 'x' found in 'array'.
-func (rel *config) In(a []Config) bool {
-	for _, r := range a {
-		if rel.Uniq() == r.Uniq() {
-			return true
-		}
-	}
-
-	return false
+func (rel *config) Equal(a Config) bool {
+	return rel.Uniq().Equal(a.Uniq())
 }
 
 func (rel *config) Name() string {
@@ -231,4 +240,8 @@ func (rel *config) Logger() *log.Entry {
 	}
 
 	return rel.log
+}
+
+func (rel *config) AllowFailure() bool {
+	return rel.AllowFailureF
 }

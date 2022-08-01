@@ -1,26 +1,27 @@
 package release
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/release"
 )
 
 // Config is an interface to manage particular helm release.
 type Config interface {
+	helper.EqualChecker[Config]
+	log.LoggerGetter
 	Uniq() uniqname.UniqName
-	HandleDependencies([]Config)
-	Sync() (*release.Release, error)
-	NotifySuccess()
-	NotifyFailed()
+	Sync(context.Context) (*release.Release, error)
+	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error
-	In([]Config) bool
 	BuildValues(string, string) error
-	Uninstall() (*release.UninstallReleaseResponse, error)
+	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get() (*release.Release, error)
 	List() (*release.Release, error)
 	Rollback(int) error
@@ -32,7 +33,6 @@ type Config interface {
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
-	Logger() *log.Entry
 }
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.

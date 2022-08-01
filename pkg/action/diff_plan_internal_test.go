@@ -4,6 +4,7 @@ package action
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -59,13 +60,13 @@ func (ts *DiffPlanTestSuite) TestRun() {
 
 	d := DiffLocalPlan{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
 
-	ts.Require().ErrorIs(d.Run(), os.ErrNotExist)
-	ts.Require().NoError(s1.Run())
-	ts.Require().ErrorIs(d.Run(), os.ErrNotExist)
-	ts.Require().NoError(s2.Run())
+	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
+	ts.Require().NoError(s1.Run(context.Background()))
+	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
+	ts.Require().NoError(s2.Run(context.Background()))
 
 	buf.Reset()
-	ts.Require().NoError(d.Run())
+	ts.Require().NoError(d.Run(context.Background()))
 
 	output := buf.String()
 	buf.Reset()

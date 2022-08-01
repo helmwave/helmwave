@@ -99,7 +99,8 @@ type planBody struct {
 	Releases     release.Configs
 }
 
-func NewBody(file string) (*planBody, error) { // nolint:revive
+// NewBody parses plan from file.
+func NewBody(file string) (*planBody, error) {
 	b := &planBody{
 		Version: version.Version,
 	}

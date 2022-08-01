@@ -1,6 +1,7 @@
 package release
 
 import (
+	"context"
 	"fmt"
 
 	"helm.sh/helm/v3/pkg/cli/values"
@@ -8,7 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) upgrade() (*release.Release, error) {
+func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 	client := rel.newUpgrade()
 
 	ch, err := rel.GetChart()
@@ -34,7 +35,7 @@ func (rel *config) upgrade() (*release.Release, error) {
 			rel.Logger().Debug("🧐 Release does not exist. Installing it now.")
 		}
 
-		r, err := rel.newInstall().Run(ch, vals)
+		r, err := rel.newInstall().RunWithContext(ctx, ch, vals)
 		if err != nil {
 			return nil, fmt.Errorf("failed to install %q: %w", rel.Uniq(), err)
 		}
@@ -43,7 +44,7 @@ func (rel *config) upgrade() (*release.Release, error) {
 	}
 
 	// Upgrade
-	r, err := client.Run(rel.Name(), ch, vals)
+	r, err := client.RunWithContext(ctx, rel.Name(), ch, vals)
 	if err != nil {
 		return nil, fmt.Errorf("failed to upgrade %s: %w", rel.Uniq(), err)
 	}

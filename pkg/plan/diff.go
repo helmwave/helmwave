@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -21,6 +22,7 @@ var (
 	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
 	// SkippedAnnotations is a map with all annotations to be skipped by differ.
+	//nolint:gochecknoglobals // cannot make this const
 	SkippedAnnotations = map[string][]string{
 		live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
 		helper.RootAnnoName + "skip-diff": {"true"},
@@ -57,8 +59,8 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
-func (p *Plan) DiffLive(showSecret bool, diffWide int) {
-	alive, _, err := p.GetLive()
+func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
+	alive, _, err := p.GetLive(ctx)
 	if err != nil {
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
 	}
@@ -122,7 +124,7 @@ func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k int) {
 	previous := false
 	for _, rel := range releases {
-		if !rel.Uniq().In(visited) {
+		if !helper.In(rel.Uniq(), visited) {
 			previous = true
 			log.Warn("🆚 ", rel.Uniq(), " was found in previous plan but not affected in new")
 		}
@@ -150,7 +152,9 @@ func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
 }
 
 // GetLive returns maps of releases in a k8s-cluster.
-func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []uniqname.UniqName, err error) {
+func (p *Plan) GetLive(
+	ctx context.Context,
+) (found map[uniqname.UniqName]*live.Release, notFound []uniqname.UniqName, err error) {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -175,7 +179,7 @@ func (p *Plan) GetLive() (found map[uniqname.UniqName]*live.Release, notFound []
 		}(wg, mu, p.body.Releases[i])
 	}
 
-	if err := wg.Wait(); err != nil {
+	if err := wg.WaitWithContext(ctx); err != nil {
 		return nil, nil, err
 	}
 

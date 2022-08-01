@@ -11,7 +11,9 @@ output:
 linters:
   enable-all: true
   disable:
-    - gochecknoglobals # TODO: get rid of globals
+    - exhaustivestruct # deprecated
+    - exhaustruct # it requires to initialize billions of fields, I ain't monkey to fix these
+    - gochecknoinits # we want to use `init()` functions
     - gocyclo # we use cyclop
     - godox # TODO: get rid of TODOs
     - goerr113 # need to create wrapped static errors
@@ -19,7 +21,9 @@ linters:
     - golint # deprecated
     - gomnd # we want to keep magic numbers
     - interfacer # deprecated
+    - ireturn # sometimes we need to return interfaces
     - maligned # deprecated
+    - nonamedreturns # we do want some named returns
     - scopelint # deprecated
     - varnamelen # I don't think short names are bad
     - wsl # lots of style checks
@@ -72,15 +76,6 @@ linters-settings:
     # switch
     default-signifies-exhaustive: true
 
-  exhaustivestruct:
-    # Struct Patterns is list of expressions to match struct packages and names
-    # The struct packages have the form example.com/package.ExampleStruct
-    # The matching patterns can use matching syntax from https://pkg.go.dev/path#Match
-    # If this list is empty, all structs are tested.
-    struct-patterns:
-      - "*.Test"
-      - "example.com/package.ExampleStruct"
-
   forbidigo:
     # Forbid the following identifiers (identifiers are written using regexp):
     forbid:
@@ -120,6 +115,16 @@ linters-settings:
       - typeSwitchVar
       - whyNoLint
       - yodaStyleExpr
+
+      # these checks fail on generics
+      # https://github.com/go-critic/go-critic/issues/1219
+      # https://github.com/go-critic/go-critic/issues/1223
+      # https://github.com/go-critic/go-critic/issues/1224
+      # https://github.com/go-critic/go-critic/issues/1242
+      - rangeValCopy
+      - typeDefFirst
+      - hugeParam
+      - paramTypeCombine
 
     settings:
       captLocal: # must be valid enabled check name
@@ -436,9 +441,13 @@ issues:
     - path: _test\.go
       linters:
         - dupl
-        - goconst
-        - wrapcheck
         - forcetypeassert
+        - gochecknoglobals
+        - goconst
+        - godot
+        - lll
+        - revive
+        - wrapcheck
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all

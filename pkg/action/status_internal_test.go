@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -33,13 +34,13 @@ func (ts *StatusTestSuite) TestRun() {
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
-	ts.Require().NoError(r.Run())
+	ts.Require().NoError(r.Run(context.Background()))
 
 	s := &Status{
 		build: r,
 	}
 
-	ts.Require().NoError(s.Run())
+	ts.Require().NoError(s.Run(context.Background()))
 }
 
 //nolint:paralleltest // cannot parallel because of setenv

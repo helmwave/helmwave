@@ -2,42 +2,43 @@ name: Container analysis
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '44 10 * * 6'
-
+    - cron: "44 10 * * 6"
 
 jobs:
   trivy:
     runs-on: ubuntu-latest
     steps:
-    - name: Run Trivy
-      uses: aquasecurity/trivy-action@0105373003c89c494a3f436bd5efc57f3ac1ca20
-      with:
-        image-ref: 'ghcr.io/helmwave/helmwave:latest'
-        format: 'template'
-        template: '@/contrib/sarif.tpl'
-        output: 'trivy-results.sarif'
-        severity: 'CRITICAL,HIGH'
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@503d3abc15463af68b817d685982721f134256a5
+        with:
+          image-ref: "ghcr.io/${{ github.repository }}:latest"
+          format: "template"
+          template: "@/contrib/sarif.tpl"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
 
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: 'trivy-results.sarif'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: "trivy-results.sarif"
 
   snyk:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Run Snyk
-      continue-on-error: true
-      uses: snyk/actions/docker@14818c4695ecc4045f33c9cee9e795a788711ca4
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        image: ghcr.io/helmwave/helmwave:latest
-        args: --file=Dockerfile
-    - name: Upload Snyk result to GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: snyk.sarif
+      - uses: actions/checkout@v3
+
+      - name: Run Snyk
+        continue-on-error: true
+        uses: snyk/actions/docker@ff5c02a0e3adc5c52e2c9e7558edf2b46d69ac1f
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ghcr.io/${{ github.repository }}:latest
+          args: --file=Dockerfile
+
+      - name: Upload Snyk result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif

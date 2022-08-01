@@ -3,14 +3,14 @@ package registry
 import (
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/helmwave/helmwave/pkg/log"
 	"gopkg.in/yaml.v3"
 )
 
 // Config is an interface to manage particular helm reg.
 type Config interface {
+	log.LoggerGetter
 	Install() error
-	Logger() *log.Entry
 	Host() string
 	// Username() string
 	// Password() string

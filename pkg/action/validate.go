@@ -1,6 +1,8 @@
 package action
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
@@ -11,7 +13,7 @@ type Validate struct {
 }
 
 // Run is main function for 'validate' command.
-func (l *Validate) Run() error {
+func (l *Validate) Run(ctx context.Context) error {
 	p, err := plan.NewAndImport(l.plandir)
 	if err != nil {
 		return err

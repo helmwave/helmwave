@@ -3,6 +3,7 @@
 package action
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -39,16 +40,16 @@ func (ts *DownTestSuite) TestRun() {
 	d := Down{
 		build: s,
 	}
-	ts.Require().ErrorIs(d.Run(), os.ErrNotExist, "down should fail before build")
-	ts.Require().NoError(s.Run())
+	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist, "down should fail before build")
+	ts.Require().NoError(s.Run(context.Background()))
 
 	u := &Up{
 		build: s,
 		dog:   &kubedog.Config{},
 	}
 
-	ts.Require().NoError(u.Run())
-	ts.Require().NoError(d.Run())
+	ts.Require().NoError(u.Run(context.Background()))
+	ts.Require().NoError(d.Run(context.Background()))
 }
 
 //nolint:paralleltest // uses helm repository.yaml flock

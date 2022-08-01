@@ -1,19 +1,16 @@
 package release
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Sync() (*release.Release, error) {
-	// DependsON
-	if err := rel.waitForDependencies(); err != nil {
-		return nil, err
-	}
-
-	return rel.upgrade()
+func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
+	return rel.upgrade(ctx)
 }
 
 func (rel *config) Cfg() *action.Configuration {
