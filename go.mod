@@ -18,7 +18,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli/v2 v2.11.1
-	github.com/werf/kubedog v0.6.4
+	github.com/werf/kubedog v0.9.6
 	github.com/werf/logboek v0.5.4
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.9.2
