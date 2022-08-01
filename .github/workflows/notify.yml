@@ -1,22 +1,21 @@
 name: Notify
 
 on:
-  push:
-    tags:
-    - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Helmwave tag to notify about"
+        required: true
+        type: string
 
 jobs:
   telegram:
     runs-on: ubuntu-latest
     steps:
-      - name: Get tag
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-
       - name: Telegram
         uses: appleboy/telegram-action@master
         env:
-          GITHUB_TAG: ${{ steps.vars.outputs.tag }}
+          GITHUB_TAG: ${{ inputs.tag }}
         with:
           to: ${{ secrets.CHAT }}
           token: ${{ secrets.BOT_TOKEN }}
@@ -28,10 +27,6 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Get tag
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-
       - name: Trigger helmwave/docs workflow
         uses: actions/github-script@v6
         with:
@@ -47,4 +42,4 @@ jobs:
               },
             })
         env:
-          GITHUB_TAG: ${{ steps.vars.outputs.tag }}
+          GITHUB_TAG: ${{ inputs.tag }}

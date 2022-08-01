@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     permissions:
-      contents: read
+      contents: write # releases are in `contents`
       packages: write
     needs:
       - get-tag
@@ -117,6 +117,7 @@ jobs:
       actions: write
     needs:
       - get-tag
+      - goreleaser
     steps:
       - name: Trigger helmwave/docs workflow
         uses: actions/github-script@v6
@@ -128,6 +129,9 @@ jobs:
               repo: context.repo.repo,
               workflow_id: "notify.yml",
               ref: process.env.GITHUB_TAG,
+              inputs: {
+                tag: process.env.GITHUB_TAG,
+              },
             })
         env:
           GITHUB_TAG: ${{ needs.get-tag.outputs.tag }}
