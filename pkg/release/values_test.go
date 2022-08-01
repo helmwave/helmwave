@@ -43,9 +43,9 @@ func (s *ValuesTestSuite) TestMap() {
 	src := `
 values:
 - src: 1
-  dst: a
+  render: false
 - src: 2
-  dst: b
+  strict: true
 `
 	c := &config{}
 
@@ -54,8 +54,8 @@ values:
 
 	s.Require().Equal(&config{
 		Values: []release.ValuesReference{
-			{Src: "1", dst: "a", Render: true},
-			{Src: "2", dst: "b", Render: true},
+			{Src: "1", Render: false},
+			{Src: "2", Strict: true},
 		},
 	}, c)
 }
