@@ -54,8 +54,8 @@ values:
 
 	s.Require().Equal(&config{
 		Values: []release.ValuesReference{
-			{Src: "1", Render: false},
-			{Src: "2", Strict: true},
+			{Src: "1", Render: false, Strict: false},
+			{Src: "2", Render: true, Strict: true},
 		},
 	}, c)
 }
