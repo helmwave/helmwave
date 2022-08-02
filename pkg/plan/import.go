@@ -29,6 +29,13 @@ func (p *Plan) Import() error {
 	}
 
 	p.body = body
+
+	// Check all files exist.
+	err = p.ValidateValuesImport()
+	if err != nil {
+		return err
+	}
+
 	version.Check(p.body.Version, version.Version)
 
 	return nil

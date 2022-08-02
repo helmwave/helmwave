@@ -43,6 +43,9 @@ func (s *BuildValuesTestSuite) TestValuesBuildError() {
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("Values").Return([]release.ValuesReference{
+		{Src: tmpValues},
+	})
 
 	errBuildValues := errors.New("values build error")
 	mockedRelease.On("BuildValues").Return(errBuildValues)

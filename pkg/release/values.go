@@ -74,9 +74,9 @@ func (v *ValuesReference) Download() error {
 }
 
 // Get returns destination path of values.
-func (v *ValuesReference) Get() string {
-	return v.Dst
-}
+// func (v *ValuesReference) Get() string {
+//	return v.Dst
+// }
 
 // SetUniq generates unique file path based on provided base directory, release uniqname and sha1 of source path.
 func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
@@ -90,8 +90,21 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 	return v
 }
 
-// func (v *ValuesReference) Set(dst string) *ValuesReference {
-//	v.dst = dst
+// ProhibitDst Dst now is public method.
+// Dst needs to marshal for export.
+// Also, dst needs to unmarshal for import from plan.
+func ProhibitDst(values []ValuesReference) error {
+	for _, v := range values {
+		if v.Dst != "" {
+			return fmt.Errorf("dst %q not allowed here, this field reserved", v.Dst)
+		}
+	}
+
+	return nil
+}
+
+// func (v *ValuesReference) Set(Dst string) *ValuesReference {
+//	v.Dst = Dst
 //	return v
 // }
 
@@ -104,7 +117,7 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 
 	v.SetUniq(dir, rel.Uniq())
 
-	l := rel.Logger().WithField("values src", v.Src).WithField("values dst", v.Dst)
+	l := rel.Logger().WithField("values src", v.Src).WithField("values Dst", v.Dst)
 
 	l.Trace("Building values reference")
 

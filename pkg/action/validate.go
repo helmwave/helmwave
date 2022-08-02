@@ -19,7 +19,7 @@ func (l *Validate) Run(ctx context.Context) error {
 		return err
 	}
 
-	return p.ValidateValues()
+	return p.ValidateValuesImport()
 }
 
 // Cmd returns 'validate' *cli.Command.

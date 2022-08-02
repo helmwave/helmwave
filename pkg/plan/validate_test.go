@@ -34,7 +34,7 @@ func (s *ValidateTestSuite) TestValidateValues() {
 
 	p.SetReleases(mockedRelease)
 
-	s.Require().NoError(p.ValidateValues())
+	s.Require().NoError(p.ValidateValuesImport())
 
 	mockedRelease.AssertExpectations(s.T())
 }
@@ -54,7 +54,7 @@ func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 
 	p.SetReleases(mockedRelease)
 
-	s.Require().Error(p.ValidateValues())
+	s.Require().Error(p.ValidateValuesImport())
 
 	mockedRelease.AssertExpectations(s.T())
 }
@@ -65,7 +65,7 @@ func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
 
 	p.NewBody()
 
-	s.Require().NoError(p.ValidateValues())
+	s.Require().NoError(p.ValidateValuesImport())
 }
 
 func (s *ValidateTestSuite) TestValidateRepositoryName() {
