@@ -20,13 +20,13 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 	// Values
 	valuesFiles := make([]string, 0, len(rel.Values()))
 	for i := range rel.Values() {
-		valuesFiles = append(valuesFiles, rel.Values()[i].Get())
+		valuesFiles = append(valuesFiles, rel.Values()[i].Dst)
 	}
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}
 	vals, err := valOpts.MergeValues(getter.All(rel.Helm()))
 	if err != nil {
-		return nil, fmt.Errorf("failed to merge values for release %q: %w", rel.Uniq(), err)
+		return nil, fmt.Errorf("failed to merge values %v: %w", valuesFiles, err)
 	}
 
 	// Install

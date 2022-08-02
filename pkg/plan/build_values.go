@@ -7,6 +7,10 @@ import (
 )
 
 func (p *Plan) buildValues() error {
+	if err := p.ValidateValuesBuild(); err != nil {
+		return err
+	}
+
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -20,7 +24,7 @@ func (p *Plan) buildValues() error {
 			} else {
 				var vals []string
 				for i := range rel.Values() {
-					vals = append(vals, rel.Values()[i].Get())
+					vals = append(vals, rel.Values()[i].Dst)
 				}
 
 				if len(vals) == 0 {

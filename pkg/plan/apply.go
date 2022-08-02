@@ -198,7 +198,13 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	}
 
 	parallelLimit := getParallelLimit(ctx, p.body.Releases)
-	log.WithField("limit", parallelLimit).Info("Deploying releases with limited parallelization")
+
+	const msg = "Deploying releases with limited parallelization"
+	if parallelLimit == len(p.body.Releases) {
+		log.WithField("limit", parallelLimit).Debug(msg)
+	} else {
+		log.WithField("limit", parallelLimit).Info(msg)
+	}
 
 	nodesChan := dependenciesGraph.Run()
 

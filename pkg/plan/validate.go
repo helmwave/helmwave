@@ -13,12 +13,12 @@ import (
 // ErrValidateFailed is returned for failed values validation.
 var ErrValidateFailed = errors.New("validate failed")
 
-// ValidateValues checks whether all values files exist.
-func (p *Plan) ValidateValues() error {
+// ValidateValuesImport checks whether all values files exist.
+func (p *Plan) ValidateValuesImport() error {
 	f := false
 	for _, rel := range p.body.Releases {
 		for i := range rel.Values() {
-			y := rel.Values()[i].Get()
+			y := rel.Values()[i].Dst
 			_, err := os.Stat(y)
 			if os.IsNotExist(err) {
 				f = true
@@ -34,6 +34,21 @@ func (p *Plan) ValidateValues() error {
 	}
 
 	return ErrValidateFailed
+}
+
+// ValidateValuesBuild Dst now is public method.
+// Dst needs to marshal for export.
+// Also, dst needs to unmarshal for import from plan.
+func (p *Plan) ValidateValuesBuild() error {
+	for _, rel := range p.body.Releases {
+		for i := range rel.Values() {
+			if rel.Values()[i].Dst != "" {
+				return fmt.Errorf("dst %q not allowed here, this field reserved", rel.Values()[i].Dst)
+			}
+		}
+	}
+
+	return nil
 }
 
 // Validate validates releases and repositories in plan.
