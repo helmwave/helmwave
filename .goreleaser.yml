@@ -23,7 +23,7 @@ builds:
       - darwin
     main: ./cmd/helmwave
     ldflags:
-      - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}
+      - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{ .Version }}
 
 ###
 # Packages
@@ -56,10 +56,10 @@ dockers:
       - diamon/helmwave:scratch-amd64
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.licenses=MIT"
       - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
       - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
@@ -80,10 +80,10 @@ dockers:
       - diamon/helmwave:scratch-arm64v8
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.licenses=MIT"
       - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
       - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
@@ -103,10 +103,10 @@ dockers:
       - diamon/helmwave:latest-amd64
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.licenses=MIT"
       - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
       - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
@@ -127,10 +127,10 @@ dockers:
       - diamon/helmwave:latest-arm64v8
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.licenses=MIT"
       - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
       - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
@@ -243,4 +243,4 @@ brews:
 milestones:
   - close: true
     fail_on_error: false
-    name_template: "{{.Tag}}"
+    name_template: "{{ .Tag }}"
