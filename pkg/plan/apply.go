@@ -345,15 +345,17 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	time.Sleep(kubedogConfig.StartDelay)
 	err = p.syncReleases(ctx)
 	if err != nil {
+		cancel()
+
 		return err
 	}
 
+	// Allow kubedog to catch release installed
+	time.Sleep(kubedogConfig.StatusInterval)
 	cancel() // stop kubedog
 
-	// ? Kubedog soft exit
-	time.Sleep(kubedogConfig.StatusInterval)
 	err = dogroup.WaitWithContext(ctx)
-	if err != nil {
+	if err != nil && !errors.Is(err, context.Canceled) {
 		// Ignore kubedog error
 		log.WithError(err).Warn("kubedog has error while watching resources.")
 	}
