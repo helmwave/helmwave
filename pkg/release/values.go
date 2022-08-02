@@ -90,6 +90,9 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 	return v
 }
 
+// ProhibitDst Dst now is public method.
+// Dst needs to marshal for export.
+// Also, dst needs to unmarshal for import from plan.
 func ProhibitDst(values []ValuesReference) error {
 	for _, v := range values {
 		if v.Dst != "" {

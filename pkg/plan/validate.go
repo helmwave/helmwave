@@ -3,11 +3,11 @@ package plan
 import (
 	"errors"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/release"
 	"net/url"
 	"os"
 	"regexp"
 
+	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 )
 
