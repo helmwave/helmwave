@@ -5,20 +5,25 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
-      - GO386=softfloat
+    goarch:
+      - amd64
+      - arm64
+    goamd64:
+      - v1
+      # - v2
+      # - v3
+      # - v4
     goos:
       - linux
       - windows
       - darwin
-    ignore:
-      - goos: darwin
-        goarch: "386"
     main: ./cmd/helmwave
     ldflags:
       - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}
 
 archives:
-  - format_overrides:
+  - format: tar.gz
+    format_overrides:
       - goos: windows
         format: zip
 
