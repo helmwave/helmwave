@@ -17,31 +17,22 @@ func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 	for i := 0; i < len(m); i++ {
 		r := &m[i]
 
+		spec, err := r.MakeMultiTrackSpec(ns)
+		if err != nil {
+			return nil, err
+		}
+
 		switch r.Kind {
 		case "Deployment":
-			s, err := r.MakeMultiTrackSpec(ns)
-			if err != nil {
-				return nil, err
-			}
-			specs.Deployments = append(specs.Deployments, *s)
+			specs.Deployments = append(specs.Deployments, *spec)
 		case "StatefulSet":
-			s, err := r.MakeMultiTrackSpec(ns)
-			if err != nil {
-				return nil, err
-			}
-			specs.StatefulSets = append(specs.StatefulSets, *s)
-		case "Job":
-			s, err := r.MakeMultiTrackSpec(ns)
-			if err != nil {
-				return nil, err
-			}
-			specs.Jobs = append(specs.Jobs, *s)
+			specs.StatefulSets = append(specs.StatefulSets, *spec)
 		case "DaemonSet":
-			s, err := r.MakeMultiTrackSpec(ns)
-			if err != nil {
-				return nil, err
-			}
-			specs.DaemonSets = append(specs.DaemonSets, *s)
+			specs.DaemonSets = append(specs.DaemonSets, *spec)
+		case "Job":
+			specs.Jobs = append(specs.Jobs, *spec)
+		case "Canary":
+			specs.Canaries = append(specs.Canaries, *spec)
 		}
 	}
 
@@ -52,8 +43,7 @@ func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, error) {
 	// Default spec
 	spec := &multitrack.MultitrackSpec{
-		ResourceName: r.Name,
-		// Namespace:               r.Namespace,
+		ResourceName:            r.Name,
 		Namespace:               ns,
 		LogRegexByContainerName: map[string]*regexp.Regexp{},
 		TrackTerminationMode:    multitrack.WaitUntilResourceReady,
@@ -66,7 +56,6 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 
 	// Override by annotations
 	for name, value := range r.Annotations {
-		// invalid := fmt.Errorf("%s/%s annotation %s with invalid value %s", r.Name, r.Kind, name, value)
 		var err error
 
 		switch name {
