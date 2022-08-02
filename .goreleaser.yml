@@ -13,6 +13,8 @@ builds:
       - amd64
       - arm64
     goamd64:
+      # Go can build using different instruction sets - https://github.com/golang/go/wiki/MinimumRequirements#amd64
+      # We don't really need this type of optimization (limiting CPUs helmwave can run on) so we use general v1.
       - v1
       # - v2
       # - v3
