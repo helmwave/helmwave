@@ -241,9 +241,6 @@ brews:
       system "#{bin}/program --version"
 
 milestones:
-  - repo:
-      owner: helmwave
-      name: helmwave
-    close: true
+  - close: true
     fail_on_error: false
     name_template: "{{.Tag}}"
