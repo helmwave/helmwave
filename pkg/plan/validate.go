@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/release"
 	"net/url"
 	"os"
 	"regexp"
@@ -41,10 +42,9 @@ func (p *Plan) ValidateValuesImport() error {
 // Also, dst needs to unmarshal for import from plan.
 func (p *Plan) ValidateValuesBuild() error {
 	for _, rel := range p.body.Releases {
-		for i := range rel.Values() {
-			if rel.Values()[i].Dst != "" {
-				return fmt.Errorf("dst %q not allowed here, this field reserved", rel.Values()[i].Dst)
-			}
+		err := release.ProhibitDst(rel.Values())
+		if err != nil {
+			return err
 		}
 	}
 

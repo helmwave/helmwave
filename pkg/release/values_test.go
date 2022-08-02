@@ -12,6 +12,27 @@ type ValuesTestSuite struct {
 	suite.Suite
 }
 
+func (s *ValuesTestSuite) TestProhibitDst() {
+	type config struct {
+		Values []release.ValuesReference
+	}
+
+	src := `
+values:
+- src: 1
+  dst: a
+- src: 2
+  dst: b
+`
+	c := &config{}
+
+	err := yaml.Unmarshal([]byte(src), c)
+	s.Require().NoError(err)
+
+	err = release.ProhibitDst(c.Values)
+	s.Require().Error(err)
+}
+
 func (s *ValuesTestSuite) TestList() {
 	type config struct {
 		Values []release.ValuesReference

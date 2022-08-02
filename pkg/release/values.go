@@ -90,6 +90,16 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 	return v
 }
 
+func ProhibitDst(values []ValuesReference) error {
+	for _, v := range values {
+		if v.Dst != "" {
+			return fmt.Errorf("dst %q not allowed here, this field reserved", v.Dst)
+		}
+	}
+
+	return nil
+}
+
 // func (v *ValuesReference) Set(Dst string) *ValuesReference {
 //	v.Dst = Dst
 //	return v
