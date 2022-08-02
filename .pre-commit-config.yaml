@@ -5,3 +5,8 @@ repos:
       - id: go-fmt
       - id: golangci-lint
       - id: go-mod-tidy
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v1.4.0
+    hooks:
+      - id: conventional-pre-commit
