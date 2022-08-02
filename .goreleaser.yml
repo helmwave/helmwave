@@ -2,6 +2,10 @@ before:
   hooks:
     - go mod tidy
 
+###
+# Builds
+###
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -21,6 +25,10 @@ builds:
     ldflags:
       - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}
 
+###
+# Packages
+###
+
 archives:
   - format: tar.gz
     format_overrides:
@@ -29,43 +37,6 @@ archives:
 
 checksum:
   name_template: "checksums.txt"
-
-snapshot:
-  name_template: "{{ .Tag }}-next"
-
-release:
-  name_template: "v{{.Version}}"
-  #  draft: true
-  prerelease: auto
-
-changelog:
-  skip: false
-  use: github
-  sort: asc
-
-  groups:
-    - title: "Linter"
-      regexp: "^.*linter.*$"
-      order: 0
-    - title: "Tests"
-      regexp: "^.*tests?.*$"
-      order: 1
-    - title: "Documentation"
-      regexp: "^.*(documentation|docs?).*$"
-      order: 2
-    - title: "Bump"
-      regexp: "^.*[bB]ump?.*$"
-      order: 3
-    - title: "Other"
-      order: 999
-
-  filters:
-    exclude:
-      - "^WIP:"
-      - Merge pull request
-      - Merge branch
-      - go mod tidy
-      - typo
 
 dockers:
   - dockerfile: Dockerfile
@@ -116,6 +87,53 @@ dockers:
     goos: linux
     goarch: amd64
     use: buildx
+
+###
+# Publishes
+###
+
+changelog:
+  skip: false
+  use: github
+  sort: asc
+
+  groups:
+    - title: "Linter"
+      regexp: "^.*linter.*$"
+      order: 1
+    - title: "Tests"
+      regexp: "^.*tests?.*$"
+      order: 2
+    - title: "Bump"
+      regexp: "^.*[bB]ump?.*$"
+      order: 3
+    - title: "Dependencies"
+      regexp: "^.*(deps):.*$"
+      order: 4
+    - title: "CI"
+      regexp: "^.*(ci):.*$"
+      order: 5
+    - title: "New Features"
+      regexp: "^feat[(\\w)]*:.*$"
+      order: 0
+    - title: "Other"
+      order: 999
+
+  filters:
+    exclude:
+      - "^WIP:"
+      - Merge pull request
+      - Merge branch
+      - go mod tidy
+      - typo
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+release:
+  name_template: "v{{ .Version }}"
+  #  draft: true
+  prerelease: auto
 
 brews:
   - tap:
