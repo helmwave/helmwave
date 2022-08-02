@@ -7,8 +7,9 @@ import (
 // Version is helmwave binary version.
 // It should be var not const.
 // It will override by goreleaser during release.
-// -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}} .
-var Version = "dev" //nolint:gochecknoglobals
+// -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}.
+//nolint:gochecknoglobals
+var Version = "dev"
 
 // Check compares helmwave versions and logs difference.
 func Check(a, b string) {
