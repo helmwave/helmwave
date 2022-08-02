@@ -43,6 +43,17 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 		return r, nil
 	}
 
+	pending, err := rel.isPending()
+	if err != nil {
+		return nil, fmt.Errorf("failed to check %q for pending status: %w", rel.Uniq(), err)
+	}
+	if pending {
+		err := rel.fixPending(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to fix %q pending status: %w", rel.Uniq(), err)
+		}
+	}
+
 	// Upgrade
 	r, err := client.RunWithContext(ctx, rel.Name(), ch, vals)
 	if err != nil {
