@@ -35,6 +35,15 @@ archives:
       - goos: windows
         format: zip
 
+nfpms:
+  - homepage: https://helmwave.github.io/
+    license: MIT
+    maintainer: TBD
+    formats:
+      - apk
+      - deb
+      - rpm
+
 checksum:
   name_template: "checksums.txt"
 
