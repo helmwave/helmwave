@@ -244,3 +244,15 @@ milestones:
   - close: true
     fail_on_error: false
     name_template: "{{ .Tag }}"
+
+###
+# Announces
+###
+
+announce:
+  telegram:
+    enabled: true
+    chat_id: "{{ .Env.TELEGRAM_CHAT_ID }}"
+    message_template: |
+      Helmwave *{{ .Tag }}* is ready!
+      See more: https://github.com/helmwave/helmwave/releases/tag/{{ .Tag }}
