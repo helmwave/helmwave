@@ -2,7 +2,10 @@ package kubedog
 
 import (
 	"bytes"
+	"errors"
+	"io"
 
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	meta1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -30,7 +33,13 @@ func Parse(yamlFile []byte) []Resource {
 	dec := yaml.NewDecoder(r)
 
 	var t Resource
-	for dec.Decode(&t) == nil {
+	var err error
+	for ; !errors.Is(err, io.EOF); err = dec.Decode(&t) {
+		if err != nil {
+			log.WithError(err).Info("failed to parse resource manifest for kubedog")
+
+			continue
+		}
 		a = append(a, t)
 	}
 

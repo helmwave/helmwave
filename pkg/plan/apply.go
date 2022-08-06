@@ -377,6 +377,7 @@ func (p *Plan) kubedogSpecs() (s multitrack.MultitrackSpecs) {
 			"DaemonSets":   len(spec.DaemonSets),
 			"StatefulSets": len(spec.StatefulSets),
 			"Canaries":     len(spec.Canaries),
+			"Generics":     len(spec.Generics),
 			"release":      rel.Uniq(),
 		}).Trace("kubedog track resources")
 
@@ -385,6 +386,7 @@ func (p *Plan) kubedogSpecs() (s multitrack.MultitrackSpecs) {
 		s.DaemonSets = append(s.DaemonSets, spec.DaemonSets...)
 		s.StatefulSets = append(s.StatefulSets, spec.StatefulSets...)
 		s.Canaries = append(s.Canaries, spec.Canaries...)
+		s.Generics = append(s.Generics, spec.Generics...)
 	}
 
 	return s
