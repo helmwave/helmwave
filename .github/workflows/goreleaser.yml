@@ -67,6 +67,7 @@ jobs:
     if: always()
     permissions:
       contents: write # releases are in `contents`
+      issues: write # for closing milestones
       packages: write
     needs:
       - get-tag
@@ -109,8 +110,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
+          TELEGRAM_CHAT_ID: ${{ secrets.CHAT }}
+          TELEGRAM_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-  trigger-notify:
+  docs:
     runs-on: ubuntu-latest
     if: always()
     permissions:
@@ -126,9 +129,9 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: "notify.yml",
-              ref: process.env.GITHUB_TAG,
+              repo: "docs",
+              workflow_id: "generate-new-version.yml",
+              ref: "main",
               inputs: {
                 tag: process.env.GITHUB_TAG,
               },
