@@ -787,8 +787,8 @@ github.com/hashicorp/vault/sdk v0.5.0/go.mod h1:UJZHlfwj7qUJG8g22CuxUgkdJouFrBNv
 github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
 github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 h1:xixZ2bWeofWV68J+x6AzmKuVM/JWCQwkWm6GW/MUR6I=
 github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87/go.mod h1:CtWFDAQgb7dxtzFs4tWbplKIe2jSi3+5vKbgIO0SLnQ=
-github.com/helmwave/logrus-emoji-formatter v1.0.1 h1:OpvK1HxjqLdHoFGi9G8xdFrcutd7laaT0HO5aQN3Bbc=
-github.com/helmwave/logrus-emoji-formatter v1.0.1/go.mod h1:pFGiggVoSB4N7A9MJm03AHRBLIh9neAqbV/FUteyzKI=
+github.com/helmwave/logrus-emoji-formatter v1.1.0 h1:LMVt9hWp0+8nNJlKYzXAgaQ2C7y43+VWDUItXk7MEv0=
+github.com/helmwave/logrus-emoji-formatter v1.1.0/go.mod h1:4rNQF//jg0jPPtIAmTmuOHUGpoy5gzEWN+toUv+2F8A=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/huandu/xstrings v1.3.1/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/huandu/xstrings v1.3.2 h1:L18LIDzqlW6xN2rEkpdV8+oL/IXWJ1APd+vsdYy4Wdw=
