@@ -254,7 +254,7 @@ milestones:
 announce:
   telegram:
     enabled: true
-    chat_id: "{{ .Env.TELEGRAM_CHAT_ID }}"
+    chat_id: -1001484486010
     message_template: |
       Helmwave *{{ .Tag }}* is ready!
       See more: https://github.com/helmwave/helmwave/releases/tag/{{ .Tag }}

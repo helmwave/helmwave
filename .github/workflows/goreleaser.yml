@@ -110,7 +110,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
-          TELEGRAM_CHAT_ID: ${{ secrets.CHAT }}
           TELEGRAM_TOKEN: ${{ secrets.BOT_TOKEN }}
 
   docs:
