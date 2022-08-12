@@ -10,14 +10,16 @@ jobs:
   trivy:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Run Trivy
-        uses: aquasecurity/trivy-action@cb606dfdb0d2b3698ace62192088ef4f5360b24f
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@v0.6.1
         with:
           image-ref: "ghcr.io/${{ github.repository }}:latest"
-          format: "template"
-          template: "@/contrib/sarif.tpl"
+          format: "sarif"
           output: "trivy-results.sarif"
-          severity: "CRITICAL,HIGH"
+          severity: "MEDIUM,HIGH,CRITICAL"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
@@ -31,12 +33,12 @@ jobs:
 
       - name: Run Snyk
         continue-on-error: true
-        uses: snyk/actions/docker@ff5c02a0e3adc5c52e2c9e7558edf2b46d69ac1f
+        uses: snyk/actions/docker@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ghcr.io/${{ github.repository }}:latest
-          args: --file=Dockerfile
+          args: --file=Dockerfile --severity-threshold=medium
 
       - name: Upload Snyk result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2

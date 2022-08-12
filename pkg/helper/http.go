@@ -33,7 +33,7 @@ func Download(file, uri string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), HTTPTimeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", uri, http.NoBody)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, http.NoBody)
 	if err != nil {
 		return fmt.Errorf("failed to create request to %s: %w", uri, err)
 	}

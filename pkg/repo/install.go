@@ -15,7 +15,10 @@ func (rep *config) Install(ctx context.Context, settings *helm.EnvSettings, f *r
 		if rep.Entry != *existing {
 			// The input coming in for the name is different from what is already
 			// configured. Return an error.
-			return fmt.Errorf("❌ repository name (%q) already exists, please specify a different name", rep.Name())
+			return fmt.Errorf(
+				"❌ repository name (%q) already exists with different config, cannot overwrite it without force",
+				rep.Name(),
+			)
 		}
 
 		// The add is idempotent so do nothing

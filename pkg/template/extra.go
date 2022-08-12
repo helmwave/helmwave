@@ -213,6 +213,7 @@ func noKeyError(key string, obj interface{}) error {
 // Second argument is default value if key not found and is optional.
 // Third argument is map to search in.
 // Used as custom template function.
+//
 //nolint:gocognit
 func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	defSet, def, obj, err := parseGetVarArgs(varArgs)

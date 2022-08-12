@@ -34,6 +34,7 @@ type config struct {
 	NameF                    string                 `yaml:"name,omitempty"`
 	NamespaceF               string                 `yaml:"namespace,omitempty"`
 	DescriptionF             string                 `yaml:"description,omitempty"`
+	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty"`
 	DependsOnF               []string               `yaml:"depends_on,omitempty"`
 	ValuesF                  []ValuesReference      `yaml:"values,omitempty"`
 	TagsF                    []string               `yaml:"tags,omitempty"`

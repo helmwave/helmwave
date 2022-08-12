@@ -2,36 +2,186 @@ before:
   hooks:
     - go mod tidy
 
+###
+# Builds
+###
+
 builds:
   - env:
       - CGO_ENABLED=0
-      - GO386=softfloat
+    goarch:
+      - amd64
+      - arm64
+    goamd64:
+      # Go can build using different instruction sets - https://github.com/golang/go/wiki/MinimumRequirements#amd64
+      # We don't really need this type of optimization (limiting CPUs helmwave can run on) so we use general v1.
+      - v1
+      # - v2
+      # - v3
+      # - v4
     goos:
       - linux
       - windows
       - darwin
-    ignore:
-      - goos: darwin
-        goarch: "386"
     main: ./cmd/helmwave
     ldflags:
-      - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{.Version}}
+      - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{ .Version }}
+
+###
+# Packages
+###
 
 archives:
-  - format_overrides:
+  - format: tar.gz
+    format_overrides:
       - goos: windows
         format: zip
+
+nfpms:
+  - homepage: https://helmwave.github.io/
+    license: MIT
+    maintainer: TBD
+    formats:
+      - apk
+      - deb
+      - rpm
 
 checksum:
   name_template: "checksums.txt"
 
-snapshot:
-  name_template: "{{ .Tag }}-next"
+dockers:
+  - dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-scratch-amd64
+      - ghcr.io/helmwave/helmwave:scratch-amd64
+      - diamon/helmwave:{{ .Version }}-scratch-amd64
+      - diamon/helmwave:scratch-amd64
+    build_flag_templates:
+      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
+      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
+      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
 
-release:
-  name_template: "v{{.Version}}"
-  #  draft: true
-  prerelease: auto
+      - "--platform=linux/amd64"
+      - "--target=scratch-goreleaser"
+      - "--pull"
+    goos: linux
+    goarch: amd64
+    goamd64: v1
+    use: buildx
+  - dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-scratch-arm64v8
+      - ghcr.io/helmwave/helmwave:scratch-arm64v8
+      - diamon/helmwave:{{ .Version }}-scratch-arm64v8
+      - diamon/helmwave:scratch-arm64v8
+    build_flag_templates:
+      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
+      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
+      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
+
+      - "--platform=linux/arm64/v8"
+      - "--target=scratch-goreleaser"
+      - "--pull"
+    goos: linux
+    goarch: arm64
+    use: buildx
+  - dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-amd64
+      - ghcr.io/helmwave/helmwave:latest-amd64
+      - diamon/helmwave:{{ .Version }}-amd64
+      - diamon/helmwave:latest-amd64
+    build_flag_templates:
+      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
+      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
+      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
+
+      - "--platform=linux/amd64"
+      - "--target=goreleaser"
+      - "--pull"
+    goos: linux
+    goarch: amd64
+    goamd64: v1
+    use: buildx
+  - dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-arm64v8
+      - ghcr.io/helmwave/helmwave:latest-arm64v8
+      - diamon/helmwave:{{ .Version }}-arm64v8
+      - diamon/helmwave:latest-arm64v8
+    build_flag_templates:
+      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
+      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
+      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
+
+      - "--platform=linux/arm64/v8"
+      - "--target=goreleaser"
+      - "--pull"
+    goos: linux
+    goarch: arm64
+    use: buildx
+
+docker_manifests:
+  - name_template: ghcr.io/helmwave/helmwave:{{ .Version }}-scratch
+    image_templates:
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-scratch-amd64
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-scratch-arm64v8
+  - name_template: ghcr.io/helmwave/helmwave:scratch
+    image_templates:
+      - ghcr.io/helmwave/helmwave:scratch-amd64
+      - ghcr.io/helmwave/helmwave:scratch-arm64v8
+  - name_template: diamon/helmwave:{{ .Version }}-scratch
+    image_templates:
+      - diamon/helmwave:{{ .Version }}-scratch-amd64
+      - diamon/helmwave:{{ .Version }}-scratch-arm64v8
+  - name_template: diamon/helmwave:scratch
+    image_templates:
+      - diamon/helmwave:scratch-amd64
+      - diamon/helmwave:scratch-arm64v8
+  - name_template: ghcr.io/helmwave/helmwave:{{ .Version }}
+    image_templates:
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-amd64
+      - ghcr.io/helmwave/helmwave:{{ .Version }}-arm64v8
+  - name_template: ghcr.io/helmwave/helmwave:latest
+    image_templates:
+      - ghcr.io/helmwave/helmwave:latest-amd64
+      - ghcr.io/helmwave/helmwave:latest-arm64v8
+  - name_template: diamon/helmwave:{{ .Version }}
+    image_templates:
+      - diamon/helmwave:{{ .Version }}-amd64
+      - diamon/helmwave:{{ .Version }}-arm64v8
+  - name_template: diamon/helmwave:latest
+    image_templates:
+      - diamon/helmwave:latest-amd64
+      - diamon/helmwave:latest-arm64v8
+
+###
+# Publishes
+###
 
 changelog:
   skip: false
@@ -41,16 +191,22 @@ changelog:
   groups:
     - title: "Linter"
       regexp: "^.*linter.*$"
-      order: 0
+      order: 1
     - title: "Tests"
       regexp: "^.*tests?.*$"
-      order: 1
-    - title: "Documentation"
-      regexp: "^.*(documentation|docs?).*$"
       order: 2
     - title: "Bump"
       regexp: "^.*[bB]ump?.*$"
       order: 3
+    - title: "Dependencies"
+      regexp: "^.*(deps):.*$"
+      order: 4
+    - title: "CI"
+      regexp: "^.*(ci):.*$"
+      order: 5
+    - title: "New Features"
+      regexp: "^feat[(\\w)]*:.*$"
+      order: 0
     - title: "Other"
       order: 999
 
@@ -62,70 +218,43 @@ changelog:
       - go mod tidy
       - typo
 
-dockers:
-  - dockerfile: Dockerfile
-    image_templates:
-      - "ghcr.io/helmwave/helmwave:{{ .Version }}-scratch"
-      - "ghcr.io/helmwave/helmwave:scratch"
+snapshot:
+  name_template: "{{ .Tag }}-next"
 
-      - "diamon/helmwave:{{ .Version }}-scratch"
-      - "diamon/helmwave:scratch"
-    build_flag_templates:
-      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
-      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
-      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
-
-      - "--platform=linux/amd64"
-      - "--target=scratch-goreleaser"
-      - "--pull"
-    goos: linux
-    goarch: amd64
-    use: buildx
-  - dockerfile: Dockerfile
-    image_templates:
-      - "ghcr.io/helmwave/helmwave:{{ .Version }}"
-      - "ghcr.io/helmwave/helmwave:latest"
-
-      - "diamon/helmwave:{{ .Version }}"
-      - "diamon/helmwave:latest"
-    build_flag_templates:
-      - "--label=org.opencontainers.image.description=Helmwave is tool for deploy your Helm Charts via GitOps"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
-      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/helmwave"
-      - "--label=org.opencontainers.image.documentation=https://helmwave.github.io/docs/"
-
-      - "--platform=linux/amd64"
-      - "--target=goreleaser"
-      - "--pull"
-    goos: linux
-    goarch: amd64
-    use: buildx
+release:
+  name_template: "v{{ .Version }}"
+  #  draft: true
+  prerelease: auto
 
 brews:
   - tap:
       owner: helmwave
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    goamd64: v1
     description: "HelmWave is like docker-compose for helm"
     license: "MIT"
     folder: formula
     skip_upload: auto
 
+    custom_block: |
+      head "https://github.com/helmwave/helmwave.git", branch: "main"
+    test: |
+      system "#{bin}/program --version"
+
 milestones:
-  - repo:
-      owner: helmwave
-      name: helmwave
-    close: true
+  - close: true
     fail_on_error: false
-    name_template: "{{.Tag}}"
+    name_template: "{{ .Tag }}"
+
+###
+# Announces
+###
+
+announce:
+  telegram:
+    enabled: true
+    chat_id: "{{ .Env.TELEGRAM_CHAT_ID }}"
+    message_template: |
+      Helmwave *{{ .Tag }}* is ready!
+      See more: https://github.com/helmwave/helmwave/releases/tag/{{ .Tag }}
