@@ -29,7 +29,7 @@ type Config interface {
 	Name() string
 	Namespace() string
 	Chart() Chart
-	DependsOn() []string
+	DependsOn() []uniqname.UniqName
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference

@@ -10,8 +10,11 @@ import (
 // Separator is a separator between release name and namespace.
 const Separator = "@"
 
-// ErrValidate is an error for failed uniqname validation.
-var ErrValidate = errors.New("failed to validate uniqname")
+var (
+	// ErrValidate is an error for failed uniqname validation.
+	ErrValidate    = errors.New("failed to validate uniqname")
+	validateRegexp = regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
+)
 
 // UniqName is an alias for string.
 type UniqName string
@@ -23,6 +26,20 @@ func Generate(name, namespace string) (UniqName, error) {
 	return u, u.Validate()
 }
 
+// GenerateWithDefaultNamespace parses uniqname out of provided line.
+// If there is no namespace in line default namespace will be used.
+func GenerateWithDefaultNamespace(line, namespace string) (UniqName, error) {
+	s := strings.Split(line, Separator)
+
+	name := s[0]
+
+	if len(s) > 1 && s[1] != "" {
+		namespace = s[1]
+	}
+
+	return Generate(name, namespace)
+}
+
 // Equal checks whether uniqnames are equal.
 func (n UniqName) Equal(a UniqName) bool {
 	return n == a
@@ -30,14 +47,16 @@ func (n UniqName) Equal(a UniqName) bool {
 
 // Validate validates this object.
 func (n UniqName) Validate() error {
-	s := string(n)
-	if len(strings.Split(s, Separator)) != 2 {
+	s := strings.Split(string(n), Separator)
+	if len(s) != 2 {
 		return ErrValidate
 	}
 
-	r := regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?" + Separator + "[a-z0-9]([-a-z0-9]*[a-z0-9])?")
+	if !validateRegexp.MatchString(s[0]) {
+		return ErrValidate
+	}
 
-	if !r.MatchString(s) {
+	if !validateRegexp.MatchString(s[1]) {
 		return ErrValidate
 	}
 

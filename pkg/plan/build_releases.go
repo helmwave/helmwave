@@ -38,12 +38,10 @@ func addToPlan(plan []release.Config, rel release.Config,
 	r = append(r, rel)
 
 	for _, depName := range rel.DependsOn() {
-		depUN := uniqname.UniqName(depName)
-
-		if dep, ok := releases[depUN]; ok {
+		if dep, ok := releases[depName]; ok {
 			r = addToPlan(r, dep, releases)
 		} else {
-			log.Warnf("cannot find dependency %s in available releases, skipping it", depName)
+			log.Warnf("cannot find dependency %q in available releases, skipping it", depName)
 		}
 	}
 

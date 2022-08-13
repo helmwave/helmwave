@@ -35,6 +35,7 @@ type config struct {
 	NamespaceF               string                 `yaml:"namespace,omitempty"`
 	DescriptionF             string                 `yaml:"description,omitempty"`
 	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty"`
+	dependsOn                []uniqname.UniqName    `yaml:"-"`
 	DependsOnF               []string               `yaml:"depends_on,omitempty"`
 	ValuesF                  []ValuesReference      `yaml:"values,omitempty"`
 	TagsF                    []string               `yaml:"tags,omitempty"`
@@ -223,8 +224,21 @@ func (rel *config) Chart() Chart {
 	return rel.ChartF
 }
 
-func (rel *config) DependsOn() []string {
-	return rel.DependsOnF
+func (rel *config) DependsOn() []uniqname.UniqName {
+	if len(rel.dependsOn) == 0 && len(rel.DependsOnF) != 0 {
+		for _, dep := range rel.DependsOnF {
+			u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
+			if err != nil {
+				rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
+
+				continue
+			}
+
+			rel.dependsOn = append(rel.dependsOn, u)
+		}
+	}
+
+	return rel.dependsOn
 }
 
 func (rel *config) Tags() []string {
