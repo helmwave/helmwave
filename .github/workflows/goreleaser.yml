@@ -24,6 +24,14 @@ jobs:
           github-token: ${{ github.token }}
           script: |
             const tag = context.payload.pull_request.head.ref.replace("release/", "v")
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: "refs/tags/" + tag,
+              })
+            } catch {
+            }
             await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -64,7 +72,6 @@ jobs:
 
   goreleaser:
     runs-on: ubuntu-latest
-    if: always()
     permissions:
       contents: write # releases are in `contents`
       issues: write # for closing milestones
@@ -122,7 +129,6 @@ jobs:
 
   docs:
     runs-on: ubuntu-latest
-    if: always()
     permissions:
       actions: write
     needs:

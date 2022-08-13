@@ -240,7 +240,7 @@ brews:
     custom_block: |
       head "https://github.com/helmwave/helmwave.git", branch: "main"
     test: |
-      system "#{bin}/program --version"
+      assert_match version.to_s, shell_output("#{bin}/helmwave --version")
 
 milestones:
   - close: true
