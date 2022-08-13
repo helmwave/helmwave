@@ -24,6 +24,14 @@ jobs:
           github-token: ${{ github.token }}
           script: |
             const tag = context.payload.pull_request.head.ref.replace("release/", "v")
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: "refs/tags/" + tag,
+              })
+            } catch {
+            }
             await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
