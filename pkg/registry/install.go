@@ -8,11 +8,23 @@ import (
 )
 
 func (reg *config) Install() error {
+	var options []registry.LoginOption
+
+	// Allow public OCI registry #410.
+	if reg.Username != "" && reg.Password != "" {
+		options = append(options, registry.LoginOptBasicAuth(reg.Username, reg.Password))
+	}
+
+	// I Know.
+	if reg.Insecure {
+		options = append(options, registry.LoginOptInsecure(reg.Insecure))
+	}
+
 	err := helper.HelmRegistryClient.Login(
 		reg.Host(),
-		registry.LoginOptBasicAuth(reg.Username, reg.Password),
-		registry.LoginOptInsecure(reg.Insecure),
+		options...,
 	)
+
 	if err != nil {
 		return fmt.Errorf("failed to login in helm registry: %w", err)
 	}
