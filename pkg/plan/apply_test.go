@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -58,7 +59,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("DependsOn").Return([]string{})
+	mockedRelease.On("DependsOn").Return([]uniqname.UniqName{})
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	e := errors.New(s.T().Name())
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, e)
@@ -81,7 +82,7 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, nil)
-	mockedRelease.On("DependsOn").Return([]string{})
+	mockedRelease.On("DependsOn").Return([]uniqname.UniqName{})
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	mockedRepo := &plan.MockRepoConfig{}

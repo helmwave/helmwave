@@ -16,17 +16,8 @@ type ChartTestSuite struct {
 	suite.Suite
 }
 
-type rt []repo.Config
-
-func (r *rt) UnmarshalYAML(value *yaml.Node) error {
-	var err error
-	*r, err = repo.UnmarshalYAML(value)
-
-	return err
-}
-
 func (s *ChartTestSuite) SetupSuite() {
-	var rs rt
+	var rs repo.Configs
 	str := `
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
@@ -36,7 +27,7 @@ func (s *ChartTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().Len(rs, 1)
 
-	s.Require().NoError(plan.SyncRepositories(context.Background(), []repo.Config(rs)))
+	s.Require().NoError(plan.SyncRepositories(context.Background(), rs))
 }
 
 func (s *ChartTestSuite) TestLocateChartLocal() {
