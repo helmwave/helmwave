@@ -11,6 +11,7 @@ func (c *config) Install() error {
 	// Allow public OCI registry #410.
 	if c.Username == "" {
 		c.Logger().Debugln("Public OCI chart. Skipping helm login.")
+
 		return nil
 	}
 
@@ -19,7 +20,6 @@ func (c *config) Install() error {
 		registry.LoginOptBasicAuth(c.Username, c.Password),
 		registry.LoginOptInsecure(c.Insecure),
 	)
-
 	if err != nil {
 		return fmt.Errorf("failed to login in helm registry: %w", err)
 	}
