@@ -102,19 +102,21 @@ func (rel *config) newInstall() *action.Install {
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
 
+	ch := rel.Chart()
+
 	// I hate private field without normal New(...Options)
-	// client.ChartPathOptions = rel.Chart().ChartPathOptions
-	client.ChartPathOptions.CaFile = rel.Chart().ChartPathOptions.CaFile
-	client.ChartPathOptions.CertFile = rel.Chart().ChartPathOptions.CertFile
-	client.ChartPathOptions.KeyFile = rel.Chart().ChartPathOptions.KeyFile
-	client.ChartPathOptions.InsecureSkipTLSverify = rel.Chart().ChartPathOptions.InsecureSkipTLSverify
-	client.ChartPathOptions.Keyring = rel.Chart().ChartPathOptions.Keyring
-	client.ChartPathOptions.Password = rel.Chart().ChartPathOptions.Password
-	client.ChartPathOptions.PassCredentialsAll = rel.Chart().ChartPathOptions.PassCredentialsAll
-	client.ChartPathOptions.RepoURL = rel.Chart().ChartPathOptions.RepoURL
-	client.ChartPathOptions.Username = rel.Chart().ChartPathOptions.Username
-	client.ChartPathOptions.Verify = rel.Chart().ChartPathOptions.Verify
-	client.ChartPathOptions.Version = rel.Chart().ChartPathOptions.Version
+	// client.ChartPathOptions = ch.ChartPathOptions
+	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
+	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
+	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
+	client.ChartPathOptions.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
+	client.ChartPathOptions.Keyring = ch.ChartPathOptions.Keyring
+	client.ChartPathOptions.Password = ch.ChartPathOptions.Password
+	client.ChartPathOptions.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
+	client.ChartPathOptions.RepoURL = ch.ChartPathOptions.RepoURL
+	client.ChartPathOptions.Username = ch.ChartPathOptions.Username
+	client.ChartPathOptions.Verify = ch.ChartPathOptions.Verify
+	client.ChartPathOptions.Version = ch.ChartPathOptions.Version
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
@@ -148,20 +150,21 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
 
-	// I hate private field without normal New(...Options)
-	// client.ChartPathOptions = rel.Chart().ChartPathOptions
+	ch := rel.Chart()
 
-	client.ChartPathOptions.CaFile = rel.Chart().ChartPathOptions.CaFile
-	client.ChartPathOptions.CertFile = rel.Chart().ChartPathOptions.CertFile
-	client.ChartPathOptions.KeyFile = rel.Chart().ChartPathOptions.KeyFile
-	client.ChartPathOptions.InsecureSkipTLSverify = rel.Chart().ChartPathOptions.InsecureSkipTLSverify
-	client.ChartPathOptions.Keyring = rel.Chart().ChartPathOptions.Keyring
-	client.ChartPathOptions.Password = rel.Chart().ChartPathOptions.Password
-	client.ChartPathOptions.PassCredentialsAll = rel.Chart().ChartPathOptions.PassCredentialsAll
-	client.ChartPathOptions.RepoURL = rel.Chart().ChartPathOptions.RepoURL
-	client.ChartPathOptions.Username = rel.Chart().ChartPathOptions.Username
-	client.ChartPathOptions.Verify = rel.Chart().ChartPathOptions.Verify
-	client.ChartPathOptions.Version = rel.Chart().ChartPathOptions.Version
+	// I hate private field without normal New(...Options)
+	// client.ChartPathOptions = ch.ChartPathOptions
+	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
+	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
+	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
+	client.ChartPathOptions.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
+	client.ChartPathOptions.Keyring = ch.ChartPathOptions.Keyring
+	client.ChartPathOptions.Password = ch.ChartPathOptions.Password
+	client.ChartPathOptions.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
+	client.ChartPathOptions.RepoURL = ch.ChartPathOptions.RepoURL
+	client.ChartPathOptions.Username = ch.ChartPathOptions.Username
+	client.ChartPathOptions.Verify = ch.ChartPathOptions.Verify
+	client.ChartPathOptions.Version = ch.ChartPathOptions.Version
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs

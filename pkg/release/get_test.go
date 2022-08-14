@@ -17,7 +17,7 @@ type GetTestSuite struct {
 }
 
 func (s *GetTestSuite) SetupSuite() {
-	var rs rt
+	var rs repo.Configs
 	str := `
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
@@ -27,7 +27,7 @@ func (s *GetTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().Len(rs, 1)
 
-	s.Require().NoError(plan.SyncRepositories(context.Background(), []repo.Config(rs)))
+	s.Require().NoError(plan.SyncRepositories(context.Background(), rs))
 }
 
 func (s *GetTestSuite) TestGetNotInstalled() {
