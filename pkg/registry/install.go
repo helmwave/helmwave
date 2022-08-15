@@ -7,11 +7,18 @@ import (
 	"helm.sh/helm/v3/pkg/registry"
 )
 
-func (reg *config) Install() error {
+func (c *config) Install() error {
+	// Allow public OCI registry #410.
+	if c.Username == "" {
+		c.Logger().Debugln("Public OCI chart. Skipping helm login.")
+
+		return nil
+	}
+
 	err := helper.HelmRegistryClient.Login(
-		reg.Host(),
-		registry.LoginOptBasicAuth(reg.Username, reg.Password),
-		registry.LoginOptInsecure(reg.Insecure),
+		c.Host(),
+		registry.LoginOptBasicAuth(c.Username, c.Password),
+		registry.LoginOptInsecure(c.Insecure),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to login in helm registry: %w", err)

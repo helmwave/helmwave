@@ -103,8 +103,8 @@ func (r *MockReleaseConfig) Chart() release.Chart {
 	return r.Called().Get(0).(release.Chart)
 }
 
-func (r *MockReleaseConfig) DependsOn() []string {
-	return r.Called().Get(0).([]string)
+func (r *MockReleaseConfig) DependsOn() []uniqname.UniqName {
+	return r.Called().Get(0).([]uniqname.UniqName)
 }
 
 func (r *MockReleaseConfig) Tags() []string {

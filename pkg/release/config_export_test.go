@@ -12,3 +12,7 @@ func NewConfig() *config {
 		NamespaceF: "blabla",
 	}
 }
+
+func (rel *config) GetDryRun() bool {
+	return rel.dryRun
+}
