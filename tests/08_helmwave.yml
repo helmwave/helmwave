@@ -1,52 +1,51 @@
 project: Test08
 
 repositories:
-- name: bitnami
-  url: https://charts.bitnami.com/bitnami
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
 
 releases:
-- name: adm-frontend
-  namespace: test
-  chart:
-    name: bitnami/nginx
-  depends_on:
-  - adm-api@test
+  - name: adm-frontend
+    namespace: test
+    chart:
+      name: bitnami/nginx
+    depends_on:
+      - adm-api
 
-- name: adm-api
-  namespace: test
-  chart:
-    name: bitnami/nginx
-  depends_on:
-  - c2c-api@test
-  - db@postgres
-  - queue@rabitmq
+  - name: adm-api
+    namespace: test
+    chart:
+      name: bitnami/nginx
+    depends_on:
+      - c2c-api
+      - db@postgres
+      - queue@rabitmq
 
-- name: c2c-api
-  namespace: test
-  chart:
-    name: bitnami/nginx
-  depends_on:
-  - db@postgres
-  - queue@rabitmq
+  - name: c2c-api
+    namespace: test
+    chart:
+      name: bitnami/nginx
+    depends_on:
+      - db@postgres
+      - queue@rabitmq
 
-- name: db
-  namespace: postgres
-  chart:
-    name: bitnami/postgresql
-  depends_on:
-  - ns-ready@test
+  - name: db
+    namespace: postgres
+    chart:
+      name: bitnami/postgresql
+    depends_on:
+      - ns-ready@test
 
-- name: queue
-  namespace: rabitmq
-  chart:
-    name: bitnami/rabbitmq
-  depends_on:
-  - ns-ready@test
+  - name: queue
+    namespace: rabitmq
+    chart:
+      name: bitnami/rabbitmq
+    depends_on:
+      - ns-ready@test
 
-
-- name: ns-ready
-  namespace: test
-  chart:
-    name: bitnami/nginx
-  values:
-    - tests/08_values.yaml
+  - name: ns-ready
+    namespace: test
+    chart:
+      name: bitnami/nginx
+    values:
+      - tests/08_values.yaml
