@@ -37,7 +37,8 @@ func (t gomplateTemplater) funcMap() template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading gomplate template functions")
-	gomplateFuncMap := gomplate.CreateFuncs(context.Background(), &gomplateData.Data{})
+	ctx := context.Background()
+	gomplateFuncMap := gomplate.CreateFuncs(ctx, &gomplateData.Data{Ctx: ctx})
 
 	addToMap(funcMap, gomplateFuncMap)
 	addToMap(funcMap, customFuncs)

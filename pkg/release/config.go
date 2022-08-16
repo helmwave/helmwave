@@ -35,7 +35,6 @@ type config struct {
 	NamespaceF               string                 `yaml:"namespace,omitempty"`
 	DescriptionF             string                 `yaml:"description,omitempty"`
 	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty"`
-	dependsOn                []uniqname.UniqName    `yaml:"-"`
 	DependsOnF               []string               `yaml:"depends_on,omitempty"`
 	ValuesF                  []ValuesReference      `yaml:"values,omitempty"`
 	TagsF                    []string               `yaml:"tags,omitempty"`
@@ -228,20 +227,23 @@ func (rel *config) Chart() Chart {
 }
 
 func (rel *config) DependsOn() []uniqname.UniqName {
-	if len(rel.dependsOn) == 0 && len(rel.DependsOnF) != 0 {
-		for _, dep := range rel.DependsOnF {
-			u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
-			if err != nil {
-				rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
+	result := make([]uniqname.UniqName, 0, len(rel.DependsOnF))
 
-				continue
-			}
+	for i, dep := range rel.DependsOnF {
+		u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
+		if err != nil {
+			rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
 
-			rel.dependsOn = append(rel.dependsOn, u)
+			continue
 		}
+
+		// generate full uniqname string if it was short
+		rel.DependsOnF[i] = string(u)
+
+		result = append(result, u)
 	}
 
-	return rel.dependsOn
+	return result
 }
 
 func (rel *config) Tags() []string {

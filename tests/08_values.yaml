@@ -1,1 +1,3 @@
+{{ defineDatasource "test" "https://raw.githubusercontent.com/helmwave/helmwave/main/tests/06_values.yaml" }}
+
 {{ include "test" | data.YAML | data.ToYAML }}

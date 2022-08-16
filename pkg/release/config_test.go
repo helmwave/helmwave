@@ -33,7 +33,7 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r := release.NewConfig()
 
 	r.NamespaceF = "testns"
-	r.DependsOnF = []string{"bla", "blabla@testns", "blablabla@testtestns"}
+	r.DependsOnF = []string{"bla", "blabla@testns", "blablabla@testtestns", "---=-=-==-@kk;'[["}
 
 	expected := []uniqname.UniqName{
 		uniqname.UniqName("bla@testns"),
