@@ -35,6 +35,8 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r.NamespaceF = "testns"
 	r.DependsOnF = []string{"bla", "blabla@testns", "blablabla@testtestns", "---=-=-==-@kk;'[["}
 
+	r.BuildAfterUnmarshal()
+
 	expected := []uniqname.UniqName{
 		uniqname.UniqName("bla@testns"),
 		uniqname.UniqName("blabla@testns"),

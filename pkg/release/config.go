@@ -265,7 +265,9 @@ func (rel *config) buildAfterUnmarshal() {
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn() {
-	for i, dep := range rel.DependsOnF {
+	res := make([]string, 0, len(rel.DependsOnF))
+
+	for _, dep := range rel.DependsOnF {
 		u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
 		if err != nil {
 			rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
@@ -274,6 +276,8 @@ func (rel *config) buildAfterUnmarshalDependsOn() {
 		}
 
 		// generate full uniqname string if it was short
-		rel.DependsOnF[i] = string(u)
+		res = append(res, string(u))
 	}
+
+	rel.DependsOnF = res
 }
