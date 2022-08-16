@@ -263,3 +263,7 @@ func (rel *config) Logger() *log.Entry {
 func (rel *config) AllowFailure() bool {
 	return rel.AllowFailureF
 }
+
+func (rel *config) HelmWait() bool {
+	return rel.Wait
+}
