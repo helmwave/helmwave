@@ -366,13 +366,18 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 
 func (p *Plan) kubedogSpecs() (s multitrack.MultitrackSpecs) {
 	for _, rel := range p.body.Releases {
+		l := log.WithField("release", rel.Uniq())
+		if !rel.HelmWait() {
+			l.Error("wait flag is disabled so kubedog cannot correctly track this release")
+		}
+
 		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
 		spec, err := kubedog.MakeSpecs(manifest, rel.Namespace())
 		if err != nil {
-			log.WithError(err).Fatal("kubedog can't parse resources")
+			l.WithError(err).Fatal("kubedog can't parse resources")
 		}
 
-		log.WithFields(log.Fields{
+		l.WithFields(log.Fields{
 			"Deployments":  len(spec.Deployments),
 			"Jobs":         len(spec.Jobs),
 			"DaemonSets":   len(spec.DaemonSets),

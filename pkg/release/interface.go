@@ -33,6 +33,7 @@ type Config interface {
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
+	HelmWait() bool
 }
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.

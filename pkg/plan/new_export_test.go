@@ -127,6 +127,10 @@ func (r *MockReleaseConfig) AllowFailure() bool {
 	return r.Called().Bool(0)
 }
 
+func (r *MockReleaseConfig) HelmWait() bool {
+	return true
+}
+
 type MockRepoConfig struct {
 	mock.Mock
 }
