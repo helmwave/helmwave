@@ -366,7 +366,7 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 
 func (p *Plan) kubedogSpecs() (s multitrack.MultitrackSpecs) {
 	for _, rel := range p.body.Releases {
-		l := log.WithField("release", rel.Uniq())
+		l := rel.Logger()
 		if !rel.HelmWait() {
 			l.Error("wait flag is disabled so kubedog cannot correctly track this release")
 		}
