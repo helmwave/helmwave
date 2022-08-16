@@ -227,20 +227,10 @@ func (rel *config) Chart() Chart {
 }
 
 func (rel *config) DependsOn() []uniqname.UniqName {
-	result := make([]uniqname.UniqName, 0, len(rel.DependsOnF))
+	result := make([]uniqname.UniqName, len(rel.DependsOnF))
 
 	for i, dep := range rel.DependsOnF {
-		u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
-		if err != nil {
-			rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
-
-			continue
-		}
-
-		// generate full uniqname string if it was short
-		rel.DependsOnF[i] = string(u)
-
-		result = append(result, u)
+		result[i] = uniqname.UniqName(dep)
 	}
 
 	return result
@@ -268,4 +258,22 @@ func (rel *config) AllowFailure() bool {
 
 func (rel *config) HelmWait() bool {
 	return rel.Wait
+}
+
+func (rel *config) buildAfterUnmarshal() {
+	rel.buildAfterUnmarshalDependsOn()
+}
+
+func (rel *config) buildAfterUnmarshalDependsOn() {
+	for i, dep := range rel.DependsOnF {
+		u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
+		if err != nil {
+			rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
+
+			continue
+		}
+
+		// generate full uniqname string if it was short
+		rel.DependsOnF[i] = string(u)
+	}
 }
