@@ -1,12 +1,9 @@
+####            ###
+#    REVIEWERS    #
+###             ###
+
 # Set to true to add reviewers to issues/PRs
 addReviewers: true
-
-# Set to true to add assignees to issues/PRs
-addAssignees: true
-
-# Set to 'author' to add issue's/PR's author as a assignee
-addAssignees: author
-
 
 reviewers:
   - zhilyaev
@@ -15,9 +12,26 @@ reviewers:
 # A number of reviewers added to the issues/PRs
 # Set 0 to add all the reviewers (default: 0)
 numberOfReviewers: 1
+
+
+
+
+
+####            ###
+#    ASSIGNEES    #
+###             ###
+
+# Set to true to add assignees to issues/PRs
+addAssignees: true
+
+# Set to 'author' to add issue's/PR's author as a assignee
+# addAssignees: author
+
+
 # A list of assignees, overrides reviewers if set
 # assignees:
-#   - assigneeA
+#   - zhilyaev
+#   - r3nic1e
 
 # A number of assignees to add to the issues/PRs
 # Set to 0 to add all of the assignees.
