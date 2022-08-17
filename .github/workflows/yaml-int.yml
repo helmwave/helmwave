@@ -1,0 +1,20 @@
+name: yamllint
+
+
+on:
+  push:
+    paths:
+    - "**.yaml"
+    - "**.yml"
+
+jobs:
+  yamllint:
+    name: yamllint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: karancode/yamllint-github-action@master
+      with:
+        yamllint_config_filepath: .yamllint.yaml
+      env:
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
