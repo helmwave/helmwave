@@ -17,7 +17,7 @@ linters:
     - gocyclo # we use cyclop
     - godox # TODO: get rid of TODOs
     - goerr113 # need to create wrapped static errors
-    - goimports # we already lint with gofumpt
+    - goimports # we`ve already lint with gofumpt
     - golint # deprecated
     - gomnd # we want to keep magic numbers
     - interfacer # deprecated
@@ -364,7 +364,8 @@ linters-settings:
       use-field-name: false
       rules:
         # any struct tag type can be used.
-        # support string case: `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`
+        # support string case:
+        # `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`
         yaml: snake
 
   testpackage:
@@ -476,12 +477,12 @@ severity:
   # severity applied. Severities should match the supported severity names of the
   # selected out format.
   # - Code climate: https://docs.codeclimate.com/docs/issues#issue-severity
-  # -   Checkstyle: https://checkstyle.sourceforge.io/property_types.html#severity
-  # -       Github: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
+  # - Checkstyle: https://checkstyle.sourceforge.io/property_types.html#severity
+  # - Github: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
   default-severity: error
 
   # The default value is false.
-  # If set to true severity-rules regular expressions become case sensitive.
+  # If set to true severity-rules regular expressions become case-sensitive.
   case-sensitive: false
 
   # Default value is empty list.
