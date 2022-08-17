@@ -1,0 +1,59 @@
+---
+locale: en_US.UTF-8
+
+yaml-files:
+- '*.yaml'
+- '*.yml'
+# - '*.yml.tpl'
+
+ignore: |
+  .helmwave/
+  tests/
+  
+
+# See: https://yamllint.readthedocs.io/en/stable/rules.html
+rules:
+  braces:
+    forbid: non-empty
+    min-spaces-inside: 0
+    max-spaces-inside: 2
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 2
+
+  brackets:
+    forbid: false
+    min-spaces-inside: 0
+    max-spaces-inside: 2
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 2
+  colons: enable
+  commas: enable
+
+  # I like comments
+  comments: disable
+  comments-indentation:
+    level: warning
+
+  # I don't like yaml ---
+  document-end: disable
+  document-start: disable
+
+  empty-lines:
+    max: 10
+    max-end: 10
+    max-start: 10
+  empty-values: enable
+  float-values: enable
+  octal-values: disable
+
+  hyphens: enable
+  indentation: disable # maybe later
+  key-duplicates: enable
+  key-ordering: disable # I prefer ordering by meaning
+  line-length:
+    max: 120
+  new-line-at-end-of-file: enable
+  new-lines: enable
+  quoted-strings: disable
+  trailing-spaces: disable
+  truthy: disable
