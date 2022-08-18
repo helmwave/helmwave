@@ -33,6 +33,13 @@ func (r *MockReleaseConfig) Sync(context.Context) (*helmRelease.Release, error) 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
+func (r *MockReleaseConfig) SyncDryRun(ctx context.Context) (*helmRelease.Release, error) {
+	r.DryRun(true)
+	defer r.DryRun(false)
+
+	return r.Sync(ctx)
+}
+
 func (r *MockReleaseConfig) DryRun(bool) {
 	r.Called()
 }

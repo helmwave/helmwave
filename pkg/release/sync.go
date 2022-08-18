@@ -13,6 +13,14 @@ func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
 	return rel.upgrade(ctx)
 }
 
+func (rel *config) SyncDryRun(ctx context.Context) (*release.Release, error) {
+	old := rel.dryRun
+	defer rel.DryRun(old)
+	rel.DryRun(true)
+
+	return rel.Sync(ctx)
+}
+
 func (rel *config) Cfg() *action.Configuration {
 	if rel.cfg == nil {
 		var err error

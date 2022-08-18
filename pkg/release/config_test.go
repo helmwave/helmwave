@@ -48,9 +48,9 @@ func (s *ConfigTestSuite) TestDependsOn() {
 func (s *ChartTestSuite) TestDryRun() {
 	rel := release.NewConfig()
 
-	s.Require().False(rel.GetDryRun())
+	s.Require().False(rel.IsDryRun())
 	rel.DryRun(true)
-	s.Require().True(rel.GetDryRun())
+	s.Require().True(rel.IsDryRun())
 }
 
 func (s *ChartTestSuite) TestUnmarshalYAMLString() {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/databus23/helm-diff/diff"
@@ -12,8 +14,10 @@ import (
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	structDiff "github.com/r3labs/diff/v3"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
+	"helm.sh/helm/v3/pkg/chart"
 	live "helm.sh/helm/v3/pkg/release"
 )
 
@@ -75,15 +79,51 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
 			oldSpecs := parseManifests(active.Manifest, rel.Namespace())
 			newSpecs := parseManifests(p.manifests[rel.Uniq()], rel.Namespace())
 
-			change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, log.StandardLogger().Out)
-			if !change {
+			change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, rel.Logger().Logger.Out)
+			chartChange := diffCharts(ctx, active.Chart, rel, rel.Logger())
+
+			if !change && !chartChange {
 				k++
-				log.Info("🆚 ❎ ", rel.Uniq(), " no changes")
+				rel.Logger().Info("🆚 ❎ no changes")
 			}
 		}
 	}
 
 	showChangesReport(p.body.Releases, visited, k)
+}
+
+func diffChartsFilter(path []string, parent reflect.Type, field reflect.StructField) bool {
+	return len(path) >= 1 && path[0] == "Metadata"
+}
+
+func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, l log.FieldLogger) bool {
+	l.Info("getting charts diff")
+
+	dryRunRelease, err := rel.SyncDryRun(ctx)
+	if err != nil {
+		l.WithError(err).Error("failed to get dry-run release")
+
+		return false
+	}
+
+	newChart := dryRunRelease.Chart
+
+	changelog, err := structDiff.Diff(oldChart, newChart, structDiff.Filter(diffChartsFilter))
+	if err != nil {
+		l.WithError(err).Error("failed to get diff of charts")
+
+		return false
+	}
+
+	if len(changelog) == 0 {
+		return false
+	}
+
+	for _, change := range changelog {
+		l.WithField("path", strings.Join(change.Path, ".")).Infof("🆚 %q -> %q", change.From, change.To)
+	}
+
+	return true
 }
 
 func parseManifests(m, ns string) map[string]*manifest.MappingResult {
