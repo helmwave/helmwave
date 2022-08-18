@@ -16,3 +16,7 @@ func NewConfig() *config {
 func (rel *config) GetDryRun() bool {
 	return rel.dryRun
 }
+
+func (rel *config) BuildAfterUnmarshal() {
+	rel.buildAfterUnmarshal()
+}

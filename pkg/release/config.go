@@ -35,7 +35,6 @@ type config struct {
 	NamespaceF               string                 `yaml:"namespace,omitempty"`
 	DescriptionF             string                 `yaml:"description,omitempty"`
 	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty"`
-	dependsOn                []uniqname.UniqName    `yaml:"-"`
 	DependsOnF               []string               `yaml:"depends_on,omitempty"`
 	ValuesF                  []ValuesReference      `yaml:"values,omitempty"`
 	TagsF                    []string               `yaml:"tags,omitempty"`
@@ -228,20 +227,13 @@ func (rel *config) Chart() Chart {
 }
 
 func (rel *config) DependsOn() []uniqname.UniqName {
-	if len(rel.dependsOn) == 0 && len(rel.DependsOnF) != 0 {
-		for _, dep := range rel.DependsOnF {
-			u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
-			if err != nil {
-				rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
+	result := make([]uniqname.UniqName, len(rel.DependsOnF))
 
-				continue
-			}
-
-			rel.dependsOn = append(rel.dependsOn, u)
-		}
+	for i, dep := range rel.DependsOnF {
+		result[i] = uniqname.UniqName(dep)
 	}
 
-	return rel.dependsOn
+	return result
 }
 
 func (rel *config) Tags() []string {
@@ -262,4 +254,30 @@ func (rel *config) Logger() *log.Entry {
 
 func (rel *config) AllowFailure() bool {
 	return rel.AllowFailureF
+}
+
+func (rel *config) HelmWait() bool {
+	return rel.Wait
+}
+
+func (rel *config) buildAfterUnmarshal() {
+	rel.buildAfterUnmarshalDependsOn()
+}
+
+func (rel *config) buildAfterUnmarshalDependsOn() {
+	res := make([]string, 0, len(rel.DependsOnF))
+
+	for _, dep := range rel.DependsOnF {
+		u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
+		if err != nil {
+			rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
+
+			continue
+		}
+
+		// generate full uniqname string if it was short
+		res = append(res, string(u))
+	}
+
+	rel.DependsOnF = res
 }
