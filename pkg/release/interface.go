@@ -17,6 +17,7 @@ type Config interface {
 	log.LoggerGetter
 	Uniq() uniqname.UniqName
 	Sync(context.Context) (*release.Release, error)
+	SyncDryRun(context.Context) (*release.Release, error)
 	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error
