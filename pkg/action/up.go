@@ -26,6 +26,8 @@ func (i *Up) Run(ctx context.Context) error {
 		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
+	} else {
+		i.warnOnBuildFlags(ctx)
 	}
 
 	p, err := plan.NewAndImport(i.build.plandir)
@@ -42,6 +44,18 @@ func (i *Up) Run(ctx context.Context) error {
 	}
 
 	return p.Apply(ctx)
+}
+
+func (i *Up) warnOnBuildFlags(ctx context.Context) {
+	cliCtx, ok := ctx.Value("cli").(*cli.Context)
+	if ok && cliCtx != nil {
+		for _, buildFlag := range i.build.flags() {
+			name := buildFlag.Names()[0]
+			if cliCtx.IsSet(name) {
+				log.WithField("flag", name).Warn("this flag is used by autobuild (--build) but autobuild is disabled")
+			}
+		}
+	}
 }
 
 // Cmd returns 'up' *cli.Command.
