@@ -1,4 +1,7 @@
 .idea/
+.git/
+.github/
+*.md
 .vscode/
 !.vscode/settings.json
 
