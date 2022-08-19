@@ -18,8 +18,8 @@ We use [semver](https://semver.org/)
 
 **Example:**
 
-- my-feature --> release-0.17.0 --> main
-- my-fix --> release-0.17.1 --> main
+- my-feature --> release/0.17.0 --> main
+- my-fix --> release/0.17.1 --> main
 
 ### Non product update
 
@@ -43,9 +43,9 @@ We use https://pre-commit.com for git hooks
 
 > change version in next files:
 
-0. [go.mod](go.mod)
-1. [Dockerfile](Dockerfile): GOLANG_VERSION=1.18
-2. [ci](.github/workflows/goreleaser.yml)
+1. [go.mod](go.mod)
+2. [Dockerfile](Dockerfile): GOLANG_VERSION=1.18
+3. [ci](.github/workflows/goreleaser.yml)
 
 ## How to upgrade alpine version?
 
