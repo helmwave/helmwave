@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 !.vscode/settings.json
+dist/
 
 /helmwave
 /helmwave.yml.tpl
