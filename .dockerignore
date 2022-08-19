@@ -2,8 +2,7 @@
 .vscode/
 !.vscode/settings.json
 
-/helmwave
-/helmwave.yml.tpl
+helmwave.yml.tpl
 helmwave.yml
 .helmwave
 
