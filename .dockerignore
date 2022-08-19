@@ -1,10 +1,11 @@
 .idea/
+.git/
+.github/
+*.md
 .vscode/
 !.vscode/settings.json
-dist/
 
-/helmwave
-/helmwave.yml.tpl
+helmwave.yml.tpl
 helmwave.yml
 .helmwave
 
