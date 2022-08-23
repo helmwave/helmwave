@@ -13,7 +13,7 @@ func NewConfig() *config {
 	}
 }
 
-func (rel *config) GetDryRun() bool {
+func (rel *config) IsDryRun() bool {
 	return rel.dryRun
 }
 
