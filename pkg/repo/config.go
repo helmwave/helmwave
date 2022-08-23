@@ -23,6 +23,7 @@ type config struct {
 	log        *log.Entry `yaml:"-"`
 	repo.Entry `yaml:",inline"`
 	Force      bool `yaml:"force"`
+	Update     bool `yaml:"update"`
 }
 
 func (c *config) Name() string {

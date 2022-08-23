@@ -24,9 +24,25 @@ func (rep *config) Install(ctx context.Context, settings *helm.EnvSettings, f *r
 		// The add is idempotent so do nothing
 		rep.Logger().Info("❎ repository already exists with the same configuration, skipping")
 
+		if rep.Update {
+			rep.Logger().Info("Updating repository index...")
+
+			return rep.update(settings)
+		}
+
 		return nil
 	}
 
+	if err := rep.update(settings); err != nil {
+		return err
+	}
+
+	f.Update(&rep.Entry)
+
+	return nil
+}
+
+func (rep *config) update(settings *helm.EnvSettings) error {
 	chartRepo, err := repo.NewChartRepository(&rep.Entry, getter.All(settings))
 	if err != nil {
 		return fmt.Errorf("failed to install repository %q: %w", rep.Name(), err)
@@ -38,10 +54,8 @@ func (rep *config) Install(ctx context.Context, settings *helm.EnvSettings, f *r
 	rep.Logger().Debugf("Download IndexFile for %q", chartRepo.Config.Name)
 	_, err = chartRepo.DownloadIndexFile()
 	if err != nil {
-		rep.Logger().WithError(err).Warnf("⚠️ looks like %q is not a valid chart repository or cannot be reached", rep.URL())
+		return fmt.Errorf("⚠️ looks like %q is not a valid chart repository or cannot be reached: %w", rep.URL(), err)
 	}
-
-	f.Update(&rep.Entry)
 
 	return nil
 }

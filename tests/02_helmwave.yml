@@ -3,6 +3,7 @@ project: Test02
 repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
+    update: true
 
 releases:
   - name: nginx
