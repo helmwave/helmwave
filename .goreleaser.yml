@@ -189,24 +189,24 @@ changelog:
   sort: asc
 
   groups:
+    - title: "Tests"
+      regexp: "^.*\\(tests?\\):.*$"
+      order: 0
+    - title: "Dependencies"
+      regexp: "^.*\\(deps\\):.*$"
+      order: 1
+    - title: "CI"
+      regexp: "^.*\\(ci\\):.*$"
+      order: 2
+    - title: "New Features"
+      regexp: "^feat(\\(.*\\))?:.*$"
+      order: 3
+    - title: "Bug Fixes"
+      regexp: "^fix(\\(.*\\))?:.*$"
+      order: 3
     - title: "Linter"
       regexp: "^.*linter.*$"
-      order: 1
-    - title: "Tests"
-      regexp: "^.*tests?.*$"
-      order: 2
-    - title: "Bump"
-      regexp: "^.*[bB]ump?.*$"
-      order: 3
-    - title: "Dependencies"
-      regexp: "^.*(deps):.*$"
       order: 4
-    - title: "CI"
-      regexp: "^.*(ci):.*$"
-      order: 5
-    - title: "New Features"
-      regexp: "^feat[(\\w)]*:.*$"
-      order: 0
     - title: "Other"
       order: 999
 
@@ -217,6 +217,7 @@ changelog:
       - Merge branch
       - go mod tidy
       - typo
+      - "^chore"
 
 snapshot:
   name_template: "{{ .Tag }}-next"
