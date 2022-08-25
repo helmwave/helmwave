@@ -10,6 +10,7 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/client-go/rest"
 )
 
 //nolint:gochecknoglobals // TODO: get rid of globals
@@ -36,11 +37,19 @@ func init() {
 	}
 }
 
+func wrapConfigFn(client *rest.Config) *rest.Config {
+	client.QPS = 100   // default is 5.0
+	client.Burst = 100 // default is 10
+
+	return client
+}
+
 // NewCfg creates helm internal configuration for provided namespace.
 func NewCfg(ns string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER") // TODO: get rid of getenv in runtime
 	config := genericclioptions.NewConfigFlags(false)
+	config.WrapConfigFn = wrapConfigFn
 	config.Namespace = &ns
 	config.Context = &Helm.KubeContext
 
