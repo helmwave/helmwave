@@ -77,9 +77,5 @@ func NewHelm(ns string) (*helm.EnvSettings, error) {
 		return nil, fmt.Errorf("failed to set namespace %s for helm: %w", ns, err)
 	}
 
-	cfg, _ := env.RESTClientGetter().ToRESTConfig()
-	cfg.QPS = 100
-	cfg.Burst = 100
-
 	return env, nil
 }
