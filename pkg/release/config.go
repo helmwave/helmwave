@@ -71,7 +71,7 @@ func (rel *Release) DryRun(b bool) {
 type Chart struct {
 	// action.ChartPathOptions `json:",inline"`
 	Version string `json:"version,omitempty"`
-	Name    string `json:"name" jsonschema:"required"`
+	Name    string `json:"name"`
 }
 
 // UnmarshalYAML flexible Release.
