@@ -9,11 +9,11 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
+func (rel *Release) Sync(ctx context.Context) (*release.Release, error) {
 	return rel.upgrade(ctx)
 }
 
-func (rel *config) Cfg() *action.Configuration {
+func (rel *Release) Cfg() *action.Configuration {
 	if rel.cfg == nil {
 		var err error
 		rel.cfg, err = helper.NewCfg(rel.Namespace())
@@ -27,7 +27,7 @@ func (rel *config) Cfg() *action.Configuration {
 	return rel.cfg
 }
 
-func (rel *config) Helm() *helm.EnvSettings {
+func (rel *Release) Helm() *helm.EnvSettings {
 	if rel.helm == nil {
 		var err error
 		rel.helm, err = helper.NewHelm(rel.Namespace())

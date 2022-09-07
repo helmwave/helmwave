@@ -8,7 +8,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Uninstall(ctx context.Context) (*release.UninstallReleaseResponse, error) {
+func (rel *Release) Uninstall(ctx context.Context) (*release.UninstallReleaseResponse, error) {
 	client := action.NewUninstall(rel.Cfg())
 	client.Timeout = rel.Timeout
 

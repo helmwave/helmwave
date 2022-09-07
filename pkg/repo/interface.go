@@ -22,9 +22,9 @@ type Config interface {
 
 // UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.
 func UnmarshalYAML(node *yaml.Node) ([]Config, error) {
-	r := make([]*config, 0)
+	r := make([]*Repository, 0)
 	if err := node.Decode(&r); err != nil {
-		return nil, fmt.Errorf("failed to decode repository config from YAML: %w", err)
+		return nil, fmt.Errorf("failed to decode repository Repository from YAML: %w", err)
 	}
 
 	res := make([]Config, len(r))

@@ -6,17 +6,17 @@ import (
 	"strconv"
 )
 
-func NewConfig() *config {
-	return &config{
+func NewConfig() *Release {
+	return &Release{
 		NameF:      "blabla" + strconv.Itoa(rand.Int()),
 		NamespaceF: "blabla",
 	}
 }
 
-func (rel *config) GetDryRun() bool {
+func (rel *Release) GetDryRun() bool {
 	return rel.dryRun
 }
 
-func (rel *config) BuildAfterUnmarshal() {
+func (rel *Release) BuildAfterUnmarshal() {
 	rel.buildAfterUnmarshal()
 }

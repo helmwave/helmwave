@@ -3,6 +3,7 @@ package release
 import (
 	"errors"
 	"fmt"
+	"github.com/invopop/jsonschema"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -24,51 +25,56 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	return err
 }
 
-type config struct {
-	cfg                      *action.Configuration  `yaml:"-"`
-	helm                     *helm.EnvSettings      `yaml:"-"`
-	log                      *log.Entry             `yaml:"-"`
-	Store                    map[string]interface{} `yaml:"store,omitempty"`
-	ChartF                   Chart                  `yaml:"chart,omitempty"`
-	uniqName                 uniqname.UniqName      `yaml:"-"`
-	NameF                    string                 `yaml:"name,omitempty"`
-	NamespaceF               string                 `yaml:"namespace,omitempty"`
-	DescriptionF             string                 `yaml:"description,omitempty"`
-	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty"`
-	DependsOnF               []string               `yaml:"depends_on,omitempty"`
-	ValuesF                  []ValuesReference      `yaml:"values,omitempty"`
-	TagsF                    []string               `yaml:"tags,omitempty"`
-	Timeout                  time.Duration          `yaml:"timeout,omitempty"`
-	MaxHistory               int                    `yaml:"max_history,omitempty"`
-	AllowFailureF            bool                   `yaml:"allow_failure,omitempty"`
-	Atomic                   bool                   `yaml:"atomic,omitempty"`
-	CleanupOnFail            bool                   `yaml:"cleanup_on_fail,omitempty"`
-	CreateNamespace          bool                   `yaml:"create_namespace,omitempty"`
-	Devel                    bool                   `yaml:"devel,omitempty"`
-	DisableHooks             bool                   `yaml:"disable_hooks,omitempty"`
-	DisableOpenAPIValidation bool                   `yaml:"disable_open_api_validation,omitempty"`
-	dryRun                   bool                   `yaml:"dry_run,omitempty"`
-	Force                    bool                   `yaml:"force,omitempty"`
-	Recreate                 bool                   `yaml:"recreate,omitempty"`
-	ResetValues              bool                   `yaml:"reset_values,omitempty"`
-	ReuseValues              bool                   `yaml:"reuse_values,omitempty"`
-	SkipCRDs                 bool                   `yaml:"skip_crds,omitempty"`
-	SubNotes                 bool                   `yaml:"sub_notes,omitempty"`
-	Wait                     bool                   `yaml:"wait,omitempty"`
-	WaitForJobs              bool                   `yaml:"wait_for_jobs,omitempty"`
+func (c *Release) JSONSchema() *jsonschema.Schema {
+	return jsonschema.Reflect(c)
 }
 
-func (rel *config) DryRun(b bool) {
+type Release struct {
+	cfg                      *action.Configuration
+	helm                     *helm.EnvSettings
+	log                      *log.Entry
+	Store                    map[string]interface{} `json:"store,omitempty"`
+	ChartF                   Chart                  `json:"chart" jsonschema:"oneof_type=string;object"`
+	uniqName                 uniqname.UniqName
+	NameF                    string            `json:"name"`
+	NamespaceF               string            `json:"namespace"`
+	DescriptionF             string            `json:"description,omitempty"`
+	PendingReleaseStrategy   PendingStrategy   `json:"pending_release_strategy,omitempty"`
+	DependsOnF               []string          `json:"depends_on,omitempty"`
+	ValuesF                  []ValuesReference `json:"values,omitempty"`
+	TagsF                    []string          `json:"tags,omitempty"`
+	Timeout                  time.Duration     `json:"timeout,omitempty"`
+	MaxHistory               int               `json:"max_history,omitempty"`
+	AllowFailureF            bool              `json:"allow_failure,omitempty"`
+	Atomic                   bool              `json:"atomic,omitempty"`
+	CleanupOnFail            bool              `json:"cleanup_on_fail,omitempty"`
+	CreateNamespace          bool              `json:"create_namespace,omitempty"`
+	Devel                    bool              `json:"devel,omitempty"`
+	DisableHooks             bool              `json:"disable_hooks,omitempty"`
+	DisableOpenAPIValidation bool              `json:"disable_open_api_validation,omitempty"`
+	dryRun                   bool
+	Force                    bool `json:"force,omitempty"`
+	Recreate                 bool `json:"recreate,omitempty"`
+	ResetValues              bool `json:"reset_values,omitempty"`
+	ReuseValues              bool `json:"reuse_values,omitempty"`
+	SkipCRDs                 bool `json:"skip_crds,omitempty"`
+	SubNotes                 bool `json:"sub_notes,omitempty"`
+	Wait                     bool `json:"wait,omitempty"`
+	WaitForJobs              bool `json:"wait_for_jobs,omitempty"`
+}
+
+func (rel *Release) DryRun(b bool) {
 	rel.dryRun = b
 }
 
 // Chart is structure for chart download options.
 type Chart struct {
-	action.ChartPathOptions `yaml:",inline"`
-	Name                    string `yaml:"name"`
+	// action.ChartPathOptions `json:",inline"`
+	Version string `json:"version,omitempty"`
+	Name    string `json:"name" jsonschema:"required"`
 }
 
-// UnmarshalYAML flexible config.
+// UnmarshalYAML flexible Release.
 func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	type raw Chart
 	var err error
@@ -89,7 +95,7 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
-func (rel *config) newInstall() *action.Install {
+func (rel *Release) newInstall() *action.Install {
 	client := action.NewInstall(rel.Cfg())
 
 	// Only Up
@@ -105,17 +111,7 @@ func (rel *config) newInstall() *action.Install {
 
 	// I hate private field without normal New(...Options)
 	// client.ChartPathOptions = ch.ChartPathOptions
-	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
-	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
-	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
-	client.ChartPathOptions.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
-	client.ChartPathOptions.Keyring = ch.ChartPathOptions.Keyring
-	client.ChartPathOptions.Password = ch.ChartPathOptions.Password
-	client.ChartPathOptions.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
-	client.ChartPathOptions.RepoURL = ch.ChartPathOptions.RepoURL
-	client.ChartPathOptions.Username = ch.ChartPathOptions.Username
-	client.ChartPathOptions.Verify = ch.ChartPathOptions.Verify
-	client.ChartPathOptions.Version = ch.ChartPathOptions.Version
+	client.ChartPathOptions.Version = ch.Version
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
@@ -135,7 +131,7 @@ func (rel *config) newInstall() *action.Install {
 	return client
 }
 
-func (rel *config) newUpgrade() *action.Upgrade {
+func (rel *Release) newUpgrade() *action.Upgrade {
 	client := action.NewUpgrade(rel.Cfg())
 	// Only Upgrade
 	client.CleanupOnFail = rel.CleanupOnFail
@@ -153,17 +149,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 
 	// I hate private field without normal New(...Options)
 	// client.ChartPathOptions = ch.ChartPathOptions
-	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
-	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
-	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
-	client.ChartPathOptions.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
-	client.ChartPathOptions.Keyring = ch.ChartPathOptions.Keyring
-	client.ChartPathOptions.Password = ch.ChartPathOptions.Password
-	client.ChartPathOptions.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
-	client.ChartPathOptions.RepoURL = ch.ChartPathOptions.RepoURL
-	client.ChartPathOptions.Username = ch.ChartPathOptions.Username
-	client.ChartPathOptions.Verify = ch.ChartPathOptions.Verify
-	client.ChartPathOptions.Version = ch.ChartPathOptions.Version
+	client.ChartPathOptions.Version = ch.Version
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
@@ -190,7 +176,7 @@ var (
 )
 
 // Uniq redis@my-namespace.
-func (rel *config) Uniq() uniqname.UniqName {
+func (rel *Release) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
 		var err error
 		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace())
@@ -206,27 +192,27 @@ func (rel *config) Uniq() uniqname.UniqName {
 	return rel.uniqName
 }
 
-func (rel *config) Equal(a Config) bool {
+func (rel *Release) Equal(a Config) bool {
 	return rel.Uniq().Equal(a.Uniq())
 }
 
-func (rel *config) Name() string {
+func (rel *Release) Name() string {
 	return rel.NameF
 }
 
-func (rel *config) Namespace() string {
+func (rel *Release) Namespace() string {
 	return rel.NamespaceF
 }
 
-func (rel *config) Description() string {
+func (rel *Release) Description() string {
 	return rel.DescriptionF
 }
 
-func (rel *config) Chart() Chart {
+func (rel *Release) Chart() Chart {
 	return rel.ChartF
 }
 
-func (rel *config) DependsOn() []uniqname.UniqName {
+func (rel *Release) DependsOn() []uniqname.UniqName {
 	result := make([]uniqname.UniqName, len(rel.DependsOnF))
 
 	for i, dep := range rel.DependsOnF {
@@ -236,15 +222,15 @@ func (rel *config) DependsOn() []uniqname.UniqName {
 	return result
 }
 
-func (rel *config) Tags() []string {
+func (rel *Release) Tags() []string {
 	return rel.TagsF
 }
 
-func (rel *config) Values() []ValuesReference {
+func (rel *Release) Values() []ValuesReference {
 	return rel.ValuesF
 }
 
-func (rel *config) Logger() *log.Entry {
+func (rel *Release) Logger() *log.Entry {
 	if rel.log == nil {
 		rel.log = log.WithField("release", rel.Uniq())
 	}
@@ -252,19 +238,19 @@ func (rel *config) Logger() *log.Entry {
 	return rel.log
 }
 
-func (rel *config) AllowFailure() bool {
+func (rel *Release) AllowFailure() bool {
 	return rel.AllowFailureF
 }
 
-func (rel *config) HelmWait() bool {
+func (rel *Release) HelmWait() bool {
 	return rel.Wait
 }
 
-func (rel *config) buildAfterUnmarshal() {
+func (rel *Release) buildAfterUnmarshal() {
 	rel.buildAfterUnmarshalDependsOn()
 }
 
-func (rel *config) buildAfterUnmarshalDependsOn() {
+func (rel *Release) buildAfterUnmarshalDependsOn() {
 	res := make([]string, 0, len(rel.DependsOnF))
 
 	for _, dep := range rel.DependsOnF {

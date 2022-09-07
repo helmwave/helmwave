@@ -7,7 +7,7 @@ import (
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
-func (rel *config) isInstalled() bool {
+func (rel *Release) isInstalled() bool {
 	client := action.NewHistory(rel.Cfg())
 	client.Max = 1
 	_, err := client.Run(rel.Name())

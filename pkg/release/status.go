@@ -7,7 +7,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Status() (*release.Release, error) {
+func (rel *Release) Status() (*release.Release, error) {
 	client := action.NewStatus(rel.Cfg())
 	client.ShowDescription = true
 

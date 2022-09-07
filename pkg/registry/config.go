@@ -16,29 +16,29 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	return err
 }
 
-// config is main registry config.
-type config struct {
-	log      *log.Entry `yaml:"-"`
-	HostF    string     `yaml:"host"`
-	Username string     `yaml:"username"`
-	Password string     `yaml:"password"`
-	Insecure bool       `yaml:"insecure"`
+// Registry is main registry Registry.
+type Registry struct {
+	log      *log.Entry
+	HostF    string `json:"host" jsonschema:"required"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	Insecure bool   `json:"insecure,omitempty"`
 }
 
 // Host return Host value.
-func (c *config) Host() string {
+func (c *Registry) Host() string {
 	return c.HostF
 }
 
-// func (c *config) Username() string {
+// func (c *Registry) Username() string {
 //	return c.UsernameF
 // }
 //
-// func (c *config) Password() string {
+// func (c *Registry) Password() string {
 //	return c.PasswordF
 // }
 
-func (c *config) Logger() *log.Entry {
+func (c *Registry) Logger() *log.Entry {
 	if c.log == nil {
 		c.log = log.WithField("registry", c.Host())
 	}

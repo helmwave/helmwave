@@ -3,6 +3,7 @@ package plan
 import (
 	"errors"
 	"fmt"
+
 	"os"
 	"path/filepath"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -92,11 +94,25 @@ func (p *Plan) Logger() *log.Entry {
 }
 
 type planBody struct {
-	Project      string
-	Version      string
-	Repositories repo.Configs
-	Registries   registry.Configs
-	Releases     release.Configs
+	Project      string           `json:"project,omitempty"`
+	Version      string           `json:"version,omitempty"`
+	Repositories repo.Configs     `json:"repositories,omitempty"`
+	Registries   registry.Configs `json:"registries,omitempty"`
+	Releases     release.Configs  `json:"releases,omitempty"`
+}
+
+type planBodyFake struct {
+	Project      string              `json:"project,omitempty"`
+	Version      string              `json:"version,omitempty"`
+	Repositories []repo.Repository   `json:"repositories,omitempty"`
+	Registries   []registry.Registry `json:"registries,omitempty"`
+	Releases     []release.Release   `json:"releases,omitempty"`
+}
+
+func GenSchema() *jsonschema.Schema {
+	r := new(jsonschema.Reflector)
+	//r.DoNotReference = true
+	return r.Reflect(&planBodyFake{})
 }
 
 // NewBody parses plan from file.
