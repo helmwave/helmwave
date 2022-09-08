@@ -127,6 +127,16 @@ jobs:
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
           TELEGRAM_TOKEN: ${{ secrets.BOT_TOKEN }}
 
+      - name: Generate schema.json
+        run: ./dist/helmwave schema > schema.json
+      - name: Upload schema.json
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "schema.json"
+          update_latest_release: true
+
   docs:
     runs-on: ubuntu-latest
     permissions:
