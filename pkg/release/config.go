@@ -25,30 +25,32 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	return err
 }
 
-func (c *Release) JSONSchema() *jsonschema.Schema {
-	return jsonschema.Reflect(c)
+func (Configs) JSONSchema() *jsonschema.Schema {
+	r := new(jsonschema.Reflector)
+	var l []*Release
+	return r.Reflect(&l)
 }
 
 type Release struct {
 	cfg                      *action.Configuration
 	helm                     *helm.EnvSettings
 	log                      *log.Entry
-	Store                    map[string]interface{} `json:"store,omitempty"`
+	Store                    map[string]interface{} `json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
 	ChartF                   Chart                  `json:"chart" jsonschema:"oneof_type=string;object"`
 	uniqName                 uniqname.UniqName
-	NameF                    string            `json:"name"`
-	NamespaceF               string            `json:"namespace"`
+	NameF                    string            `json:"name" jsonschema:"title=release name"`
+	NamespaceF               string            `json:"namespace" jsonschema:"title=kubernetes namespace"`
 	DescriptionF             string            `json:"description,omitempty"`
-	PendingReleaseStrategy   PendingStrategy   `json:"pending_release_strategy,omitempty"`
-	DependsOnF               []string          `json:"depends_on,omitempty"`
-	ValuesF                  []ValuesReference `json:"values,omitempty"`
-	TagsF                    []string          `json:"tags,omitempty"`
+	PendingReleaseStrategy   PendingStrategy   `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install, pending-upgrade, pending-rollback)"`
+	DependsOnF               []string          `json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
+	ValuesF                  []ValuesReference `json:"values,omitempty" jsonschema:"title=values of a release"`
+	TagsF                    []string          `json:"tags,omitempty" jsonschema:"description=tags allows you choose releases for build"`
 	Timeout                  time.Duration     `json:"timeout,omitempty"`
 	MaxHistory               int               `json:"max_history,omitempty"`
 	AllowFailureF            bool              `json:"allow_failure,omitempty"`
 	Atomic                   bool              `json:"atomic,omitempty"`
 	CleanupOnFail            bool              `json:"cleanup_on_fail,omitempty"`
-	CreateNamespace          bool              `json:"create_namespace,omitempty"`
+	CreateNamespace          bool              `json:"create_namespace,omitempty" jsonschema:"description=will create namespace if it doesnt exits,default=false"`
 	Devel                    bool              `json:"devel,omitempty"`
 	DisableHooks             bool              `json:"disable_hooks,omitempty"`
 	DisableOpenAPIValidation bool              `json:"disable_open_api_validation,omitempty"`
@@ -59,8 +61,8 @@ type Release struct {
 	ReuseValues              bool `json:"reuse_values,omitempty"`
 	SkipCRDs                 bool `json:"skip_crds,omitempty"`
 	SubNotes                 bool `json:"sub_notes,omitempty"`
-	Wait                     bool `json:"wait,omitempty"`
-	WaitForJobs              bool `json:"wait_for_jobs,omitempty"`
+	Wait                     bool `json:"wait,omitempty" jsonschema:"description=prefer use true"`
+	WaitForJobs              bool `json:"wait_for_jobs,omitempty" jsonschema:"description=prefer use true"`
 }
 
 func (rel *Release) DryRun(b bool) {
@@ -70,8 +72,8 @@ func (rel *Release) DryRun(b bool) {
 // Chart is structure for chart download options.
 type Chart struct {
 	// action.ChartPathOptions `json:",inline"`
-	Version string `json:"version,omitempty"`
-	Name    string `json:"name"`
+	Version string `json:"version,omitempty" jsonschema:"title=the version,description=The version of a chart,example=0.1.0"`
+	Name    string `json:"name" jsonschema:"title=the name,description=The name of a chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
 }
 
 // UnmarshalYAML flexible Release.

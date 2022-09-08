@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -16,7 +17,13 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	return err
 }
 
-// Registry is main registry Registry.
+func (Configs) JSONSchema() *jsonschema.Schema {
+	r := new(jsonschema.Reflector)
+	var l []*Registry
+	return r.Reflect(&l)
+}
+
+// Registry is main registry.
 type Registry struct {
 	log      *log.Entry
 	HostF    string `json:"host" jsonschema:"required"`

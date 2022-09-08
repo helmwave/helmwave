@@ -20,11 +20,17 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	return err
 }
 
+func (Configs) JSONSchema() *jsonschema.Schema {
+	r := new(jsonschema.Reflector)
+	var l []*Repository
+	return r.Reflect(&l)
+}
+
 type Repository struct {
 	log   *log.Entry
 	entry *repo.Entry
 
-	NameF                 string `json:"name"`
+	NameF                 string `json:"name" jsonschema:"title=repository name,description=The name of a repository,example=bitnami,example=stable"`
 	URLF                  string `json:"url"`
 	Username              string `json:"username,omitempty"`
 	Password              string `json:"password,omitempty"`
@@ -33,7 +39,7 @@ type Repository struct {
 	CAFile                string `json:"ca_file,omitempty"`
 	InsecureSkipTLSverify bool   `json:"insecure_skip_tls_verify,omitempty"`
 	PassCredentialsAll    bool   `json:"pass_credentials_all,omitempty"`
-	Force                 bool   `json:"force,omitempty"`
+	Force                 bool   `json:"force,omitempty" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }
 
 func (c *Repository) Name() string {
