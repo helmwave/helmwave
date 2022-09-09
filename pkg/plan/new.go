@@ -3,6 +3,8 @@ package plan
 import (
 	"errors"
 	"fmt"
+	"reflect"
+	"strings"
 
 	"os"
 	"path/filepath"
@@ -101,9 +103,15 @@ type planBody struct {
 	Releases     release.Configs  `json:"releases,omitempty" jsonschema:"title=helm releases,description=what you wanna deploy"`
 }
 
+func schemaNamer(typ reflect.Type) string {
+	return strings.ReplaceAll(strings.Join([]string{typ.PkgPath(), typ.Name()}, "/"), "/", "_")
+}
+
 func GenSchema() *jsonschema.Schema {
 	r := new(jsonschema.Reflector)
+	r.Namer = schemaNamer
 	r.DoNotReference = true
+
 	return r.Reflect(&planBody{})
 }
 

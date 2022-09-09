@@ -1,12 +1,12 @@
 package repo
 
 // Equal checks repo configs to have equal names.
-func (rep *Repository) Equal(a Config) bool {
+func (rep *config) Equal(a Config) bool {
 	return rep.Name() == a.Name()
 }
 
 // IndexOf check that rep in a by name.
-func (rep *Repository) IndexOf(a []Config) (int, bool) {
+func (rep *config) IndexOf(a []Config) (int, bool) {
 	return IndexOf(a, rep)
 }
 

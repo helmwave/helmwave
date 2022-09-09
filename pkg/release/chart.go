@@ -14,7 +14,7 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 )
 
-func (rel *Release) GetChart() (*chart.Chart, error) {
+func (rel *config) GetChart() (*chart.Chart, error) {
 	// Hmm nice action bro
 	client := rel.newInstall()
 
@@ -35,7 +35,7 @@ func (rel *Release) GetChart() (*chart.Chart, error) {
 	return c, nil
 }
 
-func (rel *Release) chartCheck(ch *chart.Chart) error {
+func (rel *config) chartCheck(ch *chart.Chart) error {
 	if req := ch.Metadata.Dependencies; req != nil {
 		if err := action.CheckDependencies(ch, req); err != nil {
 			return fmt.Errorf("failed to check chart %s dependencies: %w", ch.Name(), err)
@@ -53,7 +53,7 @@ func (rel *Release) chartCheck(ch *chart.Chart) error {
 	return nil
 }
 
-func (rel *Release) ChartDepsUpd() error {
+func (rel *config) ChartDepsUpd() error {
 	if !helper.IsExists(filepath.Clean(rel.Chart().Name)) {
 		rel.Logger().Info("skipping updating dependencies for remote chart")
 

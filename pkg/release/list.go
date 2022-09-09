@@ -8,7 +8,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *Release) List() (*release.Release, error) {
+func (rel *config) List() (*release.Release, error) {
 	client := action.NewList(rel.Cfg())
 	client.Filter = fmt.Sprintf("^%s$", regexp.QuoteMeta(rel.Name()))
 

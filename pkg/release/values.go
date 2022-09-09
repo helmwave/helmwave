@@ -165,7 +165,7 @@ func (v *ValuesReference) fetch(l *log.Entry) error {
 	return nil
 }
 
-func (rel *Release) BuildValues(dir, templater string) error {
+func (rel *config) BuildValues(dir, templater string) error {
 	for i := len(rel.Values()) - 1; i >= 0; i-- {
 		err := rel.Values()[i].SetViaRelease(rel, dir, templater)
 		if errors.Is(ErrSkipValues, err) {

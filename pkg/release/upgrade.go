@@ -9,7 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *Release) upgrade(ctx context.Context) (*release.Release, error) {
+func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 	client := rel.newUpgrade()
 
 	ch, err := rel.GetChart()

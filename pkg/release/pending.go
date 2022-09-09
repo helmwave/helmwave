@@ -20,7 +20,7 @@ const (
 // ErrPendingRelease is an error for fail strategy that release is in pending status.
 var ErrPendingRelease = errors.New("release is in pending status")
 
-func (rel *Release) isPending() (bool, error) {
+func (rel *config) isPending() (bool, error) {
 	status, err := rel.Status()
 	if err != nil {
 		return false, err
@@ -34,7 +34,7 @@ func (rel *Release) isPending() (bool, error) {
 	}
 }
 
-func (rel *Release) fixPending(ctx context.Context) error {
+func (rel *config) fixPending(ctx context.Context) error {
 	switch rel.PendingReleaseStrategy {
 	case PendingStrategyRollback:
 		return rel.Rollback(0)

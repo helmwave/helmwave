@@ -2,6 +2,7 @@ package repo
 
 import (
 	"errors"
+
 	"github.com/invopop/jsonschema"
 	"helm.sh/helm/v3/pkg/repo"
 
@@ -21,12 +22,13 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := new(jsonschema.Reflector)
-	var l []*Repository
+	r := &jsonschema.Reflector{DoNotReference: true}
+	var l []*config
+
 	return r.Reflect(&l)
 }
 
-type Repository struct {
+type config struct {
 	log   *log.Entry
 	entry *repo.Entry
 
@@ -42,15 +44,15 @@ type Repository struct {
 	Force                 bool   `json:"force,omitempty" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }
 
-func (c *Repository) Name() string {
+func (c *config) Name() string {
 	return c.NameF
 }
 
-func (c *Repository) URL() string {
+func (c *config) URL() string {
 	return c.URLF
 }
 
-func (c *Repository) Logger() *log.Entry {
+func (c *config) Logger() *log.Entry {
 	if c.log == nil {
 		c.log = log.WithField("repository", c.Name())
 	}
@@ -58,7 +60,7 @@ func (c *Repository) Logger() *log.Entry {
 	return c.log
 }
 
-func (c *Repository) JSONSchema() *jsonschema.Schema {
+func (c *config) JSONSchema() *jsonschema.Schema {
 	return jsonschema.Reflect(c)
 }
 

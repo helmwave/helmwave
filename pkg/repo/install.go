@@ -9,7 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-func (rep *Repository) rep2Entry() {
+func (rep *config) rep2Entry() {
 	rep.entry.Name = rep.Name()
 	rep.entry.URL = rep.URL()
 	rep.entry.Username = rep.Username
@@ -21,7 +21,7 @@ func (rep *Repository) rep2Entry() {
 	rep.entry.PassCredentialsAll = rep.PassCredentialsAll
 }
 
-func (rep *Repository) Install(ctx context.Context, settings *helm.EnvSettings, f *repo.File) error {
+func (rep *config) Install(ctx context.Context, settings *helm.EnvSettings, f *repo.File) error {
 	rep.rep2Entry()
 
 	if !rep.Force && f.Has(rep.Name()) {

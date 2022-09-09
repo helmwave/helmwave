@@ -28,7 +28,7 @@ import (
 //	return repos, nil
 // }
 
-func (rel *Release) Repo() string {
+func (rel *config) Repo() string {
 	s := rel.Chart().Name
 	if registry.IsOCI(s) {
 		s = strings.TrimPrefix(s, registry.OCIScheme+"://")

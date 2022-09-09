@@ -6,7 +6,7 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 )
 
-func (rel *Release) Rollback(version int) error {
+func (rel *config) Rollback(version int) error {
 	client := action.NewRollback(rel.Cfg())
 
 	client.CleanupOnFail = rel.CleanupOnFail

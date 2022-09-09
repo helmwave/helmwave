@@ -7,7 +7,7 @@ import (
 	"helm.sh/helm/v3/pkg/registry"
 )
 
-func (c *Registry) Install() error {
+func (c *config) Install() error {
 	// Allow public OCI registry #410.
 	if c.Username == "" {
 		c.Logger().Debugln("Public OCI chart. Skipping helm login.")

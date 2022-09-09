@@ -18,34 +18,35 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := new(jsonschema.Reflector)
-	var l []*Registry
+	r := &jsonschema.Reflector{DoNotReference: true}
+	var l []*config
+
 	return r.Reflect(&l)
 }
 
-// Registry is main registry.
-type Registry struct {
-	log      *log.Entry
-	HostF    string `json:"host" jsonschema:"required"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
-	Insecure bool   `json:"insecure,omitempty"`
+// config is main registry config.
+type config struct {
+	log      *log.Entry `yaml:"-"`
+	HostF    string     `json:"host" jsonschema:"required"`
+	Username string     `json:"username,omitempty"`
+	Password string     `json:"password,omitempty"`
+	Insecure bool       `json:"insecure,omitempty"`
 }
 
 // Host return Host value.
-func (c *Registry) Host() string {
+func (c *config) Host() string {
 	return c.HostF
 }
 
-// func (c *Registry) Username() string {
+// func (c *config) Username() string {
 //	return c.UsernameF
 // }
 //
-// func (c *Registry) Password() string {
+// func (c *config) Password() string {
 //	return c.PasswordF
 // }
 
-func (c *Registry) Logger() *log.Entry {
+func (c *config) Logger() *log.Entry {
 	if c.log == nil {
 		c.log = log.WithField("registry", c.Host())
 	}

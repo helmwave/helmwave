@@ -3,8 +3,9 @@ package release
 import (
 	"errors"
 	"fmt"
-	"github.com/invopop/jsonschema"
 	"time"
+
+	"github.com/invopop/jsonschema"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
@@ -26,12 +27,13 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := new(jsonschema.Reflector)
-	var l []*Release
+	r := &jsonschema.Reflector{DoNotReference: true}
+	var l []*config
+
 	return r.Reflect(&l)
 }
 
-type Release struct {
+type config struct {
 	cfg                      *action.Configuration
 	helm                     *helm.EnvSettings
 	log                      *log.Entry
@@ -65,7 +67,7 @@ type Release struct {
 	WaitForJobs              bool `json:"wait_for_jobs,omitempty" jsonschema:"description=prefer use true"`
 }
 
-func (rel *Release) DryRun(b bool) {
+func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
 }
 
@@ -97,7 +99,7 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
-func (rel *Release) newInstall() *action.Install {
+func (rel *config) newInstall() *action.Install {
 	client := action.NewInstall(rel.Cfg())
 
 	// Only Up
@@ -133,7 +135,7 @@ func (rel *Release) newInstall() *action.Install {
 	return client
 }
 
-func (rel *Release) newUpgrade() *action.Upgrade {
+func (rel *config) newUpgrade() *action.Upgrade {
 	client := action.NewUpgrade(rel.Cfg())
 	// Only Upgrade
 	client.CleanupOnFail = rel.CleanupOnFail
@@ -178,7 +180,7 @@ var (
 )
 
 // Uniq redis@my-namespace.
-func (rel *Release) Uniq() uniqname.UniqName {
+func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
 		var err error
 		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace())
@@ -194,27 +196,27 @@ func (rel *Release) Uniq() uniqname.UniqName {
 	return rel.uniqName
 }
 
-func (rel *Release) Equal(a Config) bool {
+func (rel *config) Equal(a Config) bool {
 	return rel.Uniq().Equal(a.Uniq())
 }
 
-func (rel *Release) Name() string {
+func (rel *config) Name() string {
 	return rel.NameF
 }
 
-func (rel *Release) Namespace() string {
+func (rel *config) Namespace() string {
 	return rel.NamespaceF
 }
 
-func (rel *Release) Description() string {
+func (rel *config) Description() string {
 	return rel.DescriptionF
 }
 
-func (rel *Release) Chart() Chart {
+func (rel *config) Chart() Chart {
 	return rel.ChartF
 }
 
-func (rel *Release) DependsOn() []uniqname.UniqName {
+func (rel *config) DependsOn() []uniqname.UniqName {
 	result := make([]uniqname.UniqName, len(rel.DependsOnF))
 
 	for i, dep := range rel.DependsOnF {
@@ -224,15 +226,15 @@ func (rel *Release) DependsOn() []uniqname.UniqName {
 	return result
 }
 
-func (rel *Release) Tags() []string {
+func (rel *config) Tags() []string {
 	return rel.TagsF
 }
 
-func (rel *Release) Values() []ValuesReference {
+func (rel *config) Values() []ValuesReference {
 	return rel.ValuesF
 }
 
-func (rel *Release) Logger() *log.Entry {
+func (rel *config) Logger() *log.Entry {
 	if rel.log == nil {
 		rel.log = log.WithField("release", rel.Uniq())
 	}
@@ -240,19 +242,19 @@ func (rel *Release) Logger() *log.Entry {
 	return rel.log
 }
 
-func (rel *Release) AllowFailure() bool {
+func (rel *config) AllowFailure() bool {
 	return rel.AllowFailureF
 }
 
-func (rel *Release) HelmWait() bool {
+func (rel *config) HelmWait() bool {
 	return rel.Wait
 }
 
-func (rel *Release) buildAfterUnmarshal() {
+func (rel *config) buildAfterUnmarshal() {
 	rel.buildAfterUnmarshalDependsOn()
 }
 
-func (rel *Release) buildAfterUnmarshalDependsOn() {
+func (rel *config) buildAfterUnmarshalDependsOn() {
 	res := make([]string, 0, len(rel.DependsOnF))
 
 	for _, dep := range rel.DependsOnF {
