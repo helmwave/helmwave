@@ -22,7 +22,7 @@ type Resource struct {
 
 // Spec is spec structure with replicas. Only replicas count is used.
 type Spec struct {
-	Replicas *uint32 `yaml:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
+	Replicas *uint32 `json:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
 }
 
 // Parse parses YAML manifests of kubernetes resources and returns Resource slice.

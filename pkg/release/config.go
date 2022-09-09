@@ -163,8 +163,17 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	ch := rel.Chart()
 
 	// I hate private field without normal New(...Options)
-	// client.ChartPathOptions = ch.ChartPathOptions
-	client.ChartPathOptions.Version = ch.Version
+	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
+	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
+	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
+	client.ChartPathOptions.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
+	client.ChartPathOptions.Keyring = ch.ChartPathOptions.Keyring
+	client.ChartPathOptions.Password = ch.ChartPathOptions.Password
+	client.ChartPathOptions.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
+	client.ChartPathOptions.RepoURL = ch.ChartPathOptions.RepoURL
+	client.ChartPathOptions.Username = ch.ChartPathOptions.Username
+	client.ChartPathOptions.Verify = ch.ChartPathOptions.Verify
+	client.ChartPathOptions.Version = ch.ChartPathOptions.Version
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
