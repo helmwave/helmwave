@@ -15,14 +15,14 @@ import (
 // Resource is base structure for all k8s resources that have replicas.
 // Used to parse out replicas count.
 type Resource struct {
-	Spec             `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
-	meta1.TypeMeta   `json:",inline"`
-	meta1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	Spec             `yaml:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	meta1.TypeMeta   `yaml:",inline"`
+	meta1.ObjectMeta `yaml:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 }
 
 // Spec is spec structure with replicas. Only replicas count is used.
 type Spec struct {
-	Replicas *uint32 `json:"replicas,omitempty" protobuf:"variant,1,opt,name=replicas"`
+	Replicas *uint32 `yaml:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
 }
 
 // Parse parses YAML manifests of kubernetes resources and returns Resource slice.

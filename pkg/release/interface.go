@@ -40,7 +40,7 @@ type Config interface {
 func UnmarshalYAML(node *yaml.Node) ([]Config, error) {
 	r := make([]*config, 0)
 	if err := node.Decode(&r); err != nil {
-		return nil, fmt.Errorf("failed to decode release Release from YAML: %w", err)
+		return nil, fmt.Errorf("failed to decode release config from YAML: %w", err)
 	}
 
 	res := make([]Config, len(r))

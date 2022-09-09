@@ -4,15 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
 
 // GenSchema is struct for running 'GenSchema' command.
-type GenSchema struct {
-	tpl, file string
-	templater string
-}
+type GenSchema struct{}
 
 // Run is main function for 'GenSchema' command.
 func (i *GenSchema) Run(ctx context.Context) error {
@@ -21,7 +19,8 @@ func (i *GenSchema) Run(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Println(string(s))
+	fmt.Println(string(s)) //nolint:forbidigo
+
 	return nil
 }
 

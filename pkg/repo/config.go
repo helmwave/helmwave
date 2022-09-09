@@ -28,28 +28,19 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 	return r.Reflect(&l)
 }
 
+//nolint:lll
 type config struct {
-	log   *log.Entry
-	entry *repo.Entry
-
-	NameF                 string `json:"name" jsonschema:"title=repository name,description=The name of a repository,example=bitnami,example=stable"`
-	URLF                  string `json:"url"`
-	Username              string `json:"username,omitempty"`
-	Password              string `json:"password,omitempty"`
-	CertFile              string `json:"cert_file,omitempty"`
-	KeyFile               string `json:"key_file,omitempty"`
-	CAFile                string `json:"ca_file,omitempty"`
-	InsecureSkipTLSverify bool   `json:"insecure_skip_tls_verify,omitempty"`
-	PassCredentialsAll    bool   `json:"pass_credentials_all,omitempty"`
-	Force                 bool   `json:"force,omitempty" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
+	log        *log.Entry `yaml:"-"`
+	repo.Entry `yaml:",inline"`
+	Force      bool `json:"force,omitempty" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }
 
 func (c *config) Name() string {
-	return c.NameF
+	return c.Entry.Name
 }
 
 func (c *config) URL() string {
-	return c.URLF
+	return c.Entry.URL
 }
 
 func (c *config) Logger() *log.Entry {
@@ -58,10 +49,6 @@ func (c *config) Logger() *log.Entry {
 	}
 
 	return c.log
-}
-
-func (c *config) JSONSchema() *jsonschema.Schema {
-	return jsonschema.Reflect(c)
 }
 
 // ErrNotFound is an error for not declared repository name.

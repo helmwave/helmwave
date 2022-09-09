@@ -172,8 +172,10 @@ func (p *Plan) GetLive(
 
 			if err != nil {
 				log.Warnf("I cant get release from k8s: %v", err)
+				//nolint:revive // we are under mutex here
 				notFound = append(notFound, rel.Uniq())
 			} else {
+				//nolint:revive // we are under mutex here
 				found[rel.Uniq()] = r
 			}
 		}(wg, mu, p.body.Releases[i])
