@@ -1,9 +1,7 @@
 <p align="center">
   <img  src="https://raw.githubusercontent.com/helmwave/logo/main/logo.png" style="max-height:100%;" height="300px" />
 </p>
-
 <h1 align="center"> Helmwave</h1>
-
 <p align="center">
   <a href="https://github.com/helmwave/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/helmwave/helmwave/workflows/release/badge.svg" /></a>
   <a href="https://codecov.io/gh/helmwave/helmwave"><img src="https://codecov.io/gh/helmwave/helmwave/branch/main/graph/badge.svg?token=0WXxYhIG4S" alt="codecov"/></a> 
@@ -13,14 +11,13 @@
   <img alt="GitHub" src="https://img.shields.io/github/license/zhilyaev/helmwave">
   <img alt="GitHub tag (latest SemVer)" src="https://img.shields.io/github/v/tag/zhilyaev/helmwave?label=latest">
 </p>
-
-
 🌊 Helmwave is **[helm3](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts.
 HelmWave is like docker-compose for helm.
 
 > We focus on speed execution, tiny size, pretty debugging.
 
 With helmwave you will become a superhero:
+
 
 - Deploy multiple environments by one step
 - Separate values for environments
