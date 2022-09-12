@@ -9,6 +9,7 @@ require (
 	github.com/hairyhenderson/gomplate/v3 v3.11.2
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/logrus-emoji-formatter v1.1.0
+	github.com/invopop/jsonschema v0.6.0
 	github.com/lempiy/dgraph v0.0.0-20190713130529-88f0f7cdb48e
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 	github.com/olekukonko/tablewriter v0.0.5
@@ -156,6 +157,7 @@ require (
 	github.com/hashicorp/vault/sdk v0.5.0 // indirect
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
+	github.com/iancoleman/orderedmap v0.0.0-20190318233801-ac98e3ecb4b0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect

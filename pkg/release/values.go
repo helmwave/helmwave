@@ -20,10 +20,10 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src    string `yaml:"src"`
-	Dst    string `yaml:"dst"`
-	Strict bool   `yaml:"strict"`
-	Render bool   `yaml:"render"`
+	Src    string `json:"src"`
+	Dst    string `json:"dst,omitempty"`
+	Strict bool   `json:"strict"`
+	Render bool   `json:"render"`
 }
 
 // UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.

@@ -11,6 +11,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -91,12 +92,20 @@ func (p *Plan) Logger() *log.Entry {
 	})
 }
 
+//nolint:lll
 type planBody struct {
-	Project      string
-	Version      string
-	Repositories repo.Configs
-	Registries   registry.Configs
-	Releases     release.Configs
+	Project      string           `json:"project,omitempty" jsonschema:"title=the project name,description=reserved for future,example=my-awesome-project"`
+	Version      string           `json:"version,omitempty" jsonschema:"title=version of helmwave,description=will check current version and project version,example=0.23.0,example=0.22.1"`
+	Repositories repo.Configs     `json:"repositories,omitempty" jsonschema:"title=repositories list,description=helm repositories"`
+	Registries   registry.Configs `json:"registries,omitempty" jsonschema:"title=registries list,description=helm OCI registries"`
+	Releases     release.Configs  `json:"releases,omitempty" jsonschema:"title=helm releases,description=what you wanna deploy"`
+}
+
+func GenSchema() *jsonschema.Schema {
+	r := new(jsonschema.Reflector)
+	r.DoNotReference = true
+
+	return r.Reflect(&planBody{})
 }
 
 // NewBody parses plan from file.

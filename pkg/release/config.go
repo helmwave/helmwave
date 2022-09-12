@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/invopop/jsonschema"
+
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -24,38 +26,46 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	return err
 }
 
+func (Configs) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{DoNotReference: true}
+	var l []*config
+
+	return r.Reflect(&l)
+}
+
+//nolint:lll
 type config struct {
 	cfg                      *action.Configuration  `yaml:"-"`
 	helm                     *helm.EnvSettings      `yaml:"-"`
 	log                      *log.Entry             `yaml:"-"`
-	Store                    map[string]interface{} `yaml:"store,omitempty"`
-	ChartF                   Chart                  `yaml:"chart,omitempty"`
+	Store                    map[string]interface{} `json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
+	ChartF                   Chart                  `json:"chart" jsonschema:"oneof_type=string;object"`
 	uniqName                 uniqname.UniqName      `yaml:"-"`
-	NameF                    string                 `yaml:"name,omitempty"`
-	NamespaceF               string                 `yaml:"namespace,omitempty"`
-	DescriptionF             string                 `yaml:"description,omitempty"`
-	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty"`
-	DependsOnF               []string               `yaml:"depends_on,omitempty"`
-	ValuesF                  []ValuesReference      `yaml:"values,omitempty"`
-	TagsF                    []string               `yaml:"tags,omitempty"`
-	Timeout                  time.Duration          `yaml:"timeout,omitempty"`
-	MaxHistory               int                    `yaml:"max_history,omitempty"`
-	AllowFailureF            bool                   `yaml:"allow_failure,omitempty"`
-	Atomic                   bool                   `yaml:"atomic,omitempty"`
-	CleanupOnFail            bool                   `yaml:"cleanup_on_fail,omitempty"`
-	CreateNamespace          bool                   `yaml:"create_namespace,omitempty"`
-	Devel                    bool                   `yaml:"devel,omitempty"`
-	DisableHooks             bool                   `yaml:"disable_hooks,omitempty"`
-	DisableOpenAPIValidation bool                   `yaml:"disable_open_api_validation,omitempty"`
-	dryRun                   bool                   `yaml:"dry_run,omitempty"`
-	Force                    bool                   `yaml:"force,omitempty"`
-	Recreate                 bool                   `yaml:"recreate,omitempty"`
-	ResetValues              bool                   `yaml:"reset_values,omitempty"`
-	ReuseValues              bool                   `yaml:"reuse_values,omitempty"`
-	SkipCRDs                 bool                   `yaml:"skip_crds,omitempty"`
-	SubNotes                 bool                   `yaml:"sub_notes,omitempty"`
-	Wait                     bool                   `yaml:"wait,omitempty"`
-	WaitForJobs              bool                   `yaml:"wait_for_jobs,omitempty"`
+	NameF                    string                 `json:"name" jsonschema:"title=release name"`
+	NamespaceF               string                 `json:"namespace" jsonschema:"title=kubernetes namespace"`
+	DescriptionF             string                 `json:"description,omitempty"`
+	PendingReleaseStrategy   PendingStrategy        `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install, pending-upgrade, pending-rollback)"`
+	DependsOnF               []string               `json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
+	ValuesF                  []ValuesReference      `json:"values,omitempty" jsonschema:"title=values of a release"`
+	TagsF                    []string               `json:"tags,omitempty" jsonschema:"description=tags allows you choose releases for build"`
+	Timeout                  time.Duration          `json:"timeout,omitempty"`
+	MaxHistory               int                    `json:"max_history,omitempty"`
+	AllowFailureF            bool                   `json:"allow_failure,omitempty"`
+	Atomic                   bool                   `json:"atomic,omitempty"`
+	CleanupOnFail            bool                   `json:"cleanup_on_fail,omitempty"`
+	CreateNamespace          bool                   `json:"create_namespace,omitempty" jsonschema:"description=will create namespace if it doesnt exits,default=false"`
+	Devel                    bool                   `json:"devel,omitempty"`
+	DisableHooks             bool                   `json:"disable_hooks,omitempty"`
+	DisableOpenAPIValidation bool                   `json:"disable_open_api_validation,omitempty"`
+	dryRun                   bool                   `json:"dry_run,omitempty"` //nolint:govet
+	Force                    bool                   `json:"force,omitempty"`
+	Recreate                 bool                   `json:"recreate,omitempty"`
+	ResetValues              bool                   `json:"reset_values,omitempty"`
+	ReuseValues              bool                   `json:"reuse_values,omitempty"`
+	SkipCRDs                 bool                   `json:"skip_crds,omitempty"`
+	SubNotes                 bool                   `json:"sub_notes,omitempty"`
+	Wait                     bool                   `json:"wait,omitempty" jsonschema:"description=prefer use true"`
+	WaitForJobs              bool                   `json:"wait_for_jobs,omitempty" jsonschema:"description=prefer use true"`
 }
 
 func (rel *config) DryRun(b bool) {
@@ -63,9 +73,11 @@ func (rel *config) DryRun(b bool) {
 }
 
 // Chart is structure for chart download options.
+//
+//nolint:lll
 type Chart struct {
 	action.ChartPathOptions `yaml:",inline"`
-	Name                    string `yaml:"name"`
+	Name                    string `json:"name" jsonschema:"title=the name,description=The name of a chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
 }
 
 // UnmarshalYAML flexible config.
@@ -104,7 +116,6 @@ func (rel *config) newInstall() *action.Install {
 	ch := rel.Chart()
 
 	// I hate private field without normal New(...Options)
-	// client.ChartPathOptions = ch.ChartPathOptions
 	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
 	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
 	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
@@ -152,7 +163,6 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	ch := rel.Chart()
 
 	// I hate private field without normal New(...Options)
-	// client.ChartPathOptions = ch.ChartPathOptions
 	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
 	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
 	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
