@@ -27,10 +27,10 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 // config is main registry config.
 type config struct {
 	log      *log.Entry `yaml:"-"`
-	HostF    string     `json:"host" jsonschema:"required"`
-	Username string     `json:"username,omitempty"`
-	Password string     `json:"password,omitempty"`
-	Insecure bool       `json:"insecure,omitempty"`
+	HostF    string     `yaml:"host" json:"host" jsonschema:"required"`
+	Username string     `yaml:"username" json:"username"`
+	Password string     `yaml:"password" json:"password"`
+	Insecure bool       `yaml:"insecure" json:"insecure"`
 }
 
 // Host return Host value.

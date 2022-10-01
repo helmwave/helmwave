@@ -32,7 +32,7 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 type config struct {
 	log        *log.Entry `yaml:"-"`
 	repo.Entry `yaml:",inline"`
-	Force      bool `json:"force,omitempty" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
+	Force      bool `yaml:"force" json:"force" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }
 
 func (c *config) Name() string {

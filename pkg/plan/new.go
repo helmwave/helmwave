@@ -94,11 +94,11 @@ func (p *Plan) Logger() *log.Entry {
 
 //nolint:lll
 type planBody struct {
-	Project      string           `json:"project,omitempty" jsonschema:"title=the project name,description=reserved for future,example=my-awesome-project"`
-	Version      string           `json:"version,omitempty" jsonschema:"title=version of helmwave,description=will check current version and project version,example=0.23.0,example=0.22.1"`
-	Repositories repo.Configs     `json:"repositories,omitempty" jsonschema:"title=repositories list,description=helm repositories"`
-	Registries   registry.Configs `json:"registries,omitempty" jsonschema:"title=registries list,description=helm OCI registries"`
-	Releases     release.Configs  `json:"releases,omitempty" jsonschema:"title=helm releases,description=what you wanna deploy"`
+	Project      string           `json:"project" jsonschema:"title=the project name,description=reserved for future,example=my-awesome-project"`
+	Version      string           `json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,example=0.23.0,example=0.22.1"`
+	Repositories repo.Configs     `json:"repositories" jsonschema:"title=repositories list,description=helm repositories"`
+	Registries   registry.Configs `json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`
+	Releases     release.Configs  `json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`
 }
 
 func GenSchema() *jsonschema.Schema {
