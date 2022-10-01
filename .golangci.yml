@@ -1,6 +1,6 @@
 # options for analysis running
 run:
-  timeout: 5m
+  timeout: 10m
   build-tags:
     - integration
 
