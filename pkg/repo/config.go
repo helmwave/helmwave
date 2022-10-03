@@ -3,9 +3,11 @@ package repo
 import (
 	"errors"
 
+	"github.com/invopop/jsonschema"
+	"helm.sh/helm/v3/pkg/repo"
+
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
-	"helm.sh/helm/v3/pkg/repo"
 )
 
 // Configs type of array Config.
@@ -19,10 +21,18 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	return err
 }
 
+func (Configs) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{DoNotReference: true}
+	var l []*config
+
+	return r.Reflect(&l)
+}
+
+//nolint:lll
 type config struct {
 	log        *log.Entry `yaml:"-"`
 	repo.Entry `yaml:",inline"`
-	Force      bool `yaml:"force"`
+	Force      bool `yaml:"force" json:"force" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }
 
 func (c *config) Name() string {
