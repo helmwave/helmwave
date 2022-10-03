@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/databus23/helm-diff v3.1.1+incompatible
 	github.com/gofrs/flock v0.8.1
-	github.com/hairyhenderson/gomplate/v3 v3.11.2
+	github.com/hairyhenderson/gomplate/v3 v3.11.3
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/logrus-emoji-formatter v1.1.0
 	github.com/invopop/jsonschema v0.6.0
@@ -61,7 +61,7 @@ require (
 	github.com/aryann/difflib v0.0.0-20210328193216-ff5ff6dc229b // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/avelino/slugify v0.0.0-20180501145920-855f152bd774 // indirect
-	github.com/aws/aws-sdk-go v1.44.27 // indirect
+	github.com/aws/aws-sdk-go v1.44.96 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.16.4 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.1 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.15.9 // indirect
@@ -229,10 +229,10 @@ require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760 // indirect
 	gocloud.dev v0.25.1-0.20220408200107-09b10f7359f7 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
-	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
 	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
+	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
