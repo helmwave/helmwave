@@ -210,7 +210,7 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	nodesChan := dependenciesGraph.Run()
 
 	wg := parallel.NewWaitGroup()
-	wg.Add(len(p.body.Releases))
+	wg.Add(parallelLimit)
 
 	fails := make(map[release.Config]error)
 
@@ -237,6 +237,7 @@ func (p *Plan) syncReleasesWorker(
 	for n := range nodesChan {
 		p.syncRelease(ctx, wg, n, mu, fails)
 	}
+	wg.Done()
 }
 
 func (p *Plan) syncRelease(
@@ -246,7 +247,6 @@ func (p *Plan) syncRelease(
 	mu *sync.Mutex,
 	fails map[release.Config]error,
 ) {
-	defer wg.Done()
 	rel := node.Data
 
 	l := rel.Logger()
