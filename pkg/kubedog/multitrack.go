@@ -51,7 +51,7 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 		AllowFailuresCount:      new(int),
 		FailureThresholdSeconds: new(int),
 	}
-	*spec.AllowFailuresCount = 1
+	*spec.AllowFailuresCount = 0
 	*spec.FailureThresholdSeconds = 0
 
 	// Override by annotations
@@ -128,10 +128,6 @@ func (*Resource) handleAnnotationLogRegex(value string, spec *multitrack.Multitr
 }
 
 func (r *Resource) handleAnnotationFailuresAllowedPerReplica(value string, spec *multitrack.MultitrackSpec) error {
-	if r.Kind == "Job" {
-		return fmt.Errorf("%s is not supported for jobs", FailuresAllowedPerReplicaAnnoName)
-	}
-
 	v, err := strconv.ParseUint(value, 10, 32)
 	if err != nil {
 		return fmt.Errorf("failed to parse %s as uint: %w", value, err)
