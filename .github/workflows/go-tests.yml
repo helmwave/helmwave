@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create KinD cluster
-        uses: container-tools/kind-action@v1
+        uses: container-tools/kind-action@v2
         with:
           registry: false
 
