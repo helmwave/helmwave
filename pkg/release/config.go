@@ -140,7 +140,6 @@ func (rel *config) newInstall() *action.Install {
 
 	if client.DryRun {
 		client.Replace = true
-		client.ClientOnly = true
 	}
 
 	return client
