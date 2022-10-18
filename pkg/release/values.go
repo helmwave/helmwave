@@ -20,10 +20,12 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src    string `yaml:"src" json:"src"`
-	Dst    string `yaml:"dst" json:"dst"`
-	Strict bool   `yaml:"strict" json:"strict"`
-	Render bool   `yaml:"render" json:"render"`
+	Src            string `yaml:"src" json:"src"`
+	Dst            string `yaml:"dst" json:"dst"`
+	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"`
+	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty"`
+	Strict         bool   `yaml:"strict" json:"strict"`
+	Render         bool   `yaml:"render" json:"render"`
 }
 
 // UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
@@ -132,10 +134,11 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 		return err
 	}
 
+	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
 	if v.isURL() {
-		err = template.Tpl2yml(v.Dst, v.Dst, data, templater)
+		err = template.Tpl2yml(v.Dst, v.Dst, data, templater, delimOption)
 	} else {
-		err = template.Tpl2yml(v.Src, v.Dst, data, templater)
+		err = template.Tpl2yml(v.Src, v.Dst, data, templater, delimOption)
 	}
 
 	if err != nil {
