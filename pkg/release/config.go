@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/postrender"
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
@@ -48,6 +49,7 @@ type config struct {
 	DependsOnF               []string               `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
 	ValuesF                  []ValuesReference      `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=values of a release"`
 	TagsF                    []string               `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=tags allows you choose releases for build"`
+	PostRendererF            []string               `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty"`
 	Timeout                  time.Duration          `yaml:"timeout,omitempty" json:"timeout,omitempty"`
 	MaxHistory               int                    `yaml:"max_history,omitempty" json:"max_history,omitempty"`
 	AllowFailureF            bool                   `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty"`
@@ -113,20 +115,7 @@ func (rel *config) newInstall() *action.Install {
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
 
-	ch := rel.Chart()
-
-	// I hate private field without normal New(...Options)
-	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
-	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
-	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
-	client.ChartPathOptions.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
-	client.ChartPathOptions.Keyring = ch.ChartPathOptions.Keyring
-	client.ChartPathOptions.Password = ch.ChartPathOptions.Password
-	client.ChartPathOptions.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
-	client.ChartPathOptions.RepoURL = ch.ChartPathOptions.RepoURL
-	client.ChartPathOptions.Username = ch.ChartPathOptions.Username
-	client.ChartPathOptions.Verify = ch.ChartPathOptions.Verify
-	client.ChartPathOptions.Version = ch.ChartPathOptions.Version
+	rel.copyChartPathOptions(&client.ChartPathOptions)
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
@@ -138,6 +127,13 @@ func (rel *config) newInstall() *action.Install {
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
 
+	pr, err := rel.PostRenderer()
+	if err != nil {
+		rel.Logger().WithError(err).Warn("failed to create postrenderer")
+	} else {
+		client.PostRenderer = pr
+	}
+
 	if client.DryRun {
 		client.Replace = true
 	}
@@ -147,6 +143,7 @@ func (rel *config) newInstall() *action.Install {
 
 func (rel *config) newUpgrade() *action.Upgrade {
 	client := action.NewUpgrade(rel.Cfg())
+
 	// Only Upgrade
 	client.CleanupOnFail = rel.CleanupOnFail
 	client.MaxHistory = rel.MaxHistory
@@ -159,21 +156,9 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
 
-	ch := rel.Chart()
+	rel.copyChartPathOptions(&client.ChartPathOptions)
 
-	// I hate private field without normal New(...Options)
-	client.ChartPathOptions.CaFile = ch.ChartPathOptions.CaFile
-	client.ChartPathOptions.CertFile = ch.ChartPathOptions.CertFile
-	client.ChartPathOptions.KeyFile = ch.ChartPathOptions.KeyFile
-	client.ChartPathOptions.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
-	client.ChartPathOptions.Keyring = ch.ChartPathOptions.Keyring
-	client.ChartPathOptions.Password = ch.ChartPathOptions.Password
-	client.ChartPathOptions.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
-	client.ChartPathOptions.RepoURL = ch.ChartPathOptions.RepoURL
-	client.ChartPathOptions.Username = ch.ChartPathOptions.Username
-	client.ChartPathOptions.Verify = ch.ChartPathOptions.Verify
-	client.ChartPathOptions.Version = ch.ChartPathOptions.Version
-
+	client.Force = rel.Force
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
@@ -184,7 +169,31 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
 
+	pr, err := rel.PostRenderer()
+	if err != nil {
+		rel.Logger().WithError(err).Warn("failed to create postrenderer")
+	} else {
+		client.PostRenderer = pr
+	}
+
 	return client
+}
+
+func (rel *config) copyChartPathOptions(cpo *action.ChartPathOptions) {
+	ch := rel.Chart()
+
+	// I hate private field without normal New(...Options)
+	cpo.CaFile = ch.ChartPathOptions.CaFile
+	cpo.CertFile = ch.ChartPathOptions.CertFile
+	cpo.KeyFile = ch.ChartPathOptions.KeyFile
+	cpo.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
+	cpo.Keyring = ch.ChartPathOptions.Keyring
+	cpo.Password = ch.ChartPathOptions.Password
+	cpo.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
+	cpo.RepoURL = ch.ChartPathOptions.RepoURL
+	cpo.Username = ch.ChartPathOptions.Username
+	cpo.Verify = ch.ChartPathOptions.Verify
+	cpo.Version = ch.ChartPathOptions.Version
 }
 
 var (
@@ -289,4 +298,12 @@ func (rel *config) buildAfterUnmarshalDependsOn() {
 	}
 
 	rel.DependsOnF = res
+}
+
+func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
+	if len(rel.PostRendererF) < 1 {
+		return nil, nil
+	}
+
+	return postrender.NewExec(rel.PostRendererF[0], rel.PostRendererF[1:]...) //nolint:wrapcheck
 }

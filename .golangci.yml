@@ -769,6 +769,7 @@ issues:
     - path: _test\.go
       linters:
         - dupl
+        - dupword
         - forcetypeassert
         - gochecknoglobals
         - goconst
