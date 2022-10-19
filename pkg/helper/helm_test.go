@@ -13,7 +13,7 @@ type HelmTestSuite struct {
 
 func (s *HelmTestSuite) TestNewCfg() {
 	ns := s.T().Name()
-	cfg, err := helper.NewCfg(ns)
+	cfg, err := helper.NewCfg(ns, "")
 
 	s.Require().NoError(err)
 	s.Require().NotNil(cfg)

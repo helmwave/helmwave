@@ -44,6 +44,7 @@ type config struct {
 	NameF                    string                 `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"title=release name"`
 	NamespaceF               string                 `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"title=kubernetes namespace"`
 	DescriptionF             string                 `yaml:"description,omitempty" json:"description,omitempty"`
+	KubeContext              string                 `yaml:"context,omitempty" json:"context,omitempty"`
 	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install, pending-upgrade, pending-rollback)"`
 	DependsOnF               []string               `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
 	ValuesF                  []ValuesReference      `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=values of a release"`
