@@ -76,7 +76,7 @@ jobs:
       contents: write # releases are in `contents`
       issues: write # for closing milestones
       packages: write
-    if: always()
+    if: always() # otherwise it will skip if tagger is skipped
     needs:
       - get-tag
     steps:
@@ -142,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write
-    if: always()
+    if: always() # otherwise it will skip if tagger is skipped
     needs:
       - get-tag
       - goreleaser
