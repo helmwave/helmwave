@@ -138,6 +138,12 @@ func (r *MockReleaseConfig) HelmWait() bool {
 	return true
 }
 
+func (r *MockReleaseConfig) DownloadChart(string) error {
+	return r.Called().Error(0)
+}
+
+func (r *MockReleaseConfig) SetChart(string) {}
+
 type MockRepoConfig struct {
 	mock.Mock
 }

@@ -2,10 +2,13 @@ package release
 
 import (
 	"fmt"
+	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -13,6 +16,39 @@ import (
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 )
+
+// Chart is structure for chart download options.
+//
+//nolint:lll
+type Chart struct {
+	action.ChartPathOptions `yaml:",inline"`
+	Name                    string `yaml:"name" json:"name" jsonschema:"title=the name,description=The name of a chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
+}
+
+// UnmarshalYAML flexible config.
+func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
+	type raw Chart
+	var err error
+
+	switch node.Kind {
+	case yaml.ScalarNode, yaml.AliasNode:
+		err = node.Decode(&(u.Name))
+	case yaml.MappingNode:
+		err = node.Decode((*raw)(u))
+	default:
+		err = fmt.Errorf("unknown format")
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to decode chart %q from YAML at %d line: %w", node.Value, node.Line, err)
+	}
+
+	return nil
+}
+
+func (u Chart) IsRemote() bool {
+	return !helper.IsExists(filepath.Clean(u.Name))
+}
 
 func (rel *config) GetChart() (*chart.Chart, error) {
 	// Hmm nice action bro
@@ -54,7 +90,7 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 }
 
 func (rel *config) ChartDepsUpd() error {
-	if !helper.IsExists(filepath.Clean(rel.Chart().Name)) {
+	if rel.Chart().IsRemote() {
 		rel.Logger().Info("skipping updating dependencies for remote chart")
 
 		return nil
@@ -84,4 +120,37 @@ func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	}
 
 	return nil
+}
+
+func (rel *config) DownloadChart(tmpDir string) error {
+	if !rel.Chart().IsRemote() {
+		rel.Logger().Info("chart is local, skipping exporting it")
+
+		return nil
+	}
+
+	pull := action.NewPullWithOpts(action.WithConfig(rel.Cfg()))
+	pull.Settings = rel.Helm()
+	rel.copyChartPathOptions(&pull.ChartPathOptions)
+
+	pull.DestDir = path.Join(tmpDir, "charts", rel.Uniq().String())
+	err := os.MkdirAll(pull.DestDir, 0o750)
+	if err != nil {
+		return fmt.Errorf("failed to create temporary directory for chart: %w", err)
+	}
+
+	logs, err := pull.Run(rel.Chart().Name)
+	if logs != "" {
+		log.StandardLogger().Print(logs)
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to download and unarchive chart: %w", err)
+	}
+
+	return nil
+}
+
+func (rel *config) SetChart(name string) {
+	rel.ChartF.Name = name
 }

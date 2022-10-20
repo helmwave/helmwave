@@ -50,7 +50,7 @@ func addToPlan(plan []release.Config, rel release.Config,
 
 func releaseNames(a []release.Config) (n []string) {
 	for _, r := range a {
-		n = append(n, string(r.Uniq()))
+		n = append(n, r.Uniq().String())
 	}
 
 	return n

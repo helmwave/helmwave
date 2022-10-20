@@ -85,7 +85,7 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 	hash := h.Sum(nil)
 	s := hex.EncodeToString(hash)
 
-	v.Dst = filepath.Join(dir, "values", string(name), s+".yml")
+	v.Dst = filepath.Join(dir, "values", name.String(), s+".yml")
 
 	return v
 }

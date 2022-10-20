@@ -47,7 +47,7 @@ func (n UniqName) Equal(a UniqName) bool {
 
 // Validate validates this object.
 func (n UniqName) Validate() error {
-	s := strings.Split(string(n), Separator)
+	s := strings.Split(n.String(), Separator)
 	if len(s) != 2 {
 		return ErrValidate
 	}
@@ -61,4 +61,8 @@ func (n UniqName) Validate() error {
 	}
 
 	return nil
+}
+
+func (n UniqName) String() string {
+	return string(n)
 }

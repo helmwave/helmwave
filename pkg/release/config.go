@@ -2,7 +2,6 @@ package release
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/invopop/jsonschema"
@@ -72,35 +71,6 @@ type config struct {
 
 func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
-}
-
-// Chart is structure for chart download options.
-//
-//nolint:lll
-type Chart struct {
-	action.ChartPathOptions `yaml:",inline"`
-	Name                    string `yaml:"name" json:"name" jsonschema:"title=the name,description=The name of a chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
-}
-
-// UnmarshalYAML flexible config.
-func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
-	type raw Chart
-	var err error
-
-	switch node.Kind {
-	case yaml.ScalarNode, yaml.AliasNode:
-		err = node.Decode(&(u.Name))
-	case yaml.MappingNode:
-		err = node.Decode((*raw)(u))
-	default:
-		err = fmt.Errorf("unknown format")
-	}
-
-	if err != nil {
-		return fmt.Errorf("failed to decode chart %q from YAML at %d line: %w", node.Value, node.Line, err)
-	}
-
-	return nil
 }
 
 func (rel *config) newInstall() *action.Install {
@@ -294,7 +264,7 @@ func (rel *config) buildAfterUnmarshalDependsOn() {
 		}
 
 		// generate full uniqname string if it was short
-		res = append(res, string(u))
+		res = append(res, u.String())
 	}
 
 	rel.DependsOnF = res

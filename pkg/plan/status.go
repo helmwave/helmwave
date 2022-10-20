@@ -23,7 +23,7 @@ func status(all []release.Config, names []string) error {
 		r = make([]release.Config, 0, len(all))
 
 		for _, rel := range all {
-			if helper.Contains(string(rel.Uniq()), names) {
+			if helper.Contains(rel.Uniq().String(), names) {
 				r = append(r, rel)
 			}
 		}
