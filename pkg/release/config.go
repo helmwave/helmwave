@@ -282,6 +282,7 @@ func (rel *config) buildAfterUnmarshal() {
 
 	// set default timeout
 	if rel.Timeout <= 0 {
+		rel.Logger().Debug("timeout is not set, defaulting to 5m")
 		rel.Timeout = 5 * time.Minute
 	}
 }
