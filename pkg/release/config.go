@@ -7,6 +7,7 @@ import (
 
 	"github.com/invopop/jsonschema"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -271,8 +272,8 @@ func (rel *config) HelmWait() bool {
 	return rel.Wait
 }
 
-func (rel *config) buildAfterUnmarshal() {
-	rel.buildAfterUnmarshalDependsOn()
+func (rel *config) buildAfterUnmarshal(allReleases []*config) {
+	rel.buildAfterUnmarshalDependsOn(allReleases)
 
 	// set default timeout
 	if rel.Timeout <= 0 {
@@ -281,18 +282,43 @@ func (rel *config) buildAfterUnmarshal() {
 	}
 }
 
-func (rel *config) buildAfterUnmarshalDependsOn() {
+func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
+	newDeps := make([]*DependsOnReference, 0)
+
 	for _, dep := range rel.DependsOn() {
-		u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
-		if err != nil {
-			rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
-
-			continue
+		l := rel.Logger().WithField("dependency", dep)
+		switch dep.Type() {
+		case DependencyRelease:
+			rel.buildAfterUnmarshalDependency(dep)
+			newDeps = append(newDeps, dep)
+		case DependencyTag:
+			for _, r := range allReleases {
+				if helper.Contains(dep.Tag, r.Tags()) {
+					newDep := &DependsOnReference{
+						Name:     string(r.Uniq()),
+						Optional: dep.Optional,
+					}
+					newDeps = append(newDeps, newDep)
+				}
+			}
+		case DependencyInvalid:
+			l.Warn("invalid dependency, skipping")
 		}
-
-		// generate full uniqname string if it was short
-		dep.Name = string(u)
 	}
+
+	rel.DependsOnF = newDeps
+}
+
+func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) {
+	u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
+	if err != nil {
+		rel.Logger().WithField("dependency", dep).WithError(err).Error("Cannot parse dependency")
+
+		return
+	}
+
+	// generate full uniqname string if it was short
+	dep.Name = string(u)
 }
 
 func (rel *config) PostRenderer() (postrender.PostRenderer, error) {

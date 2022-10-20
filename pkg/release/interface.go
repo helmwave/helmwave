@@ -46,7 +46,7 @@ func UnmarshalYAML(node *yaml.Node) ([]Config, error) {
 
 	res := make([]Config, len(r))
 	for i := range r {
-		r[i].buildAfterUnmarshal()
+		r[i].buildAfterUnmarshal(r)
 		res[i] = r[i]
 	}
 

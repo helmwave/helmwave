@@ -11,9 +11,18 @@ import (
 // ErrSkipValues is returned when values cannot be used and are skipped.
 var ErrMissingDependency = errors.New("dependency is missing")
 
+type DependencyType int
+
+const (
+	DependencyRelease DependencyType = iota
+	DependencyTag
+	DependencyInvalid
+)
+
 // DependsOnReference is used to store release dependencies.
 type DependsOnReference struct {
-	Name     string `yaml:"name" json:"name"`
+	Name     string `yaml:"name,omitempty" json:"name,omitempty"`
+	Tag      string `yaml:"tag,omitempty" json:"tag,omitempty"`
 	Optional bool   `yaml:"optional" json:"optional"`
 }
 
@@ -40,4 +49,16 @@ func (d *DependsOnReference) UnmarshalYAML(node *yaml.Node) error {
 
 func (d *DependsOnReference) Uniq() uniqname.UniqName {
 	return uniqname.UniqName(d.Name)
+}
+
+func (d *DependsOnReference) Type() DependencyType {
+	if d.Name != "" {
+		return DependencyRelease
+	}
+
+	if d.Tag != "" {
+		return DependencyTag
+	}
+
+	return DependencyInvalid
 }
