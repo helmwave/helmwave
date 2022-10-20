@@ -76,6 +76,7 @@ jobs:
       contents: write # releases are in `contents`
       issues: write # for closing milestones
       packages: write
+    if: success()
     needs:
       - get-tag
     steps:
