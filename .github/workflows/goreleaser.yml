@@ -76,7 +76,7 @@ jobs:
       contents: write # releases are in `contents`
       issues: write # for closing milestones
       packages: write
-    if: needs.get-tag.result == 'success'
+    if: always()
     needs:
       - get-tag
     steps:
@@ -142,6 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write
+    if: always()
     needs:
       - get-tag
       - goreleaser
