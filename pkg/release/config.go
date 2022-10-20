@@ -279,6 +279,11 @@ func (rel *config) HelmWait() bool {
 
 func (rel *config) buildAfterUnmarshal() {
 	rel.buildAfterUnmarshalDependsOn()
+
+	// set default timeout
+	if rel.Timeout <= 0 {
+		rel.Timeout = 5 * time.Minute
+	}
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn() {
