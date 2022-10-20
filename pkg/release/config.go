@@ -36,7 +36,6 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 
 //nolint:lll
 type config struct {
-	cfg                      *action.Configuration  `yaml:"-"`
 	helm                     *helm.EnvSettings      `yaml:"-"`
 	log                      *log.Entry             `yaml:"-"`
 	Store                    map[string]interface{} `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
