@@ -33,7 +33,12 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r := release.NewConfig()
 
 	r.NamespaceF = "testns"
-	r.DependsOnF = []string{"bla", "blabla@testns", "blablabla@testtestns", "---=-=-==-@kk;'[["}
+	r.DependsOnF = []*release.DependsOnReference{
+		{Name: "bla"},
+		{Name: "blabla@testns"},
+		{Name: "blablabla@testtestns"},
+		{Name: "---=-=-==-@kk;'[["},
+	}
 
 	r.BuildAfterUnmarshal()
 
