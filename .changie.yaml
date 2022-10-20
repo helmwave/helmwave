@@ -1,0 +1,32 @@
+changesDir: .changes
+unreleasedDir: unreleased
+headerPath: header.tpl.md
+changelogPath: CHANGELOG.md
+versionExt: md
+versionFormat: "## {{ .Version }}"
+kindFormat: "### {{ .Kind }}"
+changeFormat: |
+  * {{ if ne .Custom.Issue "" }}[#{{ .Custom.Issue }}](https://github.com/helmwave/helmwave/issues/{{ .Custom.Issue }}) {{ end }}{{ .Body }} (@{{ .Custom.Author }})
+
+custom:
+  - key: Issue
+    label: Issue number (leave empty string to skip)
+    minInt: 1
+    optional: true
+    type: int
+  - key: Author
+    label: Author's GitHub username
+    minLength: 1
+    type: string
+
+kinds:
+  - label: New feature
+  - label: Breaking change
+  - label: Fixed
+  - label: CI
+  - label: Other
+
+newlines:
+  afterChangelogHeader: 2
+  beforeChangelogVersion: 2
+  endOfVersion: 2
