@@ -13,7 +13,7 @@ jobs:
   tagger:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # to create new tag
     steps:
       - name: Create tag
         id: create
@@ -57,7 +57,7 @@ jobs:
   generate-changelog:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # to commit changes
+      contents: write # to commit merged changelog
     needs:
       - tagger
     steps:
@@ -108,10 +108,9 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # releases are in `contents`
-      issues: write # for closing milestones
-      packages: write
-    if: always() # otherwise it will skip if tagger is skipped
+      contents: write # to create release
+      issues: write # to close milestone
+      packages: write # to upload package
     needs:
       - tagger
       - generate-changelog
@@ -182,9 +181,6 @@ jobs:
 
   docs:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
-    if: always() # otherwise it will skip if tagger is skipped
     needs:
       - tagger
     steps:
