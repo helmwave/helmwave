@@ -3,7 +3,7 @@ unreleasedDir: unreleased
 headerPath: header.tpl.md
 changelogPath: CHANGELOG.md
 versionExt: md
-versionFormat: "## {{ .Version }}"
+versionFormat: "# {{ .Version }}"
 kindFormat: "### {{ .Kind }}"
 changeFormat: |
   * {{ if ne .Custom.Issue "" }}[#{{ .Custom.Issue }}](https://github.com/helmwave/helmwave/issues/{{ .Custom.Issue }}) {{ end }}{{ .Body }} (@{{ .Custom.Author }})
