@@ -20,8 +20,9 @@ custom:
     type: string
 
 kinds:
+  - label: Breaking change!
+    format: "### **{{ .Kind }}**"
   - label: New feature
-  - label: Breaking change
   - label: Fixed
   - label: CI
   - label: Dependencies
