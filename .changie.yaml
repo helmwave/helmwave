@@ -28,6 +28,11 @@ kinds:
   - label: Other
 
 newlines:
-  afterChangelogHeader: 2
-  beforeChangelogVersion: 2
-  endOfVersion: 2
+  afterChange: 0
+  afterChangelogHeader: 0
+  afterChangelogVersion: 2
+  afterKind: 1
+  afterVersion: 1
+  beforeChange: 0
+  beforeChangelogVersion: 1
+  endOfVersion: 1
