@@ -22,7 +22,10 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{DoNotReference: true}
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+	}
 	var l []*config
 
 	return r.Reflect(&l)
@@ -30,7 +33,7 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 
 //nolint:lll
 type config struct {
-	log        *log.Entry `yaml:"-"`
+	log        *log.Entry `yaml:"-" json:"-"`
 	repo.Entry `yaml:",inline"`
 	Force      bool `yaml:"force" json:"force" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/invopop/jsonschema"
+	"github.com/stoewer/go-strcase"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
@@ -28,7 +29,11 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{DoNotReference: true}
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+		KeyNamer:                   strcase.SnakeCase, // for action.ChartPathOptions
+	}
 	var l []*config
 
 	return r.Reflect(&l)
@@ -36,37 +41,37 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 
 //nolint:lll
 type config struct {
-	helm                     *helm.EnvSettings      `yaml:"-"`
-	log                      *log.Entry             `yaml:"-"`
+	helm                     *helm.EnvSettings      `yaml:"-" json:"-"`
+	log                      *log.Entry             `yaml:"-" json:"-"`
 	Store                    map[string]interface{} `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
-	ChartF                   Chart                  `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"oneof_type=string;object"`
+	ChartF                   Chart                  `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
 	uniqName                 uniqname.UniqName      `yaml:"-"`
-	NameF                    string                 `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"title=release name"`
-	NamespaceF               string                 `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"title=kubernetes namespace"`
-	DescriptionF             string                 `yaml:"description,omitempty" json:"description,omitempty"`
-	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install, pending-upgrade, pending-rollback)"`
-	DependsOnF               []string               `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
-	ValuesF                  []ValuesReference      `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=values of a release"`
-	TagsF                    []string               `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=tags allows you choose releases for build"`
-	PostRendererF            []string               `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty"`
-	Timeout                  time.Duration          `yaml:"timeout,omitempty" json:"timeout,omitempty"`
-	MaxHistory               int                    `yaml:"max_history,omitempty" json:"max_history,omitempty"`
-	AllowFailureF            bool                   `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty"`
-	Atomic                   bool                   `yaml:"atomic,omitempty" json:"atomic,omitempty"`
-	CleanupOnFail            bool                   `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty"`
-	CreateNamespace          bool                   `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=will create namespace if it doesnt exits,default=false"`
-	Devel                    bool                   `yaml:"devel,omitempty" json:"devel,omitempty"`
-	DisableHooks             bool                   `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty"`
-	DisableOpenAPIValidation bool                   `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty"`
-	dryRun                   bool                   `yaml:"dry_run,omitempty" json:"dry_run,omitempty"` //nolint:govet
-	Force                    bool                   `yaml:"force,omitempty" json:"force,omitempty"`
-	Recreate                 bool                   `yaml:"recreate,omitempty" json:"recreate,omitempty"`
-	ResetValues              bool                   `yaml:"reset_values,omitempty" json:"reset_values,omitempty"`
-	ReuseValues              bool                   `yaml:"reuse_values,omitempty" json:"reuse_values,omitempty"`
-	SkipCRDs                 bool                   `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty"`
-	SubNotes                 bool                   `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty"`
-	Wait                     bool                   `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=prefer use true"`
-	WaitForJobs              bool                   `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=prefer use true"`
+	NameF                    string                 `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required,title=Release name"`
+	NamespaceF               string                 `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
+	DescriptionF             string                 `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
+	PendingReleaseStrategy   PendingStrategy        `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback),default="`
+	DependsOnF               []string               `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of releases-dependencies that need to succeed before this release"`
+	ValuesF                  []ValuesReference      `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release"`
+	TagsF                    []string               `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
+	PostRendererF            []string               `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of postrenders to manipulate with manifests"`
+	Timeout                  time.Duration          `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"default=5m"`
+	MaxHistory               int                    `yaml:"max_history,omitempty" json:"max_history,omitempty" jsonschema:"default=0"`
+	AllowFailureF            bool                   `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
+	Atomic                   bool                   `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
+	CleanupOnFail            bool                   `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
+	CreateNamespace          bool                   `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exits,default=false"`
+	Devel                    bool                   `yaml:"devel,omitempty" json:"devel,omitempty" jsonschema:"default=false"`
+	DisableHooks             bool                   `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
+	DisableOpenAPIValidation bool                   `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
+	dryRun                   bool                   `yaml:"dry_run,omitempty" json:"dry_run,omitempty" jsonschema:"default=false"` //nolint:govet
+	Force                    bool                   `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
+	Recreate                 bool                   `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
+	ResetValues              bool                   `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`
+	ReuseValues              bool                   `yaml:"reuse_values,omitempty" json:"reuse_values,omitempty" jsonschema:"default=false"`
+	SkipCRDs                 bool                   `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty" jsonschema:"default=false"`
+	SubNotes                 bool                   `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"default=false"`
+	Wait                     bool                   `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
+	WaitForJobs              bool                   `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
 }
 
 func (rel *config) DryRun(b bool) {
@@ -78,7 +83,7 @@ func (rel *config) DryRun(b bool) {
 //nolint:lll
 type Chart struct {
 	action.ChartPathOptions `yaml:",inline"`
-	Name                    string `yaml:"name" json:"name" jsonschema:"title=the name,description=The name of a chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
+	Name                    string `yaml:"name" json:"name" jsonschema:"required,description=Name of the chart. May be either repo/chart or OCI URI,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
 }
 
 // UnmarshalYAML flexible config.

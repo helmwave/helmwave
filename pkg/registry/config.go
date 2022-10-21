@@ -18,19 +18,24 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{DoNotReference: true}
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+	}
 	var l []*config
 
 	return r.Reflect(&l)
 }
 
 // config is main registry config.
+//
+//nolint:lll
 type config struct {
-	log      *log.Entry `yaml:"-"`
-	HostF    string     `yaml:"host" json:"host" jsonschema:"required"`
+	log      *log.Entry `yaml:"-" json:"-"`
+	HostF    string     `yaml:"host" json:"host" jsonschema:"required,description=OCI registry host optionally with port,pattern=^.*(:[0-9]+)?$"`
 	Username string     `yaml:"username" json:"username"`
 	Password string     `yaml:"password" json:"password"`
-	Insecure bool       `yaml:"insecure" json:"insecure"`
+	Insecure bool       `yaml:"insecure" json:"insecure" jsonschema:"default=false"`
 }
 
 // Host return Host value.

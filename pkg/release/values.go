@@ -11,7 +11,9 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
+	"github.com/stoewer/go-strcase"
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,10 +22,32 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src    string `yaml:"src" json:"src"`
+	Src    string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or go-getter URI"`
 	Dst    string `yaml:"dst" json:"dst"`
-	Strict bool   `yaml:"strict" json:"strict"`
-	Render bool   `yaml:"render" json:"render"`
+	Strict bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
+	Render bool   `yaml:"render" json:"render" jsonschema:"description=Whether to use templater to render values,default=true"`
+}
+
+func (v ValuesReference) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+		KeyNamer:                   strcase.SnakeCase, // for action.ChartPathOptions
+	}
+
+	type values ValuesReference
+	schema := r.Reflect(values(v))
+	schema.OneOf = []*jsonschema.Schema{
+		{
+			Type: "string",
+		},
+		{
+			Type: "object",
+		},
+	}
+	schema.Type = ""
+
+	return schema
 }
 
 // UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
