@@ -126,7 +126,6 @@ func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, 
 	return true
 }
 
-//nolint:contextcheck,nolintlint
 func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 	manifests := manifest.Parse(m, ns)
 

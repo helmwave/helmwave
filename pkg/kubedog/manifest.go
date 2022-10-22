@@ -26,8 +26,6 @@ type Spec struct {
 }
 
 // Parse parses YAML manifests of kubernetes resources and returns Resource slice.
-//
-//nolint:contextcheck,nolintlint
 func Parse(yamlFile []byte) []Resource {
 	var a []Resource
 
