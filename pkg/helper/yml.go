@@ -1,15 +1,16 @@
 package helper
 
 import (
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
 
 // SaveInterface encodes input to YAML and saves to file.
-func SaveInterface(file string, in interface{}) error {
+func SaveInterface(ctx context.Context, file string, in interface{}) error {
 	f, err := CreateFile(file)
 	if err != nil {
 		return err
@@ -22,7 +23,7 @@ func SaveInterface(file string, in interface{}) error {
 		}
 	}(f)
 
-	data := Byte(in)
+	data := Byte(ctx, in)
 
 	_, err = f.Write(data)
 	if err != nil {
@@ -37,16 +38,11 @@ func SaveInterface(file string, in interface{}) error {
 }
 
 // Byte marshals input to YAML and returns YAML byte slice.
-func Byte(in interface{}) []byte {
-	data, err := yaml.Marshal(in)
+func Byte(ctx context.Context, in interface{}) []byte {
+	data, err := yaml.MarshalContext(ctx, in)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return data
-}
-
-// String marshals input to YAML and returns YAML string.
-func String(in interface{}) string {
-	return string(Byte(in))
 }

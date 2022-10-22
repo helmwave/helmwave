@@ -5,8 +5,8 @@ import (
 	"errors"
 	"io"
 
+	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 	meta1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,6 +26,8 @@ type Spec struct {
 }
 
 // Parse parses YAML manifests of kubernetes resources and returns Resource slice.
+//
+//nolint:contextcheck,nolintlint
 func Parse(yamlFile []byte) []Resource {
 	var a []Resource
 

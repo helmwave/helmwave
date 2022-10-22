@@ -10,13 +10,13 @@ import (
 
 	"github.com/databus23/helm-diff/diff"
 	"github.com/databus23/helm-diff/manifest"
+	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	structDiff "github.com/r3labs/diff/v3"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	live "helm.sh/helm/v3/pkg/release"
 )
@@ -126,6 +126,7 @@ func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, 
 	return true
 }
 
+//nolint:contextcheck,nolintlint
 func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 	manifests := manifest.Parse(m, ns)
 

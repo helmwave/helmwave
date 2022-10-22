@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/parallel"
-	"gopkg.in/yaml.v3"
 )
 
 // Values is alias for string map of interfaces.

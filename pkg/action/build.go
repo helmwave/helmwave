@@ -55,7 +55,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		oldPlan := plan.New(i.plandir)
 		if oldPlan.IsExist() {
 			log.Info("🆚 Diff with previous local plan")
-			if err := oldPlan.Import(); err != nil {
+			if err := oldPlan.Import(ctx); err != nil {
 				return err
 			}
 
@@ -69,7 +69,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		log.Warnf("I dont know what is %q diff mode. I am skiping diff.", i.diffMode)
 	}
 
-	err = newPlan.Export()
+	err = newPlan.Export(ctx)
 	if err != nil {
 		return err
 	}
