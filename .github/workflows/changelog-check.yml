@@ -1,0 +1,19 @@
+name: Check changelog
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: "Check for changelog entry"
+        uses: brettcannon/check-for-changed-files@v1
+        with:
+          file-pattern: |
+            .changes/unreleased/*.yaml
+          failure-message: "Missing any changie unreleased changelogs. Please use `changie new` and document your changes"
