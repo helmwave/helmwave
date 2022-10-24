@@ -1,11 +1,13 @@
 package plan
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -13,7 +15,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/version"
 	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -57,10 +58,10 @@ type Plan struct {
 }
 
 // NewAndImport wrapper for New and Import in one.
-func NewAndImport(src string) (p *Plan, err error) {
+func NewAndImport(ctx context.Context, src string) (p *Plan, err error) {
 	p = New(src)
 
-	err = p.Import()
+	err = p.Import(ctx)
 	if err != nil {
 		return p, err
 	}
@@ -109,7 +110,7 @@ func GenSchema() *jsonschema.Schema {
 }
 
 // NewBody parses plan from file.
-func NewBody(file string) (*planBody, error) {
+func NewBody(ctx context.Context, file string) (*planBody, error) {
 	b := &planBody{
 		Version: version.Version,
 	}
@@ -119,7 +120,7 @@ func NewBody(file string) (*planBody, error) {
 		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
 
-	err = yaml.Unmarshal(src, b)
+	err = yaml.UnmarshalContext(ctx, src, b, yaml.DisallowDuplicateKey(), yaml.DisallowUnknownField())
 	if err != nil {
 		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}

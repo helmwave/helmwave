@@ -72,7 +72,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 	ts.Require().NoError(s.Run(context.Background()))
 
 	const rep = "bitnami"
-	b, _ := plan.NewBody(filepath.Join(s.plandir, plan.File))
+	b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File))
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
 		ts.Failf("%q not found", rep)
@@ -111,7 +111,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		ts.Require().NoError(s.Run(context.Background()))
 
-		b, _ := plan.NewBody(filepath.Join(s.plandir, plan.File))
+		b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File))
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {

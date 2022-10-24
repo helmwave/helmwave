@@ -11,7 +11,7 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 	p.templater = templater
 
 	// Create Body
-	body, err := NewBody(yml)
+	body, err := NewBody(ctx, yml)
 	if err != nil {
 		return err
 	}
