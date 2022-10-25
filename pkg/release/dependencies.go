@@ -11,9 +11,11 @@ import (
 var ErrMissingDependency = errors.New("dependency is missing")
 
 // DependsOnReference is used to store release dependencies.
+//
+//nolint:lll
 type DependsOnReference struct {
-	Name     string `json:"name"`
-	Optional bool   `json:"optional"`
+	Name     string `json:"name" jsonschema:"required,description=Uniqname (or just name if in same namespace) of dependency release"`
+	Optional bool   `json:"optional" jsonschema:"description=Whether the dependency is required to succeed or not,default=false"`
 }
 
 // UnmarshalYAML is used to implement InterfaceUnmarshaler interface of github.com/goccy/go-yaml.

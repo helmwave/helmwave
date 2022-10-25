@@ -21,7 +21,7 @@ import (
 //nolint:lll
 type Chart struct {
 	action.ChartPathOptions `json:",inline"`
-	Name                    string `json:"name" jsonschema:"title=the name,description=The name of a chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
+	Name                    string `json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
 }
 
 // UnmarshalYAML flexible config.
