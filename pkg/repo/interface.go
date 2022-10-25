@@ -39,7 +39,10 @@ func (r *Configs) UnmarshalYAML(unmarshal func(interface{}) error) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{DoNotReference: true}
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+	}
 	var l []*config
 
 	return r.Reflect(&l)
