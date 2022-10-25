@@ -1,5 +1,5 @@
 kind: New feature
-body: Allow to set kubecontext for each release via `context` field
+body: Allow to set kubecontext for each release via `context` field. Kubedog requires only one context in plan used.
 time: 2022-10-21T19:39:12.759416+03:00
 custom:
   Author: r3nic1e
