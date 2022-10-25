@@ -53,6 +53,9 @@ func (v ValuesReference) JSONSchema() *jsonschema.Schema {
 
 // UnmarshalYAML flexible config.
 func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	// render by default
+	v.Render = true
+
 	if err := unmarshal(&v.Src); err != nil {
 		type raw ValuesReference
 		if err := unmarshal((*raw)(v)); err != nil {
