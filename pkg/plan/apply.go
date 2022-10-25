@@ -168,7 +168,7 @@ func (p *Plan) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, r
 		}
 
 		for _, dep := range rel.DependsOn() {
-			dependenciesGraph.AddDependency(rel.Uniq(), dep)
+			dependenciesGraph.AddDependency(rel.Uniq(), dep.Uniq())
 		}
 	}
 

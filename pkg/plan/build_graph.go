@@ -19,7 +19,7 @@ func buildGraphMD(releases release.Configs) string {
 			md += fmt.Sprintf(
 				"\t%s[%q] --> %s[%q]\n",
 				strings.ReplaceAll(string(r.Uniq()), "@", "_"), r.Uniq(),
-				strings.ReplaceAll(string(dep), "@", "_"), string(dep),
+				strings.ReplaceAll(string(dep.Uniq()), "@", "_"), string(dep.Uniq()),
 			)
 		}
 	}
@@ -35,7 +35,7 @@ func buildGraphASCII(releases release.Configs) string {
 	for _, rel := range releases {
 		deps := make([]string, len(rel.DependsOn()))
 		for i, d := range rel.DependsOn() {
-			deps[i] = string(d)
+			deps[i] = string(d.Uniq())
 		}
 
 		l := core.NodeInput{

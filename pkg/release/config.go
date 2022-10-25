@@ -24,7 +24,7 @@ type config struct {
 	NamespaceF               string                 `json:"namespace,omitempty" jsonschema:"title=kubernetes namespace"`
 	DescriptionF             string                 `json:"description,omitempty"`
 	PendingReleaseStrategy   PendingStrategy        `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install, pending-upgrade, pending-rollback)"`
-	DependsOnF               []string               `json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
+	DependsOnF               []*DependsOnReference  `json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
 	ValuesF                  []ValuesReference      `json:"values,omitempty" jsonschema:"title=values of a release"`
 	TagsF                    []string               `json:"tags,omitempty" jsonschema:"description=tags allows you choose releases for build"`
 	PostRendererF            []string               `json:"post_renderer,omitempty"`
@@ -213,14 +213,8 @@ func (rel *config) Chart() Chart {
 	return rel.ChartF
 }
 
-func (rel *config) DependsOn() []uniqname.UniqName {
-	result := make([]uniqname.UniqName, len(rel.DependsOnF))
-
-	for i, dep := range rel.DependsOnF {
-		result[i] = uniqname.UniqName(dep)
-	}
-
-	return result
+func (rel *config) DependsOn() []*DependsOnReference {
+	return rel.DependsOnF
 }
 
 func (rel *config) Tags() []string {
@@ -258,10 +252,8 @@ func (rel *config) buildAfterUnmarshal() {
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn() {
-	res := make([]string, 0, len(rel.DependsOnF))
-
-	for _, dep := range rel.DependsOnF {
-		u, err := uniqname.GenerateWithDefaultNamespace(dep, rel.Namespace())
+	for _, dep := range rel.DependsOn() {
+		u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
 		if err != nil {
 			rel.Logger().WithError(err).WithField("dependency", dep).Error("Cannot parse dependency")
 
@@ -269,10 +261,8 @@ func (rel *config) buildAfterUnmarshalDependsOn() {
 		}
 
 		// generate full uniqname string if it was short
-		res = append(res, string(u))
+		dep.Name = string(u)
 	}
-
-	rel.DependsOnF = res
 }
 
 func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
