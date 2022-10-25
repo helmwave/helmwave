@@ -17,34 +17,34 @@ type config struct {
 	helm                     *helm.EnvSettings      `json:"-"`
 	log                      *log.Entry             `json:"-"`
 	Store                    map[string]interface{} `json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
-	ChartF                   Chart                  `json:"chart,omitempty" jsonschema:"oneof_type=string;object"`
+	ChartF                   Chart                  `json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
 	uniqName                 uniqname.UniqName      `json:"-"`
-	NameF                    string                 `json:"name,omitempty" jsonschema:"title=release name"`
-	NamespaceF               string                 `json:"namespace,omitempty" jsonschema:"title=kubernetes namespace"`
-	DescriptionF             string                 `json:"description,omitempty"`
-	PendingReleaseStrategy   PendingStrategy        `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install, pending-upgrade, pending-rollback)"`
-	DependsOnF               []*DependsOnReference  `json:"depends_on,omitempty" jsonschema:"title=Needs,description=dependencies"`
-	ValuesF                  []ValuesReference      `json:"values,omitempty" jsonschema:"title=values of a release"`
-	TagsF                    []string               `json:"tags,omitempty" jsonschema:"description=tags allows you choose releases for build"`
-	PostRendererF            []string               `json:"post_renderer,omitempty"`
-	Timeout                  time.Duration          `json:"timeout,omitempty"`
-	MaxHistory               int                    `json:"max_history,omitempty"`
-	AllowFailureF            bool                   `json:"allow_failure,omitempty"`
-	Atomic                   bool                   `json:"atomic,omitempty"`
-	CleanupOnFail            bool                   `json:"cleanup_on_fail,omitempty"`
-	CreateNamespace          bool                   `json:"create_namespace,omitempty" jsonschema:"description=will create namespace if it doesnt exits,default=false"`
-	Devel                    bool                   `json:"devel,omitempty"`
-	DisableHooks             bool                   `json:"disable_hooks,omitempty"`
-	DisableOpenAPIValidation bool                   `json:"disable_open_api_validation,omitempty"`
-	dryRun                   bool                   `json:"dry_run,omitempty"` //nolint:govet
-	Force                    bool                   `json:"force,omitempty"`
-	Recreate                 bool                   `json:"recreate,omitempty"`
-	ResetValues              bool                   `json:"reset_values,omitempty"`
-	ReuseValues              bool                   `json:"reuse_values,omitempty"`
-	SkipCRDs                 bool                   `json:"skip_crds,omitempty"`
-	SubNotes                 bool                   `json:"sub_notes,omitempty"`
-	Wait                     bool                   `json:"wait,omitempty" jsonschema:"description=prefer use true"`
-	WaitForJobs              bool                   `json:"wait_for_jobs,omitempty" jsonschema:"description=prefer use true"`
+	NameF                    string                 `json:"name,omitempty" jsonschema:"required,title=Release name"`
+	NamespaceF               string                 `json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
+	DescriptionF             string                 `json:"description,omitempty" jsonschema:"default="`
+	PendingReleaseStrategy   PendingStrategy        `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback),default="`
+	DependsOnF               []string               `json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of releases-dependencies that need to succeed before this release"`
+	ValuesF                  []ValuesReference      `json:"values,omitempty" jsonschema:"title=Values of the release"`
+	TagsF                    []string               `json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
+	PostRendererF            []string               `json:"post_renderer,omitempty" jsonschema:"description=List of postrenders to manipulate with manifests"`
+	Timeout                  time.Duration          `json:"timeout,omitempty" jsonschema:"default=5m"`
+	MaxHistory               int                    `json:"max_history,omitempty" jsonschema:"default=0"`
+	AllowFailureF            bool                   `json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
+	Atomic                   bool                   `json:"atomic,omitempty" jsonschema:"default=false"`
+	CleanupOnFail            bool                   `json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
+	CreateNamespace          bool                   `json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exits,default=false"`
+	Devel                    bool                   `json:"devel,omitempty" jsonschema:"default=false"`
+	DisableHooks             bool                   `json:"disable_hooks,omitempty" jsonschema:"default=false"`
+	DisableOpenAPIValidation bool                   `json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
+	dryRun                   bool                   `json:"dry_run,omitempty" jsonschema:"default=false"` //nolint:govet
+	Force                    bool                   `json:"force,omitempty" jsonschema:"default=false"`
+	Recreate                 bool                   `json:"recreate,omitempty" jsonschema:"default=false"`
+	ResetValues              bool                   `json:"reset_values,omitempty" jsonschema:"default=false"`
+	ReuseValues              bool                   `json:"reuse_values,omitempty" jsonschema:"default=false"`
+	SkipCRDs                 bool                   `json:"skip_crds,omitempty" jsonschema:"default=false"`
+	SubNotes                 bool                   `json:"sub_notes,omitempty" jsonschema:"default=false"`
+	Wait                     bool                   `json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
+	WaitForJobs              bool                   `json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
 }
 
 func (rel *config) DryRun(b bool) {

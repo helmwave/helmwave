@@ -5,8 +5,19 @@ import (
 
 	"helm.sh/helm/v3/pkg/repo"
 
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 )
+
+func (Configs) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+	}
+	var l []*config
+
+	return r.Reflect(&l)
+}
 
 //nolint:lll
 type config struct {

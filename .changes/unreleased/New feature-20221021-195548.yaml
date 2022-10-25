@@ -1,0 +1,6 @@
+kind: New feature
+body: Add descriptions, enum, defaults, patterns to jsonschema
+time: 2022-10-21T19:55:48.911002+03:00
+custom:
+  Author: r3nic1e
+  Issue: "488"

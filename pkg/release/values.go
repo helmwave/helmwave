@@ -11,7 +11,9 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
+	"github.com/stoewer/go-strcase"
 )
 
 // ErrSkipValues is returned when values cannot be used and are skipped.
@@ -19,12 +21,35 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src            string `json:"src"`
-	Dst            string `json:"dst"`
-	DelimiterLeft  string `json:"delimiter_left,omitempty"`
-	DelimiterRight string `json:"delimiter_right,omitempty"`
-	Strict         bool   `json:"strict"`
-	Render         bool   `json:"render"`
+<<<<<<< HEAD
+	Src    string `json:"src" jsonschema:"required,description=Source of values. Can be local path or go-getter URI"`
+	Dst    string `json:"dst"`
+	DelimiterLeft  string `json:"delimiter_left,omitempty" jsonschema:"Set left delimiter for template engine,default={{"`
+	DelimiterRight string `json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
+	Strict bool   `json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
+	Render bool   `json:"render" jsonschema:"description=Whether to use templater to render values,default=true"`
+}
+
+func (v ValuesReference) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+		KeyNamer:                   strcase.SnakeCase, // for action.ChartPathOptions
+	}
+
+	type values ValuesReference
+	schema := r.Reflect(values(v))
+	schema.OneOf = []*jsonschema.Schema{
+		{
+			Type: "string",
+		},
+		{
+			Type: "object",
+		},
+	}
+	schema.Type = ""
+
+	return schema
 }
 
 // UnmarshalYAML flexible config.
