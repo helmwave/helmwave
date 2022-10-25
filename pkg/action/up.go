@@ -30,7 +30,7 @@ func (i *Up) Run(ctx context.Context) error {
 		i.warnOnBuildFlags(ctx)
 	}
 
-	p, err := plan.NewAndImport(i.build.plandir)
+	p, err := plan.NewAndImport(ctx, i.build.plandir)
 	if err != nil {
 		return err
 	}

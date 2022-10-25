@@ -3,23 +3,11 @@ package repo
 import (
 	"errors"
 
-	"github.com/invopop/jsonschema"
 	"helm.sh/helm/v3/pkg/repo"
 
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
-
-// Configs type of array Config.
-type Configs []Config
-
-// UnmarshalYAML parse Config.
-func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
-	var err error
-	*r, err = UnmarshalYAML(node)
-
-	return err
-}
 
 func (Configs) JSONSchema() *jsonschema.Schema {
 	r := &jsonschema.Reflector{
@@ -33,9 +21,9 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 
 //nolint:lll
 type config struct {
-	log        *log.Entry `yaml:"-" json:"-"`
-	repo.Entry `yaml:",inline"`
-	Force      bool `yaml:"force" json:"force" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
+	log        *log.Entry `json:"-"`
+	repo.Entry `json:",inline"`
+	Force      bool `json:"force" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }
 
 func (c *config) Name() string {

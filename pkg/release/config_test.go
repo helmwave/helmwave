@@ -3,10 +3,10 @@ package release_test
 import (
 	"testing"
 
+	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/yaml.v3"
 )
 
 type ConfigTestSuite struct {
@@ -33,7 +33,12 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r := release.NewConfig()
 
 	r.NamespaceF = "testns"
-	r.DependsOnF = []string{"bla", "blabla@testns", "blablabla@testtestns", "---=-=-==-@kk;'[["}
+	r.DependsOnF = []*release.DependsOnReference{
+		{Name: "bla"},
+		{Name: "blabla@testns"},
+		{Name: "blablabla@testtestns"},
+		{Name: "---=-=-==-@kk;'[["},
+	}
 
 	r.BuildAfterUnmarshal()
 

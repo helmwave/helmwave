@@ -34,7 +34,7 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 
 	ts.Require().NoError(y.Run(context.Background()))
 
-	b, err := plan.NewBody(y.file)
+	b, err := plan.NewBody(context.Background(), y.file)
 	ts.Require().NoError(err)
 
 	ts.Require().Equal(value, b.Project)

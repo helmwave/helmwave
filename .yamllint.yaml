@@ -2,14 +2,15 @@
 locale: en_US.UTF-8
 
 yaml-files:
-- '*.yaml'
-- '*.yml'
+  - "*.yaml"
+  - "*.yml"
 # - '*.yml.tpl'
 
 ignore: |
   .helmwave/
   tests/
-  
+  .changie.yaml
+  .github
 
 # See: https://yamllint.readthedocs.io/en/stable/rules.html
 rules:

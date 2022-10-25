@@ -14,7 +14,7 @@ type Validate struct {
 
 // Run is main function for 'validate' command.
 func (l *Validate) Run(ctx context.Context) error {
-	p, err := plan.NewAndImport(l.plandir)
+	p, err := plan.NewAndImport(ctx, l.plandir)
 	if err != nil {
 		return err
 	}

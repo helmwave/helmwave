@@ -7,7 +7,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	"gopkg.in/yaml.v3"
+	"github.com/invopop/jsonschema"
 	"helm.sh/helm/v3/pkg/release"
 )
 
@@ -21,6 +21,7 @@ type Config interface {
 	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error
+	DownloadChart(string) error
 	BuildValues(string, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get() (*release.Release, error)
@@ -30,25 +31,36 @@ type Config interface {
 	Name() string
 	Namespace() string
 	Chart() Chart
-	DependsOn() []uniqname.UniqName
+	SetChart(string)
+	DependsOn() []*DependsOnReference
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
 	HelmWait() bool
 }
 
-// UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.
-func UnmarshalYAML(node *yaml.Node) ([]Config, error) {
-	r := make([]*config, 0)
-	if err := node.Decode(&r); err != nil {
-		return nil, fmt.Errorf("failed to decode release config from YAML: %w", err)
+// Configs type of array Config.
+type Configs []Config
+
+// UnmarshalYAML is an unmarshaller for github.com/goccy/go-yaml to parse YAML into `Config` interface.
+func (r *Configs) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	rr := make([]*config, 0)
+	if err := unmarshal(&rr); err != nil {
+		return fmt.Errorf("failed to decode registry config from YAML: %w", err)
 	}
 
-	res := make([]Config, len(r))
-	for i := range r {
-		r[i].buildAfterUnmarshal()
-		res[i] = r[i]
+	*r = make([]Config, len(rr))
+	for i := range rr {
+		rr[i].buildAfterUnmarshal()
+		(*r)[i] = rr[i]
 	}
 
-	return res, nil
+	return nil
+}
+
+func (Configs) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{DoNotReference: true}
+	var l []*config
+
+	return r.Reflect(&l)
 }
