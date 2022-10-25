@@ -2,6 +2,7 @@ package release
 
 import (
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -18,18 +19,19 @@ type config struct {
 	log                      *log.Entry             `json:"-"`
 	Store                    map[string]interface{} `json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
 	ChartF                   Chart                  `json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
+	PendingReleaseStrategy   PendingStrategy        `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback),default="`
 	uniqName                 uniqname.UniqName      `json:"-"`
 	NameF                    string                 `json:"name,omitempty" jsonschema:"required,title=Release name"`
 	NamespaceF               string                 `json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
 	DescriptionF             string                 `json:"description,omitempty" jsonschema:"default="`
 	KubeContextF             string                 `json:"context,omitempty"`
-	PendingReleaseStrategy   PendingStrategy        `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback),default="`
-	DependsOnF               []*DependsOnReference  `json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of releases-dependencies that need to succeed before this release"`
+	DependsOnF               []*DependsOnReference  `json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
 	ValuesF                  []ValuesReference      `json:"values,omitempty" jsonschema:"title=Values of the release"`
 	TagsF                    []string               `json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
 	PostRendererF            []string               `json:"post_renderer,omitempty" jsonschema:"description=List of postrenders to manipulate with manifests"`
-	Timeout                  time.Duration          `json:"timeout,omitempty" jsonschema:"default=5m"`
 	MaxHistory               int                    `json:"max_history,omitempty" jsonschema:"default=0"`
+	Timeout                  time.Duration          `json:"timeout,omitempty" jsonschema:"default=5m"`
+	lock                     sync.RWMutex           `json:"-"`
 	AllowFailureF            bool                   `json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
 	Atomic                   bool                   `json:"atomic,omitempty" jsonschema:"default=false"`
 	CleanupOnFail            bool                   `json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
@@ -190,10 +192,16 @@ func (rel *config) Description() string {
 }
 
 func (rel *config) Chart() Chart {
+	rel.lock.RLock()
+	defer rel.lock.RUnlock()
+
 	return rel.ChartF
 }
 
 func (rel *config) DependsOn() []*DependsOnReference {
+	rel.lock.RLock()
+	defer rel.lock.RUnlock()
+
 	return rel.DependsOnF
 }
 
@@ -232,6 +240,8 @@ func (rel *config) buildAfterUnmarshal() {
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn() {
+	deps := make([]*DependsOnReference, 0)
+
 	for _, dep := range rel.DependsOn() {
 		u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
 		if err != nil {
@@ -242,7 +252,13 @@ func (rel *config) buildAfterUnmarshalDependsOn() {
 
 		// generate full uniqname string if it was short
 		dep.Name = u.String()
+
+		deps = append(deps, dep)
 	}
+
+	rel.lock.Lock()
+	rel.DependsOnF = deps
+	rel.lock.Unlock()
 }
 
 func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
@@ -255,4 +271,18 @@ func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
 
 func (rel *config) KubeContext() string {
 	return rel.KubeContextF
+}
+
+// MarshalYAML is a marshaller for github.com/goccy/go-yaml.
+// It is required to avoid data race with getting read lock.
+//
+//nolint:govet
+func (rel *config) MarshalYAML() (interface{}, error) {
+	rel.lock.RLock()
+	defer rel.lock.RUnlock()
+
+	type raw config
+	r := raw(*rel)
+
+	return r, nil
 }
