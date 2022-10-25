@@ -144,6 +144,10 @@ func (r *MockReleaseConfig) DownloadChart(string) error {
 
 func (r *MockReleaseConfig) SetChart(string) {}
 
+func (r *MockReleaseConfig) KubeContext() string {
+	return r.Called().String(0)
+}
+
 type MockRepoConfig struct {
 	mock.Mock
 }
