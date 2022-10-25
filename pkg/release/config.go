@@ -2,7 +2,6 @@ package release
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -50,26 +49,6 @@ type config struct {
 
 func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
-}
-
-// Chart is structure for chart download options.
-//
-//nolint:lll
-type Chart struct {
-	action.ChartPathOptions `json:",inline"`
-	Name                    string `json:"name" jsonschema:"title=the name,description=The name of a chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
-}
-
-// UnmarshalYAML flexible config.
-func (u *Chart) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	if err := unmarshal(&u.Name); err != nil {
-		type raw Chart
-		if err := unmarshal((*raw)(u)); err != nil {
-			return fmt.Errorf("failed to decode chart from YAML: %w", err)
-		}
-	}
-
-	return nil
 }
 
 func (rel *config) newInstall() *action.Install {
@@ -261,7 +240,7 @@ func (rel *config) buildAfterUnmarshalDependsOn() {
 		}
 
 		// generate full uniqname string if it was short
-		dep.Name = string(u)
+		dep.Name = u.String()
 	}
 }
 

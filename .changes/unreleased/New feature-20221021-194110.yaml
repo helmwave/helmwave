@@ -1,0 +1,6 @@
+kind: New feature
+body: Store remote charts in plandir and use them for apply
+time: 2022-10-21T19:41:10.579692+03:00
+custom:
+  Author: r3nic1e
+  Issue: "422"

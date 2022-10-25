@@ -130,12 +130,12 @@ func (p *planBody) ValidateReleases() error {
 		}
 
 		if err := r.Uniq().Validate(); err != nil {
-			return errors.New("bad uniqname: " + string(r.Uniq()))
+			return errors.New("bad uniqname: " + r.Uniq().String())
 		}
 
 		a[r.Uniq()]++
 		if a[r.Uniq()] > 1 {
-			return errors.New("release duplicate: " + string(r.Uniq()))
+			return errors.New("release duplicate: " + r.Uniq().String())
 		}
 	}
 

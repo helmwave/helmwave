@@ -73,7 +73,7 @@ func NewAndImport(ctx context.Context, src string) (p *Plan, err error) {
 func (p *Plan) Logger() *log.Entry {
 	a := make([]string, 0, len(p.body.Releases))
 	for _, r := range p.body.Releases {
-		a = append(a, string(r.Uniq()))
+		a = append(a, r.Uniq().String())
 	}
 
 	b := make([]string, 0, len(p.body.Repositories))
@@ -140,8 +140,14 @@ func NewBody(ctx context.Context, file string) (*planBody, error) {
 
 // New returns empty *Plan for provided directory.
 func New(dir string) *Plan {
+	tmpDir, err := os.MkdirTemp("", "")
+	if err != nil {
+		log.WithError(err).Warn("failed to create temporary directory")
+		tmpDir = os.TempDir()
+	}
+
 	plan := &Plan{
-		tmpDir:    os.TempDir(),
+		tmpDir:    tmpDir,
 		dir:       dir,
 		fullPath:  filepath.Join(dir, File),
 		manifests: make(map[uniqname.UniqName]string),

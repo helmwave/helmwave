@@ -21,6 +21,7 @@ type Config interface {
 	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error
+	DownloadChart(string) error
 	BuildValues(string, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get() (*release.Release, error)
@@ -30,6 +31,7 @@ type Config interface {
 	Name() string
 	Namespace() string
 	Chart() Chart
+	SetChart(string)
 	DependsOn() []*DependsOnReference
 	Tags() []string
 	Repo() string

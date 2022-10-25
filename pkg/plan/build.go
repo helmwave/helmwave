@@ -34,6 +34,12 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 	p.graphMD = buildGraphMD(p.body.Releases)
 	log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases))
 
+	log.Info("Building charts...")
+	err = p.buildCharts()
+	if err != nil {
+		return err
+	}
+
 	// Build Values
 	log.Info("Building values...")
 	err = p.buildValues()
