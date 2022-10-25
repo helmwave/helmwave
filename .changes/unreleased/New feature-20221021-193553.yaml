@@ -1,0 +1,6 @@
+kind: New feature
+body: Allow to set `delimiter_left` and `delimiter_right` for each values file
+time: 2022-10-21T19:35:53.325502+03:00
+custom:
+  Author: r3nic1e
+  Issue: "453"

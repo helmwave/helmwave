@@ -19,10 +19,12 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src    string `json:"src"`
-	Dst    string `json:"dst"`
-	Strict bool   `json:"strict"`
-	Render bool   `json:"render"`
+	Src            string `json:"src"`
+	Dst            string `json:"dst"`
+	DelimiterLeft  string `json:"delimiter_left,omitempty"`
+	DelimiterRight string `json:"delimiter_right,omitempty"`
+	Strict         bool   `json:"strict"`
+	Render         bool   `json:"render"`
 }
 
 // UnmarshalYAML flexible config.
@@ -120,10 +122,11 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 		return err
 	}
 
+	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
 	if v.isURL() {
-		err = template.Tpl2yml(v.Dst, v.Dst, data, templater)
+		err = template.Tpl2yml(v.Dst, v.Dst, data, templater, delimOption)
 	} else {
-		err = template.Tpl2yml(v.Src, v.Dst, data, templater)
+		err = template.Tpl2yml(v.Src, v.Dst, data, templater, delimOption)
 	}
 
 	if err != nil {

@@ -29,15 +29,18 @@ var (
 	}
 )
 
-type sprigTemplater struct{}
+type sprigTemplater struct {
+	delimiterLeft, delimiterRight string
+}
 
 func (t sprigTemplater) Name() string {
 	return "sprig"
 }
 
+//nolint:dupl
 func (t sprigTemplater) Render(src string, data interface{}) ([]byte, error) {
 	funcs := t.funcMap()
-	tpl, err := template.New("tpl").Funcs(funcs).Parse(src)
+	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -70,4 +73,9 @@ func addToMap(dst, src template.FuncMap) {
 	for k, v := range src {
 		dst[k] = v
 	}
+}
+
+func (t *sprigTemplater) Delims(left, right string) {
+	t.delimiterLeft = left
+	t.delimiterRight = right
 }
