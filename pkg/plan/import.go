@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -13,8 +14,8 @@ import (
 )
 
 // Import parses directory with plan files and imports them into structure.
-func (p *Plan) Import() error {
-	body, err := NewBody(p.fullPath)
+func (p *Plan) Import(ctx context.Context) error {
+	body, err := NewBody(ctx, p.fullPath)
 	if err != nil {
 		return err
 	}

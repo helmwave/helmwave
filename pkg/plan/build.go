@@ -7,11 +7,13 @@ import (
 )
 
 // Build plan with yml and tags/matchALL options.
+//
+//nolint:funlen
 func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bool, templater string) error {
 	p.templater = templater
 
 	// Create Body
-	body, err := NewBody(yml)
+	body, err := NewBody(ctx, yml)
 	if err != nil {
 		return err
 	}
@@ -19,7 +21,10 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 
 	// Build Releases
 	log.Info("Building releases...")
-	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
+	p.body.Releases, err = buildReleases(tags, p.body.Releases, matchAll)
+	if err != nil {
+		return err
+	}
 	if len(p.body.Releases) == 0 {
 		return nil
 	}
@@ -28,6 +33,12 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 	log.Info("Building graphs...")
 	p.graphMD = buildGraphMD(p.body.Releases)
 	log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases))
+
+	log.Info("Building charts...")
+	err = p.buildCharts()
+	if err != nil {
+		return err
+	}
 
 	// Build Values
 	log.Info("Building values...")

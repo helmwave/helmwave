@@ -21,7 +21,7 @@ func (i *Down) Run(ctx context.Context) error {
 		}
 	}
 
-	p, err := plan.NewAndImport(i.build.plandir)
+	p, err := plan.NewAndImport(ctx, i.build.plandir)
 	if err != nil {
 		return err
 	}

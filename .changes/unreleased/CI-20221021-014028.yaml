@@ -1,0 +1,6 @@
+kind: CI
+body: Force all release PRs to have changelog
+time: 2022-10-21T01:40:28.623917+03:00
+custom:
+  Author: r3nic1e
+  Issue: ""

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/invopop/jsonschema"
 	"helm.sh/helm/v3/pkg/release"
 )
 
@@ -19,6 +20,17 @@ const (
 
 // ErrPendingRelease is an error for fail strategy that release is in pending status.
 var ErrPendingRelease = errors.New("release is in pending status")
+
+func (PendingStrategy) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type: "string",
+		Enum: []interface{}{
+			PendingStrategyRollback,
+			PendingStrategyUninstall,
+			"",
+		},
+	}
+}
 
 func (rel *config) isPending() (bool, error) {
 	status, err := rel.Status()
