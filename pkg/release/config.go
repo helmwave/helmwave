@@ -198,6 +198,9 @@ func (rel *config) Chart() Chart {
 }
 
 func (rel *config) DependsOn() []*DependsOnReference {
+	rel.lock.RLock()
+	defer rel.lock.RUnlock()
+
 	return rel.DependsOnF
 }
 
@@ -236,6 +239,8 @@ func (rel *config) buildAfterUnmarshal() {
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn() {
+	deps := make([]*DependsOnReference, 0)
+
 	for _, dep := range rel.DependsOn() {
 		u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
 		if err != nil {
@@ -246,7 +251,13 @@ func (rel *config) buildAfterUnmarshalDependsOn() {
 
 		// generate full uniqname string if it was short
 		dep.Name = u.String()
+
+		deps = append(deps, dep)
 	}
+
+	rel.lock.Lock()
+	rel.DependsOnF = deps
+	rel.lock.Unlock()
 }
 
 func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
