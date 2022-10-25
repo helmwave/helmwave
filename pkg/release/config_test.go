@@ -40,7 +40,7 @@ func (s *ConfigTestSuite) TestDependsOn() {
 		{Name: "---=-=-==-@kk;'[["},
 	}
 
-	r.BuildAfterUnmarshal()
+	r.BuildAfterUnmarshal(r)
 
 	expected := []*release.DependsOnReference{
 		{Name: "bla@testns"},

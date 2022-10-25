@@ -17,6 +17,6 @@ func (rel *config) IsDryRun() bool {
 	return rel.dryRun
 }
 
-func (rel *config) BuildAfterUnmarshal() {
-	rel.buildAfterUnmarshal()
+func (rel *config) BuildAfterUnmarshal(releases ...*config) {
+	rel.buildAfterUnmarshal(releases)
 }

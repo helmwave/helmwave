@@ -51,7 +51,7 @@ func (r *Configs) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	*r = make([]Config, len(rr))
 	for i := range rr {
-		rr[i].buildAfterUnmarshal()
+		rr[i].buildAfterUnmarshal(rr)
 		(*r)[i] = rr[i]
 	}
 
