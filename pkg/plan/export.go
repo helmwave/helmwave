@@ -43,11 +43,6 @@ func (p *Plan) Export(ctx context.Context) error {
 		if err := p.exportValues(); err != nil {
 			wg.ErrChan() <- err
 		}
-
-		// Save Planfile after values
-		if err := helper.SaveInterface(ctx, p.fullPath, p.body); err != nil {
-			wg.ErrChan() <- err
-		}
 	}()
 	go func() {
 		defer wg.Done()
@@ -56,7 +51,13 @@ func (p *Plan) Export(ctx context.Context) error {
 		}
 	}()
 
-	return wg.Wait()
+	err := wg.Wait()
+	if err != nil {
+		return err
+	}
+
+	// Save Planfile after everything is exported
+	return helper.SaveInterface(ctx, p.fullPath, p.body)
 }
 
 func (p *Plan) exportCharts() error {
