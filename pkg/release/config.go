@@ -23,7 +23,7 @@ type config struct {
 	NamespaceF               string                 `json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
 	DescriptionF             string                 `json:"description,omitempty" jsonschema:"default="`
 	PendingReleaseStrategy   PendingStrategy        `json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback),default="`
-	DependsOnF               []string               `json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of releases-dependencies that need to succeed before this release"`
+	DependsOnF               []*DependsOnReference  `json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of releases-dependencies that need to succeed before this release"`
 	ValuesF                  []ValuesReference      `json:"values,omitempty" jsonschema:"title=Values of the release"`
 	TagsF                    []string               `json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
 	PostRendererF            []string               `json:"post_renderer,omitempty" jsonschema:"description=List of postrenders to manipulate with manifests"`

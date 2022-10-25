@@ -1,31 +1,8 @@
 package registry
 
 import (
-	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
-
-// Configs type of array Config.
-type Configs []Config
-
-// UnmarshalYAML parse Config.
-func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
-	var err error
-	*r, err = UnmarshalYAML(node)
-
-	return err
-}
-
-func (Configs) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{
-		DoNotReference:             true,
-		RequiredFromJSONSchemaTags: true,
-	}
-	var l []*config
-
-	return r.Reflect(&l)
-}
 
 // config is main registry config.
 //
