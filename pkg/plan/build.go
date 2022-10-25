@@ -21,7 +21,10 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 
 	// Build Releases
 	log.Info("Building releases...")
-	p.body.Releases = buildReleases(tags, p.body.Releases, matchAll)
+	p.body.Releases, err = buildReleases(tags, p.body.Releases, matchAll)
+	if err != nil {
+		return err
+	}
 	if len(p.body.Releases) == 0 {
 		return nil
 	}

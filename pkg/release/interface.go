@@ -32,7 +32,7 @@ type Config interface {
 	Namespace() string
 	Chart() Chart
 	SetChart(string)
-	DependsOn() []uniqname.UniqName
+	DependsOn() []*DependsOnReference
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
