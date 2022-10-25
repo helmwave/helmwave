@@ -11,6 +11,7 @@ output:
 linters:
   enable-all: true
   disable:
+    - contextcheck # we don't need contexts everywhere
     - deadcode # deprecated
     - exhaustivestruct # deprecated
     - exhaustruct # it requires to initialize billions of fields, I ain't monkey to fix these

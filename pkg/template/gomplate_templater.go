@@ -11,15 +11,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type gomplateTemplater struct{}
+type gomplateTemplater struct {
+	delimiterLeft, delimiterRight string
+}
 
 func (t gomplateTemplater) Name() string {
 	return "gomplate"
 }
 
+//nolint:dupl
 func (t gomplateTemplater) Render(src string, data interface{}) ([]byte, error) {
 	funcs := t.funcMap()
-	tpl, err := template.New("tpl").Funcs(funcs).Parse(src)
+	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -44,4 +47,9 @@ func (t gomplateTemplater) funcMap() template.FuncMap {
 	addToMap(funcMap, customFuncs)
 
 	return funcMap
+}
+
+func (t *gomplateTemplater) Delims(left, right string) {
+	t.delimiterLeft = left
+	t.delimiterRight = right
 }

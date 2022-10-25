@@ -12,14 +12,13 @@ on:
 jobs:
   tagger:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     permissions:
-      contents: write
+      contents: write # to create new tag
     steps:
       - name: Create tag
-        id: tag
+        id: create
         uses: actions/github-script@v6
-        if: github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/')
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/')
         with:
           github-token: ${{ github.token }}
           script: |
@@ -40,50 +39,86 @@ jobs:
             })
             return tag
           result-encoding: string
-    outputs:
-      tag: ${{ steps.tag.outputs.result }}
 
-  get-tag:
-    runs-on: ubuntu-latest
-    if: success() || needs.tagger.result == 'skipped'
-    needs:
-      - tagger
-    steps:
-      - name: get pushed tag
-        id: pushed
-        if: needs.tagger.result != 'success'
-        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
-
-      - name: get created tag
-        id: created
-        run: echo "::set-output name=tag::$TAG"
-        if: needs.tagger.result == 'success'
-        env:
-          TAG: "${{ needs.tagger.outputs.tag }}"
+      - name: Get pushed tag
+        id: push
+        if: github.event_name == 'push'
+        run: echo "result=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
 
       - name: combine tags
         id: combined
-        run: echo "::set-output name=tag::$CREATED$PUSHED"
+        run: echo "tag=${PUSHED_TAG}${CREATED_TAG}" >> $GITHUB_OUTPUT
         env:
-          CREATED: ${{ steps.created.outputs.tag }}
-          PUSHED: ${{ steps.pushed.outputs.tag }}
+          CREATED_TAG: ${{ steps.tag.outputs.result }}
+          PUSHED_TAG: ${{ steps.push.outputs.result }}
     outputs:
       tag: ${{ steps.combined.outputs.tag }}
 
-  goreleaser:
+  generate-changelog:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # releases are in `contents`
-      issues: write # for closing milestones
-      packages: write
-    if: always() # otherwise it will skip if tagger is skipped
+      contents: write # to commit merged changelog
     needs:
-      - get-tag
+      - tagger
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: ${{ needs.get-tag.outputs.tag }}
+          ref: main
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download changie
+        run: go install github.com/miniscruff/changie@v1
+
+      - name: Generate release changelog
+        run: changie batch $TAG
+        env:
+          TAG: ${{ needs.tagger.outputs.tag }}
+
+      - name: Upload changelog artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: changelog
+          path: .changes/${{ needs.tagger.outputs.tag }}.md
+
+      - name: Merge changelog
+        run: changie merge
+
+      - name: Commit changelog changes
+        uses: EndBug/add-and-commit@v9
+        if: "!contains(needs.tagger.outputs.tag, 'rc')"
+        with:
+          default_author: github_actions
+          message: "chore: update changelog"
+          add: "CHANGELOG.md .changes"
+
+  goreleaser:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to create release
+      issues: write # to close milestone
+      packages: write # to upload package
+    needs:
+      - tagger
+      - generate-changelog
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.tagger.outputs.tag }}
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
@@ -118,11 +153,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Download changelog artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: changelog
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
           version: latest
-          args: release --rm-dist
+          args: release --skip-validate --rm-dist --release-notes ${{ needs.tagger.outputs.tag }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
@@ -130,6 +170,7 @@ jobs:
 
       - name: Generate schema.json
         run: ./dist/helmwave_linux_amd64_v1/helmwave schema > schema.json
+
       - name: Upload schema.json
         uses: xresloader/upload-to-github-release@v1
         env:
@@ -140,12 +181,8 @@ jobs:
 
   docs:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
-    if: always() # otherwise it will skip if tagger is skipped
     needs:
-      - get-tag
-      - goreleaser
+      - tagger
     steps:
       - name: Trigger helmwave/docs workflow
         uses: actions/github-script@v6
@@ -162,4 +199,4 @@ jobs:
               },
             })
         env:
-          GITHUB_TAG: ${{ needs.get-tag.outputs.tag }}
+          GITHUB_TAG: ${{ needs.tagger.outputs.tag }}

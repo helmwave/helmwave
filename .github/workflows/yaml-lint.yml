@@ -1,20 +1,21 @@
 name: yamllint
 
-
 on:
   push:
     paths:
-    - "**.yaml"
-    - "**.yml"
+      - "**.yaml"
+      - "**.yml"
 
 jobs:
   yamllint:
     name: yamllint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - uses: karancode/yamllint-github-action@master
-      with:
-        yamllint_config_filepath: .yamllint.yaml
-      env:
-        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v3
+
+      - uses: karancode/yamllint-github-action@master
+        with:
+          yamllint_config_filepath: .yamllint.yaml
+          yamllint_comment: true
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}

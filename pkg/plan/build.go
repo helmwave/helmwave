@@ -13,7 +13,7 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 	p.templater = templater
 
 	// Create Body
-	body, err := NewBody(yml)
+	body, err := NewBody(ctx, yml)
 	if err != nil {
 		return err
 	}
@@ -33,6 +33,12 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 	log.Info("Building graphs...")
 	p.graphMD = buildGraphMD(p.body.Releases)
 	log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases))
+
+	log.Info("Building charts...")
+	err = p.buildCharts()
+	if err != nil {
+		return err
+	}
 
 	// Build Values
 	log.Info("Building values...")
