@@ -21,7 +21,7 @@ func (i *Rollback) Run(ctx context.Context) error {
 			return err
 		}
 	}
-	p, err := plan.NewAndImport(i.build.plandir)
+	p, err := plan.NewAndImport(ctx, i.build.plandir)
 	if err != nil {
 		return err
 	}

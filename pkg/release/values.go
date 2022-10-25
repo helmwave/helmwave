@@ -12,7 +12,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
 
 // ErrSkipValues is returned when values cannot be used and are skipped.
@@ -20,36 +19,25 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src    string `yaml:"src" json:"src"`
-	Dst    string `yaml:"dst" json:"dst"`
-	Strict bool   `yaml:"strict" json:"strict"`
-	Render bool   `yaml:"render" json:"render"`
+	Src    string `json:"src"`
+	Dst    string `json:"dst"`
+	Strict bool   `json:"strict"`
+	Render bool   `json:"render"`
 }
 
-// UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
-func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
-	v.Render = true // we render values by default
-
-	type raw ValuesReference
-	var err error
-	switch node.Kind {
-	// single value or reference to another value
-	case yaml.ScalarNode, yaml.AliasNode:
-		err = node.Decode(&v.Src)
-	case yaml.MappingNode:
-		err = node.Decode((*raw)(v))
-	default:
-		err = fmt.Errorf("unknown format")
-	}
-
-	if err != nil {
-		return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
+// UnmarshalYAML flexible config.
+func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	if err := unmarshal(&v.Src); err != nil {
+		type raw ValuesReference
+		if err := unmarshal((*raw)(v)); err != nil {
+			return fmt.Errorf("failed to decode values reference from YAML: %w", err)
+		}
 	}
 
 	return nil
 }
 
-// MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v3.
+// MarshalYAML is used to implement Marshaler interface of github.com/goccy/go-yaml.
 func (v ValuesReference) MarshalYAML() (interface{}, error) {
 	return struct {
 		Src string

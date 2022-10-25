@@ -23,7 +23,7 @@ func (d *DiffLocalPlan) Run(ctx context.Context) error {
 	}
 
 	// Plan 1
-	plan1, err := plan.NewAndImport(d.plandir1)
+	plan1, err := plan.NewAndImport(ctx, d.plandir1)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func (d *DiffLocalPlan) Run(ctx context.Context) error {
 	}
 
 	// Plan 2
-	plan2, err := plan.NewAndImport(d.plandir2)
+	plan2, err := plan.NewAndImport(ctx, d.plandir2)
 	if err != nil {
 		return err
 	}
