@@ -47,7 +47,7 @@ type Configs []Config
 func (r *Configs) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	rr := make([]*config, 0)
 	if err := unmarshal(&rr); err != nil {
-		return fmt.Errorf("failed to decode registry config from YAML: %w", err)
+		return fmt.Errorf("failed to decode release config from YAML: %w", err)
 	}
 
 	*r = make([]Config, len(rr))
