@@ -142,5 +142,7 @@ func (rel *config) DownloadChart(tmpDir string) error {
 }
 
 func (rel *config) SetChart(name string) {
+	rel.lock.Lock()
 	rel.ChartF.Name = name
+	rel.lock.Unlock()
 }
