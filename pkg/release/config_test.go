@@ -42,10 +42,10 @@ func (s *ConfigTestSuite) TestDependsOn() {
 
 	r.BuildAfterUnmarshal()
 
-	expected := []uniqname.UniqName{
-		uniqname.UniqName("bla@testns"),
-		uniqname.UniqName("blabla@testns"),
-		uniqname.UniqName("blablabla@testtestns"),
+	expected := []*release.DependsOnReference{
+		{Name: "bla@testns"},
+		{Name: "blabla@testns"},
+		{Name: "blablabla@testtestns"},
 	}
 	s.Require().ElementsMatch(r.DependsOn(), expected)
 }
@@ -85,7 +85,7 @@ func (s *ChartTestSuite) TestUnmarshalYAMLInvalid() {
 	str := "[1, 2, 3]"
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().ErrorContains(err, "unknown format")
+	s.Require().ErrorContains(err, "failed to decode chart from YAML")
 }
 
 func TestConfigTestSuite(t *testing.T) {
