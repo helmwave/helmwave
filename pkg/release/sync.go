@@ -22,7 +22,7 @@ func (rel *config) SyncDryRun(ctx context.Context) (*release.Release, error) {
 }
 
 func (rel *config) Cfg() *action.Configuration {
-	cfg, err := helper.NewCfg(rel.Namespace())
+	cfg, err := helper.NewCfg(rel.Namespace(), rel.KubeContext())
 	if err != nil {
 		rel.Logger().Fatal(err)
 

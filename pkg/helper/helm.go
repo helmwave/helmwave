@@ -44,14 +44,18 @@ func wrapConfigFn(client *rest.Config) *rest.Config {
 	return client
 }
 
-// NewCfg creates helm internal configuration for provided namespace.
-func NewCfg(ns string) (*action.Configuration, error) {
+// NewCfg creates helm internal configuration for provided namespace and kubecontext.
+func NewCfg(ns string, kubecontext string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER") // TODO: get rid of getenv in runtime
 	config := genericclioptions.NewConfigFlags(false)
 	config.WrapConfigFn = wrapConfigFn
 	config.Namespace = &ns
-	config.Context = &Helm.KubeContext
+	if kubecontext != "" {
+		config.Context = &kubecontext
+	} else {
+		config.Context = &Helm.KubeContext
+	}
 
 	if Helm.Debug {
 		helmLogLevel = log.Infof

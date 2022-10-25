@@ -37,6 +37,7 @@ type Config interface {
 	Repo() string
 	Values() []ValuesReference
 	HelmWait() bool
+	KubeContext() string
 }
 
 // Configs type of array Config.

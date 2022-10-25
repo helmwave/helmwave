@@ -25,6 +25,7 @@ type config struct {
 	NameF                    string                 `json:"name,omitempty" jsonschema:"required,title=Release name"`
 	NamespaceF               string                 `json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
 	DescriptionF             string                 `json:"description,omitempty" jsonschema:"default="`
+	KubeContextF             string                 `json:"context,omitempty"`
 	DependsOnF               []*DependsOnReference  `json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
 	ValuesF                  []ValuesReference      `json:"values,omitempty" jsonschema:"title=Values of the release"`
 	TagsF                    []string               `json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
@@ -290,6 +291,10 @@ func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
 	}
 
 	return postrender.NewExec(rel.PostRendererF[0], rel.PostRendererF[1:]...) //nolint:wrapcheck
+}
+
+func (rel *config) KubeContext() string {
+	return rel.KubeContextF
 }
 
 // MarshalYAML is a marshaller for github.com/goccy/go-yaml.
