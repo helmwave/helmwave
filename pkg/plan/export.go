@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,7 +12,7 @@ import (
 )
 
 // Export allows save plan to file.
-func (p *Plan) Export() error {
+func (p *Plan) Export(ctx context.Context) error {
 	if err := os.RemoveAll(p.dir); err != nil {
 		return fmt.Errorf("failed to clean plan directory %s: %w", p.dir, err)
 	}
@@ -32,7 +33,7 @@ func (p *Plan) Export() error {
 		}
 
 		// Save Planfile after values
-		if err := helper.SaveInterface(p.fullPath, p.body); err != nil {
+		if err := helper.SaveInterface(ctx, p.fullPath, p.body); err != nil {
 			wg.ErrChan() <- err
 		}
 	}()
