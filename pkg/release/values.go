@@ -131,7 +131,7 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 
 	v.SetUniq(dir, rel.Uniq())
 
-	l := rel.Logger().WithField("values src", v.Src).WithField("values Dst", v.Dst) //nolint:typecheck
+	l := rel.Logger().WithField("values src", v.Src).WithField("values Dst", v.Dst)
 
 	l.Trace("Building values reference")
 
