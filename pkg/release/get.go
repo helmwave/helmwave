@@ -8,8 +8,6 @@ import (
 )
 
 func (rel *config) Get() (*release.Release, error) {
-	// IDK wtf is going on
-	rel.cfg = nil
 	client := action.NewGet(rel.Cfg())
 
 	r, err := client.Run(rel.Name())

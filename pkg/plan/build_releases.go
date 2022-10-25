@@ -7,9 +7,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func buildReleases(tags []string, releases []release.Config, matchAll bool) (plan []release.Config) {
+func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]release.Config, error) {
 	if len(tags) == 0 {
-		return releases
+		return releases, nil
 	}
 
 	releasesMap := make(map[uniqname.UniqName]release.Config)
@@ -18,39 +18,58 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) (pla
 		releasesMap[r.Uniq()] = r
 	}
 
+	plan := make([]release.Config, 0)
+
 	for _, r := range releases {
 		if checkTagInclusion(tags, r.Tags(), matchAll) {
-			plan = addToPlan(plan, r, releasesMap)
+			var err error
+			plan, err = addToPlan(plan, r, releasesMap)
+			if err != nil {
+				log.WithError(err).Error("failed to build releases plan")
+
+				return nil, err
+			}
 		}
 	}
 
-	return plan
+	return plan, nil
 }
 
+//nolint:nestif
 func addToPlan(plan []release.Config, rel release.Config,
 	releases map[uniqname.UniqName]release.Config,
-) []release.Config {
+) ([]release.Config, error) {
 	if helper.In(rel, plan) {
-		return plan
+		return plan, nil
 	}
 
 	r := plan
 	r = append(r, rel)
 
-	for _, depName := range rel.DependsOn() {
-		if dep, ok := releases[depName]; ok {
-			r = addToPlan(r, dep, releases)
+	for _, dep := range rel.DependsOn() {
+		if depRel, ok := releases[dep.Uniq()]; ok {
+			var err error
+			r, err = addToPlan(r, depRel, releases)
+			if err != nil {
+				return nil, err
+			}
 		} else {
-			log.Warnf("cannot find dependency %q in available releases, skipping it", depName)
+			if dep.Optional {
+				log.Warnf("cannot find dependency %q in available releases, skipping it", dep.Uniq())
+			} else {
+				rel.Logger().WithField("dependency", dep.Uniq()).Error("cannot find required dependency")
+
+				return nil, release.ErrDepFailed
+			}
 		}
 	}
 
-	return r
+	return r, nil
 }
 
 func releaseNames(a []release.Config) (n []string) {
 	for _, r := range a {
-		n = append(n, string(r.Uniq()))
+		n = append(n, r.Uniq().String())
 	}
 
 	return n

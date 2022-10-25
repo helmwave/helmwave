@@ -110,8 +110,8 @@ func (r *MockReleaseConfig) Chart() release.Chart {
 	return r.Called().Get(0).(release.Chart)
 }
 
-func (r *MockReleaseConfig) DependsOn() []uniqname.UniqName {
-	return r.Called().Get(0).([]uniqname.UniqName)
+func (r *MockReleaseConfig) DependsOn() []*release.DependsOnReference {
+	return r.Called().Get(0).([]*release.DependsOnReference)
 }
 
 func (r *MockReleaseConfig) Tags() []string {
@@ -137,6 +137,12 @@ func (r *MockReleaseConfig) AllowFailure() bool {
 func (r *MockReleaseConfig) HelmWait() bool {
 	return true
 }
+
+func (r *MockReleaseConfig) DownloadChart(string) error {
+	return r.Called().Error(0)
+}
+
+func (r *MockReleaseConfig) SetChart(string) {}
 
 type MockRepoConfig struct {
 	mock.Mock
