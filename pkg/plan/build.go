@@ -54,13 +54,6 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 		return err
 	}
 
-	// to build charts we need repositories first
-	log.Info("Building charts...")
-	err = p.buildCharts()
-	if err != nil {
-		return err
-	}
-
 	// Build Registries
 	log.Info("Building registries...")
 	_, err = p.buildRegistries()
@@ -70,6 +63,13 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 
 	// Sync Registries
 	err = p.syncRegistries(ctx)
+	if err != nil {
+		return err
+	}
+
+	// to build charts we need repositories and registries first
+	log.Info("Building charts...")
+	err = p.buildCharts()
 	if err != nil {
 		return err
 	}
