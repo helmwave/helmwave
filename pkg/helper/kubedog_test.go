@@ -16,7 +16,7 @@ type KubedogTestSuite struct {
 
 func (s *KubedogTestSuite) TestKubeInit() {
 	s.T().Setenv("KUBECONFIG", filepath.Join(tests.Root, "kubeconfig.yaml"))
-	err := helper.KubeInit()
+	err := helper.KubeInit("")
 
 	s.Require().NoError(err)
 	s.Require().NotNil(kube.Client)

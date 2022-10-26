@@ -5,8 +5,8 @@ import (
 	"errors"
 	"io"
 
+	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 	meta1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

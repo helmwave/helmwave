@@ -9,3 +9,5 @@ func (t noTemplater) Name() string {
 func (t noTemplater) Render(src string, data interface{}) ([]byte, error) {
 	return []byte(src), nil
 }
+
+func (t noTemplater) Delims(string, string) {}

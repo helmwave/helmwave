@@ -1,11 +1,13 @@
 package plan
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -13,7 +15,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/version"
 	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -57,10 +58,10 @@ type Plan struct {
 }
 
 // NewAndImport wrapper for New and Import in one.
-func NewAndImport(src string) (p *Plan, err error) {
+func NewAndImport(ctx context.Context, src string) (p *Plan, err error) {
 	p = New(src)
 
-	err = p.Import()
+	err = p.Import(ctx)
 	if err != nil {
 		return p, err
 	}
@@ -72,7 +73,7 @@ func NewAndImport(src string) (p *Plan, err error) {
 func (p *Plan) Logger() *log.Entry {
 	a := make([]string, 0, len(p.body.Releases))
 	for _, r := range p.body.Releases {
-		a = append(a, string(r.Uniq()))
+		a = append(a, r.Uniq().String())
 	}
 
 	b := make([]string, 0, len(p.body.Repositories))
@@ -94,22 +95,24 @@ func (p *Plan) Logger() *log.Entry {
 
 //nolint:lll
 type planBody struct {
-	Project      string           `json:"project" jsonschema:"title=the project name,description=reserved for future,example=my-awesome-project"`
-	Version      string           `json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,example=0.23.0,example=0.22.1"`
+	Project      string           `json:"project" jsonschema:"title=project name,description=reserved for future,example=my-awesome-project"`
+	Version      string           `json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,pattern=^[0-9]+\\.[0-9]\\.[0-9]$,example=0.23.0,example=0.22.1"`
 	Repositories repo.Configs     `json:"repositories" jsonschema:"title=repositories list,description=helm repositories"`
 	Registries   registry.Configs `json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`
 	Releases     release.Configs  `json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`
 }
 
 func GenSchema() *jsonschema.Schema {
-	r := new(jsonschema.Reflector)
-	r.DoNotReference = true
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+	}
 
 	return r.Reflect(&planBody{})
 }
 
 // NewBody parses plan from file.
-func NewBody(file string) (*planBody, error) {
+func NewBody(ctx context.Context, file string) (*planBody, error) {
 	b := &planBody{
 		Version: version.Version,
 	}
@@ -119,7 +122,7 @@ func NewBody(file string) (*planBody, error) {
 		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
 
-	err = yaml.Unmarshal(src, b)
+	err = yaml.UnmarshalContext(ctx, src, b, yaml.DisallowDuplicateKey(), yaml.DisallowUnknownField())
 	if err != nil {
 		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}
@@ -139,8 +142,14 @@ func NewBody(file string) (*planBody, error) {
 
 // New returns empty *Plan for provided directory.
 func New(dir string) *Plan {
+	tmpDir, err := os.MkdirTemp("", "")
+	if err != nil {
+		log.WithError(err).Warn("failed to create temporary directory")
+		tmpDir = os.TempDir()
+	}
+
 	plan := &Plan{
-		tmpDir:    os.TempDir(),
+		tmpDir:    tmpDir,
 		dir:       dir,
 		fullPath:  filepath.Join(dir, File),
 		manifests: make(map[uniqname.UniqName]string),

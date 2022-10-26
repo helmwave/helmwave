@@ -1,0 +1,6 @@
+kind: New feature
+body: Add support for postrenderer
+time: 2022-10-21T10:29:56.324833+03:00
+custom:
+  Author: r3nic1e
+  Issue: "441"

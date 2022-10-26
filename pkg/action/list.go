@@ -20,7 +20,7 @@ func (l *List) Run(ctx context.Context) error {
 			return err
 		}
 	}
-	p, err := plan.NewAndImport(l.build.plandir)
+	p, err := plan.NewAndImport(ctx, l.build.plandir)
 	if err != nil {
 		return err
 	}

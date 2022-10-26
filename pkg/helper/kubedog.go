@@ -8,11 +8,16 @@ import (
 )
 
 // KubeInit init kubeconfig for kubedog.
-func KubeInit() (err error) {
+func KubeInit(kubecontext string) (err error) {
 	opts := kube.InitOptions{}
 	kubeconfigPath, IsExists := os.LookupEnv("KUBECONFIG")
 	if IsExists {
 		opts.ConfigPath = kubeconfigPath
+	}
+	if kubecontext != "" {
+		opts.Context = kubecontext
+	} else {
+		opts.Context = Helm.KubeContext
 	}
 
 	err = kube.Init(opts)

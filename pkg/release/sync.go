@@ -22,17 +22,14 @@ func (rel *config) SyncDryRun(ctx context.Context) (*release.Release, error) {
 }
 
 func (rel *config) Cfg() *action.Configuration {
-	if rel.cfg == nil {
-		var err error
-		rel.cfg, err = helper.NewCfg(rel.Namespace())
-		if err != nil {
-			rel.Logger().Fatal(err)
+	cfg, err := helper.NewCfg(rel.Namespace(), rel.KubeContext())
+	if err != nil {
+		rel.Logger().Fatal(err)
 
-			return nil
-		}
+		return nil
 	}
 
-	return rel.cfg
+	return cfg
 }
 
 func (rel *config) Helm() *helm.EnvSettings {

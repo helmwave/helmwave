@@ -8,18 +8,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// TemplaterOptions is a function that changes templater options.
+type TemplaterOptions func(Templater)
+
 // Templater is interface for using different template function groups.
 type Templater interface {
 	Name() string
+	Delims(string, string)
 	Render(string, interface{}) ([]byte, error)
 }
 
 func getTemplater(name string) (Templater, error) {
 	switch name {
 	case gomplateTemplater{}.Name():
-		return gomplateTemplater{}, nil
+		return &gomplateTemplater{}, nil
 	case sprigTemplater{}.Name():
-		return sprigTemplater{}, nil
+		return &sprigTemplater{}, nil
 	case noTemplater{}.Name():
 		return noTemplater{}, nil
 	default:
@@ -28,7 +32,7 @@ func getTemplater(name string) (Templater, error) {
 }
 
 // Tpl2yml renders 'tpl' file to 'yml' file as go template.
-func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
+func Tpl2yml(tpl, yml string, data interface{}, templaterName string, opts ...TemplaterOptions) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
@@ -48,6 +52,10 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 		return err
 	}
 	log.WithField("template engine", templater.Name()).Debug("Loaded template engine")
+
+	for _, opt := range opts {
+		opt(templater)
+	}
 
 	d, err := templater.Render(string(src), data)
 	if err != nil {
@@ -72,4 +80,10 @@ func Tpl2yml(tpl, yml string, data interface{}, templaterName string) error {
 	}
 
 	return nil
+}
+
+func SetDelimiters(left, right string) TemplaterOptions {
+	return func(s Templater) {
+		s.Delims(left, right)
+	}
 }

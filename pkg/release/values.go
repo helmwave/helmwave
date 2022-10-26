@@ -11,8 +11,9 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
+	"github.com/stoewer/go-strcase"
 )
 
 // ErrSkipValues is returned when values cannot be used and are skipped.
@@ -20,36 +21,52 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src    string `yaml:"src" json:"src"`
-	Dst    string `yaml:"dst" json:"dst"`
-	Strict bool   `yaml:"strict" json:"strict"`
-	Render bool   `yaml:"render" json:"render"`
+	Src            string `json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
+	Dst            string `json:"dst"`
+	DelimiterLeft  string `json:"delimiter_left,omitempty" jsonschema:"Set left delimiter for template engine,default={{"`
+	DelimiterRight string `json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
+	Strict         bool   `json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
+	Render         bool   `json:"render" jsonschema:"description=Whether to use templater to render values,default=true"`
 }
 
-// UnmarshalYAML is used to implement Unmarshaler interface of gopkg.in/yaml.v3.
-func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
-	v.Render = true // we render values by default
-
-	type raw ValuesReference
-	var err error
-	switch node.Kind {
-	// single value or reference to another value
-	case yaml.ScalarNode, yaml.AliasNode:
-		err = node.Decode(&v.Src)
-	case yaml.MappingNode:
-		err = node.Decode((*raw)(v))
-	default:
-		err = fmt.Errorf("unknown format")
+func (v ValuesReference) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+		KeyNamer:                   strcase.SnakeCase, // for action.ChartPathOptions
 	}
 
-	if err != nil {
-		return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
+	type values ValuesReference
+	schema := r.Reflect(values(v))
+	schema.OneOf = []*jsonschema.Schema{
+		{
+			Type: "string",
+		},
+		{
+			Type: "object",
+		},
+	}
+	schema.Type = ""
+
+	return schema
+}
+
+// UnmarshalYAML flexible config.
+func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	// render by default
+	v.Render = true
+
+	if err := unmarshal(&v.Src); err != nil {
+		type raw ValuesReference
+		if err := unmarshal((*raw)(v)); err != nil {
+			return fmt.Errorf("failed to decode values reference from YAML: %w", err)
+		}
 	}
 
 	return nil
 }
 
-// MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v3.
+// MarshalYAML is used to implement Marshaler interface of github.com/goccy/go-yaml.
 func (v ValuesReference) MarshalYAML() (interface{}, error) {
 	return struct {
 		Src string
@@ -85,7 +102,7 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 	hash := h.Sum(nil)
 	s := hex.EncodeToString(hash)
 
-	v.Dst = filepath.Join(dir, "values", string(name), s+".yml")
+	v.Dst = filepath.Join(dir, "values", name.String(), s+".yml")
 
 	return v
 }
@@ -132,10 +149,11 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 		return err
 	}
 
+	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
 	if v.isURL() {
-		err = template.Tpl2yml(v.Dst, v.Dst, data, templater)
+		err = template.Tpl2yml(v.Dst, v.Dst, data, templater, delimOption)
 	} else {
-		err = template.Tpl2yml(v.Src, v.Dst, data, templater)
+		err = template.Tpl2yml(v.Src, v.Dst, data, templater, delimOption)
 	}
 
 	if err != nil {

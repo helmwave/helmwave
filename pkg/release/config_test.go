@@ -3,10 +3,10 @@ package release_test
 import (
 	"testing"
 
+	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/yaml.v3"
 )
 
 type ConfigTestSuite struct {
@@ -33,14 +33,19 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r := release.NewConfig()
 
 	r.NamespaceF = "testns"
-	r.DependsOnF = []string{"bla", "blabla@testns", "blablabla@testtestns", "---=-=-==-@kk;'[["}
+	r.DependsOnF = []*release.DependsOnReference{
+		{Name: "bla"},
+		{Name: "blabla@testns"},
+		{Name: "blablabla@testtestns"},
+		{Name: "---=-=-==-@kk;'[["},
+	}
 
-	r.BuildAfterUnmarshal()
+	r.BuildAfterUnmarshal(r)
 
-	expected := []uniqname.UniqName{
-		uniqname.UniqName("bla@testns"),
-		uniqname.UniqName("blabla@testns"),
-		uniqname.UniqName("blablabla@testtestns"),
+	expected := []*release.DependsOnReference{
+		{Name: "bla@testns"},
+		{Name: "blabla@testns"},
+		{Name: "blablabla@testtestns"},
 	}
 	s.Require().ElementsMatch(r.DependsOn(), expected)
 }
@@ -80,7 +85,7 @@ func (s *ChartTestSuite) TestUnmarshalYAMLInvalid() {
 	str := "[1, 2, 3]"
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().ErrorContains(err, "unknown format")
+	s.Require().ErrorContains(err, "failed to decode chart from YAML")
 }
 
 func TestConfigTestSuite(t *testing.T) {

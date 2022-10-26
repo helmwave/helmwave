@@ -26,6 +26,7 @@ func (s *ConfigInternalTestSuite) contains(a []string, b string) bool {
 // TestConfigHelmTypeFields checks that all fields of helm upgrade action exist in config structure.
 func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 	skipFields := []string{
+		"cfg",
 		"ChartPathOptions",
 		"Install",
 		"Namespace",
