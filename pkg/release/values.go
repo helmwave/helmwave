@@ -21,7 +21,7 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
-	Src            string `json:"src" jsonschema:"required,description=Source of values. Can be local path or go-getter URI"`
+	Src            string `json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
 	Dst            string `json:"dst"`
 	DelimiterLeft  string `json:"delimiter_left,omitempty" jsonschema:"Set left delimiter for template engine,default={{"`
 	DelimiterRight string `json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
