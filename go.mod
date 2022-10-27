@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/databus23/helm-diff v3.1.1+incompatible
-	github.com/goccy/go-yaml v1.9.5
+	github.com/goccy/go-yaml v1.9.6
 	github.com/gofrs/flock v0.8.1
 	github.com/hairyhenderson/gomplate/v3 v3.11.3
 	github.com/hashicorp/go-multierror v1.1.1
