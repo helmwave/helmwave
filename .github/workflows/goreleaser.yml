@@ -49,7 +49,7 @@ jobs:
         id: combined
         run: echo "tag=${PUSHED_TAG}${CREATED_TAG}" >> $GITHUB_OUTPUT
         env:
-          CREATED_TAG: ${{ steps.tag.outputs.result }}
+          CREATED_TAG: ${{ steps.create.outputs.result }}
           PUSHED_TAG: ${{ steps.push.outputs.result }}
     outputs:
       tag: ${{ steps.combined.outputs.tag }}
