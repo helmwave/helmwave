@@ -1,6 +1,7 @@
 kind: Fixed
-body: 'Fix `client rate limiter Wait returned an error: context deadline exceeded`
-  with setting default release timeout to 5 minutes'
+body:
+  "Fix `client rate limiter Wait returned an error: context deadline exceeded`
+  with setting default release timeout to 5 minutes"
 time: 2022-10-21T10:27:19.907859+03:00
 custom:
   Author: r3nic1e
