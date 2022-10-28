@@ -1,6 +1,0 @@
-kind: Fixed
-body: Do not fail if plan doesn't contain any releases
-time: 2022-10-21T19:41:33.820242+03:00
-custom:
-  Author: r3nic1e
-  Issue: "459"

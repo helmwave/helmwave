@@ -1,8 +1,0 @@
-kind: Breaking change!
-body:
-  "YAML parsing helmwave.yml is now more strict: duplicate fields and unknown
-  fields in map are now prohibited and return parsing error"
-time: 2022-10-22T09:33:05.334553+03:00
-custom:
-  Author: r3nic1e
-  Issue: "487"

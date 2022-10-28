@@ -1,6 +1,0 @@
-kind: CI
-body: Fix generating schema.json
-time: 2022-10-21T10:26:07.248112+03:00
-custom:
-  Author: r3nic1e
-  Issue: ""

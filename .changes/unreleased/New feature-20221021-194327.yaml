@@ -1,6 +1,0 @@
-kind: New feature
-body: Allow to skip nonexisting dependencies via `optional` flag
-time: 2022-10-21T19:43:27.745307+03:00
-custom:
-  Author: r3nic1e
-  Issue: "482"

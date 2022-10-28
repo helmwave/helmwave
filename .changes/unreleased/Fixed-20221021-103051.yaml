@@ -1,6 +1,0 @@
-kind: Fixed
-body: Disable client-only for dry-run to handle `.Capabilities.APIVersions` correctly
-time: 2022-10-21T10:30:51.807834+03:00
-custom:
-  Author: r3nic1e
-  Issue: "447"

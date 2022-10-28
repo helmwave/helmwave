@@ -1,6 +1,0 @@
-kind: Other
-body: Switch to github.com/goccy/go-yaml YAML library
-time: 2022-10-22T09:31:48.094063+03:00
-custom:
-  Author: r3nic1e
-  Issue: "487"
