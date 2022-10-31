@@ -21,7 +21,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/testify v1.8.0
-	github.com/urfave/cli/v2 v2.20.3
+	github.com/urfave/cli/v2 v2.23.0
 	github.com/werf/kubedog v0.9.6
 	github.com/werf/logboek v0.5.4
 	helm.sh/helm/v3 v3.10.1
