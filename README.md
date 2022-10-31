@@ -35,7 +35,7 @@ With helmwave you will become a superhero:
 
 ## 📖 [Documentation](https://docs.helmwave.app)
 
-Documentation available at https://helmwave.github.io/docs
+Documentation available at https://docs.helmwave.app
 
 
 ## Community, discussion, contribution, and support
