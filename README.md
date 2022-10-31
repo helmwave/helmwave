@@ -33,7 +33,7 @@ With helmwave you will become a superhero:
 - Fetch data from external datasource like vault, aws sm
 - ... and much more!
 
-## 📖 [Documentation](https://helmwave.github.io/docs)
+## 📖 [Documentation](https://docs.helmwave.app)
 
 Documentation available at https://helmwave.github.io/docs
 
