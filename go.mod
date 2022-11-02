@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/databus23/helm-diff v3.1.1+incompatible
-	github.com/goccy/go-yaml v1.9.5
+	github.com/goccy/go-yaml v1.9.6
 	github.com/gofrs/flock v0.8.1
 	github.com/hairyhenderson/gomplate/v3 v3.11.3
 	github.com/hashicorp/go-multierror v1.1.1
@@ -20,8 +20,8 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.2.0
-	github.com/stretchr/testify v1.8.0
-	github.com/urfave/cli/v2 v2.20.3
+	github.com/stretchr/testify v1.8.1
+	github.com/urfave/cli/v2 v2.23.0
 	github.com/werf/kubedog v0.9.6
 	github.com/werf/logboek v0.5.4
 	helm.sh/helm/v3 v3.10.1
@@ -213,7 +213,7 @@ require (
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/cobra v1.6.1 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/xanzy/ssh-agent v0.3.2 // indirect
