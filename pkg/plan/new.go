@@ -122,7 +122,7 @@ func NewBody(ctx context.Context, file string) (*planBody, error) {
 		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
 
-	err = yaml.UnmarshalContext(ctx, src, b, yaml.DisallowDuplicateKey(), yaml.DisallowUnknownField())
+	err = yaml.UnmarshalContext(ctx, src, b)
 	if err != nil {
 		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}
