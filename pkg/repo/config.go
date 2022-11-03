@@ -10,9 +10,9 @@ import (
 
 //nolint:lll
 type config struct {
-	log        *log.Entry `json:"-"`
-	repo.Entry `json:",inline"`
-	Force      bool `json:"force" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
+	log        *log.Entry `yaml:"-" json:"-"`
+	repo.Entry `yaml:",inline" json:",inline"`
+	Force      bool `yaml:"force" json:"force" jsonschema:"title=force flag,description=force update helm repo list and download dependencies,default=false"`
 }
 
 func (c *config) Name() string {

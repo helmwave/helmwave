@@ -8,6 +8,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -20,17 +21,26 @@ import (
 //
 //nolint:lll
 type Chart struct {
-	action.ChartPathOptions `json:",inline"`
-	Name                    string `json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
+	action.ChartPathOptions `yaml:",inline" json:",inline"`
+	Name                    string `yaml:"name" json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
 }
 
 // UnmarshalYAML flexible config.
-func (u *Chart) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	if err := unmarshal(&u.Name); err != nil {
-		type raw Chart
-		if err := unmarshal((*raw)(u)); err != nil {
-			return fmt.Errorf("failed to decode chart from YAML: %w", err)
-		}
+func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
+	type raw Chart
+	var err error
+
+	switch node.Kind {
+	case yaml.ScalarNode, yaml.AliasNode:
+		err = node.Decode(&(u.Name))
+	case yaml.MappingNode:
+		err = node.Decode((*raw)(u))
+	default:
+		err = fmt.Errorf("unknown format")
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to decode chart %q from YAML at %d line: %w", node.Value, node.Line, err)
 	}
 
 	return nil

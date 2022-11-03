@@ -1,0 +1,6 @@
+kind: Fixed
+body: Reverted to prior YAML parser due to numerous parsing issues
+time: 2022-11-03T10:05:14.779062+03:00
+custom:
+  Author: r3nic1e
+  Issue: "502"
