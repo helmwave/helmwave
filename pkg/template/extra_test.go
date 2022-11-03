@@ -50,7 +50,7 @@ func (s *ExtraTestSuite) TestFromYaml() {
 	}{
 		{
 			yaml:   "abc: 123",
-			result: template.Values{"abc": uint64(123)},
+			result: template.Values{"abc": 123},
 			fails:  false,
 		},
 		{

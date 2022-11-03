@@ -5,6 +5,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/invopop/jsonschema"
+	"gopkg.in/yaml.v3"
 )
 
 // Config is an interface to manage particular helm reg.
@@ -19,11 +20,12 @@ type Config interface {
 // Configs type of array Config.
 type Configs []Config
 
-// UnmarshalYAML is an unmarshaller for github.com/goccy/go-yaml to parse YAML into `Config` interface.
-func (r *Configs) UnmarshalYAML(unmarshal func(interface{}) error) error {
+// UnmarshalYAML is an unmarshaller for gopkg.in/yaml.v3 to parse YAML into `Config` interface.
+func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	rr := make([]*config, 0)
-	if err := unmarshal(&rr); err != nil {
-		return fmt.Errorf("failed to decode registry config from YAML: %w", err)
+	err := node.Decode(&rr)
+	if err != nil {
+		return fmt.Errorf("failed to decode reg config from YAML: %w", err)
 	}
 
 	*r = make([]Config, len(rr))
