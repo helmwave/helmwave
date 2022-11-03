@@ -1,0 +1,6 @@
+kind: CI
+body: Fix telegram template
+time: 2022-11-03T10:20:55.709216+03:00
+custom:
+  Author: r3nic1e
+  Issue: ""
