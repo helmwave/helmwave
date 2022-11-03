@@ -1,0 +1,7 @@
+kind: Fixed
+body: Fix jsonschema to allow additional properties at root level and incorrect version
+  pattern
+time: 2022-11-03T10:28:05.81626+03:00
+custom:
+  Author: r3nic1e
+  Issue: "502"
