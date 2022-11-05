@@ -3,10 +3,10 @@ package release_test
 import (
 	"testing"
 
-	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
+	"gopkg.in/yaml.v3"
 )
 
 type ConfigTestSuite struct {
@@ -85,7 +85,7 @@ func (s *ChartTestSuite) TestUnmarshalYAMLInvalid() {
 	str := "[1, 2, 3]"
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().ErrorContains(err, "failed to decode chart from YAML")
+	s.Require().ErrorContains(err, "unknown format")
 }
 
 func TestConfigTestSuite(t *testing.T) {

@@ -1,13 +1,13 @@
 package plan
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/goccy/go-yaml"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -15,6 +15,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/version"
 	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -95,11 +96,11 @@ func (p *Plan) Logger() *log.Entry {
 
 //nolint:lll
 type planBody struct {
-	Project      string           `json:"project" jsonschema:"title=project name,description=reserved for future,example=my-awesome-project"`
-	Version      string           `json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,pattern=^[0-9]+\\.[0-9]\\.[0-9]$,example=0.23.0,example=0.22.1"`
-	Repositories repo.Configs     `json:"repositories" jsonschema:"title=repositories list,description=helm repositories"`
-	Registries   registry.Configs `json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`
-	Releases     release.Configs  `json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`
+	Project      string           `yaml:"project" json:"project" jsonschema:"title=project name,description=reserved for future,example=my-awesome-project"`
+	Version      string           `yaml:"version" json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,pattern=^[0-9]+\\.[0-9]+\\.[0-9]+$,example=0.23.0,example=0.22.1"`
+	Repositories repo.Configs     `yaml:"repositories" json:"repositories" jsonschema:"title=repositories list,description=helm repositories"`
+	Registries   registry.Configs `yaml:"registries" json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`
+	Releases     release.Configs  `yaml:"releases" json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`
 }
 
 func GenSchema() *jsonschema.Schema {
@@ -108,7 +109,10 @@ func GenSchema() *jsonschema.Schema {
 		RequiredFromJSONSchemaTags: true,
 	}
 
-	return r.Reflect(&planBody{})
+	schema := r.Reflect(&planBody{})
+	schema.AdditionalProperties = jsonschema.TrueSchema // to allow anchors at the top level
+
+	return schema
 }
 
 // NewBody parses plan from file.
@@ -122,7 +126,8 @@ func NewBody(ctx context.Context, file string) (*planBody, error) {
 		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
 
-	err = yaml.UnmarshalContext(ctx, src, b, yaml.DisallowDuplicateKey(), yaml.DisallowUnknownField())
+	decoder := yaml.NewDecoder(bytes.NewBuffer(src))
+	err = decoder.Decode(b)
 	if err != nil {
 		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}

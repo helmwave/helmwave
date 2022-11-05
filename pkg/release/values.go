@@ -14,19 +14,22 @@ import (
 	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
+	"gopkg.in/yaml.v3"
 )
 
 // ErrSkipValues is returned when values cannot be used and are skipped.
 var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
+//
+//nolint:lll
 type ValuesReference struct {
-	Src            string `json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
-	Dst            string `json:"dst"`
-	DelimiterLeft  string `json:"delimiter_left,omitempty" jsonschema:"Set left delimiter for template engine,default={{"`
-	DelimiterRight string `json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
-	Strict         bool   `json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
-	Render         bool   `json:"render" jsonschema:"description=Whether to use templater to render values,default=true"`
+	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
+	Dst            string `yaml:"dst" json:"dst"`
+	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty" jsonschema:"Set left delimiter for template engine,default={{"`
+	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
+	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
+	Render         bool   `yaml:"render" json:"render" jsonschema:"description=Whether to use templater to render values,default=true"`
 }
 
 func (v ValuesReference) JSONSchema() *jsonschema.Schema {
@@ -52,21 +55,30 @@ func (v ValuesReference) JSONSchema() *jsonschema.Schema {
 }
 
 // UnmarshalYAML flexible config.
-func (v *ValuesReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
 	// render by default
 	v.Render = true
 
-	if err := unmarshal(&v.Src); err != nil {
-		type raw ValuesReference
-		if err := unmarshal((*raw)(v)); err != nil {
-			return fmt.Errorf("failed to decode values reference from YAML: %w", err)
-		}
+	type raw ValuesReference
+	var err error
+	switch node.Kind {
+	// single value or reference to another value
+	case yaml.ScalarNode, yaml.AliasNode:
+		err = node.Decode(&v.Src)
+	case yaml.MappingNode:
+		err = node.Decode((*raw)(v))
+	default:
+		err = fmt.Errorf("unknown format")
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
 	}
 
 	return nil
 }
 
-// MarshalYAML is used to implement Marshaler interface of github.com/goccy/go-yaml.
+// MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v3.
 func (v ValuesReference) MarshalYAML() (interface{}, error) {
 	return struct {
 		Src string

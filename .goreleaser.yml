@@ -257,5 +257,5 @@ announce:
     enabled: true
     chat_id: -1001484486010
     message_template: |
-      Helmwave *{{ .Tag }}* is ready!
+      Helmwave *{{ replace .Tag "." "\\." }}* is ready!
       See more: https://github.com/helmwave/helmwave/releases/tag/{{ .Tag }}

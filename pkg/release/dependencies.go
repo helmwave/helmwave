@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"gopkg.in/yaml.v3"
 )
 
 // ErrSkipValues is returned when values cannot be used and are skipped.
@@ -22,18 +23,27 @@ const (
 //
 //nolint:lll
 type DependsOnReference struct {
-	Name     string `json:"name" jsonschema:"description=Uniqname (or just name if in same namespace) of dependency release"`
-	Tag      string `json:"tag,omitempty" jsonschema:"description=All available releases with the tag will be applied as dependencies"`
-	Optional bool   `json:"optional" jsonschema:"description=Whether the dependency is required to be present in plan,default=false"`
+	Name     string `yaml:"name" json:"name" jsonschema:"description=Uniqname (or just name if in same namespace) of dependency release"`
+	Tag      string `yaml:"tag,omitempty" json:"tag,omitempty" jsonschema:"description=All available releases with the tag will be applied as dependencies"`
+	Optional bool   `yaml:"optional" json:"optional" jsonschema:"description=Whether the dependency is required to be present in plan,default=false"`
 }
 
-// UnmarshalYAML is used to implement InterfaceUnmarshaler interface of github.com/goccy/go-yaml.
-func (d *DependsOnReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	if err := unmarshal(&d.Name); err != nil {
-		type raw DependsOnReference
-		if err := unmarshal((*raw)(d)); err != nil {
-			return fmt.Errorf("failed to decode depends_on reference from YAML: %w", err)
-		}
+// UnmarshalYAML is used to implement InterfaceUnmarshaler interface of gopkg.in/yaml.v3.
+func (d *DependsOnReference) UnmarshalYAML(node *yaml.Node) error {
+	type raw DependsOnReference
+	var err error
+	switch node.Kind {
+	// single value or reference to another value
+	case yaml.ScalarNode, yaml.AliasNode:
+		err = node.Decode(&d.Name)
+	case yaml.MappingNode:
+		err = node.Decode((*raw)(d))
+	default:
+		err = fmt.Errorf("unknown format")
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to decode depends_on reference %q from YAML: %w", node.Value, err)
 	}
 
 	return nil
