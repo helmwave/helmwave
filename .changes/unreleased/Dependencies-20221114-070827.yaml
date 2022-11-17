@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Upgrade helm to 3.10.2
+time: 2022-11-14T07:08:27.867246+03:00
+custom:
+  Author: r3nic1e
+  Issue: ""
