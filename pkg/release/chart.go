@@ -83,7 +83,7 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 	}
 
 	if ch.Metadata.Deprecated {
-		return fmt.Errorf("⚠️ Chart %s is deprecated", ch.Name())
+		rrel.Logger().Warnf("⚠️ Chart %s is deprecated. Please update your chart.", ch.Name())
 	}
 
 	return nil
