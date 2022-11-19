@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Upgrade helm-diff to latest version
-time: 2022-11-14T07:07:51.925647+03:00
-custom:
-  Author: r3nic1e
-  Issue: "515"
