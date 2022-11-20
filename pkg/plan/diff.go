@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/databus23/helm-diff/diff"
-	"github.com/databus23/helm-diff/manifest"
+	"github.com/databus23/helm-diff/v3/diff"
+	"github.com/databus23/helm-diff/v3/manifest"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -37,6 +37,10 @@ var (
 func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	visited := make(map[uniqname.UniqName]bool)
 	k := 0
+	opts := &diff.Options{
+		ShowSecrets:   showSecret,
+		OutputContext: diffWide,
+	}
 
 	for _, rel := range append(p.body.Releases, b.body.Releases...) {
 		if visited[rel.Uniq()] {
@@ -47,7 +51,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 		oldSpecs := parseManifests(b.manifests[rel.Uniq()], rel.Namespace())
 		newSpecs := parseManifests(p.manifests[rel.Uniq()], rel.Namespace())
 
-		change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, log.StandardLogger().Out)
+		change := diff.Manifests(oldSpecs, newSpecs, opts, log.StandardLogger().Out)
 		if !change {
 			k++
 			log.Info("🆚 ❎ ", rel.Uniq(), " no changes")
@@ -71,6 +75,11 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
 
 	visited := make([]uniqname.UniqName, 0, len(p.body.Releases))
 	k := 0
+	opts := &diff.Options{
+		ShowSecrets:   showSecret,
+		OutputContext: diffWide,
+	}
+
 	for _, rel := range p.body.Releases {
 		visited = append(visited, rel.Uniq())
 		if active, ok := alive[rel.Uniq()]; ok {
@@ -79,7 +88,7 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
 			oldSpecs := parseManifests(active.Manifest, rel.Namespace())
 			newSpecs := parseManifests(p.manifests[rel.Uniq()], rel.Namespace())
 
-			change := diff.Manifests(oldSpecs, newSpecs, []string{}, showSecret, diffWide, rel.Logger().Logger.Out)
+			change := diff.Manifests(oldSpecs, newSpecs, opts, rel.Logger().Logger.Out)
 			chartChange := diffCharts(ctx, active.Chart, rel, rel.Logger())
 
 			if !change && !chartChange {
@@ -127,7 +136,7 @@ func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, 
 }
 
 func parseManifests(m, ns string) map[string]*manifest.MappingResult {
-	manifests := manifest.Parse(m, ns)
+	manifests := manifest.Parse(m, ns, true)
 
 	type annotationManifest struct {
 		Metadata struct {
