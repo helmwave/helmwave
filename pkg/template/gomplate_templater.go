@@ -8,6 +8,7 @@ import (
 
 	"github.com/hairyhenderson/gomplate/v3"
 	gomplateData "github.com/hairyhenderson/gomplate/v3/data"
+	"github.com/hairyhenderson/gomplate/v3/tmpl"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,10 +20,10 @@ func (t gomplateTemplater) Name() string {
 	return "gomplate"
 }
 
-//nolint:dupl
 func (t gomplateTemplater) Render(src string, data interface{}) ([]byte, error) {
-	funcs := t.funcMap()
-	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
+	tpl := template.New("tpl")
+	funcs := t.funcMap(tpl, data)
+	tpl, err := tpl.Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -36,7 +37,7 @@ func (t gomplateTemplater) Render(src string, data interface{}) ([]byte, error) 
 	return buf.Bytes(), nil
 }
 
-func (t gomplateTemplater) funcMap() template.FuncMap {
+func (t gomplateTemplater) funcMap(tpl *template.Template, data interface{}) template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading gomplate template functions")
@@ -45,6 +46,10 @@ func (t gomplateTemplater) funcMap() template.FuncMap {
 
 	addToMap(funcMap, gomplateFuncMap)
 	addToMap(funcMap, customFuncs)
+
+	tp := tmpl.New(tpl, data, tpl.Name())
+	funcMap["tmpl"] = func() *tmpl.Template { return tp }
+	funcMap["tpl"] = tp.Inline
 
 	return funcMap
 }

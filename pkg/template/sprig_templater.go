@@ -37,7 +37,6 @@ func (t sprigTemplater) Name() string {
 	return "sprig"
 }
 
-//nolint:dupl
 func (t sprigTemplater) Render(src string, data interface{}) ([]byte, error) {
 	funcs := t.funcMap()
 	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
