@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"helm.sh/helm/v3/pkg/action"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -39,6 +41,7 @@ type Config interface {
 	Values() []ValuesReference
 	HelmWait() bool
 	KubeContext() string
+	Cfg() *action.Configuration
 }
 
 // Configs type of array Config.

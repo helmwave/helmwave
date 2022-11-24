@@ -4,6 +4,8 @@ import (
 	"context"
 	"path/filepath"
 
+	"helm.sh/helm/v3/pkg/action"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -146,6 +148,10 @@ func (r *MockReleaseConfig) SetChart(string) {}
 
 func (r *MockReleaseConfig) KubeContext() string {
 	return r.Called().String(0)
+}
+
+func (r *MockReleaseConfig) Cfg() *action.Configuration {
+	return r.Called().Get(0).(*action.Configuration)
 }
 
 type MockRepoConfig struct {

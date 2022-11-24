@@ -3,7 +3,6 @@ package plan
 import (
 	"context"
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 	"sync"
@@ -19,6 +18,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	live "helm.sh/helm/v3/pkg/release"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/cli-runtime/pkg/resource"
 )
 
 var (
@@ -67,7 +68,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
-func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
+func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, threeWayMerge bool) {
 	alive, _, err := p.GetLive(ctx)
 	if err != nil {
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
@@ -83,10 +84,15 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
 	for _, rel := range p.body.Releases {
 		visited = append(visited, rel.Uniq())
 		if active, ok := alive[rel.Uniq()]; ok {
+			newManifest := p.manifests[rel.Uniq()]
+			oldManifest := active.Manifest
+			if threeWayMerge {
+				oldManifest = get3WayMergeManifests(rel, active.Manifest)
+			}
 			// I dont use manifest.ParseRelease
 			// Because Structs are different.
-			oldSpecs := parseManifests(active.Manifest, rel.Namespace())
-			newSpecs := parseManifests(p.manifests[rel.Uniq()], rel.Namespace())
+			oldSpecs := parseManifests(oldManifest, rel.Namespace())
+			newSpecs := parseManifests(newManifest, rel.Namespace())
 
 			change := diff.Manifests(oldSpecs, newSpecs, opts, rel.Logger().Logger.Out)
 			chartChange := diffCharts(ctx, active.Chart, rel, rel.Logger())
@@ -99,6 +105,84 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int) {
 	}
 
 	showChangesReport(p.body.Releases, visited, k)
+}
+
+//nolint:funlen,gocognit
+func get3WayMergeManifests(rel release.Config, oldManifest string) string {
+	cfg := rel.Cfg()
+
+	err := cfg.KubeClient.IsReachable()
+	if err != nil {
+		rel.Logger().WithError(err).Warn("failed to connect to k8s to run 3-way merge, skipping")
+
+		return oldManifest
+	}
+
+	oldResources, err := cfg.KubeClient.Build(strings.NewReader(oldManifest), false)
+	if err != nil {
+		rel.Logger().WithError(err).Warn("failed to build old resources list for 3-way merge, skipping")
+
+		return oldManifest
+	}
+
+	updatedManifest := ""
+
+	err = oldResources.Visit(func(r *resource.Info, err error) error {
+		if err != nil {
+			return err
+		}
+
+		h := resource.NewHelper(r.Client, r.Mapping)
+		currentObject, err := h.Get(r.Namespace, r.Name)
+		if err != nil {
+			if !apierrors.IsNotFound(err) {
+				return err //nolint:wrapcheck
+			}
+
+			return nil
+		}
+
+		out, err := yaml.Marshal(currentObject)
+		if err != nil {
+			return err //nolint:wrapcheck
+		}
+		// currentObject stores everything under 'object' key.
+		// We need to get everything from this field and drop some generated parts.
+		var ra map[string]interface{}
+		_ = yaml.Unmarshal(out, &ra)
+		obj := ra["object"].(map[string]interface{}) //nolint:forcetypeassert
+		delete(obj, "status")
+
+		metadata := obj["metadata"].(map[string]interface{}) //nolint:forcetypeassert
+		delete(metadata, "creationTimestamp")
+		delete(metadata, "generation")
+		delete(metadata, "managedFields")
+		delete(metadata, "resourceVersion")
+		delete(metadata, "uid")
+
+		if a := metadata["annotations"]; a != nil {
+			annotations := a.(map[string]interface{}) //nolint:forcetypeassert
+			delete(annotations, "meta.helm.sh/release-name")
+			delete(annotations, "meta.helm.sh/release-namespace")
+			delete(annotations, "deployment.kubernetes.io/revision")
+
+			if len(annotations) == 0 {
+				delete(metadata, "annotations")
+			}
+		}
+
+		out, _ = yaml.Marshal(obj)
+		updatedManifest += "\n---\n" + string(out)
+
+		return nil
+	})
+	if err != nil {
+		rel.Logger().WithError(err).Warn("failed to get latest objects for 3-way merge, skipping")
+
+		return oldManifest
+	}
+
+	return updatedManifest
 }
 
 func diffChartsFilter(path []string, parent reflect.Type, field reflect.StructField) bool {
@@ -182,22 +266,6 @@ func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k
 	if k == len(releases) && !previous {
 		log.Info("🆚 🌝 Plan has no changes")
 	}
-}
-
-// GetLiveOf returns instance of deployed helm release by name.
-func (p *Plan) GetLiveOf(name uniqname.UniqName) (*live.Release, error) {
-	for _, rel := range p.body.Releases {
-		if rel.Uniq() == name {
-			r, err := rel.Get()
-			if err != nil {
-				return nil, fmt.Errorf("failed to get release %s: %w", rel.Uniq(), err)
-			}
-
-			return r, nil
-		}
-	}
-
-	return nil, errors.New("release 404")
 }
 
 // GetLive returns maps of releases in a k8s-cluster.
