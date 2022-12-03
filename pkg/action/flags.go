@@ -116,3 +116,13 @@ func flagAutoBuild(v *bool) *cli.BoolFlag {
 		Destination: v,
 	}
 }
+
+func flagDiffThreeWayMerge(v *bool) *cli.BoolFlag {
+	return &cli.BoolFlag{
+		Name:        "3-way-merge",
+		Usage:       "show 3-way merge diff",
+		Value:       false,
+		EnvVars:     []string{"HELMWAVE_DIFF_3_WAY_MERGE"},
+		Destination: v,
+	}
+}

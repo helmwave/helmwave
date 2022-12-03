@@ -64,7 +64,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 
 	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
-		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide)
+		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
 	default:
 		log.Warnf("I dont know what is %q diff mode. I am skiping diff.", i.diffMode)
 	}

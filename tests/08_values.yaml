@@ -1,3 +1,10 @@
 {{ defineDatasource "test" "https://raw.githubusercontent.com/helmwave/helmwave/main/tests/06_values.yaml" }}
 
 {{ include "test" | data.YAML | data.ToYAML }}
+
+{{ define "Template1" }}
+{{ . }}
+{{ end }}
+
+{{ tmpl.Exec "Template1" "test" }}
+{{ tmpl.Inline "{{ print `123` }}" }}
