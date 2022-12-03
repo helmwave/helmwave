@@ -1,6 +1,0 @@
-kind: New feature
-body: Add experimental support for showing 3-way merge diff
-time: 2022-11-24T21:31:44.214219+03:00
-custom:
-  Author: r3nic1e
-  Issue: "466"
