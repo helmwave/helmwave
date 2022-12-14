@@ -24,7 +24,7 @@ require (
 	github.com/werf/kubedog v0.9.6
 	github.com/werf/logboek v0.5.4
 	gopkg.in/yaml.v3 v3.0.1
-	helm.sh/helm/v3 v3.10.2
+	helm.sh/helm/v3 v3.10.3
 	k8s.io/apimachinery v0.25.4
 	k8s.io/cli-runtime v0.25.3
 	k8s.io/client-go v0.25.4
