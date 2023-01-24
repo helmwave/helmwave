@@ -154,6 +154,10 @@ func (r *MockReleaseConfig) Cfg() *action.Configuration {
 	return r.Called().Get(0).(*action.Configuration)
 }
 
+func (r *MockReleaseConfig) HooksDisabled() bool {
+	return false
+}
+
 type MockRepoConfig struct {
 	mock.Mock
 }
