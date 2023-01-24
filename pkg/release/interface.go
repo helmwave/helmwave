@@ -42,6 +42,7 @@ type Config interface {
 	HelmWait() bool
 	KubeContext() string
 	Cfg() *action.Configuration
+	HooksDisabled() bool
 }
 
 // Configs type of array Config.

@@ -40,8 +40,10 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup,
 	}
 
 	hm := ""
-	for _, h := range r.Hooks {
-		hm += fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest)
+	if !rel.HooksDisabled() {
+		for _, h := range r.Hooks {
+			hm += fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest)
+		}
 	}
 
 	document := r.Manifest
