@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Update helm to v3.10.3
+time: 2023-01-24T16:21:00.838533+03:00
+custom:
+  Author: r3nic1e
+  Issue: ""
