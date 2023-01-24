@@ -1,6 +1,0 @@
-kind: Fixed
-body: Skip showing hooks in diff if hooks are disabled
-time: 2023-01-24T15:55:29.654037+03:00
-custom:
-  Author: r3nic1e
-  Issue: ""
