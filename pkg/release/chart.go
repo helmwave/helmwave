@@ -6,6 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -50,13 +51,32 @@ func (u Chart) IsRemote() bool {
 	return !helper.IsExists(filepath.Clean(u.Name))
 }
 
-func (rel *config) GetChart() (*chart.Chart, error) {
+func (rel *config) LocateChartWithCache() (string, error) {
+	c := rel.Chart()
+	ch, err := cache.ChartsCache.FindInCache(c.Name, c.Version)
+	if err == nil {
+		rel.Logger().Infof("use cache for chart %s: %s", c.Name, ch)
+
+		return ch, nil
+	}
+
 	// Hmm nice action bro
 	client := rel.newInstall()
 
-	ch, err := client.ChartPathOptions.LocateChart(rel.Chart().Name, rel.Helm())
+	ch, err = client.ChartPathOptions.LocateChart(c.Name, rel.Helm())
 	if err != nil {
-		return nil, fmt.Errorf("failed to locate chart %s: %w", rel.Chart().Name, err)
+		return "", fmt.Errorf("failed to locate chart %s: %w", c.Name, err)
+	}
+
+	cache.ChartsCache.AddToCache(ch)
+
+	return ch, nil
+}
+
+func (rel *config) GetChart() (*chart.Chart, error) {
+	ch, err := rel.LocateChartWithCache()
+	if err != nil {
+		return nil, err
 	}
 
 	c, err := loader.Load(ch)
@@ -129,26 +149,17 @@ func (rel *config) DownloadChart(tmpDir string) error {
 		return nil
 	}
 
-	pull := action.NewPullWithOpts(action.WithConfig(rel.Cfg()))
-	pull.Settings = rel.Helm()
-	rel.copyChartPathOptions(&pull.ChartPathOptions)
-
-	pull.DestDir = path.Join(tmpDir, "charts", rel.Uniq().String())
-	err := os.MkdirAll(pull.DestDir, 0o750)
-	if err != nil {
+	destDir := path.Join(tmpDir, "charts", rel.Uniq().String())
+	if err := os.MkdirAll(destDir, 0o750); err != nil {
 		return fmt.Errorf("failed to create temporary directory for chart: %w", err)
 	}
 
-	logs, err := pull.Run(rel.Chart().Name)
-	if logs != "" {
-		log.StandardLogger().Print(logs)
-	}
-
+	ch, err := rel.LocateChartWithCache()
 	if err != nil {
-		return fmt.Errorf("failed to download and unarchive chart: %w", err)
+		return err
 	}
 
-	return nil
+	return helper.CopyFile(ch, destDir)
 }
 
 func (rel *config) SetChart(name string) {
