@@ -43,7 +43,10 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		}
 	}
 
-	cache.ChartsCache.Init(i.chartsCacheDir)
+	err = cache.ChartsCache.Init(i.chartsCacheDir)
+	if err != nil {
+		return err
+	}
 
 	newPlan := plan.New(i.plandir)
 	err = newPlan.Build(ctx, i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)

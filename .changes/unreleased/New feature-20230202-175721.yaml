@@ -1,0 +1,6 @@
+kind: New feature
+body: Add support for charts caching in build command
+time: 2023-02-02T17:57:21.428300345+03:00
+custom:
+  Author: DemitrSpb
+  Issue: ""

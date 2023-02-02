@@ -133,7 +133,7 @@ func flagChartsCacheDir(v *string) *cli.StringFlag {
 		Name:        "charts-cache-dir",
 		Value:       "",
 		Usage:       "Enable caching of helm charts in specified directory",
-		EnvVars:     []string{"HELMWAVE_CHARTS_CACHE_DIR"},
+		EnvVars:     []string{"HELMWAVE_CHARTS_CACHE"},
 		Destination: v,
 	}
 }
