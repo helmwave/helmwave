@@ -45,6 +45,9 @@ func (c *CacheConfig) FindInCache(chart string, version string) (string, error) 
 	chartName := filepath.Base(chart)
 	chartFile := path.Join(c.cacheDir, fmt.Sprintf("%s-%s.tgz", chartName, version))
 
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
 	_, err := os.Stat(chartFile)
 	if err == nil {
 		return chartFile, nil
