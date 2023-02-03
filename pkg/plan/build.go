@@ -69,6 +69,7 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 
 	// to build charts we need repositories and registries first
 	log.Info("Building charts...")
+
 	err = p.buildCharts()
 	if err != nil {
 		return err
