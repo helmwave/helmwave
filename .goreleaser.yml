@@ -258,4 +258,4 @@ announce:
     chat_id: -1001484486010
     message_template: |
       Helmwave *{{ replace .Tag "." "\\." }}* is ready\!
-      See more: https://github.com/helmwave/helmwave/releases/tag/{{ replace .Tag "." "\\." }}
+      See more: https://github\.com/helmwave/helmwave/releases/tag/{{ replace .Tag "." "\\." }}
