@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: bubkoo/auto-assign@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CR_PAT }}
 
           addAssignees: true
           addReviewers: true
