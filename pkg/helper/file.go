@@ -64,5 +64,10 @@ func CopyFile(src, dest string) error {
 		}
 	}
 
-	return cp.Copy(src, dest)
+	err = cp.Copy(src, dest)
+	if err != nil {
+		return fmt.Errorf("failed to copy file '%s' to '%s': %w", src, dest, err)
+	}
+
+	return nil
 }
