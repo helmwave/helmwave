@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -12,13 +13,14 @@ import (
 
 // Build is struct for running 'build' CLI command.
 type Build struct {
-	yml      *Yml
-	diff     *Diff
-	plandir  string
-	diffMode string
-	tags     cli.StringSlice
-	matchAll bool
-	autoYml  bool
+	yml            *Yml
+	diff           *Diff
+	plandir        string
+	diffMode       string
+	chartsCacheDir string
+	tags           cli.StringSlice
+	matchAll       bool
+	autoYml        bool
 
 	// diffLive *DiffLive
 	// diffLocal *DiffLocalPlan
@@ -39,6 +41,11 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		if err != nil {
 			return err
 		}
+	}
+
+	err = cache.ChartsCache.Init(i.chartsCacheDir)
+	if err != nil {
+		return err
 	}
 
 	newPlan := plan.New(i.plandir)
@@ -103,6 +110,7 @@ func (i *Build) flags() []cli.Flag {
 		flagTags(&i.tags),
 		flagMatchAllTags(&i.matchAll),
 		flagDiffMode(&i.diffMode),
+		flagChartsCacheDir(&i.chartsCacheDir),
 
 		&cli.BoolFlag{
 			Name:        "yml",

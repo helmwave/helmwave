@@ -126,3 +126,14 @@ func flagDiffThreeWayMerge(v *bool) *cli.BoolFlag {
 		Destination: v,
 	}
 }
+
+// flagDiffMode pass val to urfave flag.
+func flagChartsCacheDir(v *string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:        "charts-cache-dir",
+		Value:       "",
+		Usage:       "Enable caching of helm charts in specified directory",
+		EnvVars:     []string{"HELMWAVE_CHARTS_CACHE"},
+		Destination: v,
+	}
+}
