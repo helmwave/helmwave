@@ -24,10 +24,10 @@ require (
 	github.com/werf/kubedog v0.9.6
 	github.com/werf/logboek v0.5.4
 	gopkg.in/yaml.v3 v3.0.1
-	helm.sh/helm/v3 v3.10.3
-	k8s.io/apimachinery v0.25.6
-	k8s.io/cli-runtime v0.25.6
-	k8s.io/client-go v0.25.6
+	helm.sh/helm/v3 v3.11.1
+	k8s.io/apimachinery v0.26.0
+	k8s.io/cli-runtime v0.26.0
+	k8s.io/client-go v0.26.0
 	k8s.io/klog v1.0.0
 	k8s.io/klog/v2 v2.80.1
 )
@@ -39,12 +39,6 @@ require (
 	cloud.google.com/go/iam v0.7.0 // indirect
 	cloud.google.com/go/storage v1.27.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
-	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
-	github.com/Azure/go-autorest/autorest v0.11.28 // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.9.21 // indirect
-	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
-	github.com/Azure/go-autorest/logger v0.2.1 // indirect
-	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -116,7 +110,6 @@ require (
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -206,7 +199,6 @@ require (
 	github.com/rivo/uniseg v0.4.2 // indirect
 	github.com/rs/zerolog v1.28.0 // indirect
 	github.com/rubenv/sql-migrate v1.2.0 // indirect
-	github.com/russross/blackfriday v1.6.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
@@ -226,7 +218,6 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.5 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.starlark.net v0.0.0-20221020143700-22309ac47eac // indirect
 	go.uber.org/atomic v1.10.0 // indirect
@@ -254,13 +245,13 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	inet.af/netaddr v0.0.0-20220811202034-502d2d690317 // indirect
-	k8s.io/api v0.25.6 // indirect
-	k8s.io/apiextensions-apiserver v0.25.6 // indirect
-	k8s.io/apiserver v0.25.6 // indirect
-	k8s.io/component-base v0.25.6 // indirect
+	k8s.io/api v0.26.0 // indirect
+	k8s.io/apiextensions-apiserver v0.26.0 // indirect
+	k8s.io/apiserver v0.26.0 // indirect
+	k8s.io/component-base v0.26.0 // indirect
 	k8s.io/helm v2.17.0+incompatible // indirect
 	k8s.io/kube-openapi v0.0.0-20221012153701-172d655c2280 // indirect
-	k8s.io/kubectl v0.25.6 // indirect
+	k8s.io/kubectl v0.26.0 // indirect
 	k8s.io/utils v0.0.0-20221108210102-8e77b1f39fe2 // indirect
 	oras.land/oras-go v1.2.2 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
