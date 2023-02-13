@@ -18,7 +18,7 @@ require (
 	github.com/r3labs/diff/v3 v3.0.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/pflag v1.0.5
-	github.com/stoewer/go-strcase v1.2.0
+	github.com/stoewer/go-strcase v1.2.1
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.24.1
 	github.com/werf/kubedog v0.9.6
