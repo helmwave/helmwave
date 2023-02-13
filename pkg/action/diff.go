@@ -6,8 +6,9 @@ import (
 
 // Diff is struct for running 'diff' commands.
 type Diff struct {
-	ShowSecret bool
-	Wide       int
+	ThreeWayMerge bool
+	ShowSecret    bool
+	Wide          int
 }
 
 // Cmd returns 'diff' *cli.Command.
@@ -32,5 +33,6 @@ func (d *Diff) flags() []cli.Flag {
 	return []cli.Flag{
 		flagDiffWide(&d.Wide),
 		flagDiffShowSecret(&d.ShowSecret),
+		flagDiffThreeWayMerge(&d.ThreeWayMerge),
 	}
 }

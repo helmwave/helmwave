@@ -310,3 +310,7 @@ func (rel *config) MarshalYAML() (interface{}, error) {
 
 	return r, nil
 }
+
+func (rel *config) HooksDisabled() bool {
+	return rel.DisableHooks
+}

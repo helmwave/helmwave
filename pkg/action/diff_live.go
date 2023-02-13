@@ -25,7 +25,7 @@ func (d *DiffLive) Run(ctx context.Context) error {
 		return os.ErrNotExist
 	}
 
-	p.DiffLive(ctx, d.diff.ShowSecret, d.diff.Wide)
+	p.DiffLive(ctx, d.diff.ShowSecret, d.diff.Wide, d.diff.ThreeWayMerge)
 
 	return nil
 }
