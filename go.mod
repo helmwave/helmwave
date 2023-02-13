@@ -15,7 +15,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.9.0
 	github.com/pkg/errors v0.9.1
-	github.com/r3labs/diff/v3 v3.0.0
+	github.com/r3labs/diff/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.2.0
@@ -208,7 +208,8 @@ require (
 	github.com/spf13/cobra v1.6.1 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
-	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
+	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
