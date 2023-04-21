@@ -1,6 +1,0 @@
-kind: Dependencies
-body: bump main packages and fix some deps builds
-time: 2023-04-21T13:57:59.374188+03:00
-custom:
-  Author: zhilyaev
-  Issue: ""
