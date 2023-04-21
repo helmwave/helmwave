@@ -13,6 +13,7 @@ linters:
   disable:
     - contextcheck # we don't need contexts everywhere
     - deadcode # deprecated
+    - revive # piece of shit
     - exhaustivestruct # deprecated
     - exhaustruct # it requires to initialize billions of fields, I ain't monkey to fix these
     - gci # we use gofumpt
