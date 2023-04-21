@@ -22,7 +22,7 @@ var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
 //
-//nolint:lll
+// nolintlint:lll
 type ValuesReference struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
 	Dst            string `yaml:"dst" json:"dst"`
@@ -79,7 +79,7 @@ func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
 }
 
 // MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v3.
-func (v ValuesReference) MarshalYAML() (interface{}, error) {
+func (v ValuesReference) MarshalYAML() (any, error) {
 	return struct {
 		Src string
 		Dst string
@@ -175,7 +175,7 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	return nil
 }
 
-//nolint:nestif // it is still pretty easy to understand
+// nolintlint:nestif // it is still pretty easy to understand
 func (v *ValuesReference) fetch(l *log.Entry) error {
 	if v.isURL() {
 		err := v.Download()

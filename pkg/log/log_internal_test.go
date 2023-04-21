@@ -183,7 +183,7 @@ func (s *LogTestSuite) TestLogboekWidth() {
 	s.Require().Equal(settings.width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 
-//nolint:paralleltest // helmwave uses single logger for the whole program
+// nolintlint:paralleltest // helmwave uses single logger for the whole program
 func TestLogTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(LogTestSuite))

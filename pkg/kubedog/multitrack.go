@@ -82,7 +82,7 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 			err = r.handleAnnotationShowLogsOnlyForContainers(value, spec)
 
 		default:
-			//nolint:gocritic // keep switch in case of more prefix-based annotations in future
+			// nolintlint:gocritic // keep switch in case of more prefix-based annotations in future
 			switch {
 			case strings.HasPrefix(name, LogRegexForAnnoPrefix):
 				err = r.handleAnnotationLogRegexFor(name, value, spec)

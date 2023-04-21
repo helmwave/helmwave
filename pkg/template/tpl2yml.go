@@ -15,7 +15,7 @@ type TemplaterOptions func(Templater)
 type Templater interface {
 	Name() string
 	Delims(string, string)
-	Render(string, interface{}) ([]byte, error)
+	Render(string, any) ([]byte, error)
 }
 
 func getTemplater(name string) (Templater, error) {
@@ -32,14 +32,14 @@ func getTemplater(name string) (Templater, error) {
 }
 
 // Tpl2yml renders 'tpl' file to 'yml' file as go template.
-func Tpl2yml(tpl, yml string, data interface{}, templaterName string, opts ...TemplaterOptions) error {
+func Tpl2yml(tpl, yml string, data any, templaterName string, opts ...TemplaterOptions) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
 	}).Trace("Render yml file")
 
 	if data == nil {
-		data = map[string]interface{}{}
+		data = map[string]any{}
 	}
 
 	src, err := os.ReadFile(tpl)

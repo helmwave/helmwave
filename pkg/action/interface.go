@@ -28,10 +28,10 @@ func getContextWithFlags(c *cli.Context) context.Context {
 	for _, flagName := range c.FlagNames() {
 		g := c.Value(flagName)
 		log.WithField("name", flagName).WithField("value", g).Trace("adding flag to action context.Context")
-		ctx = context.WithValue(ctx, flagName, g) //nolint:staticcheck // weird issue, we won't have any collisions with strings
+		ctx = context.WithValue(ctx, flagName, g) // nolintlint:staticcheck // weird issue, we won't have any collisions with strings
 	}
 
-	//nolint:staticcheck // same
+	// nolintlint:staticcheck // same
 	ctx = context.WithValue(ctx, "cli", c)
 
 	return ctx

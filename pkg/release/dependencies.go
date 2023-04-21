@@ -21,7 +21,7 @@ const (
 
 // DependsOnReference is used to store release dependencies.
 //
-//nolint:lll
+// nolintlint:lll
 type DependsOnReference struct {
 	Name     string `yaml:"name" json:"name" jsonschema:"description=Uniqname (or just name if in same namespace) of dependency release"`
 	Tag      string `yaml:"tag,omitempty" json:"tag,omitempty" jsonschema:"description=All available releases with the tag will be applied as dependencies"`

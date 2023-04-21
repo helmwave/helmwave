@@ -27,7 +27,7 @@ var (
 	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
 	// SkippedAnnotations is a map with all annotations to be skipped by differ.
-	//nolint:gochecknoglobals // cannot make this const
+	// nolintlint:gochecknoglobals // cannot make this const
 	SkippedAnnotations = map[string][]string{
 		live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
 		helper.RootAnnoName + "skip-diff": {"true"},
@@ -107,7 +107,7 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, thre
 	showChangesReport(p.body.Releases, visited, k)
 }
 
-//nolint:funlen,gocognit
+// nolintlint:funlen,gocognit
 func get3WayMergeManifests(rel release.Config, oldManifest string) string {
 	cfg := rel.Cfg()
 
@@ -136,7 +136,7 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string {
 		currentObject, err := h.Get(r.Namespace, r.Name)
 		if err != nil {
 			if !apierrors.IsNotFound(err) {
-				return err //nolint:wrapcheck
+				return err // nolintlint:wrapcheck
 			}
 
 			return nil
@@ -144,16 +144,16 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string {
 
 		out, err := yaml.Marshal(currentObject)
 		if err != nil {
-			return err //nolint:wrapcheck
+			return err // nolintlint:wrapcheck
 		}
 		// currentObject stores everything under 'object' key.
 		// We need to get everything from this field and drop some generated parts.
-		var ra map[string]interface{}
+		var ra map[string]any
 		_ = yaml.Unmarshal(out, &ra)
-		obj := ra["object"].(map[string]interface{}) //nolint:forcetypeassert
+		obj := ra["object"].(map[string]any) // nolintlint:forcetypeassert
 		delete(obj, "status")
 
-		metadata := obj["metadata"].(map[string]interface{}) //nolint:forcetypeassert
+		metadata := obj["metadata"].(map[string]any) // nolintlint:forcetypeassert
 		delete(metadata, "creationTimestamp")
 		delete(metadata, "generation")
 		delete(metadata, "managedFields")
@@ -161,7 +161,7 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string {
 		delete(metadata, "uid")
 
 		if a := metadata["annotations"]; a != nil {
-			annotations := a.(map[string]interface{}) //nolint:forcetypeassert
+			annotations := a.(map[string]any) // nolintlint:forcetypeassert
 			delete(annotations, "meta.helm.sh/release-name")
 			delete(annotations, "meta.helm.sh/release-namespace")
 			delete(annotations, "deployment.kubernetes.io/revision")
@@ -289,10 +289,10 @@ func (p *Plan) GetLive(
 
 			if err != nil {
 				log.Warnf("I cant get release from k8s: %v", err)
-				//nolint:revive // we are under mutex here
+				// nolintlint:revive // we are under mutex here
 				notFound = append(notFound, rel.Uniq())
 			} else {
-				//nolint:revive // we are under mutex here
+				// nolintlint:revive // we are under mutex here
 				found[rel.Uniq()] = r
 			}
 		}(wg, mu, p.body.Releases[i])

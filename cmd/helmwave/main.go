@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-//nolint:gochecknoglobals // we need global list of commands
+// nolintlint:gochecknoglobals // we need global list of commands
 var commands = []*cli.Command{
 	new(action.Build).Cmd(),
 	new(action.Diff).Cmd(),
@@ -33,7 +33,7 @@ func main() {
 	defer recoverPanic()
 
 	if err := c.Run(os.Args); err != nil {
-		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regural command errors
+		log.Fatal(err) // nolintlint:gocritic // we try to recover panics, not regural command errors
 	}
 }
 
@@ -93,7 +93,7 @@ func version() *cli.Command {
 		Aliases: []string{"ver"},
 		Usage:   "Show shorts version",
 		Action: func(c *cli.Context) error {
-			fmt.Println(helmwave.Version) //nolint:forbidigo // we need to use fmt.Println here
+			fmt.Println(helmwave.Version) // nolintlint:forbidigo // we need to use fmt.Println here
 
 			return nil
 		},

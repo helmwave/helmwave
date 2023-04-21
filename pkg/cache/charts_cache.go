@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//nolint:gochecknoglobals
+// nolintlint:gochecknoglobals
 var ChartsCache = CacheConfig{}
 
 type CacheConfig struct {

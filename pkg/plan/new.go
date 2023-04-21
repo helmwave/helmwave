@@ -94,7 +94,7 @@ func (p *Plan) Logger() *log.Entry {
 	})
 }
 
-//nolint:lll
+// nolintlint:lll
 type planBody struct {
 	Project      string           `yaml:"project" json:"project" jsonschema:"title=project name,description=reserved for future,example=my-awesome-project"`
 	Version      string           `yaml:"version" json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,pattern=^[0-9]+\\.[0-9]+\\.[0-9]+$,example=0.23.0,example=0.22.1"`

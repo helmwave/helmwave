@@ -9,7 +9,7 @@ import (
 // It will override by goreleaser during release.
 // -X github.com/helmwave/helmwave/pkg/version.Version={{ .Version }}.
 //
-//nolint:gochecknoglobals
+// nolintlint:gochecknoglobals
 var Version = "dev"
 
 // Check compares helmwave versions and logs difference.

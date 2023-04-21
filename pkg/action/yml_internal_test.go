@@ -42,7 +42,7 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 	ts.Require().Equal(value, b.Releases[0].Namespace())
 }
 
-//nolint:paralleltest // cannot parallel because of setenv
+// nolintlint:paralleltest // cannot parallel because of setenv
 func TestYmlTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(YmlTestSuite))

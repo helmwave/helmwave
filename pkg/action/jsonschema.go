@@ -19,7 +19,7 @@ func (i *GenSchema) Run(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Println(string(s)) //nolint:forbidigo
+	fmt.Println(string(s)) // nolintlint:forbidigo
 
 	return nil
 }
