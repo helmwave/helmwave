@@ -235,7 +235,7 @@ brews:
     goamd64: v1
     description: "HelmWave is like docker-compose for helm"
     license: "MIT"
-    folder: formula
+    folder: Formula
     skip_upload: auto
 
     custom_block: |
