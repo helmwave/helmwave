@@ -52,7 +52,7 @@ type Plan struct {
 	graphMD   string
 	templater string
 
-	unchanged []uniqname.UniqName
+	unchanged release.Configs
 	manifests map[uniqname.UniqName]string
 }
 

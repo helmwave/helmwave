@@ -69,17 +69,8 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 func (p *Plan) removeUnchanged() {
 	filtered := p.body.Releases[:0]
 
-	isChanged := func(r release.Config) bool {
-		for _, uc := range p.unchanged {
-			if r.Uniq().Equal(uc) {
-				return false
-			}
-		}
-		return true
-	}
-
 	for _, rel := range p.body.Releases {
-		if isChanged(rel) {
+		if !helper.In[release.Config](rel, p.unchanged) {
 			filtered = append(filtered, rel)
 		}
 	}
