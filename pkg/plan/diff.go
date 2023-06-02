@@ -56,6 +56,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 		if !change {
 			k++
 			log.Info("🆚 ❎ ", rel.Uniq(), " no changes")
+			p.unchanged = append(p.unchanged, rel.Uniq())
 		}
 	}
 
@@ -100,6 +101,7 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, thre
 			if !change && !chartChange {
 				k++
 				rel.Logger().Info("🆚 ❎ no changes")
+				p.unchanged = append(p.unchanged, rel.Uniq())
 			}
 		}
 	}
