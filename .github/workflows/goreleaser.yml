@@ -85,7 +85,7 @@ jobs:
         run: go install github.com/miniscruff/changie@v1
 
       - name: Generate release changelog
-        run: changie batch $TAG
+        run: changie batch $TAG --force
         env:
           TAG: ${{ needs.tagger.outputs.tag }}
 
