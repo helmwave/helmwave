@@ -9,14 +9,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// nolintlint:gochecknoglobals // cannot make these const
 var (
-	sprigAliases = map[string]string{
+	sprigAliases = map[string]string{ //nolint:gochecknoglobals // cannot make these const
 		"get":    "sprigGet",
 		"hasKey": "sprigHasKey",
 	}
 
-	customFuncs = map[string]any{
+	customFuncs = map[string]any{ //nolint:gochecknoglobals // cannot make these const
 		"toYaml":         ToYaml,
 		"fromYaml":       FromYaml,
 		"exec":           Exec,

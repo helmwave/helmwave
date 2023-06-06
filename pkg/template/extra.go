@@ -214,7 +214,7 @@ func noKeyError(key string, obj any) error {
 // Third argument is map to search in.
 // Used as custom template function.
 //
-// nolintlint:gocognit
+//nolint:gocognit
 func Get(path string, varArgs ...any) (any, error) {
 	defSet, def, obj, err := parseGetVarArgs(varArgs)
 	if err != nil {

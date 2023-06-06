@@ -98,8 +98,7 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease.AssertExpectations(s.T())
 }
 
-// nolintlint:paralleltest // cannot parallel because of flock timeout
-func TestApplyTestSuite(t *testing.T) {
+func TestApplyTestSuite(t *testing.T) { //nolintlint:paralleltest // cannot parallel because of flock timeout
 	// t.Parallel()
 	suite.Run(t, new(ApplyTestSuite))
 }

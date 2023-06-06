@@ -73,8 +73,7 @@ func (l *Settings) Run(c *cli.Context) error {
 func (l *Settings) Init() error {
 	// Skip various low-level k8s client errors
 	// There are a lot of context deadline errors being logged
-	// nolintlint:reassign
-	utilruntime.ErrorHandlers = []func(error){
+	utilruntime.ErrorHandlers = []func(error){ //nolint:reassign
 		logKubernetesClientError,
 	}
 

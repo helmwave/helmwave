@@ -23,7 +23,7 @@ func (s *CliTestSuite) TestCompletion() {
 		},
 	}
 
-	app, _, _, _ := s.prepareApp() // nolintlint:dogsled // no need to access nor stdin or stdout or stderr
+	app, _, _, _ := s.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
 
 	for _, tt := range tests {
 		err := app.Run(tt.args)

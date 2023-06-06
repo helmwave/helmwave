@@ -95,9 +95,8 @@ func (p *Plan) syncRegistries(ctx context.Context) (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
-//
-// nolintlint:gocognit // TODO: simplify
-func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
+// TODO: simplify.
+func SyncRepositories(ctx context.Context, repositories repo.Configs) error { //nolint:gocognit
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exists

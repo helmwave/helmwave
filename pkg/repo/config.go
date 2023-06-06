@@ -8,7 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// nolintlint:lll
 type config struct {
 	log        *log.Entry `yaml:"-" json:"-"`
 	repo.Entry `yaml:",inline" json:",inline"`

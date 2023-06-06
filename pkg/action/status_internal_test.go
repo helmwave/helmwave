@@ -43,7 +43,7 @@ func (ts *StatusTestSuite) TestRun() {
 	ts.Require().NoError(s.Run(context.Background()))
 }
 
-// nolintlint:paralleltest // cannot parallel because of setenv
+//nolintlint:paralleltest // cannot parallel because of setenv
 func TestStatusTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(StatusTestSuite))

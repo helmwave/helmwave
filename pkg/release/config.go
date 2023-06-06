@@ -40,7 +40,7 @@ type config struct {
 	Devel                    bool                  `yaml:"devel,omitempty" json:"devel,omitempty" jsonschema:"default=false"`
 	DisableHooks             bool                  `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool                  `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
-	dryRun                   bool                  `yaml:"dry_run,omitempty" json:"dry_run,omitempty" jsonschema:"default=false"` // nolintlint:govet
+	dryRun                   bool                  `yaml:"dry_run,omitempty" json:"dry_run,omitempty" jsonschema:"default=false"` //nolint:govet
 	Force                    bool                  `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
 	Recreate                 bool                  `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
 	ResetValues              bool                  `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`
@@ -290,7 +290,7 @@ func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
 		return nil, nil
 	}
 
-	return postrender.NewExec(rel.PostRendererF[0], rel.PostRendererF[1:]...) // nolintlint:wrapcheck
+	return postrender.NewExec(rel.PostRendererF[0], rel.PostRendererF[1:]...) //nolint:wrapcheck
 }
 
 func (rel *config) KubeContext() string {
@@ -300,15 +300,15 @@ func (rel *config) KubeContext() string {
 // MarshalYAML is a marshaller for gopkg.in/yaml.v3.
 // It is required to avoid data race with getting read lock.
 //
-// nolintlint:govet
+//nolintlint:govet
 func (rel *config) MarshalYAML() (any, error) {
 	rel.lock.RLock()
 	defer rel.lock.RUnlock()
 
 	type raw config
-	r := raw(*rel)
+	r := raw(*rel) //nolint:govet
 
-	return r, nil
+	return r, nil //nolint:govet
 }
 
 func (rel *config) HooksDisabled() bool {
