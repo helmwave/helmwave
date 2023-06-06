@@ -85,7 +85,7 @@ jobs:
         run: go install github.com/miniscruff/changie@v1
 
       - name: Generate release changelog
-        run: changie batch $TAG
+        run: changie batch $TAG --force
         env:
           TAG: ${{ needs.tagger.outputs.tag }}
 
@@ -168,7 +168,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v4
         with:
           version: latest
-          args: release --skip-validate --rm-dist --release-notes ${{ needs.tagger.outputs.tag }}.md
+          args: release --skip-validate --clean --release-notes ${{ needs.tagger.outputs.tag }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
