@@ -75,7 +75,7 @@ func (ts *DiffPlanTestSuite) TestRun() {
 	ts.Require().Contains(output, "memcached-a-redis, Secret (v1) has been removed")
 }
 
-//nolint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
+//nolintlint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
 func TestDiffPlanTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DiffPlanTestSuite))

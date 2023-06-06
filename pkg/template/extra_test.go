@@ -16,8 +16,8 @@ type ExtraTestSuite struct {
 
 func (s *ExtraTestSuite) TestToYaml() {
 	data := struct {
-		Field       interface{}
-		nonexported interface{}
+		Field       any
+		nonexported any
 	}{
 		Field:       "field",
 		nonexported: 123,
@@ -31,7 +31,7 @@ func (s *ExtraTestSuite) TestToYaml() {
 
 type raw struct{}
 
-func (r raw) MarshalYAML() (interface{}, error) {
+func (r raw) MarshalYAML() (any, error) {
 	return nil, os.ErrNotExist
 }
 
@@ -72,7 +72,7 @@ func (s *ExtraTestSuite) TestFromYaml() {
 }
 
 func (s *ExtraTestSuite) TestExec() {
-	res, err := template.Exec("pwd", []interface{}{})
+	res, err := template.Exec("pwd", []any{})
 	s.Require().NoError(err)
 
 	pwd, err := os.Getwd()
@@ -82,27 +82,27 @@ func (s *ExtraTestSuite) TestExec() {
 }
 
 func (s *ExtraTestSuite) TestExecInvalidArg() {
-	res, err := template.Exec("pwd", []interface{}{123})
+	res, err := template.Exec("pwd", []any{123})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
 
 func (s *ExtraTestSuite) TestExecError() {
-	res, err := template.Exec(s.T().Name(), []interface{}{})
+	res, err := template.Exec(s.T().Name(), []any{})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
 
 func (s *ExtraTestSuite) TestExecStdin() {
 	input := "123"
-	res, err := template.Exec("cat", []interface{}{}, input)
+	res, err := template.Exec("cat", []any{}, input)
 	s.Require().NoError(err)
 	s.Require().Equal(input, res)
 }
 
 func (s *ExtraTestSuite) TestSetValueAtPath() {
 	data := template.Values{
-		"a": map[string]interface{}{
+		"a": map[string]any{
 			"b": "123",
 		},
 		"c": 123,
@@ -110,7 +110,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 
 	tests := []struct {
 		result template.Values
-		value  interface{}
+		value  any
 		path   string
 		fails  bool
 	}{
@@ -118,7 +118,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			path:  "c",
 			value: 321,
 			result: template.Values{
-				"a": map[string]interface{}{"b": "123"},
+				"a": map[string]any{"b": "123"},
 				"c": 321,
 			},
 			fails: false,
@@ -127,7 +127,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			path:  "a.b",
 			value: "321",
 			result: template.Values{
-				"a": map[string]interface{}{"b": "321"},
+				"a": map[string]any{"b": "321"},
 				"c": 321,
 			},
 			fails: false,
@@ -136,7 +136,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			path:  "a.c",
 			value: "321",
 			result: template.Values{
-				"a": map[string]interface{}{"b": "321", "c": "321"},
+				"a": map[string]any{"b": "321", "c": "321"},
 				"c": 321,
 			},
 			fails: false,
@@ -178,7 +178,7 @@ func (s *ExtraTestSuite) TestRequiredEnv() {
 
 func (s *ExtraTestSuite) TestRequired() {
 	tests := []struct {
-		data  interface{}
+		data  any
 		fails bool
 	}{
 		{
@@ -233,14 +233,14 @@ func (s *ExtraTestSuite) TestReadFile() {
 
 func (s *ExtraTestSuite) TestGet() {
 	data := template.Values{
-		"a": map[string]interface{}{
+		"a": map[string]any{
 			"b": "123",
 		},
 		"c": 123,
 	}
 
 	tests := []struct {
-		result interface{}
+		result any
 		path   string
 		fails  bool
 	}{
@@ -280,7 +280,7 @@ func (s *ExtraTestSuite) TestGet() {
 
 func (s *ExtraTestSuite) TestHasKey() {
 	data := template.Values{
-		"a": map[string]interface{}{
+		"a": map[string]any{
 			"b": "123",
 		},
 		"c": 123,
