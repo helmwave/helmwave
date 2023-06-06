@@ -44,7 +44,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	ts.Require().NoError(d.Run(context.Background()))
 }
 
-//nolint:paralleltest // uses helm repository.yaml flock
+//nolintlint:paralleltest // uses helm repository.yaml flock
 func TestDiffLiveTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DiffLiveTestSuite))

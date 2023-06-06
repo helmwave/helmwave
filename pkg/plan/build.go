@@ -7,9 +7,7 @@ import (
 )
 
 // Build plan with yml and tags/matchALL options.
-//
-//nolint:funlen
-func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bool, templater string) error {
+func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bool, templater string) error { //nolint:funlen
 	p.templater = templater
 
 	// Create Body

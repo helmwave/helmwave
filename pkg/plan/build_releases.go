@@ -35,7 +35,7 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]r
 	return plan, nil
 }
 
-//nolint:nestif
+//nolintlint:nestif
 func addToPlan(plan []release.Config, rel release.Config,
 	releases map[uniqname.UniqName]release.Config,
 ) ([]release.Config, error) {
