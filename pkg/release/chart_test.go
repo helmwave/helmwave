@@ -55,8 +55,8 @@ func (s *ChartTestSuite) TestLoadChartLocal() {
 	s.Require().Nil(c)
 }
 
-//nolint:paralleltest // uses helm repository.yaml flock
-func TestChartTestSuite(t *testing.T) {
+//nolintlint:paralleltest
+func TestChartTestSuite(t *testing.T) { //nolint:paralleltest // uses helm repository.yaml flock
 	// t.Parallel()
 	suite.Run(t, new(ChartTestSuite))
 }

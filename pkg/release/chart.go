@@ -20,10 +20,10 @@ import (
 
 // Chart is structure for chart download options.
 //
-//nolint:lll
+// nolintlint:lll
 type Chart struct {
 	action.ChartPathOptions `yaml:",inline" json:",inline"`
-	Name                    string `yaml:"name" json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
+	Name                    string `yaml:"name" json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"` //nolint:lll
 }
 
 // UnmarshalYAML flexible config.

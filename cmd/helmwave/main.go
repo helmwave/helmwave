@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-//nolint:gochecknoglobals // we need global list of commands
+//nolintlint:gochecknoglobals // we need global list of commands
 var commands = []*cli.Command{
 	new(action.Build).Cmd(),
 	new(action.Diff).Cmd(),
@@ -33,7 +33,7 @@ func main() {
 	defer recoverPanic()
 
 	if err := c.Run(os.Args); err != nil {
-		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regural command errors
+		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regular command errors
 	}
 }
 
