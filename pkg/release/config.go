@@ -81,7 +81,7 @@ func (rel *config) newInstall() *action.Install {
 
 	pr, err := rel.PostRenderer()
 	if err != nil {
-		rel.Logger().WithError(err).Warn("failed to create postrenderer")
+		rel.Logger().WithError(err).Warn("failed to create post-renderer")
 	} else {
 		client.PostRenderer = pr
 	}
