@@ -61,9 +61,8 @@ func CreateApp() *cli.App {
 		"1. $ helmwave build\n" +
 		"2. $ helmwave up\n"
 
-	logSet := logSetup.Settings{}
-	c.Before = logSet.Run
-	c.Flags = logSet.Flags()
+	c.Before = logSetup.Default.Run
+	c.Flags = logSetup.Default.Flags()
 
 	c.Commands = commands
 	c.CommandNotFound = command404

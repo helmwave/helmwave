@@ -313,7 +313,7 @@ func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 
 func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.Config) error {
 	ctxCancel, cancel := context.WithCancel(ctx)
-	defer cancel() // Dont forget!
+	defer cancel() // Don't forget!
 
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogConfig.StatusInterval,

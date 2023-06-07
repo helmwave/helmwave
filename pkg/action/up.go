@@ -9,6 +9,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+	"github.com/werf/logboek"
 )
 
 // Up is struct for running 'up' command.
@@ -16,8 +17,9 @@ type Up struct {
 	build *Build
 	dog   *kubedog.Config
 
-	autoBuild      bool
-	kubedogEnabled bool
+	autoBuild       bool
+	kubedogEnabled  bool
+	kubedogLogWidth int
 }
 
 // Run is main function for 'up' command.
@@ -39,6 +41,10 @@ func (i *Up) Run(ctx context.Context) error {
 
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")
+		err = i.fixKubedogLog()
+		if err != nil {
+			return err
+		}
 
 		return p.ApplyWithKubedog(ctx, i.dog)
 	}
@@ -104,6 +110,13 @@ func (i *Up) flags() []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &i.dog.Timeout,
 		},
+		&cli.IntFlag{
+			Name:        "kubedog-log-width",
+			Usage:       "Set kubedog max log line width",
+			Value:       140,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
+			Destination: &i.kubedogLogWidth,
+		},
 		&cli.BoolFlag{
 			Name:        "progress",
 			Usage:       "Enable progress logs of helm (INFO log level)",
@@ -120,4 +133,21 @@ func (i *Up) flags() []cli.Flag {
 	}
 
 	return append(self, i.build.flags()...)
+}
+
+// fixKubedogLog will disable kubernetes logger and fix width for logboek
+func (i *Up) fixKubedogLog() error {
+	if err := kubedog.SilenceKlog(context.Background()); err != nil {
+		return err
+	}
+
+	if err := kubedog.SilenceKlogV2(context.Background()); err != nil {
+		return err
+	}
+
+	if i.kubedogLogWidth > 0 {
+		logboek.DefaultLogger().Streams().SetWidth(i.kubedogLogWidth)
+	}
+
+	return nil
 }
