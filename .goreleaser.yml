@@ -235,6 +235,20 @@ brews:
     goamd64: v1
     description: "HelmWave is like docker-compose for helm"
     license: "MIT"
+    folder: formula
+    skip_upload: auto
+
+    custom_block: |
+      head "https://github.com/helmwave/helmwave.git", branch: "main"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/helmwave --version")
+  - tap:
+      owner: helmwave
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    goamd64: v1
+    description: "HelmWave is like docker-compose for helm"
+    license: "MIT"
     folder: Formula
     skip_upload: auto
 
