@@ -52,8 +52,8 @@ type Plan struct {
 	graphMD   string
 	templater string
 
-	unchanged release.Configs
 	manifests map[uniqname.UniqName]string
+	unchanged release.Configs
 }
 
 // NewAndImport wrapper for New and Import in one.
