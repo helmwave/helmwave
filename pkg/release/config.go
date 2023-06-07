@@ -40,7 +40,7 @@ type config struct {
 	Devel                    bool `yaml:"devel,omitempty" json:"devel,omitempty" jsonschema:"default=false"`
 	DisableHooks             bool `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
-	dryRun                   bool `jsonschema:"default=false"` //nolint:govet
+	dryRun                   bool `jsonschema:"default=false"`
 	EnableDNS                bool `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
 	Force                    bool `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
 	Recreate                 bool `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
@@ -87,6 +87,7 @@ func (rel *config) newInstall() *action.Install {
 		client.PostRenderer = pr
 	}
 
+	// TODO: maybe check diff-mode?
 	if client.DryRun {
 		client.Replace = true
 		client.ClientOnly = true
