@@ -161,21 +161,6 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	}
 }
 
-func (s *ExtraTestSuite) TestRequiredEnv() {
-	name := s.T().Name()
-
-	res, err := template.RequiredEnv(name)
-	s.Require().Error(err)
-	s.Require().Empty(res)
-
-	data := "test"
-	s.T().Setenv(name, data)
-
-	res, err = template.RequiredEnv(name)
-	s.Require().NoError(err)
-	s.Require().Equal(data, res)
-}
-
 func (s *ExtraTestSuite) TestRequired() {
 	tests := []struct {
 		data  any
@@ -328,4 +313,29 @@ func (s *ExtraTestSuite) TestHasKey() {
 func TestExtraTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(ExtraTestSuite))
+}
+
+type NonParallelExtraTestSuite struct {
+	suite.Suite
+}
+
+func (s *NonParallelExtraTestSuite) TestRequiredEnv() {
+	name := s.T().Name()
+
+	res, err := template.RequiredEnv(name)
+	s.Require().Error(err)
+	s.Require().Empty(res)
+
+	data := "test"
+	s.T().Setenv(name, data)
+
+	res, err = template.RequiredEnv(name)
+	s.Require().NoError(err)
+	s.Require().Equal(data, res)
+}
+
+//nolintlint:paralleltest // cannot parallel because of setenv
+func TestNonParallelExtraTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(NonParallelExtraTestSuite))
 }
