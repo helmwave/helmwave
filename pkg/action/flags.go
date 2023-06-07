@@ -67,7 +67,7 @@ func flagDiffMode(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "diff-mode",
 		Value:       "live",
-		Usage:       "You can set: [ live | local ]",
+		Usage:       "You can set: [ live | local | none ]",
 		EnvVars:     []string{"HELMWAVE_DIFF_MODE"},
 		Destination: v,
 	}

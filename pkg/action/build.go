@@ -33,6 +33,9 @@ const (
 
 	// DiffModeLocal is a subcommand name for diffing manifests in two plans.
 	DiffModeLocal = "local"
+
+	// DiffModeNone is a subcommand name for skipping diffing.
+	DiffModeNone = "none"
 )
 
 // Run is main function for 'build' CLI command.
@@ -73,8 +76,10 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
 		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
+	case DiffModeNone:
+		log.Info("🆚 Skip diffing")
 	default:
-		log.Warnf("I dont know what is %q diff mode. I am skiping diff.", i.diffMode)
+		log.Warnf("I don't know what is %q diff mode. I am skiping diff.", i.diffMode)
 	}
 
 	err = newPlan.Export(ctx, i.skipUnchanged)
