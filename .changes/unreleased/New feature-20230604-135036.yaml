@@ -1,6 +1,0 @@
-kind: New feature
-body: Add `--skip-unchanged` flag for build command
-time: 2023-06-04T13:50:36.392755+04:00
-custom:
-  Author: rndmit
-  Issue: ""
