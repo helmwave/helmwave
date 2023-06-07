@@ -135,7 +135,7 @@ func (i *Up) flags() []cli.Flag {
 	return append(self, i.build.flags()...)
 }
 
-// fixKubedogLog will disable kubernetes logger and fix width for logboek
+// fixKubedogLog will disable kubernetes logger and fix width for logboek.
 func (i *Up) fixKubedogLog() error {
 	if err := kubedog.SilenceKlog(context.Background()); err != nil {
 		return err
