@@ -67,6 +67,7 @@ func (rel *config) newInstall() *action.Install {
 	client.DryRun = rel.dryRun
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
+	client.EnableDNS = rel.EnableDNS
 
 	rel.copyChartPathOptions(&client.ChartPathOptions)
 
@@ -110,6 +111,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.DryRun = rel.dryRun
 	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
+	client.EnableDNS = rel.EnableDNS
 
 	rel.copyChartPathOptions(&client.ChartPathOptions)
 
