@@ -41,6 +41,7 @@ type config struct {
 	DisableHooks             bool                  `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool                  `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
 	dryRun                   bool                  `yaml:"dry_run,omitempty" json:"dry_run,omitempty" jsonschema:"default=false"` //nolint:govet
+	EnableDNS                bool                  `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
 	Force                    bool                  `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
 	Recreate                 bool                  `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
 	ResetValues              bool                  `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`

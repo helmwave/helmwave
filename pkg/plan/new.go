@@ -45,17 +45,15 @@ var (
 
 // Plan contains full helmwave state.
 type Plan struct {
-	body     *planBody
-	dir      string
-	fullPath string
-
-	tmpDir string
+	body      *planBody
+	dir       string
+	fullPath  string
+	tmpDir    string
+	graphMD   string
+	templater string
 
 	manifests map[uniqname.UniqName]string
-
-	graphMD string
-
-	templater string
+	unchanged release.Configs
 }
 
 // NewAndImport wrapper for New and Import in one.

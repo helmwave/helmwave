@@ -21,6 +21,7 @@ type Build struct {
 	tags           cli.StringSlice
 	matchAll       bool
 	autoYml        bool
+	skipUnchanged  bool
 
 	// diffLive *DiffLive
 	// diffLocal *DiffLocalPlan
@@ -76,7 +77,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		log.Warnf("I dont know what is %q diff mode. I am skiping diff.", i.diffMode)
 	}
 
-	err = newPlan.Export(ctx)
+	err = newPlan.Export(ctx, i.skipUnchanged)
 	if err != nil {
 		return err
 	}
@@ -118,6 +119,13 @@ func (i *Build) flags() []cli.Flag {
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
 			Destination: &i.autoYml,
+		},
+		&cli.BoolFlag{
+			Name:        "skip-unchanged",
+			Usage:       "Skip unchanged releases",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_SKIP_UNCHANGED"},
+			Destination: &i.skipUnchanged,
 		},
 	}
 
