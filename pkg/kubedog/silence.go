@@ -60,3 +60,21 @@ func silenceKlogFlagSet(fs *flag.FlagSet) error {
 
 	return nil
 }
+
+// FixKubedogLog will disable kubernetes logger and fix width for logboek.
+// Todo: add ctx as an argument.
+func FixKubedogLog(width int) error {
+	if err := SilenceKlog(context.Background()); err != nil {
+		return err
+	}
+
+	if err := SilenceKlogV2(context.Background()); err != nil {
+		return err
+	}
+
+	if width > 0 {
+		logboek.DefaultLogger().Streams().SetWidth(width)
+	}
+
+	return nil
+}

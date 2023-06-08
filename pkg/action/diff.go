@@ -4,6 +4,17 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+const (
+	// DiffModeLive is a subcommand name for diffing manifests in plan with actually running manifests in k8s.
+	DiffModeLive = "live"
+
+	// DiffModeLocal is a subcommand name for diffing manifests in two plans.
+	DiffModeLocal = "local"
+
+	// DiffModeNone is a subcommand name for skipping diffing.
+	DiffModeNone = "none"
+)
+
 // Diff is struct for running 'diff' commands.
 type Diff struct {
 	ThreeWayMerge bool

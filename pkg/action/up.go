@@ -9,7 +9,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/werf/logboek"
 )
 
 // Up is struct for running 'up' command.
@@ -41,7 +40,7 @@ func (i *Up) Run(ctx context.Context) error {
 
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")
-		err = i.fixKubedogLog()
+		err = kubedog.FixKubedogLog(i.kubedogLogWidth)
 		if err != nil {
 			return err
 		}
@@ -133,21 +132,4 @@ func (i *Up) flags() []cli.Flag {
 	}
 
 	return append(self, i.build.flags()...)
-}
-
-// fixKubedogLog will disable kubernetes logger and fix width for logboek.
-func (i *Up) fixKubedogLog() error {
-	if err := kubedog.SilenceKlog(context.Background()); err != nil {
-		return err
-	}
-
-	if err := kubedog.SilenceKlogV2(context.Background()); err != nil {
-		return err
-	}
-
-	if i.kubedogLogWidth > 0 {
-		logboek.DefaultLogger().Streams().SetWidth(i.kubedogLogWidth)
-	}
-
-	return nil
 }

@@ -59,6 +59,8 @@ func (rel *config) DryRun(b bool) {
 func (rel *config) newInstall() *action.Install {
 	client := action.NewInstall(rel.Cfg())
 
+	// client.IncludeCRDs = true
+
 	// Only Up
 	client.CreateNamespace = rel.CreateNamespace
 	client.ReleaseName = rel.Name()

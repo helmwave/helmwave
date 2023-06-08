@@ -1092,6 +1092,8 @@ github.com/hashicorp/vault/sdk v0.6.0 h1:6Z+In5DXHiUfZvIZdMx7e2loL1PPyDjA4bVh9ZT
 github.com/hashicorp/vault/sdk v0.6.0/go.mod h1:+DRpzoXIdMvKc88R4qxr+edwy/RvH5QK8itmxLiDHLc=
 github.com/hashicorp/yamux v0.1.1 h1:yrQxtgseBDrq9Y652vSRDvsKCJKOUD+GzTS4Y0Y8pvE=
 github.com/hashicorp/yamux v0.1.1/go.mod h1:CtWFDAQgb7dxtzFs4tWbplKIe2jSi3+5vKbgIO0SLnQ=
+github.com/helmwave/asciigraph v1.0.0 h1:xTmqyOPUuaudsEw0BU3T/LC9YkZQRDY/QMur1k+DBps=
+github.com/helmwave/asciigraph v1.0.0/go.mod h1:f8DLnrh1Rnb3jrnTjFLPdB1hunfQ9L/zxFcxQHX8WGM=
 github.com/helmwave/logrus-emoji-formatter v1.1.0 h1:LMVt9hWp0+8nNJlKYzXAgaQ2C7y43+VWDUItXk7MEv0=
 github.com/helmwave/logrus-emoji-formatter v1.1.0/go.mod h1:4rNQF//jg0jPPtIAmTmuOHUGpoy5gzEWN+toUv+2F8A=
 github.com/hetznercloud/hcloud-go v1.33.1/go.mod h1:XX/TQub3ge0yWR2yHWmnDVIrB+MQbda1pHxkUmDlUME=
@@ -1246,8 +1248,6 @@ github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 h1:SOEGU9fKiNWd/HOJuq
 github.com/lann/builder v0.0.0-20180802200727-47ae307949d0/go.mod h1:dXGbAdH5GtBTC4WfIxhKZfyBF/HBFgRZSWwZ9g/He9o=
 github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 h1:P6pPBnrTSX3DEVR4fDembhRWSsG5rVo6hYhAB/ADZrk=
 github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0/go.mod h1:vmVJ0l/dxyfGW6FmdpVm2joNMFikkuWg0EoCKLGUMNw=
-github.com/lempiy/dgraph v0.0.0-20190713130529-88f0f7cdb48e h1:z2LhXZGJPFi+ZxKy2NxWarQMq3NTdSbuHsxwfQc9tQ4=
-github.com/lempiy/dgraph v0.0.0-20190713130529-88f0f7cdb48e/go.mod h1:GIpCi7ZwavptYScvUFk71HfjsVs67RFwwCZH9AmyZbM=
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
 github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
 github.com/lib/pq v1.1.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=

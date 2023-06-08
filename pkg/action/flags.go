@@ -137,3 +137,28 @@ func flagChartsCacheDir(v *string) *cli.StringFlag {
 		Destination: v,
 	}
 }
+
+// flagSkipUnchanged skip unchanged releases.
+func flagSkipUnchanged(v *bool) *cli.BoolFlag {
+	return &cli.BoolFlag{
+		Name:        "skip-unchanged",
+		Usage:       "Skip unchanged releases",
+		Value:       false,
+		EnvVars:     []string{"HELMWAVE_SKIP_UNCHANGED"},
+		Destination: v,
+	}
+}
+
+// flagGraphWidth pass val to urfave flag.
+func flagGraphWidth(v *int) *cli.IntFlag {
+	return &cli.IntFlag{
+		Name: "graph-width",
+		Usage: "set ceil width of graph: " +
+			"1 – disable graph; 0 – full names; " +
+			"N>1 – show only N symbols; " +
+			"N<0 – drop N symbols from end.",
+		Value:       0,
+		EnvVars:     []string{"HELMWAVE_GRAPH_WIDTH"},
+		Destination: v,
+	}
+}

@@ -15,28 +15,14 @@ import (
 type Build struct {
 	yml            *Yml
 	diff           *Diff
+	options        plan.BuildOptions
 	plandir        string
 	diffMode       string
 	chartsCacheDir string
 	tags           cli.StringSlice
-	matchAll       bool
 	autoYml        bool
 	skipUnchanged  bool
-
-	// diffLive *DiffLive
-	// diffLocal *DiffLocalPlan
 }
-
-const (
-	// DiffModeLive is a subcommand name for diffing manifests in plan with actually running manifests in k8s.
-	DiffModeLive = "live"
-
-	// DiffModeLocal is a subcommand name for diffing manifests in two plans.
-	DiffModeLocal = "local"
-
-	// DiffModeNone is a subcommand name for skipping diffing.
-	DiffModeNone = "none"
-)
 
 // Run is main function for 'build' CLI command.
 func (i *Build) Run(ctx context.Context) (err error) {
@@ -53,7 +39,12 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	}
 
 	newPlan := plan.New(i.plandir)
-	err = newPlan.Build(ctx, i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
+
+	i.options.Tags = i.normalizeTags()
+	i.options.Yml = i.yml.file
+	i.options.Templater = i.yml.templater
+
+	err = newPlan.Build(ctx, i.options)
 	if err != nil {
 		return err
 	}
@@ -114,23 +105,18 @@ func (i *Build) flags() []cli.Flag {
 	self := []cli.Flag{
 		flagPlandir(&i.plandir),
 		flagTags(&i.tags),
-		flagMatchAllTags(&i.matchAll),
+		flagMatchAllTags(&i.options.MatchAll),
+		flagGraphWidth(&i.options.GraphWidth),
+		flagSkipUnchanged(&i.skipUnchanged),
 		flagDiffMode(&i.diffMode),
 		flagChartsCacheDir(&i.chartsCacheDir),
 
 		&cli.BoolFlag{
 			Name:        "yml",
-			Usage:       "Auto helmwave.yml.tpl --> helmwave.yml",
+			Usage:       "auto helmwave.yml.tpl --> helmwave.yml",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
 			Destination: &i.autoYml,
-		},
-		&cli.BoolFlag{
-			Name:        "skip-unchanged",
-			Usage:       "Skip unchanged releases",
-			Value:       false,
-			EnvVars:     []string{"HELMWAVE_SKIP_UNCHANGED"},
-			Destination: &i.skipUnchanged,
 		},
 	}
 
