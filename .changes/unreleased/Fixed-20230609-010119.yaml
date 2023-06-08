@@ -1,6 +1,0 @@
-kind: Fixed
-body: fix kubedog context.Background()
-time: 2023-06-09T01:01:19.235733+04:00
-custom:
-  Author: zhilyaev
-  Issue: ""
