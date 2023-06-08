@@ -2,7 +2,6 @@ package log
 
 import (
 	"bytes"
-	"context"
 	"os"
 	"testing"
 
@@ -182,7 +181,7 @@ func (s *LogTestSuite) TestLogboekWidth() {
 	}
 
 	s.Require().NoError(settings.Init())
-	s.Require().NoError(kubedog.FixLog(context.Background(), settings.width))
+	s.Require().NoError(kubedog.FixLog(settings.width))
 	s.Require().Equal(settings.width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 

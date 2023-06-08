@@ -28,7 +28,7 @@ var (
 	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
 	// SkippedAnnotations is a map with all annotations to be skipped by differ.
-	//nolintlint:gochecknoglobals // cannot make this const
+	//nolintlint:gochecknoglobals // can't make this const
 	SkippedAnnotations = map[string][]string{
 		live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
 		helper.RootAnnoName + "skip-diff": {"true"},

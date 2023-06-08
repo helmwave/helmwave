@@ -55,9 +55,9 @@ func addToPlan(plan []release.Config, rel release.Config,
 			}
 		} else {
 			if dep.Optional {
-				log.Warnf("cannot find dependency %q in available releases, skipping it", dep.Uniq())
+				log.Warnf("can't find dependency %q in available releases, skipping", dep.Uniq())
 			} else {
-				rel.Logger().WithField("dependency", dep.Uniq()).Error("cannot find required dependency")
+				rel.Logger().WithField("dependency", dep.Uniq()).Error("can't find required dependency")
 
 				return nil, release.ErrDepFailed
 			}

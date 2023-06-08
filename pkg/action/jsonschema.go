@@ -28,7 +28,7 @@ func (i *GenSchema) Run(ctx context.Context) error {
 func (i *GenSchema) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "schema",
-		Usage:  "Generate helmwave json schema",
+		Usage:  "generate json schema",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}

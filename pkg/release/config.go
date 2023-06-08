@@ -281,7 +281,7 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error {
 	u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
 	if err != nil {
-		rel.Logger().WithField("dependency", dep).WithError(err).Error("Cannot parse dependency")
+		rel.Logger().WithField("dependency", dep).WithError(err).Error("can't parse dependency")
 
 		return err
 	}

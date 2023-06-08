@@ -10,12 +10,12 @@ import (
 )
 
 var (
-	sprigAliases = map[string]string{ //nolint:gochecknoglobals // cannot make these const
+	sprigAliases = map[string]string{ //nolint:gochecknoglobals // can't make these const
 		"get":    "sprigGet",
 		"hasKey": "sprigHasKey",
 	}
 
-	customFuncs = map[string]any{ //nolint:gochecknoglobals // cannot make these const
+	customFuncs = map[string]any{ //nolint:gochecknoglobals // can't make these const
 		"toYaml":         ToYaml,
 		"fromYaml":       FromYaml,
 		"exec":           Exec,

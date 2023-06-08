@@ -23,6 +23,7 @@ var commands = []*cli.Command{
 	new(action.Validate).Cmd(),
 	new(action.Yml).Cmd(),
 	new(action.GenSchema).Cmd(),
+	new(action.Graph).Cmd(),
 	version(),
 	completion(),
 }
@@ -90,7 +91,7 @@ func version() *cli.Command {
 	return &cli.Command{
 		Name:    "version",
 		Aliases: []string{"ver"},
-		Usage:   "Show shorts version",
+		Usage:   "show shorts version",
 		Action: func(c *cli.Context) error {
 			fmt.Println(helmwave.Version) //nolint:forbidigo // we need to use fmt.Println here
 

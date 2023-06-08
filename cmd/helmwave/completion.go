@@ -71,7 +71,7 @@ var (
 func completion() *cli.Command {
 	return &cli.Command{
 		Name:  "completion",
-		Usage: "Generate completion script",
+		Usage: "generate completion script",
 		Description: `
 			 echo "source <(helmwave completion bash)" >> ~/.bashrc
 			 echo "source <(helmwave completion zsh)" >> ~/.zshrc"
