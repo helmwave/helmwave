@@ -1,0 +1,6 @@
+kind: New feature
+body: auto width for graph ceil
+time: 2023-06-08T14:58:15.770615+04:00
+custom:
+  Author: zhilyaev
+  Issue: "535"
