@@ -40,7 +40,7 @@ func (i *Up) Run(ctx context.Context) error {
 
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")
-		err = kubedog.FixLog(ctx, i.kubedogLogWidth)
+		err = kubedog.FixLog(i.kubedogLogWidth)
 		if err != nil {
 			return err
 		}

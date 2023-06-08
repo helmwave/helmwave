@@ -62,12 +62,12 @@ func silenceKlogFlagSet(fs *flag.FlagSet) error {
 }
 
 // FixLog will disable kubernetes logger and fix width for logboek.
-func FixLog(ctx context.Context, width int) error {
-	if err := SilenceKlog(ctx); err != nil {
+func FixLog(width int) error {
+	if err := SilenceKlog(context.Background()); err != nil {
 		return err
 	}
 
-	if err := SilenceKlogV2(ctx); err != nil {
+	if err := SilenceKlogV2(context.Background()); err != nil {
 		return err
 	}
 
