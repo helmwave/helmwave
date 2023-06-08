@@ -70,7 +70,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	case DiffModeNone:
 		log.Info("🆚 Skip diffing")
 	default:
-		log.Warnf("I don't know what is %q diff mode. I am skiping diff.", i.diffMode)
+		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
 	}
 
 	err = newPlan.Export(ctx, i.skipUnchanged)
@@ -78,10 +78,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		return err
 	}
 
-	log.WithField(
-		"deploy it with next command",
-		"helmwave up --plandir "+i.plandir,
-	).Info("🏗 Planfile is ready!")
+	log.Info("🏗 Planfile is ready!")
 
 	return nil
 }

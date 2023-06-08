@@ -210,7 +210,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
-//nolintlint:paralleltest // cannot parallel because of setenv and uses helm repository.yaml flock
+//nolintlint:paralleltest // can't parallel because of setenv and uses helm repository.yaml flock
 func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(NonParallelBuildTestSuite))

@@ -33,7 +33,7 @@ func (l *List) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "list",
 		Aliases: []string{"ls"},
-		Usage:   "👀 List of deployed releases",
+		Usage:   "👀 list of deployed releases",
 		Flags:   l.flags(),
 		Action:  toCtx(l.Run),
 	}

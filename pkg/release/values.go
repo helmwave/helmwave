@@ -17,7 +17,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ErrSkipValues is returned when values cannot be used and are skipped.
+// ErrSkipValues is returned when values can't be used and are skipped.
 var ErrSkipValues = errors.New("values have been skipped")
 
 // ValuesReference is used to match source values file path and temporary.
@@ -136,7 +136,7 @@ func ProhibitDst(values []ValuesReference) error {
 // }
 
 // SetViaRelease downloads and templates values file.
-// Returns ErrSkipValues if values cannot be downloaded or doesn't exist in local FS.
+// Returns ErrSkipValues if values can't be downloaded or doesn't exist in local FS.
 func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
 	if !v.Render {
 		templater = "copy"

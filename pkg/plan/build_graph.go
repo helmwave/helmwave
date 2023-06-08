@@ -33,8 +33,8 @@ func buildGraphMD(releases release.Configs) string {
 func buildGraphASCII(releases release.Configs, width int) string {
 	list := make([]core.NodeInput, 0, len(releases))
 
-	// Recommended width
 	maxLength := 0
+	minLength := 9999
 
 	for _, rel := range releases {
 		deps := make([]string, len(rel.DependsOn()))
@@ -44,6 +44,10 @@ func buildGraphASCII(releases release.Configs, width int) string {
 
 		if len(rel.Uniq().String()) > maxLength {
 			maxLength = len(rel.Uniq().String())
+		}
+
+		if len(rel.Uniq().String()) < minLength {
+			minLength = len(rel.Uniq().String())
 		}
 
 		l := core.NodeInput{
@@ -61,23 +65,31 @@ func buildGraphASCII(releases release.Configs, width int) string {
 		Padding:      1,
 	}
 
-	// auto max mode
-	if 0 == width {
-		o.MinCellWidth = maxLength
-		o.MaxWidth = maxLength
-	}
-
-	// exactly width
-	if 1 < width {
+	switch {
+	case 0 == width:
+		if maxLength > o.MinCellWidth {
+			o.MinCellWidth = maxLength
+		}
+		if maxLength > o.MaxWidth {
+			o.MaxWidth = maxLength
+		}
+	case 1 == width:
+		return ""
+	case 1 < width:
 		o.MinCellWidth = width
 		o.MaxWidth = width
+	case 0 > width:
+		o.MinCellWidth = minLength + width
+		o.MaxWidth = maxLength + width
 	}
 
-	// drop N symbols from end
-	if 0 > width {
-		o.MinCellWidth = maxLength - width
-		o.MaxWidth = maxLength
-	}
+	log.WithFields(log.Fields{
+		"graph-width":     width,
+		"max-word-length": maxLength,
+		"min-word-length": minLength,
+		"min-cell-width":  o.MinCellWidth,
+		"max-cell-width":  o.MaxWidth,
+	}).Debug("graph draw options")
 
 	canvas, err := dgraph.DrawGraph(list, o)
 	if err != nil {
@@ -85,4 +97,8 @@ func buildGraphASCII(releases release.Configs, width int) string {
 	}
 
 	return canvas.String()
+}
+
+func (p *Plan) BuildGraphASCII(width int) string {
+	return buildGraphASCII(p.body.Releases, width)
 }

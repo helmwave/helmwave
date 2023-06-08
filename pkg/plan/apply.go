@@ -30,13 +30,13 @@ var ErrDeploy = errors.New("deploy failed")
 
 // Apply syncs repositories and releases.
 func (p *Plan) Apply(ctx context.Context) (err error) {
-	log.Info("🗄 Sync repositories...")
+	log.Info("🗄 sync repositories...")
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🗄 Sync registries...")
+	log.Info("🗄 sync registries")
 	err = p.syncRegistries(ctx)
 	if err != nil {
 		return err
@@ -46,14 +46,14 @@ func (p *Plan) Apply(ctx context.Context) (err error) {
 		return nil
 	}
 
-	log.Info("🛥 Sync releases...")
+	log.Info("🛥 sync releases")
 
 	return p.syncReleases(ctx)
 }
 
 // ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
 func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Config) (err error) {
-	log.Info("🗄 Sync repositories...")
+	log.Info("🗄 sync repositories...")
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Conf
 		return nil
 	}
 
-	log.Info("🛥 Sync releases...")
+	log.Info("🛥 sync releases...")
 
 	return p.syncReleasesKubedog(ctx, kubedogConfig)
 }
@@ -134,7 +134,7 @@ func SyncRepositories(ctx context.Context, repositories repo.Configs) error { //
 		return fmt.Errorf("failed to load helm repositories file: %w", err)
 	}
 
-	// We cannot parallel repositories installation as helm manages single repositories.yaml.
+	// We can't parallel repositories installation as helm manages single repositories.yaml.
 	// To prevent data race we need either make helm use futex or not parallel at all
 	for i := range repositories {
 		err := repositories[i].Install(ctx, helper.Helm, f)
@@ -376,7 +376,7 @@ func (p *Plan) kubedogSpecs() (multitrack.MultitrackSpecs, string, error) {
 
 		l := rel.Logger()
 		if !rel.HelmWait() {
-			l.Error("wait flag is disabled so kubedog cannot correctly track this release")
+			l.Error("wait flag is disabled so kubedog can't correctly track this release")
 		}
 
 		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
@@ -404,7 +404,7 @@ func (p *Plan) kubedogSpecs() (multitrack.MultitrackSpecs, string, error) {
 	}
 
 	if len(foundContexts) > 1 {
-		return specs, "", fmt.Errorf("kubedog cannot work with releases in multiple kubecontexts")
+		return specs, "", fmt.Errorf("kubedog can't work with releases in multiple kubecontexts")
 	}
 
 	return specs, kubecontext, nil

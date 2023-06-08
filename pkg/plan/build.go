@@ -26,7 +26,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	p.body = body
 
 	// Build Releases
-	log.Info("Building releases...")
+	log.Info("🔨 Building releases...")
 	p.body.Releases, err = buildReleases(o.Tags, p.body.Releases, o.MatchAll)
 	if err != nil {
 		return err
@@ -37,20 +37,20 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 
 	// Build graphs
 	if o.GraphWidth != 1 {
-		log.Info("Building graphs...")
+		log.Info("🔨 Building graphs...")
 		p.graphMD = buildGraphMD(p.body.Releases)
-		log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases, o.GraphWidth))
+		log.Infof("show graph:\n%s", p.BuildGraphASCII(o.GraphWidth))
 	}
 
 	// Build Values
-	log.Info("Building values...")
+	log.Info("🔨 Building values...")
 	err = p.buildValues()
 	if err != nil {
 		return err
 	}
 
 	// Build Repositories
-	log.Info("Building repositories...")
+	log.Info("🔨 Building repositories...")
 	_, err = p.buildRepositories()
 	if err != nil {
 		return err
@@ -63,12 +63,11 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	}
 
 	// Build Registries
-	log.Info("Building registries...")
+	log.Info("🔨 Building registries...")
 	_, err = p.buildRegistries()
 	if err != nil {
 		return err
 	}
-
 	// Sync Registries
 	err = p.syncRegistries(ctx)
 	if err != nil {
@@ -76,15 +75,14 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	}
 
 	// to build charts we need repositories and registries first
-	log.Info("Building charts...")
-
+	log.Info("🔨 Building charts...")
 	err = p.buildCharts()
 	if err != nil {
 		return err
 	}
 
 	// Build Manifest
-	log.Info("Building manifests...")
+	log.Info("🔨 Building manifests...")
 	err = p.buildManifest(ctx)
 	if err != nil {
 		return err
