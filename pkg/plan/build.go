@@ -6,12 +6,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type BuildOptions struct { //nolint:govet
+	Tags       []string
+	Yml        string
+	Templater  string
+	MatchAll   bool
+	GraphWidth int
+}
+
 // Build plan with yml and tags/matchALL options.
-func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bool, templater string) error { //nolint:funlen
-	p.templater = templater
+func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funlen
+	p.templater = o.Templater
 
 	// Create Body
-	body, err := NewBody(ctx, yml)
+	body, err := NewBody(ctx, o.Yml)
 	if err != nil {
 		return err
 	}
@@ -19,7 +27,7 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 
 	// Build Releases
 	log.Info("Building releases...")
-	p.body.Releases, err = buildReleases(tags, p.body.Releases, matchAll)
+	p.body.Releases, err = buildReleases(o.Tags, p.body.Releases, o.MatchAll)
 	if err != nil {
 		return err
 	}
@@ -28,9 +36,11 @@ func (p *Plan) Build(ctx context.Context, yml string, tags []string, matchAll bo
 	}
 
 	// Build graphs
-	log.Info("Building graphs...")
-	p.graphMD = buildGraphMD(p.body.Releases)
-	log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases))
+	if o.GraphWidth != 1 {
+		log.Info("Building graphs...")
+		p.graphMD = buildGraphMD(p.body.Releases)
+		log.Infof("Depends On:\n%s", buildGraphASCII(p.body.Releases, o.GraphWidth))
+	}
 
 	// Build Values
 	log.Info("Building values...")

@@ -16,8 +16,9 @@ type Up struct {
 	build *Build
 	dog   *kubedog.Config
 
-	autoBuild      bool
-	kubedogEnabled bool
+	autoBuild       bool
+	kubedogEnabled  bool
+	kubedogLogWidth int
 }
 
 // Run is main function for 'up' command.
@@ -39,6 +40,10 @@ func (i *Up) Run(ctx context.Context) error {
 
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")
+		err = kubedog.FixLog(ctx, i.kubedogLogWidth)
+		if err != nil {
+			return err
+		}
 
 		return p.ApplyWithKubedog(ctx, i.dog)
 	}
@@ -103,6 +108,13 @@ func (i *Up) flags() []cli.Flag {
 			Value:       5 * time.Minute,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &i.dog.Timeout,
+		},
+		&cli.IntFlag{
+			Name:        "kubedog-log-width",
+			Usage:       "Set kubedog max log line width",
+			Value:       140,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
+			Destination: &i.kubedogLogWidth,
 		},
 		&cli.BoolFlag{
 			Name:        "progress",

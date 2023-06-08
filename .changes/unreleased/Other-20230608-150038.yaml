@@ -1,0 +1,6 @@
+kind: Other
+body: refactor build options, replace global logger, fix logger, tests, lints
+time: 2023-06-08T15:00:38.222337+04:00
+custom:
+  Author: zhilyaev
+  Issue: ""

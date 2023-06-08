@@ -67,7 +67,7 @@ func flagDiffMode(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "diff-mode",
 		Value:       "live",
-		Usage:       "You can set: [ live | local ]",
+		Usage:       "You can set: [ live | local | none ]",
 		EnvVars:     []string{"HELMWAVE_DIFF_MODE"},
 		Destination: v,
 	}
@@ -100,7 +100,7 @@ func flagTemplateEngine(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "templater",
 		Value:       "sprig",
-		Usage:       "Select template engine: sprig or gomplate",
+		Usage:       "Select template engine: [ sprig | gomplate ]",
 		EnvVars:     []string{"HELMWAVE_TEMPLATER", "HELMWAVE_TEMPLATE_ENGINE"},
 		Destination: v,
 	}
@@ -134,6 +134,31 @@ func flagChartsCacheDir(v *string) *cli.StringFlag {
 		Value:       "",
 		Usage:       "Enable caching of helm charts in specified directory",
 		EnvVars:     []string{"HELMWAVE_CHARTS_CACHE"},
+		Destination: v,
+	}
+}
+
+// flagSkipUnchanged skip unchanged releases.
+func flagSkipUnchanged(v *bool) *cli.BoolFlag {
+	return &cli.BoolFlag{
+		Name:        "skip-unchanged",
+		Usage:       "Skip unchanged releases",
+		Value:       false,
+		EnvVars:     []string{"HELMWAVE_SKIP_UNCHANGED"},
+		Destination: v,
+	}
+}
+
+// flagGraphWidth pass val to urfave flag.
+func flagGraphWidth(v *int) *cli.IntFlag {
+	return &cli.IntFlag{
+		Name: "graph-width",
+		Usage: "set ceil width of graph: " +
+			"1 – disable graph; 0 – full names; " +
+			"N>1 – show only N symbols; " +
+			"N<0 – drop N symbols from end.",
+		Value:       0,
+		EnvVars:     []string{"HELMWAVE_GRAPH_WIDTH"},
 		Destination: v,
 	}
 }

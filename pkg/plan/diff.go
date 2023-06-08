@@ -10,6 +10,7 @@ import (
 	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/databus23/helm-diff/v3/manifest"
 	"github.com/helmwave/helmwave/pkg/helper"
+	logSetup "github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -18,7 +19,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	live "helm.sh/helm/v3/pkg/release"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/cli-runtime/pkg/resource"
 )
 
@@ -41,6 +42,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	opts := &diff.Options{
 		ShowSecrets:   showSecret,
 		OutputContext: diffWide,
+		OutputFormat:  logSetup.Default.Format(),
 	}
 
 	for _, rel := range append(p.body.Releases, b.body.Releases...) {
@@ -136,7 +138,7 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string { //no
 		h := resource.NewHelper(r.Client, r.Mapping)
 		currentObject, err := h.Get(r.Namespace, r.Name)
 		if err != nil {
-			if !apierrors.IsNotFound(err) {
+			if !apiErrors.IsNotFound(err) {
 				return err //nolint:wrapcheck
 			}
 
@@ -289,7 +291,7 @@ func (p *Plan) GetLive(
 			defer mu.Unlock()
 
 			if err != nil {
-				log.Warnf("I cant get release from k8s: %v", err)
+				log.Warnf("I can't get release from k8s: %v", err)
 				//nolintlint:revive // we are under mutex here
 				notFound = append(notFound, rel.Uniq())
 			} else {

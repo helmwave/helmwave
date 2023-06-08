@@ -2,10 +2,12 @@ package log
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
@@ -180,6 +182,7 @@ func (s *LogTestSuite) TestLogboekWidth() {
 	}
 
 	s.Require().NoError(settings.Init())
+	s.Require().NoError(kubedog.FixLog(context.Background(), settings.width))
 	s.Require().Equal(settings.width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 

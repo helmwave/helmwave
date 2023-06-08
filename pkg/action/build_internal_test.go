@@ -30,10 +30,12 @@ func (ts *BuildTestSuite) TestManifest() {
 	}
 
 	s := &Build{
-		plandir:  tmpDir,
-		yml:      y,
-		tags:     cli.StringSlice{},
-		matchAll: true,
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
 	}
 
 	ts.Require().NoError(s.Run(context.Background()))
@@ -45,7 +47,9 @@ func (ts *BuildTestSuite) TestManifest() {
 //		plandir:  tmpDir,
 //		ymlFile:      filepath.Join(tests.Root, "04_helmwave.yml"),
 //		tags:     cli.StringSlice{},
-//		matchAll: true,
+//		options: plan.BuildOptions{
+//				MatchAll: true,
+//			},
 //	}
 //
 //	err := s.Run()
@@ -63,10 +67,12 @@ func (ts *BuildTestSuite) TestRepositories() {
 	}
 
 	s := &Build{
-		plandir:  tmpDir,
-		yml:      y,
-		tags:     cli.StringSlice{},
-		matchAll: true,
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
 	}
 
 	ts.Require().NoError(s.Run(context.Background()))
@@ -103,10 +109,12 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 	for i := range cases {
 		s := &Build{
-			plandir:  tmpDir,
-			yml:      y,
-			tags:     *cases[i].tags,
-			matchAll: true,
+			plandir: tmpDir,
+			yml:     y,
+			tags:    *cases[i].tags,
+			options: plan.BuildOptions{
+				MatchAll: true,
+			},
 		}
 
 		ts.Require().NoError(s.Run(context.Background()))
@@ -131,9 +139,11 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	}
 
 	s := &Build{
-		plandir:  tmpDir,
-		tags:     cli.StringSlice{},
-		matchAll: true,
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
 		autoYml:  true,
 		yml:      y,
 		diff:     &Diff{},
@@ -162,11 +172,13 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	}
 
 	s := &Build{
-		plandir:  tmpDir,
-		tags:     cli.StringSlice{},
-		matchAll: true,
-		autoYml:  true,
-		yml:      y,
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+		yml:     y,
 	}
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
@@ -185,11 +197,13 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	}
 
 	s := &Build{
-		plandir:  tmpDir,
-		tags:     cli.StringSlice{},
-		matchAll: true,
-		autoYml:  true,
-		yml:      y,
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+		yml:     y,
 	}
 
 	ts.Require().NoError(s.Run(context.Background()))

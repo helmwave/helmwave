@@ -1,18 +1,17 @@
 package log
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	"github.com/mgutz/ansi"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/werf/logboek"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
+
+var Default = &Settings{}
 
 // Settings stores configuration for logger.
 type Settings struct {
@@ -47,13 +46,6 @@ func (l *Settings) Flags() []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
 			Destination: &l.color,
 		},
-		&cli.IntFlag{
-			Name:        "kubedog-log-width",
-			Usage:       "Set kubedog max log line width",
-			Value:       140,
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
-			Destination: &l.width,
-		},
 		&cli.BoolFlag{
 			Name:        "log-timestamps",
 			Usage:       "Add timestamps to log messages",
@@ -75,18 +67,6 @@ func (l *Settings) Init() error {
 	// There are a lot of context deadline errors being logged
 	utilruntime.ErrorHandlers = []func(error){ //nolint:reassign
 		logKubernetesClientError,
-	}
-
-	if err := kubedog.SilenceKlog(context.Background()); err != nil {
-		return err
-	}
-
-	if err := kubedog.SilenceKlogV2(context.Background()); err != nil {
-		return err
-	}
-
-	if l.width > 0 {
-		logboek.DefaultLogger().Streams().SetWidth(l.width)
 	}
 
 	l.setFormat()
@@ -150,4 +130,8 @@ func (l *Settings) setFormat() {
 
 func logKubernetesClientError(err error) {
 	log.WithError(err).Trace("kubernetes client error")
+}
+
+func (l *Settings) Format() string {
+	return l.format
 }

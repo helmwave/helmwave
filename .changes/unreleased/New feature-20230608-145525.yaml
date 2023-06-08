@@ -1,0 +1,6 @@
+kind: New feature
+body: return true offline build
+time: 2023-06-08T14:55:25.821983+04:00
+custom:
+  Author: zhilyaev
+  Issue: "537"
