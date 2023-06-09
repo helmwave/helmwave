@@ -8,7 +8,8 @@ releases:
   - name: cert-manager
     chart:
       name: jetstack/cert-manager
-      version: v1.10.0
+      version: v1.12.1
+    offline_kube_version: 1.22.2
     skip_crds: true
     namespace: test234u5395u345
     values:

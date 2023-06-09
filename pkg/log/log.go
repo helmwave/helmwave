@@ -19,7 +19,6 @@ type Settings struct {
 	format     string
 	color      bool
 	timestamps bool
-	width      int
 }
 
 // Flags returns CLI flags for logger settings.

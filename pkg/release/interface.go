@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"helm.sh/helm/v3/pkg/action"
-
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
 )
 
@@ -43,6 +43,7 @@ type Config interface {
 	KubeContext() string
 	Cfg() *action.Configuration
 	HooksDisabled() bool
+	OfflineKubeVersion() *chartutil.KubeVersion
 }
 
 // Configs type of array Config.
