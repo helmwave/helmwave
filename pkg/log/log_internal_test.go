@@ -174,15 +174,10 @@ func (s *LogTestSuite) TestDefaultFormatter() {
 }
 
 func (s *LogTestSuite) TestLogboekWidth() {
-	settings := &Settings{
-		level:  "info",
-		format: "text",
-		width:  1,
-	}
+	width := 1
 
-	s.Require().NoError(settings.Init())
-	s.Require().NoError(kubedog.FixLog(settings.width))
-	s.Require().Equal(settings.width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
+	s.Require().NoError(kubedog.FixLog(width))
+	s.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 
 func TestLogTestSuite(t *testing.T) { //nolintlint:paralleltest // helmwave uses single logger for the whole program

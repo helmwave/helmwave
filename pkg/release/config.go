@@ -9,6 +9,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chartutil"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/postrender"
 	"helm.sh/helm/v3/pkg/storage/driver"
@@ -26,6 +27,7 @@ type config struct {
 	NamespaceF               string                `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
 	DescriptionF             string                `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
 	KubeContextF             string                `yaml:"context,omitempty" json:"context,omitempty"`
+	OfflineKubeVersionF      string                `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
 	DependsOnF               []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
 	ValuesF                  []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release"`
 	TagsF                    []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
@@ -90,10 +92,13 @@ func (rel *config) newInstall() *action.Install {
 		client.PostRenderer = pr
 	}
 
-	// TODO: maybe check diff-mode?
 	if client.DryRun {
 		client.Replace = true
+	}
+
+	if client.DryRun && nil != rel.OfflineKubeVersion() {
 		client.ClientOnly = true
+		client.KubeVersion = rel.OfflineKubeVersion()
 	}
 
 	return client
@@ -320,4 +325,19 @@ func (rel *config) MarshalYAML() (any, error) {
 
 func (rel *config) HooksDisabled() bool {
 	return rel.DisableHooks
+}
+
+func (rel *config) OfflineKubeVersion() *chartutil.KubeVersion {
+	if rel.OfflineKubeVersionF != "" {
+		v, err := chartutil.ParseKubeVersion(rel.OfflineKubeVersionF)
+		if err != nil {
+			log.Fatalf("invalid kube version %q: %s", rel.OfflineKubeVersionF, err)
+
+			return nil
+		}
+
+		return v
+	}
+
+	return nil
 }

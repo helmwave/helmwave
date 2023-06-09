@@ -4,14 +4,14 @@ import (
 	"context"
 	"path/filepath"
 
-	"helm.sh/helm/v3/pkg/action"
-
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chartutil"
 	helm "helm.sh/helm/v3/pkg/cli"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 	helmRepo "helm.sh/helm/v3/pkg/repo"
@@ -19,6 +19,18 @@ import (
 
 type MockReleaseConfig struct {
 	mock.Mock
+}
+
+func (r *MockReleaseConfig) OfflineKubeVersion() *chartutil.KubeVersion {
+	r.Called()
+
+	v := &chartutil.KubeVersion{
+		Major:   "1",
+		Minor:   "22",
+		Version: "1.22.0",
+	}
+
+	return v
 }
 
 func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
