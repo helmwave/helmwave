@@ -10,6 +10,7 @@ import (
 	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/databus23/helm-diff/v3/manifest"
 	"github.com/helmwave/helmwave/pkg/helper"
+	logSetup "github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -18,7 +19,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	live "helm.sh/helm/v3/pkg/release"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/cli-runtime/pkg/resource"
 )
 
@@ -27,7 +28,7 @@ var (
 	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
 	// SkippedAnnotations is a map with all annotations to be skipped by differ.
-	//nolint:gochecknoglobals // cannot make this const
+	//nolintlint:gochecknoglobals // can't make this const
 	SkippedAnnotations = map[string][]string{
 		live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
 		helper.RootAnnoName + "skip-diff": {"true"},
@@ -41,6 +42,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 	opts := &diff.Options{
 		ShowSecrets:   showSecret,
 		OutputContext: diffWide,
+		OutputFormat:  logSetup.Default.Format(),
 	}
 
 	for _, rel := range append(p.body.Releases, b.body.Releases...) {
@@ -56,6 +58,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 		if !change {
 			k++
 			log.Info("🆚 ❎ ", rel.Uniq(), " no changes")
+			p.unchanged = append(p.unchanged, rel)
 		}
 	}
 
@@ -100,6 +103,7 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, thre
 			if !change && !chartChange {
 				k++
 				rel.Logger().Info("🆚 ❎ no changes")
+				p.unchanged = append(p.unchanged, rel)
 			}
 		}
 	}
@@ -107,8 +111,7 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, thre
 	showChangesReport(p.body.Releases, visited, k)
 }
 
-//nolint:funlen,gocognit
-func get3WayMergeManifests(rel release.Config, oldManifest string) string {
+func get3WayMergeManifests(rel release.Config, oldManifest string) string { //nolint:funlen,gocognit
 	cfg := rel.Cfg()
 
 	err := cfg.KubeClient.IsReachable()
@@ -135,7 +138,7 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string {
 		h := resource.NewHelper(r.Client, r.Mapping)
 		currentObject, err := h.Get(r.Namespace, r.Name)
 		if err != nil {
-			if !apierrors.IsNotFound(err) {
+			if !apiErrors.IsNotFound(err) {
 				return err //nolint:wrapcheck
 			}
 
@@ -148,12 +151,12 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string {
 		}
 		// currentObject stores everything under 'object' key.
 		// We need to get everything from this field and drop some generated parts.
-		var ra map[string]interface{}
+		var ra map[string]any
 		_ = yaml.Unmarshal(out, &ra)
-		obj := ra["object"].(map[string]interface{}) //nolint:forcetypeassert
+		obj := ra["object"].(map[string]any) //nolint:forcetypeassert
 		delete(obj, "status")
 
-		metadata := obj["metadata"].(map[string]interface{}) //nolint:forcetypeassert
+		metadata := obj["metadata"].(map[string]any) //nolint:forcetypeassert
 		delete(metadata, "creationTimestamp")
 		delete(metadata, "generation")
 		delete(metadata, "managedFields")
@@ -161,7 +164,7 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string {
 		delete(metadata, "uid")
 
 		if a := metadata["annotations"]; a != nil {
-			annotations := a.(map[string]interface{}) //nolint:forcetypeassert
+			annotations := a.(map[string]any) //nolint:forcetypeassert
 			delete(annotations, "meta.helm.sh/release-name")
 			delete(annotations, "meta.helm.sh/release-namespace")
 			delete(annotations, "deployment.kubernetes.io/revision")
@@ -288,11 +291,11 @@ func (p *Plan) GetLive(
 			defer mu.Unlock()
 
 			if err != nil {
-				log.Warnf("I cant get release from k8s: %v", err)
-				//nolint:revive // we are under mutex here
+				log.Warnf("I can't get release from k8s: %v", err)
+				//nolintlint:revive // we are under mutex here
 				notFound = append(notFound, rel.Uniq())
 			} else {
-				//nolint:revive // we are under mutex here
+				//nolintlint:revive // we are under mutex here
 				found[rel.Uniq()] = r
 			}
 		}(wg, mu, p.body.Releases[i])

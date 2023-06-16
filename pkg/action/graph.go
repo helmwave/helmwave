@@ -4,43 +4,56 @@ import (
 	"context"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
-// Status is struct for running 'status' command.
-type Status struct {
+// Graph is struct for running 'graph' command.
+type Graph struct {
 	build     *Build
-	names     cli.StringSlice
 	autoBuild bool
 }
 
 // Run is main function for 'status' command.
-func (l *Status) Run(ctx context.Context) error {
+func (l *Graph) Run(ctx context.Context) error {
+	if 1 == l.build.options.GraphWidth {
+		log.Info("🔺it is not possible to turn off the graph in this command")
+
+		return nil
+	}
+
+	old := l.build.options.GraphWidth
 	if l.autoBuild {
+		// Disable graph if it needs to build
+		l.build.options.GraphWidth = 1
 		if err := l.build.Run(ctx); err != nil {
 			return err
 		}
 	}
+	l.build.options.GraphWidth = old
+
 	p, err := plan.NewAndImport(ctx, l.build.plandir)
 	if err != nil {
 		return err
 	}
 
-	return p.Status(l.names.Value()...)
+	log.Infof("show graph:\n%s", p.BuildGraphASCII(l.build.options.GraphWidth))
+
+	return nil
 }
 
 // Cmd returns 'status' *cli.Command.
-func (l *Status) Cmd() *cli.Command {
+func (l *Graph) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "status",
-		Usage:  "👁️status of deployed releases",
+		Name:   "graph",
+		Usage:  "show graph",
 		Flags:  l.flags(),
 		Action: toCtx(l.Run),
 	}
 }
 
 // flags return flag set of CLI urfave.
-func (l *Status) flags() []cli.Flag {
+func (l *Graph) flags() []cli.Flag {
 	// Init sub-structures
 	l.build = &Build{}
 

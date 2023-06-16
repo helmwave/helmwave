@@ -11,7 +11,7 @@ func flagPlandir(v *string) *cli.StringFlag {
 		Name:        "plandir",
 		Aliases:     []string{"p"},
 		Value:       plan.Dir,
-		Usage:       "Path to plandir",
+		Usage:       "path to plandir",
 		EnvVars:     []string{"HELMWAVE_PLANDIR", "HELMWAVE_PLAN"},
 		Destination: v,
 	}
@@ -22,7 +22,7 @@ func flagTags(v *cli.StringSlice) *cli.StringSliceFlag {
 	return &cli.StringSliceFlag{
 		Name:        "tags",
 		Aliases:     []string{"t"},
-		Usage:       "It allows you choose releases for sync. Example: -t tag1 -t tag3,tag4",
+		Usage:       "build releases by tags: -t tag1 -t tag3,tag4",
 		EnvVars:     []string{"HELMWAVE_TAGS"},
 		Destination: v,
 	}
@@ -32,7 +32,7 @@ func flagTags(v *cli.StringSlice) *cli.StringSliceFlag {
 func flagMatchAllTags(v *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Name:        "match-all-tags",
-		Usage:       "Match all provided tags",
+		Usage:       "match all provided tags",
 		Value:       false,
 		EnvVars:     []string{"HELMWAVE_MATCH_ALL_TAGS"},
 		Destination: v,
@@ -45,7 +45,7 @@ func flagYmlFile(v *string) *cli.StringFlag {
 		Name:        "file",
 		Aliases:     []string{"f"},
 		Value:       plan.Body,
-		Usage:       "Main yml file",
+		Usage:       "main yml file",
 		EnvVars:     []string{"HELMWAVE_YAML", "HELMWAVE_YML"},
 		Destination: v,
 	}
@@ -56,7 +56,7 @@ func flagTplFile(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "tpl",
 		Value:       "helmwave.yml.tpl",
-		Usage:       "Main tpl file",
+		Usage:       "main tpl file",
 		EnvVars:     []string{"HELMWAVE_TPL"},
 		Destination: v,
 	}
@@ -67,7 +67,7 @@ func flagDiffMode(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "diff-mode",
 		Value:       "live",
-		Usage:       "You can set: [ live | local ]",
+		Usage:       "You can set: [ live | local | none ]",
 		EnvVars:     []string{"HELMWAVE_DIFF_MODE"},
 		Destination: v,
 	}
@@ -78,7 +78,7 @@ func flagDiffWide(v *int) *cli.IntFlag {
 	return &cli.IntFlag{
 		Name:        "wide",
 		Value:       5,
-		Usage:       "Show line around change",
+		Usage:       "show line around changes",
 		EnvVars:     []string{"HELMWAVE_DIFF_WIDE"},
 		Destination: v,
 	}
@@ -89,7 +89,7 @@ func flagDiffShowSecret(v *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Name:        "show-secret",
 		Value:       true,
-		Usage:       "Show secret in diff",
+		Usage:       "show secret in diff",
 		EnvVars:     []string{"HELMWAVE_DIFF_SHOW_SECRET"},
 		Destination: v,
 	}
@@ -100,7 +100,7 @@ func flagTemplateEngine(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "templater",
 		Value:       "sprig",
-		Usage:       "Select template engine: sprig or gomplate",
+		Usage:       "select template engine: [ sprig | gomplate ]",
 		EnvVars:     []string{"HELMWAVE_TEMPLATER", "HELMWAVE_TEMPLATE_ENGINE"},
 		Destination: v,
 	}
@@ -132,8 +132,34 @@ func flagChartsCacheDir(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "charts-cache-dir",
 		Value:       "",
-		Usage:       "Enable caching of helm charts in specified directory",
+		Usage:       "enable caching of helm charts in specified directory",
 		EnvVars:     []string{"HELMWAVE_CHARTS_CACHE"},
+		Destination: v,
+	}
+}
+
+// flagSkipUnchanged skip unchanged releases.
+func flagSkipUnchanged(v *bool) *cli.BoolFlag {
+	return &cli.BoolFlag{
+		Name:        "skip-unchanged",
+		Usage:       "skip unchanged releases",
+		Value:       false,
+		EnvVars:     []string{"HELMWAVE_SKIP_UNCHANGED"},
+		Destination: v,
+	}
+}
+
+// flagGraphWidth pass val to urfave flag.
+func flagGraphWidth(v *int) *cli.IntFlag {
+	return &cli.IntFlag{
+		Name: "graph-width",
+		Usage: "set ceil width: " +
+			"1 – disable graph; " +
+			"0 – full names; " +
+			"N>1 – show only N symbols; " +
+			"N<0 – drop N symbols from end.",
+		Value:       0,
+		EnvVars:     []string{"HELMWAVE_GRAPH_WIDTH"},
 		Destination: v,
 	}
 }

@@ -26,7 +26,7 @@ func (l *Validate) Run(ctx context.Context) error {
 func (l *Validate) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "validate",
-		Usage:  "🛂 Validate your plan",
+		Usage:  "🛂 validate your plan",
 		Flags:  l.flags(),
 		Action: toCtx(l.Run),
 	}
