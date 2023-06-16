@@ -29,12 +29,17 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 		return nil, fmt.Errorf("failed to merge values %v: %w", valuesFiles, err)
 	}
 
-	// Install
-	if !rel.isInstalled() {
-		if !rel.dryRun {
-			rel.Logger().Debug("🧐 Release does not exist. Installing it now.")
+	// Install or Template
+	if rel.dryRun {
+		rel.Logger().Debug("I'll dry-run.")
+		r, err := rel.newInstall().RunWithContext(ctx, ch, vals)
+		if err != nil {
+			return nil, fmt.Errorf("failed with dry-run %q: %w", rel.Uniq(), err)
 		}
 
+		return r, nil
+	} else if !rel.dryRun && !rel.isInstalled() {
+		rel.Logger().Debug("🧐 Release does not exist. Installing it now.")
 		r, err := rel.newInstall().RunWithContext(ctx, ch, vals)
 		if err != nil {
 			return nil, fmt.Errorf("failed to install %q: %w", rel.Uniq(), err)
@@ -42,7 +47,6 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 
 		return r, nil
 	}
-
 	pending, err := rel.isPending()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check %q for pending status: %w", rel.Uniq(), err)

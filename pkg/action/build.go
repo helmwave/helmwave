@@ -15,24 +15,14 @@ import (
 type Build struct {
 	yml            *Yml
 	diff           *Diff
+	options        plan.BuildOptions
 	plandir        string
 	diffMode       string
 	chartsCacheDir string
 	tags           cli.StringSlice
-	matchAll       bool
 	autoYml        bool
-
-	// diffLive *DiffLive
-	// diffLocal *DiffLocalPlan
+	skipUnchanged  bool
 }
-
-const (
-	// DiffModeLive is a subcommand name for diffing manifests in plan with actually running manifests in k8s.
-	DiffModeLive = "live"
-
-	// DiffModeLocal is a subcommand name for diffing manifests in two plans.
-	DiffModeLocal = "local"
-)
 
 // Run is main function for 'build' CLI command.
 func (i *Build) Run(ctx context.Context) (err error) {
@@ -49,7 +39,12 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	}
 
 	newPlan := plan.New(i.plandir)
-	err = newPlan.Build(ctx, i.yml.file, i.normalizeTags(), i.matchAll, i.yml.templater)
+
+	i.options.Tags = i.normalizeTags()
+	i.options.Yml = i.yml.file
+	i.options.Templater = i.yml.templater
+
+	err = newPlan.Build(ctx, i.options)
 	if err != nil {
 		return err
 	}
@@ -72,19 +67,18 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
 		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
+	case DiffModeNone:
+		log.Info("🆚 Skip diffing")
 	default:
-		log.Warnf("I dont know what is %q diff mode. I am skiping diff.", i.diffMode)
+		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
 	}
 
-	err = newPlan.Export(ctx)
+	err = newPlan.Export(ctx, i.skipUnchanged)
 	if err != nil {
 		return err
 	}
 
-	log.WithField(
-		"deploy it with next command",
-		"helmwave up --plandir "+i.plandir,
-	).Info("🏗 Planfile is ready!")
+	log.Info("🏗 Planfile is ready!")
 
 	return nil
 }
@@ -108,13 +102,15 @@ func (i *Build) flags() []cli.Flag {
 	self := []cli.Flag{
 		flagPlandir(&i.plandir),
 		flagTags(&i.tags),
-		flagMatchAllTags(&i.matchAll),
+		flagMatchAllTags(&i.options.MatchAll),
+		flagGraphWidth(&i.options.GraphWidth),
+		flagSkipUnchanged(&i.skipUnchanged),
 		flagDiffMode(&i.diffMode),
 		flagChartsCacheDir(&i.chartsCacheDir),
 
 		&cli.BoolFlag{
 			Name:        "yml",
-			Usage:       "Auto helmwave.yml.tpl --> helmwave.yml",
+			Usage:       "auto helmwave.yml.tpl --> helmwave.yml",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
 			Destination: &i.autoYml,

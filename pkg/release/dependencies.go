@@ -8,7 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ErrSkipValues is returned when values cannot be used and are skipped.
+// ErrMissingDependency is returned when values can't be used and are skipped.
 var ErrMissingDependency = errors.New("dependency is missing")
 
 type DependencyType int
@@ -21,11 +21,11 @@ const (
 
 // DependsOnReference is used to store release dependencies.
 //
-//nolint:lll
+// nolintlint:lll
 type DependsOnReference struct {
-	Name     string `yaml:"name" json:"name" jsonschema:"description=Uniqname (or just name if in same namespace) of dependency release"`
-	Tag      string `yaml:"tag,omitempty" json:"tag,omitempty" jsonschema:"description=All available releases with the tag will be applied as dependencies"`
-	Optional bool   `yaml:"optional" json:"optional" jsonschema:"description=Whether the dependency is required to be present in plan,default=false"`
+	Name     string `yaml:"name" json:"name" jsonschema:"description=Uniqname (or just name if in same namespace) of dependency release"`                    //nolint:lll
+	Tag      string `yaml:"tag,omitempty" json:"tag,omitempty" jsonschema:"description=All available releases with the tag will be applied as dependencies"` //nolint:lll
+	Optional bool   `yaml:"optional" json:"optional" jsonschema:"description=Whether the dependency is required to be present in plan,default=false"`        //nolint:lll
 }
 
 // UnmarshalYAML is used to implement InterfaceUnmarshaler interface of gopkg.in/yaml.v3.

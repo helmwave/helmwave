@@ -11,14 +11,19 @@ output:
 linters:
   enable-all: true
   disable:
+    - paralleltest
+    - gochecknoglobals # we use globals
+    - musttag # we don't need tags always
+    - depguard # we know what we do. We can check extra deps via PRs changes.
     - contextcheck # we don't need contexts everywhere
     - deadcode # deprecated
+    - revive # piece of shit
     - exhaustivestruct # deprecated
     - exhaustruct # it requires to initialize billions of fields, I ain't monkey to fix these
     - gci # we use gofumpt
     - gochecknoinits # we want to use `init()` functions
     - gocyclo # we use cyclop
-    - godox # TODO: get rid of TODOs
+    - godox # get rid of TODOs
     - goerr113 # need to create wrapped static errors
     - goimports # we`ve already lint with gofumpt
     - golint # deprecated
@@ -38,6 +43,25 @@ linters:
 
 # all available settings of specific linters
 linters-settings:
+  # https://golangci-lint.run/usage/linters/#lll
+  tagalign:
+    # Align and sort can be used together or separately.
+    # Whether enable align. If true, the struct tags will be aligned.
+    # Default: true.
+    align: false
+    # Whether enable tags sort.
+    # If true, the tags will be sorted by name in ascending order.
+    # eg: `xml:"bar" json:"bar" validate:"required"` -> `json:"bar" validate:"required" xml:"bar"`
+    # Default: true
+    sort: true
+    order:
+      - yaml
+      - yml
+      - json
+      - toml
+      - mapstructure
+      - binding
+      - validate
   cyclop:
     # the maximal code complexity to report
     max-complexity: 13
@@ -89,12 +113,10 @@ linters-settings:
     forbid:
       - ^print.*$
       - 'fmt\.Print.*'
-    # Exclude godoc examples from forbidigo checks.  Default is true.
-    exclude_godoc_examples: false
 
   funlen:
-    lines: 62
-    statements: 40
+    lines: 69
+    statements: 75
 
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
@@ -102,7 +124,7 @@ linters-settings:
 
   nestif:
     # minimal complexity of if statements to report, 5 by default
-    min-complexity: 4
+    min-complexity: 6
 
   goconst:
     # minimal length of string constant, 3 by default
@@ -175,7 +197,7 @@ linters-settings:
     simplify: true
 
   gofumpt:
-    # Choose whether or not to use the extra rules that are disabled
+    # Choose whether to use the extra rules that are disabled
     # by default
     extra-rules: false
 
@@ -241,7 +263,7 @@ linters-settings:
   lll:
     # max line length, lines longer will be reported. Default is 120.
     # '\t' is counted as 1 character by default, and can be changed with the tab-width option
-    line-length: 125
+    line-length: 128
     # tab width in spaces. Default to 1.
     tab-width: 1
 
@@ -263,7 +285,8 @@ linters-settings:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: false
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
+    require-specific: false
+    allow-leading-space: true
 
   prealloc:
     # XXX: we don't recommend using this linter before doing performance profiling.
@@ -276,13 +299,14 @@ linters-settings:
     for-loops: false # Report preallocation suggestions on for loops, false by default
 
   promlinter:
-    # Promlinter cannot infer all metrics name in static analysis.
+    # Promlinter can't infer all metrics name in static analysis.
     # Enable strict mode will also include the errors caused by failing to parse the args.
     strict: false
     # Please refer to https://github.com/yeya24/promlinter#usage for detailed usage.
     disabled-linters: []
     #  - "Help"
-    #  - "MetricUnits"
+    #  - "MetricUnits"к
+
     #  - "Counter"
     #  - "HistogramSummaryReserved"
     #  - "MetricTypeInName"
@@ -767,6 +791,14 @@ linters-settings:
 
 issues:
   exclude-rules:
+    - path: pkg/version/
+      linters:
+        - gochecknoglobals
+        - lll
+        - wrapcheck
+    - path: config\.go
+      linters:
+        - lll
     - path: _test\.go
       linters:
         - dupl
@@ -820,6 +852,13 @@ severity:
   # are allowed to specify one matcher per severity rule.
   # Only affects out formats that support setting severity information.
   rules:
-    - linters:
+    - severity: warning
+      linters:
+        - forcetypeassert
+        - gochecknoglobals
+        - funlen
+        - paralleltest
+    - severity: notice
+      linters:
         - godox
-      severity: notice
+
