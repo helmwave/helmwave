@@ -67,7 +67,7 @@ func flagDiffMode(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "diff-mode",
 		Value:       "live",
-		Usage:       "You can set: [ live | local | none ]",
+		Usage:       "you can set: [ live | local | none ]",
 		EnvVars:     []string{"HELMWAVE_DIFF_MODE"},
 		Destination: v,
 	}
@@ -149,7 +149,7 @@ func flagSkipUnchanged(v *bool) *cli.BoolFlag {
 	}
 }
 
-// flagGraphWidth pass val to urfave flag.
+// flagGraphWidth pass val to an urfave flag.
 func flagGraphWidth(v *int) *cli.IntFlag {
 	return &cli.IntFlag{
 		Name: "graph-width",
