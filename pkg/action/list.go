@@ -7,13 +7,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// List is struct for running 'list' command.
+// List is a struct for running 'list' command.
 type List struct {
 	build     *Build
 	autoBuild bool
 }
 
-// Run is main function for 'list' command.
+// Run is the main function for 'list' command.
 func (l *List) Run(ctx context.Context) error {
 	if l.autoBuild {
 		if err := l.build.Run(ctx); err != nil {

@@ -9,14 +9,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// DiffLocalPlan is struct for running 'diff plan' command.
+// DiffLocalPlan is a struct for running 'diff plan' command.
 type DiffLocalPlan struct {
 	diff     *Diff
 	plandir1 string
 	plandir2 string
 }
 
-// Run is main function for 'diff plan' command.
+// Run is the main function for 'diff plan' command.
 func (d *DiffLocalPlan) Run(ctx context.Context) error {
 	if d.plandir1 == d.plandir2 {
 		log.Warn(plan.ErrPlansAreTheSame)

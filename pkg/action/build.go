@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Build is struct for running 'build' CLI command.
+// Build is a struct for running 'build' CLI command.
 type Build struct {
 	yml            *Yml
 	diff           *Diff
@@ -24,7 +24,7 @@ type Build struct {
 	skipUnchanged  bool
 }
 
-// Run is main function for 'build' CLI command.
+// Run is the main function for 'build' CLI command.
 func (i *Build) Run(ctx context.Context) (err error) {
 	if i.autoYml {
 		err = i.yml.Run(ctx)
@@ -87,7 +87,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "build",
-		Usage:  "🏗 Build a plan",
+		Usage:  "🏗 build a plan",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}
@@ -110,7 +110,7 @@ func (i *Build) flags() []cli.Flag {
 
 		&cli.BoolFlag{
 			Name:        "yml",
-			Usage:       "auto helmwave.yml.tpl --> helmwave.yml",
+			Usage:       "Auto helmwave.yml.tpl --> helmwave.yml",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
 			Destination: &i.autoYml,

@@ -40,7 +40,7 @@ func (l *Settings) Flags() []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
-			Usage:       "Force color",
+			Usage:       "on/off color",
 			Value:       true,
 			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
 			Destination: &l.color,

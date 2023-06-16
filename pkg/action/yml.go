@@ -8,13 +8,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Yml is struct for running 'yml' command.
+// Yml is a struct for running 'yml' command.
 type Yml struct {
 	tpl, file string
 	templater string
 }
 
-// Run is main function for 'yml' command.
+// Run is the main function for 'yml' command.
 func (i *Yml) Run(ctx context.Context) error {
 	err := template.Tpl2yml(i.tpl, i.file, nil, i.templater)
 	if err != nil {

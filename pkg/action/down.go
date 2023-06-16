@@ -7,13 +7,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Down is struct for running 'down' command.
+// Down is a struct for running 'down' command.
 type Down struct {
 	build     *Build
 	autoBuild bool
 }
 
-// Run is main function for 'down' command.
+// Run is the main function for 'down' command.
 func (i *Down) Run(ctx context.Context) error {
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
@@ -33,7 +33,7 @@ func (i *Down) Run(ctx context.Context) error {
 func (i *Down) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "down",
-		Usage:  "🔪 Delete all",
+		Usage:  "🔪 delete all",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}

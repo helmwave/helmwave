@@ -7,12 +7,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Validate is struct for running 'validate' command.
+// Validate is a struct for running 'validate' command.
 type Validate struct {
 	plandir string
 }
 
-// Run is main function for 'validate' command.
+// Run is the main function for 'validate' command.
 func (l *Validate) Run(ctx context.Context) error {
 	p, err := plan.NewAndImport(ctx, l.plandir)
 	if err != nil {

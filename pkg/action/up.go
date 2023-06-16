@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Up is struct for running 'up' command.
+// Up is a struct for running 'up' command.
 type Up struct {
 	build *Build
 	dog   *kubedog.Config
@@ -21,7 +21,7 @@ type Up struct {
 	kubedogLogWidth int
 }
 
-// Run is main function for 'up' command.
+// Run is the main function for 'up' command.
 func (i *Up) Run(ctx context.Context) error {
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
