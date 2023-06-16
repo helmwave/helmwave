@@ -33,6 +33,8 @@ With helmwave you will become a superhero:
 - Fetch data from external datasource like vault, aws sm
 - ... and much more!
 
+[![asciicast](https://asciinema.org/a/591181.svg)](https://asciinema.org/a/591181)
+
 ## 📖 [Documentation](https://docs.helmwave.app)
 
 Documentation available at https://docs.helmwave.app
