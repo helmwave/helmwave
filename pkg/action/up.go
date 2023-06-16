@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Up is struct for running 'up' command.
+// Up is a struct for running 'up' command.
 type Up struct {
 	build *Build
 	dog   *kubedog.Config
@@ -21,7 +21,7 @@ type Up struct {
 	kubedogLogWidth int
 }
 
-// Run is main function for 'up' command.
+// Run is the main function for 'up' command.
 func (i *Up) Run(ctx context.Context) error {
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
@@ -111,21 +111,21 @@ func (i *Up) flags() []cli.Flag {
 		},
 		&cli.IntFlag{
 			Name:        "kubedog-log-width",
-			Usage:       "Set kubedog max log line width",
+			Usage:       "set kubedog max log line width",
 			Value:       140,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
 			Destination: &i.kubedogLogWidth,
 		},
 		&cli.BoolFlag{
 			Name:        "progress",
-			Usage:       "Enable progress logs of helm (INFO log level)",
+			Usage:       "enable progress logs of helm (INFO log level)",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_PROGRESS"},
 			Destination: &helper.Helm.Debug,
 		},
 		&cli.IntFlag{
 			Name:    "parallel-limit",
-			Usage:   "Limit amount of parallel releases",
+			Usage:   "limit amount of parallel releases",
 			EnvVars: []string{"HELMWAVE_PARALLEL_LIMIT"},
 			Value:   0,
 		},

@@ -8,13 +8,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Graph is struct for running 'graph' command.
+// Graph is a struct for running 'graph' command.
 type Graph struct {
 	build     *Build
 	autoBuild bool
 }
 
-// Run is main function for 'status' command.
+// Run is the main function for 'status' command.
 func (l *Graph) Run(ctx context.Context) error {
 	if 1 == l.build.options.GraphWidth {
 		log.Info("🔺it is not possible to turn off the graph in this command")

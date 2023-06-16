@@ -9,10 +9,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// GenSchema is struct for running 'GenSchema' command.
+// GenSchema is a struct for running 'GenSchema' command.
 type GenSchema struct{}
 
-// Run is main function for 'GenSchema' command.
+// Run is the main function for 'GenSchema' command.
 func (i *GenSchema) Run(ctx context.Context) error {
 	s, err := json.Marshal(plan.GenSchema())
 	if err != nil {

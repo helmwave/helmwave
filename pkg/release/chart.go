@@ -18,7 +18,7 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 )
 
-// Chart is structure for chart download options.
+// Chart is a structure for chart download options.
 //
 // nolintlint:lll
 type Chart struct {

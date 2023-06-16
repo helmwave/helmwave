@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-//nolintlint:gochecknoglobals // we need global list of commands
+//nolintlint:gochecknoglobals // we need a global list of commands
 var commands = []*cli.Command{
 	new(action.Build).Cmd(),
 	new(action.Diff).Cmd(),
@@ -55,7 +55,7 @@ func CreateApp() *cli.App {
 	c := cli.NewApp()
 
 	c.EnableBashCompletion = true
-	c.Usage = "is like docker-compose for helm"
+	c.Usage = "true release management for helm"
 	c.Version = helmwave.Version
 	c.Description = "This tool helps you compose your helm releases!\n" +
 		"0. $ helmwave yml\n" +

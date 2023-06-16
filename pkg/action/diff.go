@@ -15,7 +15,7 @@ const (
 	DiffModeNone = "none"
 )
 
-// Diff is struct for running 'diff' commands.
+// Diff is a struct for running 'diff' commands.
 type Diff struct {
 	ThreeWayMerge bool
 	ShowSecret    bool
@@ -29,7 +29,7 @@ func (d *Diff) Cmd() *cli.Command {
 
 	return &cli.Command{
 		Name:    "diff",
-		Usage:   "🆚 Show Differences",
+		Usage:   "🆚 show differences",
 		Aliases: []string{"vs"},
 		Flags:   d.flags(),
 		Subcommands: []*cli.Command{
