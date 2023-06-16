@@ -33,7 +33,7 @@ func (i *Rollback) Run(ctx context.Context) error {
 func (i *Rollback) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "rollback",
-		Usage:  "⏮  Rollback your plan",
+		Usage:  "⏮ Rollback your plan",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}
@@ -49,7 +49,7 @@ func (i *Rollback) flags() []cli.Flag {
 		&cli.IntFlag{
 			Name:        "revision",
 			Value:       -1,
-			Usage:       "Rollback all releases to this revision",
+			Usage:       "rollback all releases to this revision",
 			Destination: &i.revision,
 		},
 	}

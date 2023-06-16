@@ -24,7 +24,7 @@ var ErrPendingRelease = errors.New("release is in pending status")
 func (PendingStrategy) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
-		Enum: []interface{}{
+		Enum: []any{
 			PendingStrategyRollback,
 			PendingStrategyUninstall,
 			"",

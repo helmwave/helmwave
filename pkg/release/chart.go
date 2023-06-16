@@ -20,10 +20,10 @@ import (
 
 // Chart is structure for chart download options.
 //
-//nolint:lll
+// nolintlint:lll
 type Chart struct {
 	action.ChartPathOptions `yaml:",inline" json:",inline"`
-	Name                    string `yaml:"name" json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
+	Name                    string `yaml:"name" json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"` //nolint:lll
 }
 
 // UnmarshalYAML flexible config.
@@ -55,7 +55,7 @@ func (rel *config) LocateChartWithCache() (string, error) {
 	c := rel.Chart()
 	ch, err := cache.ChartsCache.FindInCache(c.Name, c.Version)
 	if err == nil {
-		rel.Logger().Infof("use cache for chart %s: %s", c.Name, ch)
+		rel.Logger().Infof("❎ use cache for chart %s: %s", c.Name, ch)
 
 		return ch, nil
 	}
@@ -111,7 +111,7 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 
 func (rel *config) ChartDepsUpd() error {
 	if rel.Chart().IsRemote() {
-		rel.Logger().Info("skipping updating dependencies for remote chart")
+		rel.Logger().Info("❎ skipping updating dependencies for remote chart")
 
 		return nil
 	}
@@ -144,7 +144,7 @@ func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 
 func (rel *config) DownloadChart(tmpDir string) error {
 	if !rel.Chart().IsRemote() {
-		rel.Logger().Info("chart is local, skipping exporting it")
+		rel.Logger().Info("❎ chart is local, skipping exporting")
 
 		return nil
 	}

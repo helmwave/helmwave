@@ -9,10 +9,11 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
+	"github.com/helmwave/helmwave/pkg/release"
 )
 
 // Export allows save plan to file.
-func (p *Plan) Export(ctx context.Context) error {
+func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 	if err := os.RemoveAll(p.dir); err != nil {
 		return fmt.Errorf("failed to clean plan directory %s: %w", p.dir, err)
 	}
@@ -22,6 +23,11 @@ func (p *Plan) Export(ctx context.Context) error {
 			p.Logger().WithError(err).Error("failed to remove temporary directory")
 		}
 	}(p.tmpDir)
+
+	if skipUnchanged {
+		p.removeUnchanged()
+		p.Logger().Info("removed unchanged releases from plan")
+	}
 
 	wg := parallel.NewWaitGroup()
 	wg.Add(4)
@@ -58,6 +64,18 @@ func (p *Plan) Export(ctx context.Context) error {
 
 	// Save Planfile after everything is exported
 	return helper.SaveInterface(ctx, p.fullPath, p.body)
+}
+
+func (p *Plan) removeUnchanged() {
+	filtered := p.body.Releases[:0]
+
+	for _, rel := range p.body.Releases {
+		if !helper.In[release.Config](rel, p.unchanged) {
+			filtered = append(filtered, rel)
+		}
+	}
+
+	p.body.Releases = filtered
 }
 
 func (p *Plan) exportCharts() error {
