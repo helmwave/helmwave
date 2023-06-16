@@ -57,5 +57,5 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup,
 	p.manifests[rel.Uniq()] = document
 	mu.Unlock()
 
-	l.Info("✅ manifest done")
+	l.Info("✅  manifest done")
 }

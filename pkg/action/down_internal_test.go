@@ -52,7 +52,7 @@ func (ts *DownTestSuite) TestRun() {
 	ts.Require().NoError(d.Run(context.Background()))
 }
 
-//nolint:paralleltest // uses helm repository.yaml flock
+//nolintlint:paralleltest // uses helm repository.yaml flock
 func TestDownTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DownTestSuite))

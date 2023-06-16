@@ -16,8 +16,9 @@ type Up struct {
 	build *Build
 	dog   *kubedog.Config
 
-	autoBuild      bool
-	kubedogEnabled bool
+	autoBuild       bool
+	kubedogEnabled  bool
+	kubedogLogWidth int
 }
 
 // Run is main function for 'up' command.
@@ -39,6 +40,10 @@ func (i *Up) Run(ctx context.Context) error {
 
 	if i.kubedogEnabled {
 		log.Warn("🐶 kubedog is enable")
+		err = kubedog.FixLog(i.kubedogLogWidth)
+		if err != nil {
+			return err
+		}
 
 		return p.ApplyWithKubedog(ctx, i.dog)
 	}
@@ -62,7 +67,7 @@ func (i *Up) warnOnBuildFlags(ctx context.Context) {
 func (i *Up) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "up",
-		Usage:  "🚢 Apply your plan",
+		Usage:  "🚢 apply your plan",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}
@@ -78,31 +83,38 @@ func (i *Up) flags() []cli.Flag {
 		flagAutoBuild(&i.autoBuild),
 		&cli.BoolFlag{
 			Name:        "kubedog",
-			Usage:       "Enable/Disable kubedog",
+			Usage:       "enable/disable kubedog",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_ENABLED", "HELMWAVE_KUBEDOG"},
 			Destination: &i.kubedogEnabled,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-status-interval",
-			Usage:       "Interval of kubedog status messages",
+			Usage:       "interval of kubedog status messages",
 			Value:       5 * time.Second,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
 			Destination: &i.dog.StatusInterval,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-start-delay",
-			Usage:       "Delay kubedog start, don't make it too late",
+			Usage:       "delay kubedog start, don't make it too late",
 			Value:       time.Second,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_START_DELAY"},
 			Destination: &i.dog.StartDelay,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-timeout",
-			Usage:       "Timeout of kubedog multitrackers",
+			Usage:       "timeout of kubedog multitrackers",
 			Value:       5 * time.Minute,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &i.dog.Timeout,
+		},
+		&cli.IntFlag{
+			Name:        "kubedog-log-width",
+			Usage:       "Set kubedog max log line width",
+			Value:       140,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
+			Destination: &i.kubedogLogWidth,
 		},
 		&cli.BoolFlag{
 			Name:        "progress",
