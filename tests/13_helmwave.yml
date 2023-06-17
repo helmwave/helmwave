@@ -5,7 +5,8 @@ hooks:
   pre_build:
     - cmd: "ls"
       args: ["-l", "-a"]
-      show: true
+      show: false
+    - echo "HelloWorld"
 
 
 repositories:
