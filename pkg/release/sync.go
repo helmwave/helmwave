@@ -10,6 +10,15 @@ import (
 )
 
 func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
+	// Run hooks
+	if rel.dryRun {
+		rel.Lifecycle.PreBuilding()
+		defer rel.Lifecycle.PostBuilding()
+	} else {
+		rel.Lifecycle.PreUping()
+		defer rel.Lifecycle.PostUping()
+	}
+
 	return rel.upgrade(ctx)
 }
 

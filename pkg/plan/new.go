@@ -99,7 +99,7 @@ type planBody struct {
 	Repositories repo.Configs     `yaml:"repositories" json:"repositories" jsonschema:"title=repositories list,description=helm repositories"`                                                                                       //nolint:lll
 	Registries   registry.Configs `yaml:"registries" json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`                                                                                           //nolint:lll
 	Releases     release.Configs  `yaml:"releases" json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`                                                                                               //nolint:lll
-	Hooks        hooks.Global     `yaml:"hooks" json:"hooks" jsonschema:"title=hooks,description=helmwave hooks"`                                                                                                                    //nolint:lll
+	Lifecycle    hooks.Lifecycle  `yaml:"lifecycle" json:"lifecycle" jsonschema:"title=lifecycle,description=helmwave lifecycle hooks"`                                                                                              //nolint:lll
 }
 
 func GenSchema() *jsonschema.Schema {

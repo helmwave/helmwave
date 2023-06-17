@@ -7,6 +7,10 @@ import (
 )
 
 func (rel *config) Rollback(version int) error {
+	// Run hooks
+	rel.Lifecycle.PreRolling()
+	defer rel.Lifecycle.PostRolling()
+
 	client := action.NewRollback(rel.Cfg())
 
 	client.CleanupOnFail = rel.CleanupOnFail

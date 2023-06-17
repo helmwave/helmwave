@@ -3,7 +3,6 @@ package plan
 import (
 	"context"
 
-	"github.com/helmwave/helmwave/pkg/hooks"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,7 +15,7 @@ type BuildOptions struct { //nolint:govet
 }
 
 // Build plan with yml and tags/matchALL options.
-func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funlen,cyclop
+func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funlen
 	p.templater = o.Templater
 
 	// Create Body
@@ -26,11 +25,9 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	}
 	p.body = body
 
-	// Run pre-build hooks
-	if len(p.body.Hooks.PreBuild) != 0 {
-		log.Info("🩼 Running pre-build hooks...")
-		hooks.Run(p.body.Hooks.PreBuild)
-	}
+	// Run hooks
+	p.body.Lifecycle.PreBuilding()
+	defer p.body.Lifecycle.PostBuilding()
 
 	// Build Releases
 	log.Info("🔨 Building releases...")
@@ -93,12 +90,6 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	err = p.buildManifest(ctx)
 	if err != nil {
 		return err
-	}
-
-	// Run post-build hooks
-	if len(p.body.Hooks.PostBuild) != 0 {
-		log.Info("🩼 Running post-build hooks...")
-		hooks.Run(p.body.Hooks.PostBuild)
 	}
 
 	return nil

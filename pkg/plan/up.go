@@ -10,7 +10,6 @@ import (
 
 	"github.com/gofrs/flock"
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	regi "github.com/helmwave/helmwave/pkg/registry"
@@ -31,10 +30,9 @@ var ErrDeploy = errors.New("deploy failed")
 
 // Up syncs repositories and releases.
 func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
-	if len(p.body.Hooks.PreUp) != 0 {
-		log.Info("🩼 Running pre-up hooks...")
-		hooks.Run(p.body.Hooks.PreUp)
-	}
+	// Run hooks
+	p.body.Lifecycle.PreUping()
+	defer p.body.Lifecycle.PostUping()
 
 	log.Info("🗄 sync repositories...")
 	err = SyncRepositories(ctx, p.body.Repositories)
@@ -64,11 +62,6 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 
 	if err != nil {
 		return err
-	}
-
-	if len(p.body.Hooks.PostUp) != 0 {
-		log.Info("🩼 Running post-up hooks...")
-		hooks.Run(p.body.Hooks.PostUp)
 	}
 
 	return nil
@@ -250,6 +243,7 @@ func (p *Plan) syncRelease(
 	rel := node.Data
 
 	l := rel.Logger()
+
 	l.Info("🛥 deploying... ")
 
 	if _, err := rel.Sync(ctx); err != nil {
@@ -273,7 +267,7 @@ func (p *Plan) syncRelease(
 	}
 }
 
-// ApplyReport renders table report for failed releases.
+// ApplyReport renders a table report for failed releases.
 func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 	n := len(p.body.Releases)
 	k := len(fails)
