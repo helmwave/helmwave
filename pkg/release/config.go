@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/action"
@@ -19,6 +20,7 @@ import (
 type config struct {
 	helm                     *helm.EnvSettings
 	log                      *log.Entry
+	Lifecycle                hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
 	Store                    map[string]any  `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
 	ChartF                   Chart           `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
 	PendingReleaseStrategy   PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback),default="`
@@ -135,7 +137,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 
 	pr, err := rel.PostRenderer()
 	if err != nil {
-		rel.Logger().WithError(err).Warn("failed to create postrenderer")
+		rel.Logger().WithError(err).Warn("failed to create post_renderer")
 	} else {
 		client.PostRenderer = pr
 	}

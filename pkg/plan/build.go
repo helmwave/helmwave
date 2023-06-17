@@ -25,6 +25,10 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	}
 	p.body = body
 
+	// Run hooks
+	p.body.Lifecycle.PreBuilding()
+	defer p.body.Lifecycle.PostBuilding()
+
 	// Build Releases
 	log.Info("🔨 Building releases...")
 	p.body.Releases, err = buildReleases(o.Tags, p.body.Releases, o.MatchAll)
@@ -74,7 +78,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 		return err
 	}
 
-	// to build charts we need repositories and registries first
+	// to build charts, we need repositories and registries first
 	log.Info("🔨 Building charts...")
 	err = p.buildCharts()
 	if err != nil {

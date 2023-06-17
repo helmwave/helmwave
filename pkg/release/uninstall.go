@@ -9,6 +9,10 @@ import (
 )
 
 func (rel *config) Uninstall(ctx context.Context) (*release.UninstallReleaseResponse, error) {
+	// Run hooks
+	rel.Lifecycle.PreDowning()
+	defer rel.Lifecycle.PostDowning()
+
 	client := action.NewUninstall(rel.Cfg())
 	client.Timeout = rel.Timeout
 
