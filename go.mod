@@ -21,7 +21,7 @@ require (
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/testify v1.8.2
 	github.com/urfave/cli/v2 v2.25.6
-	github.com/werf/kubedog v0.9.11
+	github.com/werf/kubedog v0.9.12
 	github.com/werf/logboek v0.5.5
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.12.1
