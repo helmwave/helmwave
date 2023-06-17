@@ -13,12 +13,9 @@ import (
 
 // Up is a struct for running 'up' command.
 type Up struct {
-	build *Build
-	dog   *kubedog.Config
-
-	autoBuild       bool
-	kubedogEnabled  bool
-	kubedogLogWidth int
+	build     *Build
+	dog       *kubedog.Config
+	autoBuild bool
 }
 
 // Run is the main function for 'up' command.
@@ -38,17 +35,7 @@ func (i *Up) Run(ctx context.Context) error {
 
 	p.Logger().Info("🏗 Plan")
 
-	if i.kubedogEnabled {
-		log.Warn("🐶 kubedog is enable")
-		err = kubedog.FixLog(i.kubedogLogWidth)
-		if err != nil {
-			return err
-		}
-
-		return p.ApplyWithKubedog(ctx, i.dog)
-	}
-
-	return p.Apply(ctx)
+	return p.Up(ctx, i.dog)
 }
 
 func (i *Up) warnOnBuildFlags(ctx context.Context) {
@@ -86,7 +73,7 @@ func (i *Up) flags() []cli.Flag {
 			Usage:       "enable/disable kubedog",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_ENABLED", "HELMWAVE_KUBEDOG"},
-			Destination: &i.kubedogEnabled,
+			Destination: &i.dog.Enabled,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-status-interval",
@@ -114,7 +101,7 @@ func (i *Up) flags() []cli.Flag {
 			Usage:       "set kubedog max log line width",
 			Value:       140,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
-			Destination: &i.kubedogLogWidth,
+			Destination: &i.dog.LogWidth,
 		},
 		&cli.BoolFlag{
 			Name:        "progress",

@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofrs/flock"
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	regi "github.com/helmwave/helmwave/pkg/registry"
@@ -28,37 +29,20 @@ import (
 // ErrDeploy is returned when deploy is failed for whatever reason.
 var ErrDeploy = errors.New("deploy failed")
 
-// Apply syncs repositories and releases.
-func (p *Plan) Apply(ctx context.Context) (err error) {
+// Up syncs repositories and releases.
+func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
+	if len(p.body.Hooks.PreUp) != 0 {
+		log.Info("🩼 Running pre-up hooks...")
+		hooks.Run(p.body.Hooks.PreUp)
+	}
+
 	log.Info("🗄 sync repositories...")
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🗄 sync registries")
-	err = p.syncRegistries(ctx)
-	if err != nil {
-		return err
-	}
-
-	if len(p.body.Releases) == 0 {
-		return nil
-	}
-
-	log.Info("🛥 sync releases")
-
-	return p.syncReleases(ctx)
-}
-
-// ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
-func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Config) (err error) {
-	log.Info("🗄 sync repositories...")
-	err = SyncRepositories(ctx, p.body.Repositories)
-	if err != nil {
-		return err
-	}
-
+	log.Info("🗄 sync registries...")
 	err = p.syncRegistries(ctx)
 	if err != nil {
 		return err
@@ -70,7 +54,24 @@ func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Conf
 
 	log.Info("🛥 sync releases...")
 
-	return p.syncReleasesKubedog(ctx, kubedogConfig)
+	if dog.Enabled {
+		log.Warn("🐶 kubedog is enable")
+		kubedog.FixLog(dog.LogWidth)
+		err = p.syncReleasesKubedog(ctx, dog)
+	} else {
+		err = p.syncReleases(ctx)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if len(p.body.Hooks.PostUp) != 0 {
+		log.Info("🩼 Running post-up hooks...")
+		hooks.Run(p.body.Hooks.PostUp)
+	}
+
+	return nil
 }
 
 func (p *Plan) syncRegistries(ctx context.Context) (err error) {

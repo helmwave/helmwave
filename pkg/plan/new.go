@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -19,16 +20,16 @@ import (
 )
 
 const (
-	// Dir is default directory for generated files.
+	// Dir is the default directory for generated files.
 	Dir = ".helmwave/"
 
-	// File is default file name for planfile.
+	// File is the default file name for planfile.
 	File = "planfile"
 
-	// Body is default file name for main config.
+	// Body is a default file name for the main config.
 	Body = "helmwave.yml"
 
-	// Manifest is default directory under Dir for manifests.
+	// Manifest is the default directory under Dir for manifests.
 	Manifest = "manifest/"
 
 	// Values is default directory for values.
@@ -92,13 +93,13 @@ func (p *Plan) Logger() *log.Entry {
 	})
 }
 
-// nolintlint:lll
 type planBody struct {
 	Project      string           `yaml:"project" json:"project" jsonschema:"title=project name,description=reserved for future,example=my-awesome-project"`                                                                         //nolint:lll
 	Version      string           `yaml:"version" json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,pattern=^[0-9]+\\.[0-9]+\\.[0-9]+$,example=0.23.0,example=0.22.1"` //nolint:lll
 	Repositories repo.Configs     `yaml:"repositories" json:"repositories" jsonschema:"title=repositories list,description=helm repositories"`                                                                                       //nolint:lll
 	Registries   registry.Configs `yaml:"registries" json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`                                                                                           //nolint:lll
 	Releases     release.Configs  `yaml:"releases" json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`                                                                                               //nolint:lll
+	Hooks        hooks.Global     `yaml:"hooks" json:"hooks" jsonschema:"title=hooks,description=helmwave hooks"`                                                                                                                    //nolint:lll
 }
 
 func GenSchema() *jsonschema.Schema {

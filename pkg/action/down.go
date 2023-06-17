@@ -26,7 +26,7 @@ func (i *Down) Run(ctx context.Context) error {
 		return err
 	}
 
-	return p.Destroy(ctx)
+	return p.Down(ctx)
 }
 
 // Cmd returns 'down' *cli.Command.

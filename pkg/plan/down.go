@@ -3,13 +3,19 @@ package plan
 import (
 	"context"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
 )
 
-// Destroy destroys all releases that exist in plan.
-func (p *Plan) Destroy(ctx context.Context) error {
+// Down destroys all releases that exist in a plan.
+func (p *Plan) Down(ctx context.Context) error {
+	if len(p.body.Hooks.PreDown) != 0 {
+		log.Info("🩼 Running pre-down hooks...")
+		hooks.Run(p.body.Hooks.PreDown)
+	}
+
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -26,5 +32,15 @@ func (p *Plan) Destroy(ctx context.Context) error {
 		}(ctx, wg, p.body.Releases[i])
 	}
 
-	return wg.Wait()
+	err := wg.Wait()
+	if err != nil {
+		return err
+	}
+
+	if len(p.body.Hooks.PostDown) != 0 {
+		log.Info("🩼 Running post-down hooks...")
+		hooks.Run(p.body.Hooks.PostDown)
+	}
+
+	return nil
 }

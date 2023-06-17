@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -30,7 +31,7 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Apply(context.Background())
+	err := p.Up(context.Background(), &kubedog.Config{})
 	s.Require().ErrorIs(err, e)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -44,8 +45,9 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
+	dog := &kubedog.Config{}
 
-	err := p.Apply(context.Background())
+	err := p.Up(context.Background(), dog)
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -67,7 +69,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Apply(context.Background())
+	err := p.Up(context.Background(), &kubedog.Config{})
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -91,7 +93,7 @@ func (s *ApplyTestSuite) TestApply() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	err := p.Apply(context.Background())
+	err := p.Up(context.Background(), &kubedog.Config{})
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())
