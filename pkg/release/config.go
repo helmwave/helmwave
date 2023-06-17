@@ -137,7 +137,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 
 	pr, err := rel.PostRenderer()
 	if err != nil {
-		rel.Logger().WithError(err).Warn("failed to create postrenderer")
+		rel.Logger().WithError(err).Warn("failed to create post_renderer")
 	} else {
 		client.PostRenderer = pr
 	}
