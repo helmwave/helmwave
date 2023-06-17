@@ -28,37 +28,19 @@ import (
 // ErrDeploy is returned when deploy is failed for whatever reason.
 var ErrDeploy = errors.New("deploy failed")
 
-// Apply syncs repositories and releases.
-func (p *Plan) Apply(ctx context.Context) (err error) {
+// Up syncs repositories and releases.
+func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
+	// Run hooks
+	p.body.Lifecycle.PreUping()
+	defer p.body.Lifecycle.PostUping()
+
 	log.Info("🗄 sync repositories...")
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🗄 sync registries")
-	err = p.syncRegistries(ctx)
-	if err != nil {
-		return err
-	}
-
-	if len(p.body.Releases) == 0 {
-		return nil
-	}
-
-	log.Info("🛥 sync releases")
-
-	return p.syncReleases(ctx)
-}
-
-// ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
-func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Config) (err error) {
-	log.Info("🗄 sync repositories...")
-	err = SyncRepositories(ctx, p.body.Repositories)
-	if err != nil {
-		return err
-	}
-
+	log.Info("🗄 sync registries...")
 	err = p.syncRegistries(ctx)
 	if err != nil {
 		return err
@@ -70,7 +52,19 @@ func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Conf
 
 	log.Info("🛥 sync releases...")
 
-	return p.syncReleasesKubedog(ctx, kubedogConfig)
+	if dog.Enabled {
+		log.Warn("🐶 kubedog is enable")
+		kubedog.FixLog(dog.LogWidth)
+		err = p.syncReleasesKubedog(ctx, dog)
+	} else {
+		err = p.syncReleases(ctx)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *Plan) syncRegistries(ctx context.Context) (err error) {
@@ -249,6 +243,7 @@ func (p *Plan) syncRelease(
 	rel := node.Data
 
 	l := rel.Logger()
+
 	l.Info("🛥 deploying... ")
 
 	if _, err := rel.Sync(ctx); err != nil {
@@ -272,7 +267,7 @@ func (p *Plan) syncRelease(
 	}
 }
 
-// ApplyReport renders table report for failed releases.
+// ApplyReport renders a table report for failed releases.
 func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 	n := len(p.body.Releases)
 	k := len(fails)

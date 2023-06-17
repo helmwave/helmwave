@@ -7,6 +7,10 @@ import (
 
 // Rollback rollbacks helm release.
 func (p *Plan) Rollback(version int) error {
+	// Run hooks
+	p.body.Lifecycle.PreRolling()
+	defer p.body.Lifecycle.PostRolling()
+
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -23,5 +27,10 @@ func (p *Plan) Rollback(version int) error {
 		}(wg, p.body.Releases[i])
 	}
 
-	return wg.Wait()
+	err := wg.Wait()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
