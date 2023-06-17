@@ -8,8 +8,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Destroy destroys all releases that exist in plan.
-func (p *Plan) Destroy(ctx context.Context) error {
+// Down destroys all releases that exist in a plan.
+func (p *Plan) Down(ctx context.Context) error {
+	// Run hooks
+	p.body.Lifecycle.PreDowning()
+	defer p.body.Lifecycle.PreDowning()
+
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -26,5 +30,10 @@ func (p *Plan) Destroy(ctx context.Context) error {
 		}(ctx, wg, p.body.Releases[i])
 	}
 
-	return wg.Wait()
+	err := wg.Wait()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

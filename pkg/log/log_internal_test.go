@@ -176,7 +176,7 @@ func (s *LogTestSuite) TestDefaultFormatter() {
 func (s *LogTestSuite) TestLogboekWidth() {
 	width := 1
 
-	s.Require().NoError(kubedog.FixLog(width))
+	kubedog.FixLog(width)
 	s.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 
