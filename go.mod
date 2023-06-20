@@ -13,14 +13,14 @@ require (
 	github.com/invopop/jsonschema v0.7.0
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/otiai10/copy v1.11.0
+	github.com/otiai10/copy v1.12.0
 	github.com/pkg/errors v0.9.1
 	github.com/r3labs/diff/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/testify v1.8.4
-	github.com/urfave/cli/v2 v2.25.6
+	github.com/urfave/cli/v2 v2.25.7
 	github.com/werf/kubedog v0.9.12
 	github.com/werf/logboek v0.5.5
 	gopkg.in/yaml.v3 v3.0.1
