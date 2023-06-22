@@ -12,14 +12,14 @@ import (
 )
 
 //nolintlint:gochecknoglobals
-var ChartsCache = CacheConfig{}
+var ChartsCache = Config{}
 
-type CacheConfig struct {
+type Config struct {
 	cacheDir string
 	lock     sync.RWMutex
 }
 
-func (c *CacheConfig) Init(dir string) error {
+func (c *Config) Init(dir string) error {
 	c.cacheDir = dir
 	if dir == "" {
 		return nil
@@ -33,11 +33,11 @@ func (c *CacheConfig) Init(dir string) error {
 	return nil
 }
 
-func (c *CacheConfig) IsEnabled() bool {
+func (c *Config) IsEnabled() bool {
 	return c.cacheDir != ""
 }
 
-func (c *CacheConfig) FindInCache(chart string, version string) (string, error) {
+func (c *Config) FindInCache(chart string, version string) (string, error) {
 	if !c.IsEnabled() {
 		return "", fmt.Errorf("cache is disabled")
 	}
@@ -56,7 +56,7 @@ func (c *CacheConfig) FindInCache(chart string, version string) (string, error) 
 	return "", fmt.Errorf("chart not found")
 }
 
-func (c *CacheConfig) AddToCache(file string) {
+func (c *Config) AddToCache(file string) {
 	if !c.IsEnabled() {
 		return
 	}
