@@ -9,15 +9,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// DiffLocalPlan is a struct for running 'diff plan' command.
-type DiffLocalPlan struct {
+// DiffLocal is a struct for running 'diff plan' command.
+type DiffLocal struct {
 	diff     *Diff
 	plandir1 string
 	plandir2 string
 }
 
 // Run is the main function for 'diff plan' command.
-func (d *DiffLocalPlan) Run(ctx context.Context) error {
+func (d *DiffLocal) Run(ctx context.Context) error {
 	if d.plandir1 == d.plandir2 {
 		log.Warn(plan.ErrPlansAreTheSame)
 	}
@@ -46,17 +46,18 @@ func (d *DiffLocalPlan) Run(ctx context.Context) error {
 }
 
 // Cmd returns 'diff plan' *cli.Command.
-func (d *DiffLocalPlan) Cmd() *cli.Command {
+func (d *DiffLocal) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "plan",
-		Usage:  "plan1  🆚  plan2",
-		Flags:  d.flags(),
-		Action: toCtx(d.Run),
+		Name:    "local",
+		Aliases: []string{"plan"},
+		Usage:   "plan1  🆚  plan2",
+		Flags:   d.flags(),
+		Action:  toCtx(d.Run),
 	}
 }
 
 // flags return flag set of CLI urfave.
-func (d *DiffLocalPlan) flags() []cli.Flag {
+func (d *DiffLocal) flags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "plandir1",

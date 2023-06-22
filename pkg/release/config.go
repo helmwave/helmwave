@@ -16,14 +16,13 @@ import (
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
-// nolintlint:lll
 type config struct {
 	helm                     *helm.EnvSettings
 	log                      *log.Entry
 	Lifecycle                hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
 	Store                    map[string]any  `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
 	ChartF                   Chart           `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
-	PendingReleaseStrategy   PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback),default="`
+	PendingReleaseStrategy   PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"enum=rollback,enum=uninstall,description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback)"`
 	uniqName                 uniqname.UniqName
 	NameF                    string                `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required,title=Release name"`
 	NamespaceF               string                `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
@@ -31,11 +30,11 @@ type config struct {
 	KubeContextF             string                `yaml:"context,omitempty" json:"context,omitempty"`
 	OfflineKubeVersionF      string                `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
 	DependsOnF               []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
-	ValuesF                  []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release"`
+	ValuesF                  []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release,oneof_type=string;object"`
 	TagsF                    []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
-	PostRendererF            []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of postrenders to manipulate with manifests"`
+	PostRendererF            []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
 	MaxHistory               int                   `yaml:"max_history,omitempty" json:"max_history,omitempty" jsonschema:"default=0"`
-	Timeout                  time.Duration         `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"default=5m"`
+	Timeout                  time.Duration         `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;int,default=5m"`
 	lock                     sync.RWMutex
 	AllowFailureF            bool `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
 	Atomic                   bool `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
@@ -44,7 +43,7 @@ type config struct {
 	Devel                    bool `yaml:"devel,omitempty" json:"devel,omitempty" jsonschema:"default=false"`
 	DisableHooks             bool `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
-	dryRun                   bool `jsonschema:"default=false"`
+	dryRun                   bool `jsonschema:"default=false,-"`
 	EnableDNS                bool `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
 	Force                    bool `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
 	Recreate                 bool `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
