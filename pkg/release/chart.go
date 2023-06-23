@@ -19,21 +19,35 @@ import (
 )
 
 // Chart is a structure for chart download options.
-//
-// nolintlint:lll
-type Chart struct { //nolint:govet
-	Name      string `yaml:"name" json:"name" jsonschema:"required,description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"` //nolint:lll
-	CaFile    string `yaml:"ca_file" json:"ca_file" jsonschema:"description=Verify certificates of HTTPS-enabled servers using this CA bundle"`                       //nolint:lll
-	CertFile  string `yaml:"cert_file" json:"cert_file" jsonschema:"description=Identify HTTPS client using this SSL certificate file"`                               //nolint:lll
-	KeyFile   string `yaml:"key_file" json:"key_file" jsonschema:"description=Identify HTTPS client using this SSL key file"`
-	Insecure  bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"` //nolint:lll
-	Keyring   string `yaml:"keyring" json:"keyring" jsonschema:"description=Location of public keys used for verification"`
-	PassCreds bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`
-	RepoURL   string `yaml:"repo_url" json:"repo_url" jsonschema:"description=Chart repository url"`
-	Username  string `yaml:"username" json:"username" jsonschema:"description=Chart repository username"`
-	Password  string `yaml:"password" json:"password" jsonschema:"description=Chart repository password"`
-	Verify    bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`
-	Version   string `yaml:"version" json:"version" jsonschema:"description=Chart version"`
+type Chart struct {
+	Name                  string `yaml:"name" json:"name" jsonschema:"required,description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"` //nolint:lll
+	CaFile                string `yaml:"ca_file" json:"ca_file" jsonschema:"description=Verify certificates of HTTPS-enabled servers using this CA bundle"`                       //nolint:lll
+	CertFile              string `yaml:"cert_file" json:"cert_file" jsonschema:"description=Identify HTTPS client using this SSL certificate file"`                               //nolint:lll
+	KeyFile               string `yaml:"key_file" json:"key_file" jsonschema:"description=Identify HTTPS client using this SSL key file"`                                         //nolint:lll
+	Keyring               string `yaml:"keyring" json:"keyring" jsonschema:"description=Location of public keys used for verification"`                                           //nolint:lll
+	RepoURL               string `yaml:"repo_url" json:"repo_url" jsonschema:"description=Chart repository url"`
+	Username              string `yaml:"username" json:"username" jsonschema:"description=Chart repository username"`
+	Password              string `yaml:"password" json:"password" jsonschema:"description=Chart repository password"`
+	Version               string `yaml:"version" json:"version" jsonschema:"description=Chart version"`
+	InsecureSkipTLSverify bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"` //nolint:lll
+	Verify                bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`                              //nolint:lll
+	PassCredentialsAll    bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`                             //nolint:lll
+}
+
+// CopyOptions is a helper for copy options from Chart to ChartPathOptions.
+func (c *Chart) CopyOptions(cpo *action.ChartPathOptions) {
+	// I hate private field without normal New(...Options)
+	cpo.CaFile = c.CaFile
+	cpo.CertFile = c.CertFile
+	cpo.KeyFile = c.KeyFile
+	cpo.InsecureSkipTLSverify = c.InsecureSkipTLSverify
+	cpo.Keyring = c.Keyring
+	cpo.Password = c.Password
+	cpo.PassCredentialsAll = c.PassCredentialsAll
+	cpo.RepoURL = c.RepoURL
+	cpo.Username = c.Username
+	cpo.Verify = c.Verify
+	cpo.Version = c.Version
 }
 
 // UnmarshalYAML flexible config.
@@ -57,7 +71,7 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
-func (u Chart) IsRemote() bool {
+func (u *Chart) IsRemote() bool {
 	return !helper.IsExists(filepath.Clean(u.Name))
 }
 
@@ -70,7 +84,7 @@ func (rel *config) LocateChartWithCache() (string, error) {
 		return ch, nil
 	}
 
-	// Hmm nice action bro
+	// nice action bro
 	client := rel.newInstall()
 
 	ch, err = client.ChartPathOptions.LocateChart(c.Name, rel.Helm())
@@ -172,7 +186,7 @@ func (rel *config) DownloadChart(tmpDir string) error {
 	return helper.CopyFile(ch, destDir)
 }
 
-func (rel *config) SetChart(name string) {
+func (rel *config) SetChartName(name string) {
 	rel.lock.Lock()
 	rel.ChartF.Name = name
 	rel.lock.Unlock()

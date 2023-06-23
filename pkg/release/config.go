@@ -83,7 +83,7 @@ func (rel *config) newInstall() *action.Install {
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 
-	rel.copyChartPathOptions(&client.ChartPathOptions)
+	rel.Chart().CopyOptions(&client.ChartPathOptions)
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
@@ -130,7 +130,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 
-	rel.copyChartPathOptions(&client.ChartPathOptions)
+	rel.Chart().CopyOptions(&client.ChartPathOptions)
 
 	client.Force = rel.Force
 	client.DisableHooks = rel.DisableHooks
@@ -153,23 +153,6 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	return client
 }
 
-func (rel *config) copyChartPathOptions(cpo *action.ChartPathOptions) {
-	ch := rel.Chart()
-
-	// I hate private field without normal New(...Options)
-	cpo.CaFile = ch.CaFile
-	cpo.CertFile = ch.CertFile
-	cpo.KeyFile = ch.KeyFile
-	cpo.InsecureSkipTLSverify = ch.Insecure
-	cpo.Keyring = ch.Keyring
-	cpo.Password = ch.Password
-	cpo.PassCredentialsAll = ch.PassCreds
-	cpo.RepoURL = ch.RepoURL
-	cpo.Username = ch.Username
-	cpo.Verify = ch.Verify
-	cpo.Version = ch.Version
-}
-
 var (
 	// ErrNotFound is an error for not found release.
 	ErrNotFound = driver.ErrReleaseNotFound
@@ -181,7 +164,7 @@ var (
 	ErrDepFailed = errors.New("dependency failed")
 )
 
-// Uniq redis@my-namespace.
+// Uniq like redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
 		var err error
@@ -214,11 +197,11 @@ func (rel *config) Description() string {
 	return rel.DescriptionF
 }
 
-func (rel *config) Chart() Chart {
+func (rel *config) Chart() *Chart {
 	rel.lock.RLock()
 	defer rel.lock.RUnlock()
 
-	return rel.ChartF
+	return &rel.ChartF
 }
 
 func (rel *config) DependsOn() []*DependsOnReference {
@@ -321,8 +304,6 @@ func (rel *config) KubeContext() string {
 
 // MarshalYAML is a marshaller for gopkg.in/yaml.v3.
 // It is required to avoid data race with getting read lock.
-//
-//nolintlint:govet
 func (rel *config) MarshalYAML() (any, error) {
 	rel.lock.RLock()
 	defer rel.lock.RUnlock()

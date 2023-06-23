@@ -114,7 +114,7 @@ func (p *Plan) exportCharts() error {
 		}
 
 		chart := entries[0]
-		p.body.Releases[i].SetChart(path.Join(dst, chart.Name()))
+		p.body.Releases[i].SetChartName(path.Join(dst, chart.Name()))
 	}
 
 	return nil

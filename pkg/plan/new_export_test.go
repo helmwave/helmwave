@@ -21,6 +21,10 @@ type MockReleaseConfig struct {
 	mock.Mock
 }
 
+func (r *MockReleaseConfig) SetChartName(s string) {
+	r.Called()
+}
+
 func (r *MockReleaseConfig) OfflineKubeVersion() *chartutil.KubeVersion {
 	r.Called()
 
@@ -120,8 +124,8 @@ func (r *MockReleaseConfig) Namespace() string {
 	return r.Called().String(0)
 }
 
-func (r *MockReleaseConfig) Chart() release.Chart {
-	return r.Called().Get(0).(release.Chart)
+func (r *MockReleaseConfig) Chart() *release.Chart {
+	return r.Called().Get(0).(*release.Chart)
 }
 
 func (r *MockReleaseConfig) DependsOn() []*release.DependsOnReference {
