@@ -33,8 +33,8 @@ type Config interface {
 	Status() (*release.Release, error)
 	Name() string
 	Namespace() string
-	Chart() Chart
-	SetChart(string)
+	Chart() *Chart
+	SetChartName(string)
 	DependsOn() []*DependsOnReference
 	Tags() []string
 	Repo() string

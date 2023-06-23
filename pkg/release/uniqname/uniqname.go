@@ -27,7 +27,7 @@ func Generate(name, namespace string) (UniqName, error) {
 }
 
 // GenerateWithDefaultNamespace parses uniqname out of provided line.
-// If there is no namespace in line default namespace will be used.
+// If there is no namespace in line, default namespace will be used.
 func GenerateWithDefaultNamespace(line, namespace string) (UniqName, error) {
 	s := strings.Split(line, Separator)
 

@@ -17,25 +17,32 @@ import (
 )
 
 type config struct {
-	helm                     *helm.EnvSettings
-	log                      *log.Entry
-	Lifecycle                hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
-	Store                    map[string]any  `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
-	ChartF                   Chart           `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
-	PendingReleaseStrategy   PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"enum=rollback,enum=uninstall,description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback)"`
-	uniqName                 uniqname.UniqName
-	NameF                    string                `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required,title=Release name"`
-	NamespaceF               string                `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
-	DescriptionF             string                `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
-	KubeContextF             string                `yaml:"context,omitempty" json:"context,omitempty"`
-	OfflineKubeVersionF      string                `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
-	DependsOnF               []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
-	ValuesF                  []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release,oneof_type=string;object"`
-	TagsF                    []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
-	PostRendererF            []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
-	MaxHistory               int                   `yaml:"max_history,omitempty" json:"max_history,omitempty" jsonschema:"default=0"`
-	Timeout                  time.Duration         `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;int,default=5m"`
-	lock                     sync.RWMutex
+	helm *helm.EnvSettings
+	log  *log.Entry
+
+	Lifecycle              hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
+	Store                  map[string]any  `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
+	ChartF                 Chart           `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
+	PendingReleaseStrategy PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"enum=rollback,enum=uninstall,description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback)"`
+	uniqName               uniqname.UniqName
+
+	NameF               string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required,title=Release name"`
+	NamespaceF          string `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
+	DescriptionF        string `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
+	KubeContextF        string `yaml:"context,omitempty" json:"context,omitempty"`
+	OfflineKubeVersionF string `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
+
+	DependsOnF    []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
+	ValuesF       []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release,oneof_type=string;object"`
+	TagsF         []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
+	PostRendererF []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
+
+	Timeout time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;int,default=5m"`
+
+	// Lock for parallel testing
+	lock sync.RWMutex
+
+	MaxHistory               int  `yaml:"max_history,omitempty" json:"max_history,omitempty" jsonschema:"default=0"`
 	AllowFailureF            bool `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
 	Atomic                   bool `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
 	CleanupOnFail            bool `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
@@ -43,7 +50,6 @@ type config struct {
 	Devel                    bool `yaml:"devel,omitempty" json:"devel,omitempty" jsonschema:"default=false"`
 	DisableHooks             bool `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
-	dryRun                   bool `jsonschema:"default=false,-"`
 	EnableDNS                bool `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
 	Force                    bool `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
 	Recreate                 bool `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
@@ -53,6 +59,9 @@ type config struct {
 	SubNotes                 bool `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"default=false"`
 	Wait                     bool `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
 	WaitForJobs              bool `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
+
+	// special field for templating and building
+	dryRun bool `jsonschema:"default=false,-"`
 }
 
 func (rel *config) DryRun(b bool) {
@@ -74,7 +83,7 @@ func (rel *config) newInstall() *action.Install {
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 
-	rel.copyChartPathOptions(&client.ChartPathOptions)
+	rel.Chart().CopyOptions(&client.ChartPathOptions)
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
@@ -121,7 +130,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 
-	rel.copyChartPathOptions(&client.ChartPathOptions)
+	rel.Chart().CopyOptions(&client.ChartPathOptions)
 
 	client.Force = rel.Force
 	client.DisableHooks = rel.DisableHooks
@@ -144,23 +153,6 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	return client
 }
 
-func (rel *config) copyChartPathOptions(cpo *action.ChartPathOptions) {
-	ch := rel.Chart()
-
-	// I hate private field without normal New(...Options)
-	cpo.CaFile = ch.CaFile
-	cpo.CertFile = ch.CertFile
-	cpo.KeyFile = ch.KeyFile
-	cpo.InsecureSkipTLSverify = ch.Insecure
-	cpo.Keyring = ch.Keyring
-	cpo.Password = ch.Password
-	cpo.PassCredentialsAll = ch.PassCreds
-	cpo.RepoURL = ch.RepoURL
-	cpo.Username = ch.Username
-	cpo.Verify = ch.Verify
-	cpo.Version = ch.Version
-}
-
 var (
 	// ErrNotFound is an error for not found release.
 	ErrNotFound = driver.ErrReleaseNotFound
@@ -172,7 +164,7 @@ var (
 	ErrDepFailed = errors.New("dependency failed")
 )
 
-// Uniq redis@my-namespace.
+// Uniq like redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
 		var err error
@@ -205,11 +197,11 @@ func (rel *config) Description() string {
 	return rel.DescriptionF
 }
 
-func (rel *config) Chart() Chart {
+func (rel *config) Chart() *Chart {
 	rel.lock.RLock()
 	defer rel.lock.RUnlock()
 
-	return rel.ChartF
+	return &rel.ChartF
 }
 
 func (rel *config) DependsOn() []*DependsOnReference {
@@ -312,8 +304,6 @@ func (rel *config) KubeContext() string {
 
 // MarshalYAML is a marshaller for gopkg.in/yaml.v3.
 // It is required to avoid data race with getting read lock.
-//
-//nolintlint:govet
 func (rel *config) MarshalYAML() (any, error) {
 	rel.lock.RLock()
 	defer rel.lock.RUnlock()
