@@ -129,7 +129,7 @@ func SyncRepositories(ctx context.Context, repositories repo.Configs) error { //
 	}
 
 	// We can't parallel repositories installation as helm manages single repositories.yaml.
-	// To prevent data race we need either make helm use futex or not parallel at all
+	// To prevent data race, we need to either make helm use futex or not parallel at all
 	for i := range repositories {
 		err := repositories[i].Install(ctx, helper.Helm, f)
 		if err != nil {
