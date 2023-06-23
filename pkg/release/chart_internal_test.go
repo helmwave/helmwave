@@ -28,15 +28,14 @@ func (s *ChartInternalTestSuite) contains(a []string, b string) bool {
 func (s *ChartInternalTestSuite) TestChartTypeFields() {
 	skipFields := []string{
 		"Name",
-		"name",
 	}
 
 	a := Chart{}
-	aa := reflect.ValueOf(a).Elem().Type()
+	aa := reflect.ValueOf(a).Type()
 	fieldsR := make([]string, aa.NumField())
 
 	b := action.ChartPathOptions{}
-	bb := reflect.ValueOf(b).Elem().Type()
+	bb := reflect.ValueOf(b).Type()
 
 	for i := range fieldsR {
 		f := aa.Field(i)
@@ -45,6 +44,9 @@ func (s *ChartInternalTestSuite) TestChartTypeFields() {
 
 	for i := bb.NumField() - 1; i >= 0; i-- {
 		f := bb.Field(i)
+		if !f.IsExported() {
+			continue
+		}
 		if !s.contains(skipFields, f.Name) {
 			s.Require().Contains(fieldsR, f.Name)
 		}
