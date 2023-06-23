@@ -21,10 +21,19 @@ import (
 // Chart is a structure for chart download options.
 //
 // nolintlint:lll
-type Chart struct {
-	action.ChartPathOptions `yaml:",inline" json:",inline"`
-
-	Name string `yaml:"name" json:"name" jsonschema:"description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"` //nolint:lll
+type Chart struct { //nolint:govet
+	Name      string `yaml:"name" json:"name" jsonschema:"required,description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"` //nolint:lll
+	CaFile    string `yaml:"ca_file" json:"ca_file" jsonschema:"description=Verify certificates of HTTPS-enabled servers using this CA bundle"`                       //nolint:lll
+	CertFile  string `yaml:"cert_file" json:"cert_file" jsonschema:"description=Identify HTTPS client using this SSL certificate file"`                               //nolint:lll
+	KeyFile   string `yaml:"key_file" json:"key_file" jsonschema:"description=Identify HTTPS client using this SSL key file"`
+	Insecure  bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"` //nolint:lll
+	Keyring   string `yaml:"keyring" json:"keyring" jsonschema:"description=Location of public keys used for verification"`
+	PassCreds bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`
+	RepoURL   string `yaml:"repo_url" json:"repo_url" jsonschema:"description=Chart repository url"`
+	Username  string `yaml:"username" json:"username" jsonschema:"description=Chart repository username"`
+	Password  string `yaml:"password" json:"password" jsonschema:"description=Chart repository password"`
+	Verify    bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`
+	Version   string `yaml:"version" json:"version" jsonschema:"description=Chart version"`
 }
 
 // UnmarshalYAML flexible config.
