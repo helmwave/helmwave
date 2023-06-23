@@ -148,17 +148,17 @@ func (rel *config) copyChartPathOptions(cpo *action.ChartPathOptions) {
 	ch := rel.Chart()
 
 	// I hate private field without normal New(...Options)
-	cpo.CaFile = ch.ChartPathOptions.CaFile
-	cpo.CertFile = ch.ChartPathOptions.CertFile
-	cpo.KeyFile = ch.ChartPathOptions.KeyFile
-	cpo.InsecureSkipTLSverify = ch.ChartPathOptions.InsecureSkipTLSverify
-	cpo.Keyring = ch.ChartPathOptions.Keyring
-	cpo.Password = ch.ChartPathOptions.Password
-	cpo.PassCredentialsAll = ch.ChartPathOptions.PassCredentialsAll
-	cpo.RepoURL = ch.ChartPathOptions.RepoURL
-	cpo.Username = ch.ChartPathOptions.Username
-	cpo.Verify = ch.ChartPathOptions.Verify
-	cpo.Version = ch.ChartPathOptions.Version
+	cpo.CaFile = ch.CaFile
+	cpo.CertFile = ch.CertFile
+	cpo.KeyFile = ch.KeyFile
+	cpo.InsecureSkipTLSverify = ch.Insecure
+	cpo.Keyring = ch.Keyring
+	cpo.Password = ch.Password
+	cpo.PassCredentialsAll = ch.PassCreds
+	cpo.RepoURL = ch.RepoURL
+	cpo.Username = ch.Username
+	cpo.Verify = ch.Verify
+	cpo.Version = ch.Version
 }
 
 var (
