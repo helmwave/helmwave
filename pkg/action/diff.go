@@ -24,7 +24,7 @@ type Diff struct {
 
 // Cmd returns 'diff' *cli.Command.
 func (d *Diff) Cmd() *cli.Command {
-	plan := DiffLocalPlan{diff: d}
+	plan := DiffLocal{diff: d}
 	live := DiffLive{diff: d}
 
 	return &cli.Command{

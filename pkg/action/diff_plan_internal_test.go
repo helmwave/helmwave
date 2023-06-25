@@ -30,7 +30,7 @@ func (ts *DiffPlanTestSuite) TearDownTest() {
 }
 
 func (ts *DiffPlanTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &DiffLocalPlan{})
+	ts.Require().Implements((*Action)(nil), &DiffLocal{})
 }
 
 func (ts *DiffPlanTestSuite) TestRun() {
@@ -58,7 +58,7 @@ func (ts *DiffPlanTestSuite) TestRun() {
 		diffMode: DiffModeLive,
 	}
 
-	d := DiffLocalPlan{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
+	d := DiffLocal{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
 
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s1.Run(context.Background()))

@@ -131,11 +131,6 @@ func NewBody(ctx context.Context, file string) (*planBody, error) {
 		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}
 
-	// Setup dev version
-	// if b.Version == "" {
-	// 	 b.Version = version.Version
-	// }
-
 	err = b.Validate()
 	if err != nil {
 		return nil, err
