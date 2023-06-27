@@ -10,15 +10,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func runHooks(ctx context.Context, hooks []hook) error {
+func runHooks(ctx context.Context, hooks []Hook) error {
 	for _, h := range hooks {
 		err := h.Run(ctx)
 		if err != nil {
-			h.Log().Errorf("failed to run hook: %v", err)
+			h.Log().WithError(err).Error("failed to run hook")
 
-			if !h.AllowFailure {
-				return err
-			}
+			return err
 		}
 	}
 
@@ -26,6 +24,18 @@ func runHooks(ctx context.Context, hooks []hook) error {
 }
 
 func (h *hook) Run(ctx context.Context) error {
+	err := h.run(ctx)
+
+	if h.AllowFailure {
+		h.Log().WithError(err).Warn("caught lifecycle error, skipping...")
+
+		return nil
+	}
+
+	return err
+}
+
+func (h *hook) run(ctx context.Context) error {
 	cmd := exec.CommandContext(ctx, h.Cmd, h.Args...)
 
 	const t = "🩼 running hook..."
