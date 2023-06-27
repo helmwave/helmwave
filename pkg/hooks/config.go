@@ -1,6 +1,8 @@
 package hooks
 
 import (
+	"context"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,14 +21,15 @@ type Lifecycle struct {
 }
 
 type Hook interface {
-	Run()
+	Run(context.Context) error
 	Log() *log.Entry
 }
 
 type hook struct {
-	Cmd  string
-	Args []string
-	Show bool
+	Cmd          string
+	Args         []string
+	Show         bool
+	AllowFailure bool
 }
 
 func (h *hook) Log() *log.Entry {

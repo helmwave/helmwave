@@ -49,7 +49,7 @@ func (rel *config) isPending() (bool, error) {
 func (rel *config) fixPending(ctx context.Context) error {
 	switch rel.PendingReleaseStrategy {
 	case PendingStrategyRollback:
-		return rel.Rollback(0)
+		return rel.Rollback(ctx, 0)
 	case PendingStrategyUninstall:
 		_, err := rel.Uninstall(ctx)
 

@@ -1,15 +1,27 @@
 package plan
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	log "github.com/sirupsen/logrus"
 )
 
 // Rollback rollbacks helm release.
-func (p *Plan) Rollback(version int) error {
+func (p *Plan) Rollback(ctx context.Context, version int) error {
 	// Run hooks
-	p.body.Lifecycle.PreRolling()
-	defer p.body.Lifecycle.PostRolling()
+	err := p.body.Lifecycle.PreRollbacking(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		err := p.body.Lifecycle.PostRollbacking(ctx)
+		if err != nil {
+			log.Errorf("got an error from postrollback hooks: %v", err)
+		}
+	}()
 
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
@@ -17,7 +29,7 @@ func (p *Plan) Rollback(version int) error {
 	for i := range p.body.Releases {
 		go func(wg *parallel.WaitGroup, rel release.Config) {
 			defer wg.Done()
-			err := rel.Rollback(version)
+			err := rel.Rollback(ctx, version)
 			if err != nil {
 				rel.Logger().WithError(err).Error("❌ rollback")
 				wg.ErrChan() <- err
@@ -27,7 +39,7 @@ func (p *Plan) Rollback(version int) error {
 		}(wg, p.body.Releases[i])
 	}
 
-	err := wg.Wait()
+	err = wg.Wait()
 	if err != nil {
 		return err
 	}

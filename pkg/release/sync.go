@@ -10,13 +10,33 @@ import (
 )
 
 func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
+	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
+
 	// Run hooks
 	if rel.dryRun {
-		rel.Lifecycle.PreBuilding()
-		defer rel.Lifecycle.PostBuilding()
+		err := rel.Lifecycle.PreBuilding(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			err := rel.Lifecycle.PostBuilding(ctx)
+			if err != nil {
+				rel.Logger().Errorf("got an error from postbuild hooks: %v", err)
+			}
+		}()
 	} else {
-		rel.Lifecycle.PreUping()
-		defer rel.Lifecycle.PostUping()
+		err := rel.Lifecycle.PreUping(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			err := rel.Lifecycle.PostUping(ctx)
+			if err != nil {
+				rel.Logger().Errorf("got an error from postup hooks: %v", err)
+			}
+		}()
 	}
 
 	return rel.upgrade(ctx)
