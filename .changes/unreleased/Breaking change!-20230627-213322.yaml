@@ -1,0 +1,6 @@
+kind: Breaking change!
+body: Fail helmwave if lifecycle command is failed by default
+time: 2023-06-27T21:33:22.699948+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""
