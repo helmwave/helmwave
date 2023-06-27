@@ -106,7 +106,7 @@ func (r *MockReleaseConfig) List() (*helmRelease.Release, error) {
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) Rollback(int) error {
+func (r *MockReleaseConfig) Rollback(context.Context, int) error {
 	return r.Called().Error(0)
 }
 

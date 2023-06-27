@@ -1,6 +1,7 @@
 package plan_test
 
 import (
+	"context"
 	"errors"
 	"path/filepath"
 	"testing"
@@ -24,7 +25,7 @@ func (s *RollbackTestSuite) TestRollback() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback(-1)
+	err := p.Rollback(context.Background(), -1)
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -41,7 +42,7 @@ func (s *RollbackTestSuite) TestRollbackError() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback(-1)
+	err := p.Rollback(context.Background(), -1)
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -52,7 +53,7 @@ func (s *RollbackTestSuite) TestRollbackNoReleases() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Rollback(-1)
+	err := p.Rollback(context.Background(), -1)
 	s.Require().NoError(err)
 }
 

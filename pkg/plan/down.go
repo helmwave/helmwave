@@ -11,8 +11,17 @@ import (
 // Down destroys all releases that exist in a plan.
 func (p *Plan) Down(ctx context.Context) error {
 	// Run hooks
-	p.body.Lifecycle.PreDowning()
-	defer p.body.Lifecycle.PreDowning()
+	err := p.body.Lifecycle.PreDowning(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		err := p.body.Lifecycle.PostDowning(ctx)
+		if err != nil {
+			log.Errorf("got an error from postdown hooks: %v", err)
+		}
+	}()
 
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
@@ -30,7 +39,7 @@ func (p *Plan) Down(ctx context.Context) error {
 		}(ctx, wg, p.body.Releases[i])
 	}
 
-	err := wg.Wait()
+	err = wg.Wait()
 	if err != nil {
 		return err
 	}
