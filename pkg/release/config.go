@@ -143,7 +143,6 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
-	client.DependencyUpdate = !rel.SkipDependencyRefresh
 
 	pr, err := rel.PostRenderer()
 	if err != nil {
