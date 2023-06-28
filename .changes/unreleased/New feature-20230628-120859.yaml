@@ -1,6 +1,0 @@
-kind: New feature
-body: Allow to skip repo refresh during building dependencies
-time: 2023-06-28T12:08:59.007862+04:00
-custom:
-  Author: r3nic1e
-  Issue: "510"
