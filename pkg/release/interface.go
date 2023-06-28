@@ -29,7 +29,7 @@ type Config interface {
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get() (*release.Release, error)
 	List() (*release.Release, error)
-	Rollback(int) error
+	Rollback(context.Context, int) error
 	Status() (*release.Release, error)
 	Name() string
 	Namespace() string

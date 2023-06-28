@@ -26,7 +26,7 @@ func (i *Rollback) Run(ctx context.Context) error {
 		return err
 	}
 
-	return p.Rollback(i.revision)
+	return p.Rollback(ctx, i.revision)
 }
 
 // Cmd returns 'rollback' *cli.Command.

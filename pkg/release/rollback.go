@@ -1,15 +1,28 @@
 package release
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/action"
 )
 
-func (rel *config) Rollback(version int) error {
+func (rel *config) Rollback(ctx context.Context, version int) error {
+	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
+
 	// Run hooks
-	rel.Lifecycle.PreRolling()
-	defer rel.Lifecycle.PostRolling()
+	err := rel.Lifecycle.RunPreRollback(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		err := rel.Lifecycle.RunPostRollback(ctx)
+		if err != nil {
+			rel.Logger().Errorf("got an error from postrollback hooks: %v", err)
+		}
+	}()
 
 	client := action.NewRollback(rel.Cfg())
 

@@ -15,6 +15,8 @@ type BuildOptions struct { //nolint:govet
 }
 
 // Build plan with yml and tags/matchALL options.
+//
+//nolint:cyclop // TODO: reduce cyclomatic complexity
 func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funlen
 	p.templater = o.Templater
 
@@ -26,8 +28,17 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	p.body = body
 
 	// Run hooks
-	p.body.Lifecycle.PreBuilding()
-	defer p.body.Lifecycle.PostBuilding()
+	err = p.body.Lifecycle.RunPreBuild(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		err := p.body.Lifecycle.RunPostBuild(ctx)
+		if err != nil {
+			log.Errorf("got an error from postbuild hooks: %v", err)
+		}
+	}()
 
 	// Build Releases
 	log.Info("🔨 Building releases...")
