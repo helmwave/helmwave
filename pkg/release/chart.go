@@ -13,25 +13,27 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
-	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 )
 
 // Chart is a structure for chart download options.
+//
+//nolint:lll
 type Chart struct {
-	Name                  string `yaml:"name" json:"name" jsonschema:"required,description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"` //nolint:lll
-	CaFile                string `yaml:"ca_file" json:"ca_file" jsonschema:"description=Verify certificates of HTTPS-enabled servers using this CA bundle"`                       //nolint:lll
-	CertFile              string `yaml:"cert_file" json:"cert_file" jsonschema:"description=Identify HTTPS client using this SSL certificate file"`                               //nolint:lll
-	KeyFile               string `yaml:"key_file" json:"key_file" jsonschema:"description=Identify HTTPS client using this SSL key file"`                                         //nolint:lll
-	Keyring               string `yaml:"keyring" json:"keyring" jsonschema:"description=Location of public keys used for verification"`                                           //nolint:lll
+	Name                  string `yaml:"name" json:"name" jsonschema:"required,description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
+	CaFile                string `yaml:"ca_file" json:"ca_file" jsonschema:"description=Verify certificates of HTTPS-enabled servers using this CA bundle"`
+	CertFile              string `yaml:"cert_file" json:"cert_file" jsonschema:"description=Identify HTTPS client using this SSL certificate file"`
+	KeyFile               string `yaml:"key_file" json:"key_file" jsonschema:"description=Identify HTTPS client using this SSL key file"`
+	Keyring               string `yaml:"keyring" json:"keyring" jsonschema:"description=Location of public keys used for verification"`
 	RepoURL               string `yaml:"repo_url" json:"repo_url" jsonschema:"description=Chart repository url"`
 	Username              string `yaml:"username" json:"username" jsonschema:"description=Chart repository username"`
 	Password              string `yaml:"password" json:"password" jsonschema:"description=Chart repository password"`
 	Version               string `yaml:"version" json:"version" jsonschema:"description=Chart version"`
-	InsecureSkipTLSverify bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"` //nolint:lll
-	Verify                bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`                              //nolint:lll
-	PassCredentialsAll    bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`                             //nolint:lll
+	InsecureSkipTLSverify bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"`
+	Verify                bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`
+	PassCredentialsAll    bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`
+	SkipDependencyRefresh bool   `yaml:"skip_dependency_refresh,omitempty" json:"skip_dependency_refresh,omitempty" jsonschema:"default=false"`
 }
 
 // CopyOptions is a helper for copy options from Chart to ChartPathOptions.
@@ -140,16 +142,14 @@ func (rel *config) ChartDepsUpd() error {
 		return nil
 	}
 
-	return chartDepsUpd(rel.Chart().Name, rel.Helm())
-}
+	settings := rel.Helm()
 
-func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              log.StandardLogger().Writer(),
-		ChartPath:        filepath.Clean(name),
+		ChartPath:        filepath.Clean(rel.Chart().Name),
 		Keyring:          client.Keyring,
-		SkipUpdate:       client.SkipRefresh,
+		SkipUpdate:       rel.Chart().SkipDependencyRefresh,
 		Getters:          getter.All(settings),
 		RepositoryConfig: settings.RepositoryConfig,
 		RepositoryCache:  settings.RepositoryCache,
@@ -160,7 +160,7 @@ func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	}
 
 	if err := man.Update(); err != nil {
-		return fmt.Errorf("failed to update %s chart dependencies: %w", name, err)
+		return fmt.Errorf("failed to update %s chart dependencies: %w", rel.Chart().Name, err)
 	}
 
 	return nil
