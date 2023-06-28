@@ -12,13 +12,13 @@ func (rel *config) Rollback(ctx context.Context, version int) error {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
-	err := rel.Lifecycle.PreRollbacking(ctx)
+	err := rel.Lifecycle.RunPreRollback(ctx)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		err := rel.Lifecycle.PostRollbacking(ctx)
+		err := rel.Lifecycle.RunPostRollback(ctx)
 		if err != nil {
 			rel.Logger().Errorf("got an error from postrollback hooks: %v", err)
 		}

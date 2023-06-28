@@ -31,13 +31,13 @@ var ErrDeploy = errors.New("deploy failed")
 // Up syncs repositories and releases.
 func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
 	// Run hooks
-	err := p.body.Lifecycle.PreUping(ctx)
+	err := p.body.Lifecycle.RunPreUp(ctx)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		err := p.body.Lifecycle.PostUping(ctx)
+		err := p.body.Lifecycle.RunPostUp(ctx)
 		if err != nil {
 			log.Errorf("got an error from postup hooks: %v", err)
 		}

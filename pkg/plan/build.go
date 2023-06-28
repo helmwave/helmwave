@@ -28,13 +28,13 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	p.body = body
 
 	// Run hooks
-	err = p.body.Lifecycle.PreBuilding(ctx)
+	err = p.body.Lifecycle.RunPreBuild(ctx)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		err := p.body.Lifecycle.PostBuilding(ctx)
+		err := p.body.Lifecycle.RunPostBuild(ctx)
 		if err != nil {
 			log.Errorf("got an error from postbuild hooks: %v", err)
 		}

@@ -11,13 +11,13 @@ import (
 // Rollback rollbacks helm release.
 func (p *Plan) Rollback(ctx context.Context, version int) error {
 	// Run hooks
-	err := p.body.Lifecycle.PreRollbacking(ctx)
+	err := p.body.Lifecycle.RunPreRollback(ctx)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		err := p.body.Lifecycle.PostRollbacking(ctx)
+		err := p.body.Lifecycle.RunPostRollback(ctx)
 		if err != nil {
 			log.Errorf("got an error from postrollback hooks: %v", err)
 		}

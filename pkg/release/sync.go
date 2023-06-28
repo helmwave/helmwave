@@ -14,25 +14,25 @@ func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
 
 	// Run hooks
 	if rel.dryRun {
-		err := rel.Lifecycle.PreBuilding(ctx)
+		err := rel.Lifecycle.RunPreBuild(ctx)
 		if err != nil {
 			return nil, err
 		}
 
 		defer func() {
-			err := rel.Lifecycle.PostBuilding(ctx)
+			err := rel.Lifecycle.RunPostBuild(ctx)
 			if err != nil {
 				rel.Logger().Errorf("got an error from postbuild hooks: %v", err)
 			}
 		}()
 	} else {
-		err := rel.Lifecycle.PreUping(ctx)
+		err := rel.Lifecycle.RunPreUp(ctx)
 		if err != nil {
 			return nil, err
 		}
 
 		defer func() {
-			err := rel.Lifecycle.PostUping(ctx)
+			err := rel.Lifecycle.RunPostUp(ctx)
 			if err != nil {
 				rel.Logger().Errorf("got an error from postup hooks: %v", err)
 			}

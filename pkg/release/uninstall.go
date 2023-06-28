@@ -13,13 +13,13 @@ func (rel *config) Uninstall(ctx context.Context) (*release.UninstallReleaseResp
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
-	err := rel.Lifecycle.PreDowning(ctx)
+	err := rel.Lifecycle.RunPreDown(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
-		err := rel.Lifecycle.PostDowning(ctx)
+		err := rel.Lifecycle.RunPostDown(ctx)
 		if err != nil {
 			rel.Logger().Errorf("got an error from postdown hooks: %v", err)
 		}

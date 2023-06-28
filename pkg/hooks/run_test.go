@@ -42,7 +42,7 @@ func (s *LifecycleRunTestSuite) TestRunNoError() {
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
 	ctx := context.Background()
 
-	err := lifecycle.PreBuilding(ctx)
+	err := lifecycle.RunPreBuild(ctx)
 
 	s.Require().NoError(err)
 	hook.AssertExpectations(s.T())
@@ -57,10 +57,24 @@ func (s *LifecycleRunTestSuite) TestRunError() {
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
 	ctx := context.Background()
 
-	err := lifecycle.PreBuilding(ctx)
+	err := lifecycle.RunPreBuild(ctx)
 
 	s.Require().ErrorIs(err, errExpected)
 	hook.AssertExpectations(s.T())
+}
+
+func (s *LifecycleRunTestSuite) TestEmpty() {
+	lifecycle := hooks.Lifecycle{}
+	ctx := context.Background()
+
+	s.Require().NoError(lifecycle.RunPreBuild(ctx))
+	s.Require().NoError(lifecycle.RunPostBuild(ctx))
+	s.Require().NoError(lifecycle.RunPreUp(ctx))
+	s.Require().NoError(lifecycle.RunPostUp(ctx))
+	s.Require().NoError(lifecycle.RunPreDown(ctx))
+	s.Require().NoError(lifecycle.RunPostDown(ctx))
+	s.Require().NoError(lifecycle.RunPreRollback(ctx))
+	s.Require().NoError(lifecycle.RunPostRollback(ctx))
 }
 
 type HookRunTestSuite struct {
@@ -80,7 +94,7 @@ func (s *HookRunTestSuite) TestRunCanceledContext() {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	err := lifecycle.PreBuilding(ctx)
+	err := lifecycle.RunPreBuild(ctx)
 
 	s.Require().ErrorIs(err, context.Canceled)
 }
@@ -92,7 +106,7 @@ func (s *HookRunTestSuite) TestRunNoError() {
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
 	ctx := context.Background()
 
-	err := lifecycle.PreBuilding(ctx)
+	err := lifecycle.RunPreBuild(ctx)
 
 	s.Require().NoError(err)
 }
@@ -104,7 +118,7 @@ func (s *HookRunTestSuite) TestRunWrongCommand() {
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
 	ctx := context.Background()
 
-	err := lifecycle.PreBuilding(ctx)
+	err := lifecycle.RunPreBuild(ctx)
 
 	s.Require().ErrorIs(err, exec.ErrNotFound)
 }

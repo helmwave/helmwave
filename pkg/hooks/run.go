@@ -84,7 +84,7 @@ func (h *hook) run(ctx context.Context) error {
 
 // BUILD
 
-func (l *Lifecycle) PreBuilding(ctx context.Context) error {
+func (l *Lifecycle) RunPreBuild(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "pre-build")
 
 	if len(l.PreBuild) != 0 {
@@ -96,7 +96,7 @@ func (l *Lifecycle) PreBuilding(ctx context.Context) error {
 	return nil
 }
 
-func (l *Lifecycle) PostBuilding(ctx context.Context) error {
+func (l *Lifecycle) RunPostBuild(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "post-build")
 
 	if len(l.PostBuild) != 0 {
@@ -110,7 +110,7 @@ func (l *Lifecycle) PostBuilding(ctx context.Context) error {
 
 // UP
 
-func (l *Lifecycle) PreUping(ctx context.Context) error {
+func (l *Lifecycle) RunPreUp(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "pre-up")
 
 	if len(l.PreUp) != 0 {
@@ -122,7 +122,7 @@ func (l *Lifecycle) PreUping(ctx context.Context) error {
 	return nil
 }
 
-func (l *Lifecycle) PostUping(ctx context.Context) error {
+func (l *Lifecycle) RunPostUp(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "post-up")
 
 	if len(l.PostUp) != 0 {
@@ -136,7 +136,7 @@ func (l *Lifecycle) PostUping(ctx context.Context) error {
 
 // DOWN
 
-func (l *Lifecycle) PreDowning(ctx context.Context) error {
+func (l *Lifecycle) RunPreDown(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "pre-down")
 
 	if len(l.PreDown) != 0 {
@@ -148,7 +148,7 @@ func (l *Lifecycle) PreDowning(ctx context.Context) error {
 	return nil
 }
 
-func (l *Lifecycle) PostDowning(ctx context.Context) error {
+func (l *Lifecycle) RunPostDown(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "post-down")
 
 	if len(l.PostDown) != 0 {
@@ -162,7 +162,7 @@ func (l *Lifecycle) PostDowning(ctx context.Context) error {
 
 // ROLLBACK
 
-func (l *Lifecycle) PreRollbacking(ctx context.Context) error {
+func (l *Lifecycle) RunPreRollback(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "pre-rollback")
 
 	if len(l.PreRollback) != 0 {
@@ -174,7 +174,7 @@ func (l *Lifecycle) PreRollbacking(ctx context.Context) error {
 	return nil
 }
 
-func (l *Lifecycle) PostRollbacking(ctx context.Context) error {
+func (l *Lifecycle) RunPostRollback(ctx context.Context) error {
 	ctx = helper.ContextWithLifecycleType(ctx, "post-rollback")
 
 	if len(l.PostRollback) != 0 {
