@@ -1,6 +1,7 @@
 package action
 
 import (
+	"bytes"
 	"context"
 	"path/filepath"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/tests"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
 )
@@ -208,6 +210,39 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+}
+
+func (ts *NonParallelBuildTestSuite) TestLifecycle() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "13_helmwave.yml"),
+		file:      filepath.Join(tmpDir, "13_helmwave.yml"),
+		templater: "sprig",
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+		yml:     y,
+	}
+
+	var buf bytes.Buffer
+	oldOut := log.StandardLogger().Out
+	log.StandardLogger().SetOutput(&buf)
+	defer log.StandardLogger().SetOutput(oldOut)
+
+	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+
+	output := buf.String()
+	ts.Require().Contains(output, "running pre_build script for nginx")
+	ts.Require().Contains(output, "run global pre_build script")
+	ts.Require().Contains(output, "running post_build script for nginx")
+	ts.Require().Contains(output, "run global post_build script")
 }
 
 //nolintlint:paralleltest // can't parallel because of setenv and uses helm repository.yaml flock
