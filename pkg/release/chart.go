@@ -13,7 +13,6 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
-	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 )
@@ -140,16 +139,14 @@ func (rel *config) ChartDepsUpd() error {
 		return nil
 	}
 
-	return chartDepsUpd(rel.Chart().Name, rel.Helm())
-}
+	settings := rel.Helm()
 
-func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              log.StandardLogger().Writer(),
-		ChartPath:        filepath.Clean(name),
+		ChartPath:        filepath.Clean(rel.Chart().Name),
 		Keyring:          client.Keyring,
-		SkipUpdate:       client.SkipRefresh,
+		SkipUpdate:       rel.SkipDependencyRefresh,
 		Getters:          getter.All(settings),
 		RepositoryConfig: settings.RepositoryConfig,
 		RepositoryCache:  settings.RepositoryCache,
@@ -160,7 +157,7 @@ func chartDepsUpd(name string, settings *helm.EnvSettings) error {
 	}
 
 	if err := man.Update(); err != nil {
-		return fmt.Errorf("failed to update %s chart dependencies: %w", name, err)
+		return fmt.Errorf("failed to update %s chart dependencies: %w", rel.Chart().Name, err)
 	}
 
 	return nil

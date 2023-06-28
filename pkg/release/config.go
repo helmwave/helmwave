@@ -56,6 +56,7 @@ type config struct {
 	ResetValues              bool `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`
 	ReuseValues              bool `yaml:"reuse_values,omitempty" json:"reuse_values,omitempty" jsonschema:"default=false"`
 	SkipCRDs                 bool `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty" jsonschema:"default=false"`
+	SkipDependencyRefresh    bool `yaml:"skip_dependency_refresh,omitempty" json:"skip_dependency_refresh,omitempty" jsonschema:"default=false"`
 	SubNotes                 bool `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"default=false"`
 	Wait                     bool `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
 	WaitForJobs              bool `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
@@ -142,6 +143,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
+	client.DependencyUpdate = !rel.SkipDependencyRefresh
 
 	pr, err := rel.PostRenderer()
 	if err != nil {

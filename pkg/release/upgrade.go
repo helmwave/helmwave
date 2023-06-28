@@ -47,6 +47,7 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 
 		return r, nil
 	}
+
 	pending, err := rel.isPending()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check %q for pending status: %w", rel.Uniq(), err)
