@@ -1,6 +1,0 @@
-kind: New feature
-body: Allow to completely skip dependencies update for local charts
-time: 2023-06-28T13:57:25.891482+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
