@@ -33,7 +33,8 @@ type Chart struct {
 	InsecureSkipTLSverify bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"`
 	Verify                bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`
 	PassCredentialsAll    bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`
-	SkipDependencyRefresh bool   `yaml:"skip_dependency_refresh,omitempty" json:"skip_dependency_refresh,omitempty" jsonschema:"default=false"`
+	SkipDependencyUpdate  bool   `yaml:"skip_dependency_update" json:"skip_dependency_update" jsonschema:"description=Skip updating and downloading dependencies,default=false"`
+	SkipRefresh           bool   `yaml:"skip_refresh,omitempty" json:"skip_refresh,omitempty" jsonschema:"description=Skip refreshing repositories,default=false"`
 }
 
 // CopyOptions is a helper for copy options from Chart to ChartPathOptions.
@@ -142,6 +143,12 @@ func (rel *config) ChartDepsUpd() error {
 		return nil
 	}
 
+	if rel.Chart().SkipDependencyUpdate {
+		rel.Logger().Info("❎ forced skipping updating dependencies for local chart")
+
+		return nil
+	}
+
 	settings := rel.Helm()
 
 	client := action.NewDependency()
@@ -149,7 +156,7 @@ func (rel *config) ChartDepsUpd() error {
 		Out:              log.StandardLogger().Writer(),
 		ChartPath:        filepath.Clean(rel.Chart().Name),
 		Keyring:          client.Keyring,
-		SkipUpdate:       rel.Chart().SkipDependencyRefresh,
+		SkipUpdate:       rel.Chart().SkipRefresh,
 		Getters:          getter.All(settings),
 		RepositoryConfig: settings.RepositoryConfig,
 		RepositoryCache:  settings.RepositoryCache,
