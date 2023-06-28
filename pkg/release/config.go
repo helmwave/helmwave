@@ -23,7 +23,7 @@ type config struct {
 	Lifecycle              hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
 	Store                  map[string]any  `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
 	ChartF                 Chart           `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
-	PendingReleaseStrategy PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"enum=rollback,enum=uninstall,description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback)"`
+	PendingReleaseStrategy PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback)"`
 	uniqName               uniqname.UniqName
 
 	NameF               string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required,title=Release name"`
