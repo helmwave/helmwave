@@ -16,10 +16,6 @@ type StatusTestSuite struct {
 	suite.Suite
 }
 
-func (ts *StatusTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &Status{})
-}
-
 func (ts *StatusTestSuite) TestRun() {
 	r := &Build{
 		plandir: ts.T().TempDir(),

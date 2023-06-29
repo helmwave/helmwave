@@ -9,6 +9,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*GenSchema)(nil)
+
 // GenSchema is a struct for running 'GenSchema' command.
 type GenSchema struct{}
 

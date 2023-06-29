@@ -7,6 +7,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Status)(nil)
+
 // Status is a struct for running 'status' command.
 type Status struct {
 	build     *Build

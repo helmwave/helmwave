@@ -17,10 +17,6 @@ type YmlTestSuite struct {
 	suite.Suite
 }
 
-func (ts *YmlTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &Yml{})
-}
-
 func (ts *YmlTestSuite) TestRenderEnv() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{

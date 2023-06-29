@@ -7,6 +7,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Rollback)(nil)
+
 // Rollback is a struct for running 'rollback' command.
 type Rollback struct {
 	build     *Build

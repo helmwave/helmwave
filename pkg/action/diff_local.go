@@ -9,6 +9,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*DiffLocal)(nil)
+
 // DiffLocal is a struct for running 'diff plan' command.
 type DiffLocal struct {
 	diff     *Diff

@@ -11,6 +11,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Up)(nil)
+
 // Up is a struct for running 'up' command.
 type Up struct {
 	build     *Build
