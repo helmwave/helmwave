@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -16,7 +17,7 @@ type ExportTestSuite struct {
 func (s *ExportTestSuite) TestValuesEmpty() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
-	p.templater = "sprig"
+	p.templater = template.TemplaterSprig
 
 	p.body = &planBody{}
 
@@ -27,7 +28,7 @@ func (s *ExportTestSuite) TestValuesEmpty() {
 func (s *ExportTestSuite) TestValuesOneRelease() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
-	p.templater = "sprig"
+	p.templater = template.TemplaterSprig
 
 	valuesName := "blablavalues.yaml"
 	valuesContents := []byte("a: b")

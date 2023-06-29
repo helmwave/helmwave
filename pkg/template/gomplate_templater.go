@@ -12,12 +12,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	TemplaterGomplate = "gomplate"
+)
+
 type gomplateTemplater struct {
 	delimiterLeft, delimiterRight string
 }
 
 func (t gomplateTemplater) Name() string {
-	return "gomplate"
+	return TemplaterGomplate
 }
 
 func (t gomplateTemplater) Render(src string, data any) ([]byte, error) {

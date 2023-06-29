@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -27,7 +28,7 @@ func (ts *DownTestSuite) TestRun() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: "sprig",
+		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{

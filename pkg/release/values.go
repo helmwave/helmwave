@@ -139,7 +139,7 @@ func ProhibitDst(values []ValuesReference) error {
 // Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
 func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
 	if !v.Render {
-		templater = "copy"
+		templater = template.TemplaterNone
 	}
 
 	v.SetUniq(dir, rel.Uniq())

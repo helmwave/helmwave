@@ -2,6 +2,7 @@ package action
 
 import (
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/urfave/cli/v2"
 )
 
@@ -99,7 +100,7 @@ func flagDiffShowSecret(v *bool) *cli.BoolFlag {
 func flagTemplateEngine(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "templater",
-		Value:       "sprig",
+		Value:       template.TemplaterSprig,
 		Usage:       "select template engine: [ sprig | gomplate ]",
 		EnvVars:     []string{"HELMWAVE_TEMPLATER", "HELMWAVE_TEMPLATE_ENGINE"},
 		Destination: v,
