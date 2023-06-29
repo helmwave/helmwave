@@ -126,6 +126,6 @@ func (s *ValuesTestSuite) TestJSONSchema() {
 	s.Require().Contains(keys, "dst")
 	s.Require().Contains(keys, "delimiter_left")
 	s.Require().Contains(keys, "delimiter_right")
-	s.Require().Contains(keys, "string")
+	s.Require().Contains(keys, "strict")
 	s.Require().Contains(keys, "render")
 }
