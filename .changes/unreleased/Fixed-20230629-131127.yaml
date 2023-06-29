@@ -1,0 +1,6 @@
+kind: Fixed
+body: Properly handle values `strict` flag
+time: 2023-06-29T13:11:27.71932+04:00
+custom:
+  Author: r3nic1e
+  Issue: "533"
