@@ -38,7 +38,11 @@ func (r *MockReleaseConfig) OfflineKubeVersion() *chartutil.KubeVersion {
 }
 
 func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
-	r.Called()
+	args := r.Called()
+
+	if len(args) > 0 {
+		return args.Get(0).(uniqname.UniqName)
+	}
 
 	u, _ := uniqname.Generate(r.Name(), r.Namespace())
 
