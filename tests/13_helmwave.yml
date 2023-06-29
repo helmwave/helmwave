@@ -32,4 +32,4 @@ releases:
     namespace: test
 
     values:
-      -  https://raw.githubusercontent.com/helmwave/helmwave/main/tests/06_values.yaml
+      - https://raw.githubusercontent.com/helmwave/helmwave/main/tests/06_values.yaml

@@ -4,12 +4,18 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
 )
 
 type ValuesTestSuite struct {
 	suite.Suite
+}
+
+func TestValuesTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(ValuesTestSuite))
 }
 
 func (s *ValuesTestSuite) TestProhibitDst() {
@@ -81,7 +87,31 @@ values:
 	}, c)
 }
 
-func TestValuesTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(ValuesTestSuite))
+func (s *ValuesTestSuite) TestBuildNonExistingNonStrict() {
+	r := release.NewConfig()
+	r.ValuesF = []release.ValuesReference{
+		{
+			Src:    "nonexisting.values",
+			Strict: false,
+		},
+	}
+
+	err := r.BuildValues(".", template.TemplaterSprig)
+
+	s.Require().NoError(err)
+	s.Require().Len(r.Values(), 0)
+}
+
+func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
+	r := release.NewConfig()
+	r.ValuesF = []release.ValuesReference{
+		{
+			Src:    "nonexisting.values",
+			Strict: true,
+		},
+	}
+
+	err := r.BuildValues(".", template.TemplaterSprig)
+
+	s.Require().Error(err)
 }

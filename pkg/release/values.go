@@ -17,8 +17,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ErrSkipValues is returned when values can't be used and are skipped.
-var ErrSkipValues = errors.New("values have been skipped")
+// ErrValuesNotExist is returned when values can't be used and are skipped.
+var ErrValuesNotExist = errors.New("values file doesn't exist")
 
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
@@ -136,10 +136,10 @@ func ProhibitDst(values []ValuesReference) error {
 // }
 
 // SetViaRelease downloads and templates values file.
-// Returns ErrSkipValues if values can't be downloaded or doesn't exist in local FS.
+// Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
 func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
 	if !v.Render {
-		templater = "copy"
+		templater = template.TemplaterNone
 	}
 
 	v.SetUniq(dir, rel.Uniq())
@@ -180,14 +180,12 @@ func (v *ValuesReference) fetch(l *log.Entry) error {
 		if err != nil {
 			l.WithError(err).Warnf("%q skipping: cant download", v.Src)
 
-			if v.Strict {
-				return ErrSkipValues
-			}
+			return ErrValuesNotExist
 		}
 	} else if !helper.IsExists(v.Src) {
 		l.Warn("skipping: local file not found")
 
-		return ErrSkipValues
+		return ErrValuesNotExist
 	}
 
 	return nil
@@ -195,13 +193,18 @@ func (v *ValuesReference) fetch(l *log.Entry) error {
 
 func (rel *config) BuildValues(dir, templater string) error {
 	for i := len(rel.Values()) - 1; i >= 0; i-- {
-		err := rel.Values()[i].SetViaRelease(rel, dir, templater)
-		if errors.Is(ErrSkipValues, err) {
+		v := rel.Values()[i]
+		err := v.SetViaRelease(rel, dir, templater)
+		switch {
+		case !v.Strict && errors.Is(ErrValuesNotExist, err):
+			rel.Logger().WithError(err).WithField("values", v).Warn("skipping values...")
 			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
-		} else if err != nil {
-			rel.Logger().WithError(err).WithField("values", rel.Values()[i]).Fatal("failed to build values")
+		case err != nil:
+			rel.Logger().WithError(err).WithField("values", v).Error("failed to build values")
 
 			return err
+		default:
+			rel.Values()[i] = v
 		}
 	}
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
@@ -28,7 +29,7 @@ func (ts *BuildTestSuite) TestManifest() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: "sprig",
+		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
@@ -65,7 +66,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: "sprig",
+		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
@@ -92,7 +93,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "03_helmwave.yml"),
-		templater: "sprig",
+		templater: template.TemplaterSprig,
 	}
 
 	cases := []struct {
@@ -137,7 +138,7 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "07_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "07_helmwave.yml"),
-		templater: "sprig",
+		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
@@ -170,7 +171,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
-		templater: "sprig",
+		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
@@ -195,7 +196,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "08_helmwave.yml"),
 		file:      filepath.Join(tmpDir, "08_helmwave.yml"),
-		templater: "gomplate",
+		templater: template.TemplaterGomplate,
 	}
 
 	s := &Build{
@@ -217,7 +218,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "13_helmwave.yml"),
 		file:      filepath.Join(tmpDir, "13_helmwave.yml"),
-		templater: "sprig",
+		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{

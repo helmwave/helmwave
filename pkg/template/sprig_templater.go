@@ -9,6 +9,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	TemplaterSprig = "sprig"
+)
+
 var (
 	sprigAliases = map[string]string{ //nolint:gochecknoglobals // can't make these const
 		"get":    "sprigGet",
@@ -33,7 +37,7 @@ type sprigTemplater struct {
 }
 
 func (t sprigTemplater) Name() string {
-	return "sprig"
+	return TemplaterSprig
 }
 
 func (t sprigTemplater) Render(src string, data any) ([]byte, error) {

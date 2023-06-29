@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
@@ -40,7 +41,7 @@ func (ts *DiffPlanTestSuite) TestRun() {
 		yml: &Yml{
 			tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
 			file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-			templater: "sprig",
+			templater: template.TemplaterSprig,
 		},
 		diff:     &Diff{},
 		diffMode: DiffModeLive,
@@ -52,7 +53,7 @@ func (ts *DiffPlanTestSuite) TestRun() {
 		yml: &Yml{
 			tpl:       filepath.Join(tests.Root, "03_helmwave.yml"),
 			file:      filepath.Join(tests.Root, "03_helmwave.yml"),
-			templater: "sprig",
+			templater: template.TemplaterSprig,
 		},
 		diff:     &Diff{},
 		diffMode: DiffModeLive,
