@@ -228,7 +228,7 @@ release:
   prerelease: auto
 
 brews:
-  - tap:
+  - repository:
       owner: helmwave
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
