@@ -16,6 +16,20 @@ type StatusTestSuite struct {
 	suite.Suite
 }
 
+//nolintlint:paralleltest // can't parallel because of setenv
+func TestStatusTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(StatusTestSuite))
+}
+
+func (ts *StatusTestSuite) TestCmd() {
+	s := &Status{}
+	cmd := s.Cmd()
+
+	ts.Require().NotNil(cmd)
+	ts.Require().NotEmpty(cmd.Name)
+}
+
 func (ts *StatusTestSuite) TestRun() {
 	r := &Build{
 		plandir: ts.T().TempDir(),
@@ -38,10 +52,4 @@ func (ts *StatusTestSuite) TestRun() {
 	}
 
 	ts.Require().NoError(s.Run(context.Background()))
-}
-
-//nolintlint:paralleltest // can't parallel because of setenv
-func TestStatusTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(StatusTestSuite))
 }

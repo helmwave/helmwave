@@ -18,6 +18,20 @@ type DiffLiveTestSuite struct {
 	suite.Suite
 }
 
+//nolintlint:paralleltest // uses helm repository.yaml flock
+func TestDiffLiveTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(DiffLiveTestSuite))
+}
+
+func (ts *DiffLiveTestSuite) TestCmd() {
+	s := &DiffLive{}
+	cmd := s.Cmd()
+
+	ts.Require().NotNil(cmd)
+	ts.Require().NotEmpty(cmd.Name)
+}
+
 func (ts *DiffLiveTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
@@ -39,10 +53,4 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().NoError(d.Run(context.Background()))
-}
-
-//nolintlint:paralleltest // uses helm repository.yaml flock
-func TestDiffLiveTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(DiffLiveTestSuite))
 }

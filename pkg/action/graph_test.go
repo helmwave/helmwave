@@ -7,17 +7,17 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type ValidateTestSuite struct {
+type GraphTestSuite struct {
 	suite.Suite
 }
 
-func TestValidateTestSuite(t *testing.T) {
+func TestGraphTestSuite(t *testing.T) {
 	t.Parallel()
-	suite.Run(t, new(ValidateTestSuite))
+	suite.Run(t, new(GraphTestSuite))
 }
 
-func (ts *ValidateTestSuite) TestCmd() {
-	s := &action.Validate{}
+func (ts *GraphTestSuite) TestCmd() {
+	s := &action.Graph{}
 	cmd := s.Cmd()
 
 	ts.Require().NotNil(cmd)
