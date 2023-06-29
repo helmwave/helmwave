@@ -195,16 +195,17 @@ func (rel *config) BuildValues(dir, templater string) error {
 	for i := len(rel.Values()) - 1; i >= 0; i-- {
 		v := rel.Values()[i]
 		err := v.SetViaRelease(rel, dir, templater)
-		if !v.Strict && errors.Is(ErrValuesNotExist, err) {
+		switch {
+		case !v.Strict && errors.Is(ErrValuesNotExist, err):
 			rel.Logger().WithError(err).WithField("values", v).Warn("skipping values...")
 			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
-		} else if err != nil {
+		case err != nil:
 			rel.Logger().WithError(err).WithField("values", v).Error("failed to build values")
 
 			return err
+		default:
+			rel.Values()[i] = v
 		}
-
-		rel.Values()[i] = v
 	}
 
 	return nil
