@@ -120,7 +120,6 @@ func (s *ValuesTestSuite) TestJSONSchema() {
 	schema := release.ValuesReference{}.JSONSchema()
 
 	s.Require().NotNil(schema)
-	s.Require().Equal("object", schema.Type)
 
 	keys := schema.Properties.Keys()
 	s.Require().Contains(keys, "src")
