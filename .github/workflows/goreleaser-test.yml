@@ -29,9 +29,6 @@ jobs:
       contents: write # to create release
       issues: write # to close milestone
       packages: write # to upload package
-    needs:
-      - tagger
-      - generate-changelog
     steps:
       - uses: actions/checkout@v3
         with:
