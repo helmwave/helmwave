@@ -199,10 +199,12 @@ func (rel *config) BuildValues(dir, templater string) error {
 			rel.Logger().WithError(err).WithField("values", v).Warn("skipping values...")
 			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
 		} else if err != nil {
-			rel.Logger().WithError(err).WithField("values", v).Fatal("failed to build values")
+			rel.Logger().WithError(err).WithField("values", v).Error("failed to build values")
 
 			return err
 		}
+
+		rel.Values()[i] = v
 	}
 
 	return nil
