@@ -1,6 +1,8 @@
 package action
 
 import (
+	"fmt"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/urfave/cli/v2"
@@ -101,7 +103,7 @@ func flagTemplateEngine(v *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Name:        "templater",
 		Value:       template.TemplaterSprig,
-		Usage:       "select template engine: [ sprig | gomplate ]",
+		Usage:       fmt.Sprintf("select template engine: [ %s | %s ]", template.TemplaterSprig, template.TemplaterGomplate),
 		EnvVars:     []string{"HELMWAVE_TEMPLATER", "HELMWAVE_TEMPLATE_ENGINE"},
 		Destination: v,
 	}
