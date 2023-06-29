@@ -47,7 +47,6 @@ type config struct {
 	Atomic                   bool `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
 	CleanupOnFail            bool `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
 	CreateNamespace          bool `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exits,default=false"`
-	Devel                    bool `yaml:"devel,omitempty" json:"devel,omitempty" jsonschema:"default=false"`
 	DisableHooks             bool `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
 	EnableDNS                bool `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
@@ -79,7 +78,6 @@ func (rel *config) newInstall() *action.Install {
 
 	// Common Part
 	client.DryRun = rel.dryRun
-	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 
@@ -126,7 +124,6 @@ func (rel *config) newUpgrade() *action.Upgrade {
 
 	// Common Part
 	client.DryRun = rel.dryRun
-	client.Devel = rel.Devel
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 
