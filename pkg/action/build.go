@@ -11,6 +11,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Build)(nil)
+
 // Build is a struct for running 'build' CLI command.
 type Build struct {
 	yml            *Yml

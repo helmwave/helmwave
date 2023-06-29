@@ -19,8 +19,18 @@ type DownTestSuite struct {
 	suite.Suite
 }
 
-func (ts *DownTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &Down{})
+//nolintlint:paralleltest // uses helm repository.yaml flock
+func TestDownTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(DownTestSuite))
+}
+
+func (ts *DownTestSuite) TestCmd() {
+	s := &Down{}
+	cmd := s.Cmd()
+
+	ts.Require().NotNil(cmd)
+	ts.Require().NotEmpty(cmd.Name)
 }
 
 func (ts *DownTestSuite) TestRun() {
@@ -51,10 +61,4 @@ func (ts *DownTestSuite) TestRun() {
 
 	ts.Require().NoError(u.Run(context.Background()))
 	ts.Require().NoError(d.Run(context.Background()))
-}
-
-//nolintlint:paralleltest // uses helm repository.yaml flock
-func TestDownTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(DownTestSuite))
 }

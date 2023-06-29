@@ -7,6 +7,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Down)(nil)
+
 // Down is a struct for running 'down' command.
 type Down struct {
 	build     *Build

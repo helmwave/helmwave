@@ -7,6 +7,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*List)(nil)
+
 // List is a struct for running 'list' command.
 type List struct {
 	build     *Build

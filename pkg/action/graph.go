@@ -8,6 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Graph)(nil)
+
 // Graph is a struct for running 'graph' command.
 type Graph struct {
 	build     *Build

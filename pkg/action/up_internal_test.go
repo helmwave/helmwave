@@ -19,8 +19,18 @@ type UpTestSuite struct {
 	suite.Suite
 }
 
-func (ts *UpTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &Up{})
+//nolintlint:paralleltest // can't parallel because of setenv
+func TestUpTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(UpTestSuite))
+}
+
+func (ts *UpTestSuite) TestCmd() {
+	s := &Up{}
+	cmd := s.Cmd()
+
+	ts.Require().NotNil(cmd)
+	ts.Require().NotEmpty(cmd.Name)
 }
 
 func (ts *UpTestSuite) TestAutoBuild() {
@@ -46,10 +56,4 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(u.Run(context.Background()))
-}
-
-//nolintlint:paralleltest // can't parallel because of setenv
-func TestUpTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(UpTestSuite))
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Yml)(nil)
+
 // Yml is a struct for running 'yml' command.
 type Yml struct {
 	tpl, file string

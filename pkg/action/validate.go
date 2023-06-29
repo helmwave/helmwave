@@ -7,6 +7,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*Validate)(nil)
+
 // Validate is a struct for running 'validate' command.
 type Validate struct {
 	plandir string

@@ -7,17 +7,17 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type ValidateTestSuite struct {
+type GenSchemaTestSuite struct {
 	suite.Suite
 }
 
-func TestValidateTestSuite(t *testing.T) {
+func TestGenSchemaTestSuite(t *testing.T) {
 	t.Parallel()
-	suite.Run(t, new(ValidateTestSuite))
+	suite.Run(t, new(GenSchemaTestSuite))
 }
 
-func (ts *ValidateTestSuite) TestCmd() {
-	s := &action.Validate{}
+func (ts *GenSchemaTestSuite) TestCmd() {
+	s := &action.GenSchema{}
 	cmd := s.Cmd()
 
 	ts.Require().NotNil(cmd)

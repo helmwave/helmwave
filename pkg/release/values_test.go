@@ -115,3 +115,17 @@ func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
 
 	s.Require().Error(err)
 }
+
+func (s *ValuesTestSuite) TestJSONSchema() {
+	schema := release.ValuesReference{}.JSONSchema()
+
+	s.Require().NotNil(schema)
+
+	keys := schema.Properties.Keys()
+	s.Require().Contains(keys, "src")
+	s.Require().Contains(keys, "dst")
+	s.Require().Contains(keys, "delimiter_left")
+	s.Require().Contains(keys, "delimiter_right")
+	s.Require().Contains(keys, "strict")
+	s.Require().Contains(keys, "render")
+}

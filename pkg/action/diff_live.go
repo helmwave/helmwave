@@ -8,6 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var _ Action = (*DiffLive)(nil)
+
 // DiffLive is a struct for running 'diff live' command.
 type DiffLive struct {
 	diff    *Diff

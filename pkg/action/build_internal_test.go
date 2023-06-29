@@ -20,8 +20,57 @@ type BuildTestSuite struct {
 	suite.Suite
 }
 
-func (ts *BuildTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &Build{})
+func TestBuildTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(BuildTestSuite))
+}
+
+func (ts *BuildTestSuite) TestCmd() {
+	s := &Build{}
+	cmd := s.Cmd()
+
+	ts.Require().NotNil(cmd)
+	ts.Require().NotEmpty(cmd.Name)
+}
+
+func (ts *BuildTestSuite) TestYmlError() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		file:      filepath.Join(tests.Root, "helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+	}
+
+	ts.Require().Error(s.Run(context.Background()))
+}
+
+func (ts *BuildTestSuite) TestInvalidCacheDir() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
+		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		chartsCacheDir: "/proc/1/bla",
+	}
+
+	ts.Require().Error(s.Run(context.Background()))
 }
 
 func (ts *BuildTestSuite) TestManifest() {
@@ -157,13 +206,14 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	ts.Require().NoError(s.Run(context.Background()), "build should not fail with diffing with previous plan")
 }
 
-func TestBuildTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(BuildTestSuite))
-}
-
 type NonParallelBuildTestSuite struct {
 	suite.Suite
+}
+
+//nolintlint:paralleltest // can't parallel because of setenv and uses helm repository.yaml flock
+func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(NonParallelBuildTestSuite))
 }
 
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
@@ -244,10 +294,4 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	ts.Require().Contains(output, "run global pre_build script")
 	ts.Require().Contains(output, "running post_build script for nginx")
 	ts.Require().Contains(output, "run global post_build script")
-}
-
-//nolintlint:paralleltest // can't parallel because of setenv and uses helm repository.yaml flock
-func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(NonParallelBuildTestSuite))
 }

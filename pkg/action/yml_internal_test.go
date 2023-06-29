@@ -17,8 +17,18 @@ type YmlTestSuite struct {
 	suite.Suite
 }
 
-func (ts *YmlTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &Yml{})
+//nolintlint:paralleltest // can't parallel because of setenv
+func TestYmlTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(YmlTestSuite))
+}
+
+func (ts *YmlTestSuite) TestCmd() {
+	s := &Yml{}
+	cmd := s.Cmd()
+
+	ts.Require().NotNil(cmd)
+	ts.Require().NotEmpty(cmd.Name)
 }
 
 func (ts *YmlTestSuite) TestRenderEnv() {
@@ -41,10 +51,4 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 	ts.Require().Equal(value, b.Project)
 	ts.Require().Len(b.Releases, 1)
 	ts.Require().Equal(value, b.Releases[0].Namespace())
-}
-
-//nolintlint:paralleltest // can't parallel because of setenv
-func TestYmlTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(YmlTestSuite))
 }

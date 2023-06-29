@@ -34,6 +34,7 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 		"PostRenderer",
 		"DependencyUpdate",
 		"Lock",
+		"Devel", // we removed that to force everyone specify the version
 	}
 
 	r := NewConfig()

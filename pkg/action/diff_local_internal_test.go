@@ -18,23 +18,33 @@ import (
 
 var buf bytes.Buffer
 
-type DiffPlanTestSuite struct {
+type DiffLocalTestSuite struct {
 	suite.Suite
 }
 
-func (ts *DiffPlanTestSuite) SetupTest() {
+//nolintlint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
+func TestDiffLocalTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(DiffLocalTestSuite))
+}
+
+func (ts *DiffLocalTestSuite) SetupTest() {
 	log.StandardLogger().SetOutput(&buf)
 }
 
-func (ts *DiffPlanTestSuite) TearDownTest() {
+func (ts *DiffLocalTestSuite) TearDownTest() {
 	log.StandardLogger().SetOutput(os.Stderr)
 }
 
-func (ts *DiffPlanTestSuite) TestImplementsAction() {
-	ts.Require().Implements((*Action)(nil), &DiffLocal{})
+func (ts *DiffLocalTestSuite) TestCmd() {
+	s := &DiffLocal{}
+	cmd := s.Cmd()
+
+	ts.Require().NotNil(cmd)
+	ts.Require().NotEmpty(cmd.Name)
 }
 
-func (ts *DiffPlanTestSuite) TestRun() {
+func (ts *DiffLocalTestSuite) TestRun() {
 	s1 := &Build{
 		plandir: ts.T().TempDir(),
 		tags:    cli.StringSlice{},
@@ -74,10 +84,4 @@ func (ts *DiffPlanTestSuite) TestRun() {
 
 	ts.Require().Contains(output, "nginx, Deployment (apps) has been added")
 	ts.Require().Contains(output, "memcached-a-redis, Secret (v1) has been removed")
-}
-
-//nolintlint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
-func TestDiffPlanTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(DiffPlanTestSuite))
 }
