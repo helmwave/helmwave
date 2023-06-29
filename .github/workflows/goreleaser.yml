@@ -175,7 +175,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.BOT_TOKEN }}
 
       - name: Generate schema.json
-        run: ./dist/helmwave_darwin_amd64_v1/helmwave schema > schema.json
+        run: ./dist/helmwave_linux_amd64_v1/helmwave schema > schema.json
 
       - name: Upload schema.json
         uses: xresloader/upload-to-github-release@v1
