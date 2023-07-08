@@ -21,7 +21,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	p.templater = o.Templater
 
 	// Create Body
-	body, err := NewBody(ctx, o.Yml)
+	body, err := NewBody(ctx, o.Yml, false)
 	if err != nil {
 		return err
 	}
@@ -48,13 +48,6 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	}
 	if len(p.body.Releases) == 0 {
 		return nil
-	}
-
-	// Build graphs
-	if o.GraphWidth != 1 {
-		log.Info("🔨 Building graphs...")
-		p.graphMD = buildGraphMD(p.body.Releases)
-		log.Infof("show graph:\n%s", p.BuildGraphASCII(o.GraphWidth))
 	}
 
 	// Build Values
@@ -96,11 +89,24 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 		return err
 	}
 
+	// Validating plan after it was changed
+	err = p.body.Validate()
+	if err != nil {
+		return err
+	}
+
 	// Build Manifest
 	log.Info("🔨 Building manifests...")
 	err = p.buildManifest(ctx)
 	if err != nil {
 		return err
+	}
+
+	// Build graphs
+	if o.GraphWidth != 1 {
+		log.Info("🔨 Building graphs...")
+		p.graphMD = buildGraphMD(p.body.Releases)
+		log.Infof("show graph:\n%s", p.BuildGraphASCII(o.GraphWidth))
 	}
 
 	return nil

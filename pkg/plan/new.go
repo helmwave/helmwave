@@ -115,7 +115,7 @@ func GenSchema() *jsonschema.Schema {
 }
 
 // NewBody parses plan from file.
-func NewBody(ctx context.Context, file string) (*planBody, error) {
+func NewBody(ctx context.Context, file string, validate bool) (*planBody, error) {
 	b := &planBody{
 		Version: version.Version,
 	}
@@ -131,9 +131,12 @@ func NewBody(ctx context.Context, file string) (*planBody, error) {
 		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)
 	}
 
-	err = b.Validate()
-	if err != nil {
-		return nil, err
+	if validate {
+		err = b.Validate()
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return b, nil

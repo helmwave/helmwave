@@ -110,6 +110,63 @@ func (ts *BuildTestSuite) TestManifest() {
 //	}
 // }
 
+func (ts *BuildTestSuite) TestNonUniqueReleases() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "14_helmwave.yml"),
+		file:      filepath.Join(tmpDir, "14_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	sfail := &Build{
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+	}
+
+	sfailByTag := &Build{
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+	}
+	sfailByTag.tags.Set("nginx")
+
+	sa := &Build{
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+	}
+	sa.tags.Set("nginx-a")
+
+	sb := &Build{
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+	}
+	sb.tags.Set("nginx-b")
+
+	ts.Require().ErrorIs(sfail.Run(context.Background()), plan.ErrDuplicateReleases{})
+	ts.Require().ErrorIs(sfailByTag.Run(context.Background()), plan.ErrDuplicateReleases{})
+	ts.Require().NoError(sa.Run(context.Background()))
+	ts.Require().NoError(sb.Run(context.Background()))
+}
+
 func (ts *BuildTestSuite) TestRepositories() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
@@ -130,7 +187,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 	ts.Require().NoError(s.Run(context.Background()))
 
 	const rep = "bitnami"
-	b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File))
+	b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File), true)
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
 		ts.Failf("%q not found", rep)
@@ -171,7 +228,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		ts.Require().NoError(s.Run(context.Background()))
 
-		b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File))
+		b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File), true)
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {
