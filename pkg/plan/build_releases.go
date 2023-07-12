@@ -29,13 +29,14 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]r
 }
 
 //nolintlint:nestif
+//nolint:gocognit
 func addToPlan(plan []release.Config, rel release.Config,
 	releases []release.Config,
 ) ([]release.Config, error) {
 	for _, r := range plan {
 		if r.Uniq() == rel.Uniq() {
 			if r != rel {
-				return nil, ErrDuplicateReleases{uniq: rel.Uniq()}
+				return nil, DuplicateReleasesError{uniq: rel.Uniq()}
 			} else {
 				return plan, nil
 			}

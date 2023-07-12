@@ -14,17 +14,18 @@ import (
 // ErrValidateFailed is returned for failed values validation.
 var ErrValidateFailed = errors.New("validate failed")
 
-type ErrDuplicateReleases struct {
+type DuplicateReleasesError struct {
 	uniq uniqname.UniqName
 }
 
-func (err ErrDuplicateReleases) Error() string {
+func (err DuplicateReleasesError) Error() string {
 	return fmt.Sprintf("release duplicate: %s", err.uniq.String())
 }
 
-func (ErrDuplicateReleases) Is(target error) bool {
+//nolint:errorlint
+func (DuplicateReleasesError) Is(target error) bool {
 	switch target.(type) {
-	case ErrDuplicateReleases, *ErrDuplicateReleases:
+	case DuplicateReleasesError, *DuplicateReleasesError:
 		return true
 	default:
 		return false
@@ -152,7 +153,7 @@ func (p *planBody) ValidateReleases() error {
 
 		a[r.Uniq()]++
 		if a[r.Uniq()] > 1 {
-			return ErrDuplicateReleases{uniq: r.Uniq()}
+			return DuplicateReleasesError{uniq: r.Uniq()}
 		}
 	}
 

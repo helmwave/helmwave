@@ -137,7 +137,8 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 		},
 		autoYml: true,
 	}
-	sfailByTag.tags.Set("nginx")
+	err := sfailByTag.tags.Set("nginx")
+	ts.Require().NoError(err)
 
 	sa := &Build{
 		plandir: tmpDir,
@@ -148,7 +149,8 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 		},
 		autoYml: true,
 	}
-	sa.tags.Set("nginx-a")
+	err = sa.tags.Set("nginx-a")
+	ts.Require().NoError(err)
 
 	sb := &Build{
 		plandir: tmpDir,
@@ -159,10 +161,11 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 		},
 		autoYml: true,
 	}
-	sb.tags.Set("nginx-b")
+	err = sb.tags.Set("nginx-b")
+	ts.Require().NoError(err)
 
-	ts.Require().ErrorIs(sfail.Run(context.Background()), plan.ErrDuplicateReleases{})
-	ts.Require().ErrorIs(sfailByTag.Run(context.Background()), plan.ErrDuplicateReleases{})
+	ts.Require().ErrorIs(sfail.Run(context.Background()), plan.DuplicateReleasesError{})
+	ts.Require().ErrorIs(sfailByTag.Run(context.Background()), plan.DuplicateReleasesError{})
 	ts.Require().NoError(sa.Run(context.Background()))
 	ts.Require().NoError(sb.Run(context.Background()))
 }
