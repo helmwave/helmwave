@@ -15,7 +15,7 @@ import (
 
 // Import parses directory with plan files and imports them into structure.
 func (p *Plan) Import(ctx context.Context) error {
-	body, err := NewBody(ctx, p.fullPath)
+	body, err := NewBody(ctx, p.fullPath, true)
 	if err != nil {
 		return err
 	}

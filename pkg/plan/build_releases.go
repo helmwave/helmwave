@@ -3,7 +3,6 @@ package plan
 import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -12,18 +11,12 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]r
 		return releases, nil
 	}
 
-	releasesMap := make(map[uniqname.UniqName]release.Config)
-
-	for _, r := range releases {
-		releasesMap[r.Uniq()] = r
-	}
-
 	plan := make([]release.Config, 0)
 
 	for _, r := range releases {
 		if checkTagInclusion(tags, r.Tags(), matchAll) {
 			var err error
-			plan, err = addToPlan(plan, r, releasesMap)
+			plan, err = addToPlan(plan, r, releases)
 			if err != nil {
 				log.WithError(err).Error("failed to build releases plan")
 
@@ -36,24 +29,37 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]r
 }
 
 //nolintlint:nestif
+//nolint:gocognit
 func addToPlan(plan []release.Config, rel release.Config,
-	releases map[uniqname.UniqName]release.Config,
+	releases []release.Config,
 ) ([]release.Config, error) {
-	if helper.In(rel, plan) {
-		return plan, nil
+	for _, r := range plan {
+		if r.Uniq() == rel.Uniq() {
+			if r != rel {
+				return nil, DuplicateReleasesError{uniq: rel.Uniq()}
+			} else {
+				return plan, nil
+			}
+		}
 	}
 
 	r := plan
 	r = append(r, rel)
 
 	for _, dep := range rel.DependsOn() {
-		if depRel, ok := releases[dep.Uniq()]; ok {
-			var err error
-			r, err = addToPlan(r, depRel, releases)
-			if err != nil {
-				return nil, err
+		found := false
+		for _, rel := range releases {
+			if rel.Uniq().Equal(dep.Uniq()) {
+				found = true
+				var err error
+				r, err = addToPlan(r, rel, releases)
+				if err != nil {
+					return nil, err
+				}
 			}
-		} else {
+		}
+
+		if !found {
 			if dep.Optional {
 				log.Warnf("can't find dependency %q in available releases, skipping", dep.Uniq())
 			} else {
