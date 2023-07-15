@@ -16,7 +16,7 @@ func (rep *config) Install(ctx context.Context, settings *helm.EnvSettings, f *r
 			// The input coming in for the name is different from what is already
 			// configured. Return an error.
 			return fmt.Errorf(
-				"❌ repository name (%q) already exists with different config, cannot overwrite it without force",
+				"❌ repository name (%q) already exists with different config, can't overwrite it without force",
 				rep.Name(),
 			)
 		}
@@ -38,7 +38,7 @@ func (rep *config) Install(ctx context.Context, settings *helm.EnvSettings, f *r
 	rep.Logger().Debugf("Download IndexFile for %q", chartRepo.Config.Name)
 	_, err = chartRepo.DownloadIndexFile()
 	if err != nil {
-		rep.Logger().WithError(err).Warnf("⚠️ looks like %q is not a valid chart repository or cannot be reached", rep.URL())
+		rep.Logger().WithError(err).Warnf("⚠️ looks like %q is not a valid chart repository or can't be reached", rep.URL())
 	}
 
 	f.Update(&rep.Entry)

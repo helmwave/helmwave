@@ -11,16 +11,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Up is struct for running 'up' command.
-type Up struct {
-	build *Build
-	dog   *kubedog.Config
+var _ Action = (*Up)(nil)
 
-	autoBuild      bool
-	kubedogEnabled bool
+// Up is a struct for running 'up' command.
+type Up struct {
+	build     *Build
+	dog       *kubedog.Config
+	autoBuild bool
 }
 
-// Run is main function for 'up' command.
+// Run is the main function for 'up' command.
 func (i *Up) Run(ctx context.Context) error {
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
@@ -37,13 +37,7 @@ func (i *Up) Run(ctx context.Context) error {
 
 	p.Logger().Info("🏗 Plan")
 
-	if i.kubedogEnabled {
-		log.Warn("🐶 kubedog is enable")
-
-		return p.ApplyWithKubedog(ctx, i.dog)
-	}
-
-	return p.Apply(ctx)
+	return p.Up(ctx, i.dog)
 }
 
 func (i *Up) warnOnBuildFlags(ctx context.Context) {
@@ -62,7 +56,7 @@ func (i *Up) warnOnBuildFlags(ctx context.Context) {
 func (i *Up) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "up",
-		Usage:  "🚢 Apply your plan",
+		Usage:  "🚢 apply your plan",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}
@@ -78,42 +72,49 @@ func (i *Up) flags() []cli.Flag {
 		flagAutoBuild(&i.autoBuild),
 		&cli.BoolFlag{
 			Name:        "kubedog",
-			Usage:       "Enable/Disable kubedog",
+			Usage:       "enable/disable kubedog",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_ENABLED", "HELMWAVE_KUBEDOG"},
-			Destination: &i.kubedogEnabled,
+			Destination: &i.dog.Enabled,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-status-interval",
-			Usage:       "Interval of kubedog status messages",
+			Usage:       "interval of kubedog status messages",
 			Value:       5 * time.Second,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
 			Destination: &i.dog.StatusInterval,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-start-delay",
-			Usage:       "Delay kubedog start, don't make it too late",
+			Usage:       "delay kubedog start, don't make it too late",
 			Value:       time.Second,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_START_DELAY"},
 			Destination: &i.dog.StartDelay,
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-timeout",
-			Usage:       "Timeout of kubedog multitrackers",
+			Usage:       "timeout of kubedog multitrackers",
 			Value:       5 * time.Minute,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
 			Destination: &i.dog.Timeout,
 		},
+		&cli.IntFlag{
+			Name:        "kubedog-log-width",
+			Usage:       "set kubedog max log line width",
+			Value:       140,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
+			Destination: &i.dog.LogWidth,
+		},
 		&cli.BoolFlag{
 			Name:        "progress",
-			Usage:       "Enable progress logs of helm (INFO log level)",
+			Usage:       "enable progress logs of helm (INFO log level)",
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_PROGRESS"},
 			Destination: &helper.Helm.Debug,
 		},
 		&cli.IntFlag{
 			Name:    "parallel-limit",
-			Usage:   "Limit amount of parallel releases",
+			Usage:   "limit amount of parallel releases",
 			EnvVars: []string{"HELMWAVE_PARALLEL_LIMIT"},
 			Value:   0,
 		},

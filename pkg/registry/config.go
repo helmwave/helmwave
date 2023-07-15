@@ -4,9 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// config is main registry config.
-//
-//nolint:lll
+// config is the main registry config.
 type config struct {
 	log      *log.Entry `yaml:"-" json:"-"`
 	HostF    string     `yaml:"host" json:"host" jsonschema:"required,description=OCI registry host optionally with port,pattern=^.*(:[0-9]+)?$"`

@@ -1,18 +1,17 @@
 package log
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	"github.com/mgutz/ansi"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/werf/logboek"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
+
+var Default = &Settings{}
 
 // Settings stores configuration for logger.
 type Settings struct {
@@ -20,7 +19,6 @@ type Settings struct {
 	format     string
 	color      bool
 	timestamps bool
-	width      int
 }
 
 // Flags returns CLI flags for logger settings.
@@ -42,17 +40,10 @@ func (l *Settings) Flags() []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
-			Usage:       "Force color",
+			Usage:       "on/off color",
 			Value:       true,
 			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
 			Destination: &l.color,
-		},
-		&cli.IntFlag{
-			Name:        "kubedog-log-width",
-			Usage:       "Set kubedog max log line width",
-			Value:       140,
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
-			Destination: &l.width,
 		},
 		&cli.BoolFlag{
 			Name:        "log-timestamps",
@@ -73,21 +64,8 @@ func (l *Settings) Run(c *cli.Context) error {
 func (l *Settings) Init() error {
 	// Skip various low-level k8s client errors
 	// There are a lot of context deadline errors being logged
-	//nolint:reassign
-	utilruntime.ErrorHandlers = []func(error){
+	utilruntime.ErrorHandlers = []func(error){ //nolint:reassign
 		logKubernetesClientError,
-	}
-
-	if err := kubedog.SilenceKlog(context.Background()); err != nil {
-		return err
-	}
-
-	if err := kubedog.SilenceKlogV2(context.Background()); err != nil {
-		return err
-	}
-
-	if l.width > 0 {
-		logboek.DefaultLogger().Streams().SetWidth(l.width)
 	}
 
 	l.setFormat()
@@ -151,4 +129,8 @@ func (l *Settings) setFormat() {
 
 func logKubernetesClientError(err error) {
 	log.WithError(err).Trace("kubernetes client error")
+}
+
+func (l *Settings) Format() string {
+	return l.format
 }

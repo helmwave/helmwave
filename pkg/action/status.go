@@ -7,14 +7,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Status is struct for running 'status' command.
+var _ Action = (*Status)(nil)
+
+// Status is a struct for running 'status' command.
 type Status struct {
 	build     *Build
 	names     cli.StringSlice
 	autoBuild bool
 }
 
-// Run is main function for 'status' command.
+// Run is the main function for 'status' command.
 func (l *Status) Run(ctx context.Context) error {
 	if l.autoBuild {
 		if err := l.build.Run(ctx); err != nil {
@@ -33,7 +35,7 @@ func (l *Status) Run(ctx context.Context) error {
 func (l *Status) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "status",
-		Usage:  "👁️ Status of deployed releases",
+		Usage:  "👁️status of deployed releases",
 		Flags:  l.flags(),
 		Action: toCtx(l.Run),
 	}

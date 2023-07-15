@@ -28,15 +28,28 @@ import (
 // ErrDeploy is returned when deploy is failed for whatever reason.
 var ErrDeploy = errors.New("deploy failed")
 
-// Apply syncs repositories and releases.
-func (p *Plan) Apply(ctx context.Context) (err error) {
-	log.Info("🗄 Sync repositories...")
+// Up syncs repositories and releases.
+func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
+	// Run hooks
+	err := p.body.Lifecycle.RunPreUp(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		err := p.body.Lifecycle.RunPostUp(ctx)
+		if err != nil {
+			log.Errorf("got an error from postup hooks: %v", err)
+		}
+	}()
+
+	log.Info("🗄 sync repositories...")
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🗄 Sync registries...")
+	log.Info("🗄 sync registries...")
 	err = p.syncRegistries(ctx)
 	if err != nil {
 		return err
@@ -46,31 +59,21 @@ func (p *Plan) Apply(ctx context.Context) (err error) {
 		return nil
 	}
 
-	log.Info("🛥 Sync releases...")
+	log.Info("🛥 sync releases...")
 
-	return p.syncReleases(ctx)
-}
+	if dog.Enabled {
+		log.Warn("🐶 kubedog is enable")
+		kubedog.FixLog(dog.LogWidth)
+		err = p.syncReleasesKubedog(ctx, dog)
+	} else {
+		err = p.syncReleases(ctx)
+	}
 
-// ApplyWithKubedog runs kubedog in goroutine and syncs repositories and releases.
-func (p *Plan) ApplyWithKubedog(ctx context.Context, kubedogConfig *kubedog.Config) (err error) {
-	log.Info("🗄 Sync repositories...")
-	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
 		return err
 	}
 
-	err = p.syncRegistries(ctx)
-	if err != nil {
-		return err
-	}
-
-	if len(p.body.Releases) == 0 {
-		return nil
-	}
-
-	log.Info("🛥 Sync releases...")
-
-	return p.syncReleasesKubedog(ctx, kubedogConfig)
+	return nil
 }
 
 func (p *Plan) syncRegistries(ctx context.Context) (err error) {
@@ -95,9 +98,8 @@ func (p *Plan) syncRegistries(ctx context.Context) (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
-//
-//nolint:gocognit // TODO: simplify
-func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
+// TODO: simplify.
+func SyncRepositories(ctx context.Context, repositories repo.Configs) error { //nolint:gocognit
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exists
@@ -135,8 +137,8 @@ func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
 		return fmt.Errorf("failed to load helm repositories file: %w", err)
 	}
 
-	// We cannot parallel repositories installation as helm manages single repositories.yaml.
-	// To prevent data race we need either make helm use futex or not parallel at all
+	// We can't parallel repositories installation as helm manages single repositories.yaml.
+	// To prevent data race, we need to either make helm use futex or not parallel at all
 	for i := range repositories {
 		err := repositories[i].Install(ctx, helper.Helm, f)
 		if err != nil {
@@ -250,6 +252,7 @@ func (p *Plan) syncRelease(
 	rel := node.Data
 
 	l := rel.Logger()
+
 	l.Info("🛥 deploying... ")
 
 	if _, err := rel.Sync(ctx); err != nil {
@@ -273,7 +276,7 @@ func (p *Plan) syncRelease(
 	}
 }
 
-// ApplyReport renders table report for failed releases.
+// ApplyReport renders a table report for failed releases.
 func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 	n := len(p.body.Releases)
 	k := len(fails)
@@ -314,7 +317,7 @@ func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 
 func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.Config) error {
 	ctxCancel, cancel := context.WithCancel(ctx)
-	defer cancel() // Dont forget!
+	defer cancel() // Don't forget!
 
 	opts := multitrack.MultitrackOptions{
 		StatusProgressPeriod: kubedogConfig.StatusInterval,
@@ -377,7 +380,7 @@ func (p *Plan) kubedogSpecs() (multitrack.MultitrackSpecs, string, error) {
 
 		l := rel.Logger()
 		if !rel.HelmWait() {
-			l.Error("wait flag is disabled so kubedog cannot correctly track this release")
+			l.Error("wait flag is disabled so kubedog can't correctly track this release")
 		}
 
 		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
@@ -405,7 +408,7 @@ func (p *Plan) kubedogSpecs() (multitrack.MultitrackSpecs, string, error) {
 	}
 
 	if len(foundContexts) > 1 {
-		return specs, "", fmt.Errorf("kubedog cannot work with releases in multiple kubecontexts")
+		return specs, "", fmt.Errorf("kubedog can't work with releases in multiple kubecontexts")
 	}
 
 	return specs, kubecontext, nil

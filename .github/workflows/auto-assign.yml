@@ -8,8 +8,13 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: bubkoo/auto-assign@v1
+      - uses: bubkoo/auto-assign@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CONFIG_FILE: .github/auto-assign.yml
-          
+          GITHUB_TOKEN: ${{ secrets.CR_PAT }}
+
+          addAssignees: true
+          addReviewers: true
+          reviewers: |
+            zhilyaev
+            r3nic1e
+          numberOfReviewers: 1

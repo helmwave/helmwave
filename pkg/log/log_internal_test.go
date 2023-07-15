@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
@@ -173,18 +174,13 @@ func (s *LogTestSuite) TestDefaultFormatter() {
 }
 
 func (s *LogTestSuite) TestLogboekWidth() {
-	settings := &Settings{
-		level:  "info",
-		format: "text",
-		width:  1,
-	}
+	width := 1
 
-	s.Require().NoError(settings.Init())
-	s.Require().Equal(settings.width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
+	kubedog.FixLog(width)
+	s.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 
-//nolint:paralleltest // helmwave uses single logger for the whole program
-func TestLogTestSuite(t *testing.T) {
+func TestLogTestSuite(t *testing.T) { //nolintlint:paralleltest // helmwave uses single logger for the whole program
 	// t.Parallel()
 	suite.Run(t, new(LogTestSuite))
 }

@@ -8,13 +8,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// DiffLive is struct for running 'diff live' command.
+var _ Action = (*DiffLive)(nil)
+
+// DiffLive is a struct for running 'diff live' command.
 type DiffLive struct {
 	diff    *Diff
 	plandir string
 }
 
-// Run is main function for 'diff live' command.
+// Run is the main function for 'diff live' command.
 func (d *DiffLive) Run(ctx context.Context) error {
 	p, err := plan.NewAndImport(ctx, d.plandir)
 	if err != nil {

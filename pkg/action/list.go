@@ -7,13 +7,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// List is struct for running 'list' command.
+var _ Action = (*List)(nil)
+
+// List is a struct for running 'list' command.
 type List struct {
 	build     *Build
 	autoBuild bool
 }
 
-// Run is main function for 'list' command.
+// Run is the main function for 'list' command.
 func (l *List) Run(ctx context.Context) error {
 	if l.autoBuild {
 		if err := l.build.Run(ctx); err != nil {
@@ -33,7 +35,7 @@ func (l *List) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:    "list",
 		Aliases: []string{"ls"},
-		Usage:   "👀 List of deployed releases",
+		Usage:   "👀 list of deployed releases",
 		Flags:   l.flags(),
 		Action:  toCtx(l.Run),
 	}

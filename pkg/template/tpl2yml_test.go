@@ -19,7 +19,7 @@ func (s *Tpl2YmlTestSuite) TestNonExistingTemplate() {
 	tpl := filepath.Join(tmpDir, "values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, "sprig")
+	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
 	s.Require().ErrorIs(err, os.ErrNotExist)
 }
 
@@ -28,7 +28,7 @@ func (s *Tpl2YmlTestSuite) TestNonExistingDestDir() {
 	tpl := filepath.Join(tests.Root, "05_values.yaml")
 	dst := filepath.Join(tmpDir, "blabla", "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, "sprig")
+	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
 	s.Require().NoError(err)
 }
 
@@ -37,7 +37,7 @@ func (s *Tpl2YmlTestSuite) TestMissingData() {
 	tpl := filepath.Join(tests.Root, "08_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, "sprig")
+	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
 	s.Require().EqualError(err, "failed to render template: failed to parse template: template: tpl:1: function \"defineDatasource\" not defined")
 }
 
@@ -46,7 +46,7 @@ func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, "sprig")
+	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
 	s.Require().Error(err)
 }
 
@@ -55,7 +55,7 @@ func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, "gomplate")
+	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterGomplate)
 	s.Require().NoError(err)
 }
 

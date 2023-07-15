@@ -8,13 +8,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Yml is struct for running 'yml' command.
+var _ Action = (*Yml)(nil)
+
+// Yml is a struct for running 'yml' command.
 type Yml struct {
 	tpl, file string
 	templater string
 }
 
-// Run is main function for 'yml' command.
+// Run is the main function for 'yml' command.
 func (i *Yml) Run(ctx context.Context) error {
 	err := template.Tpl2yml(i.tpl, i.file, nil, i.templater)
 	if err != nil {
@@ -33,7 +35,7 @@ func (i *Yml) Run(ctx context.Context) error {
 func (i *Yml) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "yml",
-		Usage:  "📄 Render helmwave.yml.tpl -> helmwave.yml",
+		Usage:  "📄 render helmwave.yml.tpl -> helmwave.yml",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}

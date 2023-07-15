@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 
 	"github.com/werf/logboek"
 	"k8s.io/klog"
@@ -59,4 +60,19 @@ func silenceKlogFlagSet(fs *flag.FlagSet) error {
 	}
 
 	return nil
+}
+
+// FixLog will disable kubernetes logger and fix width for logboek.
+func FixLog(width int) {
+	if err := SilenceKlog(context.Background()); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := SilenceKlogV2(context.Background()); err != nil {
+		log.Fatal(err)
+	}
+
+	if width > 0 {
+		logboek.DefaultLogger().Streams().SetWidth(width)
+	}
 }

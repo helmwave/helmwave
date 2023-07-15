@@ -27,7 +27,7 @@ func (s *DestroyTestSuite) TestDestroy() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Destroy(context.Background())
+	err := p.Down(context.Background())
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -46,7 +46,7 @@ func (s *DestroyTestSuite) TestDestroyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Destroy(context.Background())
+	err := p.Down(context.Background())
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -57,7 +57,7 @@ func (s *DestroyTestSuite) TestDestroyNoReleases() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Destroy(context.Background())
+	err := p.Down(context.Background())
 	s.Require().NoError(err)
 }
 

@@ -228,14 +228,14 @@ release:
   prerelease: auto
 
 brews:
-  - tap:
+  - repository:
       owner: helmwave
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     goamd64: v1
     description: "HelmWave is like docker-compose for helm"
     license: "MIT"
-    folder: formula
+    folder: Formula
     skip_upload: auto
 
     custom_block: |
@@ -257,5 +257,5 @@ announce:
     enabled: true
     chat_id: -1001484486010
     message_template: |
-      Helmwave *{{ replace .Tag "." "\\." }}* is ready!
-      See more: https://github.com/helmwave/helmwave/releases/tag/{{ .Tag }}
+      Helmwave *{{ replace .Tag "." "\\." }}* is ready\!
+      See more: https://github\.com/helmwave/helmwave/releases/tag/{{ replace .Tag "." "\\." }}

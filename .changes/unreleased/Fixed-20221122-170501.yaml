@@ -1,6 +1,0 @@
-kind: Fixed
-body: Added missing `tmpl` and `tpl` functions to gomplate renderer
-time: 2022-11-22T17:05:01.336851+03:00
-custom:
-  Author: r3nic1e
-  Issue: "518"
