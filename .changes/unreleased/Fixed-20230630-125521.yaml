@@ -1,0 +1,6 @@
+kind: Fixed
+body: Make graph cells a bit wider to contain all uniqnames
+time: 2023-06-30T12:55:21.471422+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""
