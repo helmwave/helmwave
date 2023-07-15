@@ -64,7 +64,8 @@ func (s *GetTestSuite) TestGet() {
 	s.Require().NoError(err)
 }
 
-func TestGetTestSuite(t *testing.T) { //nolint:paralleltest // uses helm repository.yaml flock
+//nolint:paralleltest // uses helm repository.yaml flock
+func TestGetTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(GetTestSuite))
 }

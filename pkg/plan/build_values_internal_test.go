@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -19,7 +18,7 @@ func (s *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
 	s.T().Helper()
 
 	p := New(filepath.Join(tmpDir, Dir))
-	p.templater = template.TemplaterSprig
+	p.templater = "sprig"
 
 	return p
 }

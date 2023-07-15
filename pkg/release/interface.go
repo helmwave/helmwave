@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"helm.sh/helm/v3/pkg/action"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
 )
 
@@ -29,12 +29,12 @@ type Config interface {
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get() (*release.Release, error)
 	List() (*release.Release, error)
-	Rollback(context.Context, int) error
+	Rollback(int) error
 	Status() (*release.Release, error)
 	Name() string
 	Namespace() string
-	Chart() *Chart
-	SetChartName(string)
+	Chart() Chart
+	SetChart(string)
 	DependsOn() []*DependsOnReference
 	Tags() []string
 	Repo() string
@@ -42,8 +42,6 @@ type Config interface {
 	HelmWait() bool
 	KubeContext() string
 	Cfg() *action.Configuration
-	HooksDisabled() bool
-	OfflineKubeVersion() *chartutil.KubeVersion
 }
 
 // Configs type of array Config.

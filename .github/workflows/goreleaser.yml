@@ -67,9 +67,9 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v3
         with:
-          go-version: "1.20"
+          go-version: 1.18
 
       - name: Cache Go modules
         uses: actions/cache@v3
@@ -85,7 +85,7 @@ jobs:
         run: go install github.com/miniscruff/changie@v1
 
       - name: Generate release changelog
-        run: changie batch $TAG --force
+        run: changie batch $TAG
         env:
           TAG: ${{ needs.tagger.outputs.tag }}
 
@@ -99,7 +99,7 @@ jobs:
         run: changie merge
 
       - name: Create Pull Request for changelog
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v4
         with:
           add-paths: |
             CHANGELOG.md
@@ -145,9 +145,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v3
         with:
-          go-version: "1.20"
+          go-version: 1.18
 
       - name: Cache Go modules
         uses: actions/cache@v3
@@ -165,10 +165,10 @@ jobs:
           name: changelog
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v3
         with:
           version: latest
-          args: release --skip-validate --clean --release-notes ${{ needs.tagger.outputs.tag }}.md
+          args: release --skip-validate --rm-dist --release-notes ${{ needs.tagger.outputs.tag }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}

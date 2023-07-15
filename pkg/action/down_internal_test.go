@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -19,18 +18,8 @@ type DownTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // uses helm repository.yaml flock
-func TestDownTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(DownTestSuite))
-}
-
-func (ts *DownTestSuite) TestCmd() {
-	s := &Down{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
+func (ts *DownTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Down{})
 }
 
 func (ts *DownTestSuite) TestRun() {
@@ -38,7 +27,7 @@ func (ts *DownTestSuite) TestRun() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -61,4 +50,10 @@ func (ts *DownTestSuite) TestRun() {
 
 	ts.Require().NoError(u.Run(context.Background()))
 	ts.Require().NoError(d.Run(context.Background()))
+}
+
+//nolint:paralleltest // uses helm repository.yaml flock
+func TestDownTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(DownTestSuite))
 }

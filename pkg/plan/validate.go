@@ -37,7 +37,7 @@ func (p *Plan) ValidateValuesImport() error {
 	return ErrValidateFailed
 }
 
-// ValidateValuesBuild Dst now is a public method.
+// ValidateValuesBuild Dst now is public method.
 // Dst needs to marshal for export.
 // Also, dst needs to unmarshal for import from plan.
 func (p *Plan) ValidateValuesBuild() error {
@@ -53,8 +53,8 @@ func (p *Plan) ValidateValuesBuild() error {
 
 // Validate validates releases and repositories in plan.
 func (p *planBody) Validate() error {
-	if len(p.Releases) == 0 && len(p.Repositories) == 0 && len(p.Registries) == 0 {
-		return errors.New("releases, repositories and registries are empty")
+	if len(p.Releases) == 0 && len(p.Repositories) == 0 {
+		return errors.New("releases and repositories are empty")
 	}
 
 	if err := p.ValidateRegistries(); err != nil {

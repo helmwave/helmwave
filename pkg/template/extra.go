@@ -15,11 +15,11 @@ import (
 )
 
 // Values is alias for string map of interfaces.
-type Values = map[string]any
+type Values = map[string]interface{}
 
 // ToYaml renders data into YAML string.
 // Used as custom template function.
-func ToYaml(v any) (string, error) {
+func ToYaml(v interface{}) (string, error) {
 	data, err := yaml.Marshal(v)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal %v to YAML: %w", v, err)
@@ -42,7 +42,7 @@ func FromYaml(str string) (Values, error) {
 
 // Exec runs external binary and returns its standard output.
 // Used as custom template function.
-func Exec(command string, args []any, inputs ...string) (string, error) {
+func Exec(command string, args []interface{}, inputs ...string) (string, error) {
 	var input string
 	if len(inputs) > 0 {
 		input = inputs[0]
@@ -121,8 +121,8 @@ func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGrou
 
 // SetValueAtPath sets value in map by dot-separated key path.
 // Used as custom template function.
-func SetValueAtPath(path string, value any, values Values) (Values, error) {
-	var current any
+func SetValueAtPath(path string, value interface{}, values Values) (Values, error) {
+	var current interface{}
 	current = values
 	components := strings.Split(path, ".")
 	pathToMap := components[:len(components)-1]
@@ -130,13 +130,13 @@ func SetValueAtPath(path string, value any, values Values) (Values, error) {
 
 	for _, k := range pathToMap {
 		switch typedCurrent := current.(type) {
-		case map[string]any:
+		case map[string]interface{}:
 			v, exists := typedCurrent[k]
 			if !exists {
 				return nil, fmt.Errorf("failed to set value at path %q: value for key %q does not exist", path, k)
 			}
 			current = v
-		case map[any]any:
+		case map[interface{}]interface{}:
 			v, exists := typedCurrent[k]
 			if !exists {
 				return nil, fmt.Errorf("failed to set value at path %q: value for key %q does not exist", path, k)
@@ -153,9 +153,9 @@ func SetValueAtPath(path string, value any, values Values) (Values, error) {
 	}
 
 	switch typedCurrent := current.(type) {
-	case map[string]any:
+	case map[string]interface{}:
 		typedCurrent[key] = value
-	case map[any]any:
+	case map[interface{}]interface{}:
 		typedCurrent[key] = value
 	default:
 		return nil, fmt.Errorf(
@@ -181,7 +181,7 @@ func RequiredEnv(name string) (string, error) {
 
 // Required returns error if val is nil of empty string. Otherwise it returns the same val.
 // Used as custom template function.
-func Required(warn string, val any) (any, error) {
+func Required(warn string, val interface{}) (interface{}, error) {
 	if val == nil {
 		return nil, errors.New(warn)
 	} else if _, ok := val.(string); ok {
@@ -204,7 +204,7 @@ func ReadFile(file string) (string, error) {
 	return string(b), nil
 }
 
-func noKeyError(key string, obj any) error {
+func noKeyError(key string, obj interface{}) error {
 	return fmt.Errorf("key %q is not present in %v", key, obj)
 }
 
@@ -215,7 +215,7 @@ func noKeyError(key string, obj any) error {
 // Used as custom template function.
 //
 //nolint:gocognit
-func Get(path string, varArgs ...any) (any, error) {
+func Get(path string, varArgs ...interface{}) (interface{}, error) {
 	defSet, def, obj, err := parseGetVarArgs(varArgs)
 	if err != nil {
 		return nil, err
@@ -226,10 +226,10 @@ func Get(path string, varArgs ...any) (any, error) {
 	}
 	keys := strings.Split(path, ".")
 	key := keys[0]
-	var v any
+	var v interface{}
 	var ok bool
 	switch typedObj := obj.(type) {
-	case map[string]any:
+	case map[string]interface{}:
 		v, ok = typedObj[key]
 		if !ok {
 			if defSet {
@@ -238,7 +238,7 @@ func Get(path string, varArgs ...any) (any, error) {
 
 			return nil, noKeyError(key, obj)
 		}
-	case map[any]any:
+	case map[interface{}]interface{}:
 		v, ok = typedObj[key]
 		if !ok {
 			if defSet {
@@ -262,11 +262,11 @@ func Get(path string, varArgs ...any) (any, error) {
 	return Get(strings.Join(keys[1:], "."), v)
 }
 
-func tryReflectGet(obj any, key string, defSet bool, def any) (any, error) {
+func tryReflectGet(obj interface{}, key string, defSet bool, def interface{}) (interface{}, error) {
 	maybeStruct := reflect.ValueOf(obj)
 	if maybeStruct.Kind() != reflect.Struct {
 		return nil, fmt.Errorf(
-			"unexpected type(%v) of value for key %q: it must be either map[string]any or any struct",
+			"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
 			reflect.TypeOf(obj),
 			key,
 		)
@@ -287,7 +287,7 @@ func tryReflectGet(obj any, key string, defSet bool, def any) (any, error) {
 
 // HasKey searches for any value by dot-separated key path in map.
 // Used as custom template function.
-func HasKey(path string, varArgs ...any) (bool, error) {
+func HasKey(path string, varArgs ...interface{}) (bool, error) {
 	defSet, def, obj, err := parseGetVarArgs(varArgs)
 	if err != nil {
 		return false, err
@@ -297,15 +297,15 @@ func HasKey(path string, varArgs ...any) (bool, error) {
 		return true, nil
 	}
 	keys := strings.Split(path, ".")
-	var v any
+	var v interface{}
 	var ok bool
 	switch typedObj := obj.(type) {
-	case map[string]any:
+	case map[string]interface{}:
 		v, ok = typedObj[keys[0]]
 		if !ok {
 			return defSet, nil
 		}
-	case map[any]any:
+	case map[interface{}]interface{}:
 		v, ok = typedObj[keys[0]]
 		if !ok {
 			return defSet, nil
@@ -329,11 +329,11 @@ func HasKey(path string, varArgs ...any) (bool, error) {
 	return HasKey(strings.Join(keys[1:], "."), v)
 }
 
-func tryReflectHasKey(obj any, key string, defSet bool, def any) (bool, any, error) {
+func tryReflectHasKey(obj interface{}, key string, defSet bool, def interface{}) (bool, interface{}, error) {
 	maybeStruct := reflect.ValueOf(obj)
 	if maybeStruct.Kind() != reflect.Struct {
 		return false, nil, fmt.Errorf(
-			"unexpected type(%v) of value for key %q: it must be either map[string]any or any struct",
+			"unexpected type(%v) of value for key %q: it must be either map[string]interface{} or any struct",
 			reflect.TypeOf(obj),
 			key,
 		)
@@ -352,7 +352,7 @@ func tryReflectHasKey(obj any, key string, defSet bool, def any) (bool, any, err
 	return true, f.Interface(), nil
 }
 
-func parseGetVarArgs(varArgs []any) (defSet bool, def, obj any, err error) {
+func parseGetVarArgs(varArgs []interface{}) (defSet bool, def, obj interface{}, err error) {
 	switch len(varArgs) {
 	case 1:
 		defSet = false

@@ -3,10 +3,8 @@ package helper
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 
-	cp "github.com/otiai10/copy"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -50,24 +48,4 @@ func IsExists(s string) bool {
 
 		return false
 	}
-}
-
-// CopyFile copy file to dest. Destination is either file or dir.
-func CopyFile(src, dest string) error {
-	destStat, err := os.Stat(dest)
-
-	if err == nil {
-		if destStat.Mode().IsDir() {
-			dest = path.Join(dest, filepath.Base(src))
-		} else {
-			return fmt.Errorf("failed to copy file '%s': destination '%s' already exists", src, dest)
-		}
-	}
-
-	err = cp.Copy(src, dest)
-	if err != nil {
-		return fmt.Errorf("failed to copy file '%s' to '%s': %w", src, dest, err)
-	}
-
-	return nil
 }

@@ -31,7 +31,8 @@ func getContextWithFlags(c *cli.Context) context.Context {
 		ctx = context.WithValue(ctx, flagName, g) //nolint:staticcheck // weird issue, we won't have any collisions with strings
 	}
 
-	ctx = context.WithValue(ctx, "cli", c) //nolint:staticcheck // same
+	//nolint:staticcheck // same
+	ctx = context.WithValue(ctx, "cli", c)
 
 	return ctx
 }

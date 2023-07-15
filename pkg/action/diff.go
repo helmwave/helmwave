@@ -4,18 +4,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	// DiffModeLive is a subcommand name for diffing manifests in plan with actually running manifests in k8s.
-	DiffModeLive = "live"
-
-	// DiffModeLocal is a subcommand name for diffing manifests in two plans.
-	DiffModeLocal = "local"
-
-	// DiffModeNone is a subcommand name for skipping diffing.
-	DiffModeNone = "none"
-)
-
-// Diff is a struct for running 'diff' commands.
+// Diff is struct for running 'diff' commands.
 type Diff struct {
 	ThreeWayMerge bool
 	ShowSecret    bool
@@ -24,12 +13,12 @@ type Diff struct {
 
 // Cmd returns 'diff' *cli.Command.
 func (d *Diff) Cmd() *cli.Command {
-	plan := DiffLocal{diff: d}
+	plan := DiffLocalPlan{diff: d}
 	live := DiffLive{diff: d}
 
 	return &cli.Command{
 		Name:    "diff",
-		Usage:   "🆚 show differences",
+		Usage:   "🆚 Show Differences",
 		Aliases: []string{"vs"},
 		Flags:   d.flags(),
 		Subcommands: []*cli.Command{

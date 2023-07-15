@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -17,18 +16,8 @@ type YmlTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // can't parallel because of setenv
-func TestYmlTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(YmlTestSuite))
-}
-
-func (ts *YmlTestSuite) TestCmd() {
-	s := &Yml{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
+func (ts *YmlTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Yml{})
 }
 
 func (ts *YmlTestSuite) TestRenderEnv() {
@@ -36,7 +25,7 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tmpDir, "01_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	value := "test01"
@@ -51,4 +40,10 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 	ts.Require().Equal(value, b.Project)
 	ts.Require().Len(b.Releases, 1)
 	ts.Require().Equal(value, b.Releases[0].Namespace())
+}
+
+//nolint:paralleltest // cannot parallel because of setenv
+func TestYmlTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(YmlTestSuite))
 }

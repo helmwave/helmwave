@@ -67,11 +67,11 @@ var (
 	ErrNotChose = errors.New("you did not specify a shell")
 )
 
-//nolintlint:forbidigo // we need to use fmt.Print
+//nolint:forbidigo // we need to use fmt.Print
 func completion() *cli.Command {
 	return &cli.Command{
 		Name:  "completion",
-		Usage: "generate completion script",
+		Usage: "Generate completion script",
 		Description: `
 			 echo "source <(helmwave completion bash)" >> ~/.bashrc
 			 echo "source <(helmwave completion zsh)" >> ~/.zshrc"
@@ -83,11 +83,11 @@ func completion() *cli.Command {
 
 			switch c.Args().First() {
 			case "bash":
-				fmt.Print(bash) //nolint:forbidigo
+				fmt.Print(bash)
 
 				return nil
 			case "zsh":
-				fmt.Print(zsh) //nolint:forbidigo
+				fmt.Print(zsh)
 
 				return nil
 			default:

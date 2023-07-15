@@ -8,9 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// ErrNotFound is an error for not declared repository name.
-var ErrNotFound = errors.New("repository not found")
-
+//nolint:lll
 type config struct {
 	log        *log.Entry `yaml:"-" json:"-"`
 	repo.Entry `yaml:",inline" json:",inline"`
@@ -32,3 +30,6 @@ func (c *config) Logger() *log.Entry {
 
 	return c.log
 }
+
+// ErrNotFound is an error for not declared repository name.
+var ErrNotFound = errors.New("repository not found")

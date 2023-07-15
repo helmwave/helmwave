@@ -9,7 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-//nolintlint:gochecknoglobals // can't make these colors const
+//nolint:gochecknoglobals // cannot make these colors const
 var (
 	// FailStatusColor is tablewriter color for failed releases.
 	FailStatusColor = tablewriter.Color(tablewriter.Bold, tablewriter.BgRedColor)

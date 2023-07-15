@@ -14,7 +14,7 @@ func buildRegistriesMapTop(releases []release.Config) map[string][]release.Confi
 	for _, rel := range releases {
 		if registry.IsOCI(rel.Chart().Name) {
 			m[rel.Repo()] = append(m[rel.Repo()], rel)
-			rel.Logger().Debugln("🗄 This chart will download via OCI")
+			rel.Logger().Debugln("This chart will download via OCI.")
 		}
 	}
 

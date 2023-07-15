@@ -4,14 +4,14 @@ import (
 	"context"
 	"path/filepath"
 
+	"helm.sh/helm/v3/pkg/action"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chartutil"
 	helm "helm.sh/helm/v3/pkg/cli"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 	helmRepo "helm.sh/helm/v3/pkg/repo"
@@ -21,28 +21,8 @@ type MockReleaseConfig struct {
 	mock.Mock
 }
 
-func (r *MockReleaseConfig) SetChartName(s string) {
-	r.Called()
-}
-
-func (r *MockReleaseConfig) OfflineKubeVersion() *chartutil.KubeVersion {
-	r.Called()
-
-	v := &chartutil.KubeVersion{
-		Major:   "1",
-		Minor:   "22",
-		Version: "1.22.0",
-	}
-
-	return v
-}
-
 func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
-	args := r.Called()
-
-	if len(args) > 0 {
-		return args.Get(0).(uniqname.UniqName)
-	}
+	r.Called()
 
 	u, _ := uniqname.Generate(r.Name(), r.Namespace())
 
@@ -110,7 +90,7 @@ func (r *MockReleaseConfig) List() (*helmRelease.Release, error) {
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) Rollback(context.Context, int) error {
+func (r *MockReleaseConfig) Rollback(int) error {
 	return r.Called().Error(0)
 }
 
@@ -128,8 +108,8 @@ func (r *MockReleaseConfig) Namespace() string {
 	return r.Called().String(0)
 }
 
-func (r *MockReleaseConfig) Chart() *release.Chart {
-	return r.Called().Get(0).(*release.Chart)
+func (r *MockReleaseConfig) Chart() release.Chart {
+	return r.Called().Get(0).(release.Chart)
 }
 
 func (r *MockReleaseConfig) DependsOn() []*release.DependsOnReference {
@@ -172,10 +152,6 @@ func (r *MockReleaseConfig) KubeContext() string {
 
 func (r *MockReleaseConfig) Cfg() *action.Configuration {
 	return r.Called().Get(0).(*action.Configuration)
-}
-
-func (r *MockReleaseConfig) HooksDisabled() bool {
-	return false
 }
 
 type MockRepoConfig struct {

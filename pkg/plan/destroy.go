@@ -8,21 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Down destroys all releases that exist in a plan.
-func (p *Plan) Down(ctx context.Context) error {
-	// Run hooks
-	err := p.body.Lifecycle.RunPreDown(ctx)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		err := p.body.Lifecycle.RunPostDown(ctx)
-		if err != nil {
-			log.Errorf("got an error from postdown hooks: %v", err)
-		}
-	}()
-
+// Destroy destroys all releases that exist in plan.
+func (p *Plan) Destroy(ctx context.Context) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
@@ -39,10 +26,5 @@ func (p *Plan) Down(ctx context.Context) error {
 		}(ctx, wg, p.body.Releases[i])
 	}
 
-	err = wg.Wait()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return wg.Wait()
 }
