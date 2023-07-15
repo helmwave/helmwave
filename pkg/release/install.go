@@ -17,7 +17,7 @@ func (rel *config) isInstalled() bool {
 	case err == nil:
 		return true
 	default:
-		rel.Logger().WithError(err).Warn("I can't check if release is installed")
+		rel.Logger().WithError(err).Fatal("I can't check if release is installed")
 
 		return false
 	}

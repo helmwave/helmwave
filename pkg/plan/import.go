@@ -31,13 +31,13 @@ func (p *Plan) Import(ctx context.Context) error {
 
 	p.body = body
 
-	// Validate all files exist.
+	// Check all files exist.
 	err = p.ValidateValuesImport()
 	if err != nil {
 		return err
 	}
 
-	version.Validate(p.body.Version)
+	version.Check(p.body.Version, version.Version)
 
 	return nil
 }

@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -31,7 +30,7 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
+	err := p.Apply(context.Background())
 	s.Require().ErrorIs(err, e)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -45,9 +44,8 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
-	dog := &kubedog.Config{}
 
-	err := p.Up(context.Background(), dog)
+	err := p.Apply(context.Background())
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -69,7 +67,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
+	err := p.Apply(context.Background())
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -93,14 +91,15 @@ func (s *ApplyTestSuite) TestApply() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
+	err := p.Apply(context.Background())
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())
 	mockedRelease.AssertExpectations(s.T())
 }
 
-func TestApplyTestSuite(t *testing.T) { //nolintlint:paralleltest // can't parallel because of flock timeout
+//nolint:paralleltest // cannot parallel because of flock timeout
+func TestApplyTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(ApplyTestSuite))
 }

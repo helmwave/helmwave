@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/helmwave/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/helmwave/helmwave/workflows/release/badge.svg" /></a>
-  <a href="https://codecov.io/gh/helmwave/helmwave"><img src="https://codecov.io/gh/helmwave/helmwave/branch/main/graph/badge.svg?token=0WXxYhIG4S" alt="codecov"/></a>
+  <a href="https://codecov.io/gh/helmwave/helmwave"><img src="https://codecov.io/gh/helmwave/helmwave/branch/main/graph/badge.svg?token=0WXxYhIG4S" alt="codecov"/></a> 
   <a href="https://bestpractices.coreinfrastructure.org/projects/5426"><img src="https://bestpractices.coreinfrastructure.org/projects/5426/badge"></a>
   <a href="https://www.codacy.com/gh/helmwave/helmwave/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=helmwave/helmwave&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/200ca37690b7463b976f1ece36b53a4e"/></a>
   <a href="https://www.codefactor.io/repository/github/helmwave/helmwave"><img src="https://www.codefactor.io/repository/github/helmwave/helmwave/badge" alt="CodeFactor" /></a>
@@ -20,7 +20,7 @@ HelmWave is like docker-compose for helm.
 
 > We focus on speed execution, tiny size, pretty debugging.
 
-With 🌊 helmwave you will become a superhero:
+With helmwave you will become a superhero:
 
 - Deploy multiple environments by one step
 - Separate values for environments
@@ -32,8 +32,6 @@ With 🌊 helmwave you will become a superhero:
 - Live tracking kubernetes resources with kubedog
 - Fetch data from external datasource like vault, aws sm
 - ... and much more!
-
-[![asciicast](https://asciinema.org/a/591181.svg)](https://asciinema.org/a/591181)
 
 ## 📖 [Documentation](https://docs.helmwave.app)
 

@@ -1,12 +1,12 @@
 repos:
   - repo: https://github.com/dnephin/pre-commit-golang
-    rev: v0.5.1
+    rev: v0.5.0
     hooks:
       - id: go-fmt
       - id: golangci-lint
       - id: go-mod-tidy
 
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v2.3.0
+    rev: v1.4.0
     hooks:
       - id: conventional-pre-commit

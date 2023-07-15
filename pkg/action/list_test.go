@@ -11,15 +11,11 @@ type ListTestSuite struct {
 	suite.Suite
 }
 
+func (ts *ListTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*action.Action)(nil), &action.List{})
+}
+
 func TestListTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(ListTestSuite))
-}
-
-func (ts *ListTestSuite) TestCmd() {
-	s := &action.List{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
 }

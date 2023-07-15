@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -19,18 +18,8 @@ type UpTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // can't parallel because of setenv
-func TestUpTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(UpTestSuite))
-}
-
-func (ts *UpTestSuite) TestCmd() {
-	s := &Up{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
+func (ts *UpTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Up{})
 }
 
 func (ts *UpTestSuite) TestAutoBuild() {
@@ -38,7 +27,7 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tmpDir, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	u := &Up{
@@ -56,4 +45,10 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(u.Run(context.Background()))
+}
+
+//nolint:paralleltest // cannot parallel because of setenv
+func TestUpTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(UpTestSuite))
 }

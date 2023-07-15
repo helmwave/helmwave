@@ -9,12 +9,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var _ Action = (*GenSchema)(nil)
-
-// GenSchema is a struct for running 'GenSchema' command.
+// GenSchema is struct for running 'GenSchema' command.
 type GenSchema struct{}
 
-// Run is the main function for 'GenSchema' command.
+// Run is main function for 'GenSchema' command.
 func (i *GenSchema) Run(ctx context.Context) error {
 	s, err := json.Marshal(plan.GenSchema())
 	if err != nil {
@@ -30,7 +28,7 @@ func (i *GenSchema) Run(ctx context.Context) error {
 func (i *GenSchema) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "schema",
-		Usage:  "generate json schema",
+		Usage:  "Generate helmwave json schema",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}

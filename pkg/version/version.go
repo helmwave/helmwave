@@ -4,26 +4,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Version is a helmwave binary version.
-// It should be a var not const.
+// Version is helmwave binary version.
+// It should be var not const.
 // It will override by goreleaser during release.
 // -X github.com/helmwave/helmwave/pkg/version.Version={{ .Version }}.
+//
+//nolint:gochecknoglobals
 var Version = "dev"
 
-// validate compares helmwave versions.
-func validate(a, b string) bool {
+// Check compares helmwave versions and logs difference.
+func Check(a, b string) {
 	if a != b {
-		log.Warnf("⚠️ yaml version is %s but binary version is %s", a, b)
-
-		return false
+		log.Warn("⚠️ Unsupported version ", b)
+		log.Debug("🌊 HelmWave version ", a)
 	}
-
-	log.Debug("✅ yaml version is equal to binary version")
-
-	return true
-}
-
-// Validate compare version.
-func Validate(a string) bool {
-	return validate(a, Version)
 }

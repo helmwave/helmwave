@@ -10,7 +10,7 @@ import (
 )
 
 // SaveInterface encodes input to YAML and saves to file.
-func SaveInterface(ctx context.Context, file string, in any) error {
+func SaveInterface(ctx context.Context, file string, in interface{}) error {
 	f, err := CreateFile(file)
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func SaveInterface(ctx context.Context, file string, in any) error {
 }
 
 // Byte marshals input to YAML and returns YAML byte slice.
-func Byte(ctx context.Context, in any) []byte {
+func Byte(ctx context.Context, in interface{}) []byte {
 	data, err := yaml.Marshal(in)
 	if err != nil {
 		log.Fatal(err)

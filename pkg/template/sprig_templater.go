@@ -9,17 +9,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	TemplaterSprig = "sprig"
-)
-
+//nolint:gochecknoglobals // cannot make these const
 var (
-	sprigAliases = map[string]string{ //nolint:gochecknoglobals // can't make these const
+	sprigAliases = map[string]string{
 		"get":    "sprigGet",
 		"hasKey": "sprigHasKey",
 	}
 
-	customFuncs = map[string]any{ //nolint:gochecknoglobals // can't make these const
+	customFuncs = map[string]interface{}{
 		"toYaml":         ToYaml,
 		"fromYaml":       FromYaml,
 		"exec":           Exec,
@@ -37,10 +34,10 @@ type sprigTemplater struct {
 }
 
 func (t sprigTemplater) Name() string {
-	return TemplaterSprig
+	return "sprig"
 }
 
-func (t sprigTemplater) Render(src string, data any) ([]byte, error) {
+func (t sprigTemplater) Render(src string, data interface{}) ([]byte, error) {
 	funcs := t.funcMap()
 	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
 	if err != nil {

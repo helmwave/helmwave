@@ -35,7 +35,7 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]r
 	return plan, nil
 }
 
-//nolintlint:nestif
+//nolint:nestif
 func addToPlan(plan []release.Config, rel release.Config,
 	releases map[uniqname.UniqName]release.Config,
 ) ([]release.Config, error) {
@@ -55,9 +55,9 @@ func addToPlan(plan []release.Config, rel release.Config,
 			}
 		} else {
 			if dep.Optional {
-				log.Warnf("can't find dependency %q in available releases, skipping", dep.Uniq())
+				log.Warnf("cannot find dependency %q in available releases, skipping it", dep.Uniq())
 			} else {
-				rel.Logger().WithField("dependency", dep.Uniq()).Error("can't find required dependency")
+				rel.Logger().WithField("dependency", dep.Uniq()).Error("cannot find required dependency")
 
 				return nil, release.ErrDepFailed
 			}

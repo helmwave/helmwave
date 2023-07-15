@@ -1,7 +1,6 @@
 package action
 
 import (
-	"bytes"
 	"context"
 	"path/filepath"
 	"strings"
@@ -9,9 +8,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/repo"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
 )
@@ -20,57 +17,8 @@ type BuildTestSuite struct {
 	suite.Suite
 }
 
-func TestBuildTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(BuildTestSuite))
-}
-
-func (ts *BuildTestSuite) TestCmd() {
-	s := &Build{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
-}
-
-func (ts *BuildTestSuite) TestYmlError() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		file:      filepath.Join(tests.Root, "helmwave.yml"),
-		templater: template.TemplaterSprig,
-	}
-
-	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-	}
-
-	ts.Require().Error(s.Run(context.Background()))
-}
-
-func (ts *BuildTestSuite) TestInvalidCacheDir() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
-	}
-
-	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		chartsCacheDir: "/proc/1/bla",
-	}
-
-	ts.Require().Error(s.Run(context.Background()))
+func (ts *BuildTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &Build{})
 }
 
 func (ts *BuildTestSuite) TestManifest() {
@@ -78,16 +26,14 @@ func (ts *BuildTestSuite) TestManifest() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
+		plandir:  tmpDir,
+		yml:      y,
+		tags:     cli.StringSlice{},
+		matchAll: true,
 	}
 
 	ts.Require().NoError(s.Run(context.Background()))
@@ -99,9 +45,7 @@ func (ts *BuildTestSuite) TestManifest() {
 //		plandir:  tmpDir,
 //		ymlFile:      filepath.Join(tests.Root, "04_helmwave.yml"),
 //		tags:     cli.StringSlice{},
-//		options: plan.BuildOptions{
-//				MatchAll: true,
-//			},
+//		matchAll: true,
 //	}
 //
 //	err := s.Run()
@@ -115,16 +59,14 @@ func (ts *BuildTestSuite) TestRepositories() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
+		plandir:  tmpDir,
+		yml:      y,
+		tags:     cli.StringSlice{},
+		matchAll: true,
 	}
 
 	ts.Require().NoError(s.Run(context.Background()))
@@ -142,7 +84,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "03_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	cases := []struct {
@@ -161,12 +103,10 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 	for i := range cases {
 		s := &Build{
-			plandir: tmpDir,
-			yml:     y,
-			tags:    *cases[i].tags,
-			options: plan.BuildOptions{
-				MatchAll: true,
-			},
+			plandir:  tmpDir,
+			yml:      y,
+			tags:     *cases[i].tags,
+			matchAll: true,
 		}
 
 		ts.Require().NoError(s.Run(context.Background()))
@@ -187,15 +127,13 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "07_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "07_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
+		plandir:  tmpDir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
 		autoYml:  true,
 		yml:      y,
 		diff:     &Diff{},
@@ -206,14 +144,13 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	ts.Require().NoError(s.Run(context.Background()), "build should not fail with diffing with previous plan")
 }
 
-type NonParallelBuildTestSuite struct {
-	suite.Suite
+func TestBuildTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(BuildTestSuite))
 }
 
-//nolintlint:paralleltest // can't parallel because of setenv and uses helm repository.yaml flock
-func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(NonParallelBuildTestSuite))
+type NonParallelBuildTestSuite struct {
+	suite.Suite
 }
 
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
@@ -221,17 +158,15 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		autoYml: true,
-		yml:     y,
+		plandir:  tmpDir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
 	}
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
@@ -246,52 +181,23 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "08_helmwave.yml"),
 		file:      filepath.Join(tmpDir, "08_helmwave.yml"),
-		templater: template.TemplaterGomplate,
+		templater: "gomplate",
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		autoYml: true,
-		yml:     y,
+		plandir:  tmpDir,
+		tags:     cli.StringSlice{},
+		matchAll: true,
+		autoYml:  true,
+		yml:      y,
 	}
 
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
-func (ts *NonParallelBuildTestSuite) TestLifecycle() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "13_helmwave.yml"),
-		file:      filepath.Join(tmpDir, "13_helmwave.yml"),
-		templater: template.TemplaterSprig,
-	}
-
-	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		autoYml: true,
-		yml:     y,
-	}
-
-	var buf bytes.Buffer
-	oldOut := log.StandardLogger().Out
-	log.StandardLogger().SetOutput(&buf)
-	defer log.StandardLogger().SetOutput(oldOut)
-
-	ts.Require().NoError(s.Run(context.Background()))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
-
-	output := buf.String()
-	ts.Require().Contains(output, "running pre_build script for nginx")
-	ts.Require().Contains(output, "run global pre_build script")
-	ts.Require().Contains(output, "running post_build script for nginx")
-	ts.Require().Contains(output, "run global post_build script")
+//nolint:paralleltest // cannot parallel because of setenv and uses helm repository.yaml flock
+func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(NonParallelBuildTestSuite))
 }

@@ -11,15 +11,11 @@ type ValidateTestSuite struct {
 	suite.Suite
 }
 
+func (ts *ValidateTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*action.Action)(nil), &action.Validate{})
+}
+
 func TestValidateTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(ValidateTestSuite))
-}
-
-func (ts *ValidateTestSuite) TestCmd() {
-	s := &action.Validate{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
 }

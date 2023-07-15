@@ -1,16 +1,12 @@
 package template
 
-const (
-	TemplaterNone = "copy"
-)
-
 type noTemplater struct{}
 
 func (t noTemplater) Name() string {
-	return TemplaterNone
+	return "copy"
 }
 
-func (t noTemplater) Render(src string, data any) ([]byte, error) {
+func (t noTemplater) Render(src string, data interface{}) ([]byte, error) {
 	return []byte(src), nil
 }
 

@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
@@ -18,40 +17,30 @@ import (
 
 var buf bytes.Buffer
 
-type DiffLocalTestSuite struct {
+type DiffPlanTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
-func TestDiffLocalTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(DiffLocalTestSuite))
-}
-
-func (ts *DiffLocalTestSuite) SetupTest() {
+func (ts *DiffPlanTestSuite) SetupTest() {
 	log.StandardLogger().SetOutput(&buf)
 }
 
-func (ts *DiffLocalTestSuite) TearDownTest() {
+func (ts *DiffPlanTestSuite) TearDownTest() {
 	log.StandardLogger().SetOutput(os.Stderr)
 }
 
-func (ts *DiffLocalTestSuite) TestCmd() {
-	s := &DiffLocal{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
+func (ts *DiffPlanTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &DiffLocalPlan{})
 }
 
-func (ts *DiffLocalTestSuite) TestRun() {
+func (ts *DiffPlanTestSuite) TestRun() {
 	s1 := &Build{
 		plandir: ts.T().TempDir(),
 		tags:    cli.StringSlice{},
 		yml: &Yml{
 			tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
 			file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-			templater: template.TemplaterSprig,
+			templater: "sprig",
 		},
 		diff:     &Diff{},
 		diffMode: DiffModeLive,
@@ -63,13 +52,13 @@ func (ts *DiffLocalTestSuite) TestRun() {
 		yml: &Yml{
 			tpl:       filepath.Join(tests.Root, "03_helmwave.yml"),
 			file:      filepath.Join(tests.Root, "03_helmwave.yml"),
-			templater: template.TemplaterSprig,
+			templater: "sprig",
 		},
 		diff:     &Diff{},
 		diffMode: DiffModeLive,
 	}
 
-	d := DiffLocal{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
+	d := DiffLocalPlan{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
 
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s1.Run(context.Background()))
@@ -84,4 +73,10 @@ func (ts *DiffLocalTestSuite) TestRun() {
 
 	ts.Require().Contains(output, "nginx, Deployment (apps) has been added")
 	ts.Require().Contains(output, "memcached-a-redis, Secret (v1) has been removed")
+}
+
+//nolint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
+func TestDiffPlanTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(DiffPlanTestSuite))
 }

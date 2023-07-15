@@ -12,19 +12,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	TemplaterGomplate = "gomplate"
-)
-
 type gomplateTemplater struct {
 	delimiterLeft, delimiterRight string
 }
 
 func (t gomplateTemplater) Name() string {
-	return TemplaterGomplate
+	return "gomplate"
 }
 
-func (t gomplateTemplater) Render(src string, data any) ([]byte, error) {
+func (t gomplateTemplater) Render(src string, data interface{}) ([]byte, error) {
 	tpl := template.New("tpl")
 	funcs := t.funcMap(tpl, data)
 	tpl, err := tpl.Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
@@ -41,7 +37,7 @@ func (t gomplateTemplater) Render(src string, data any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (t gomplateTemplater) funcMap(tpl *template.Template, data any) template.FuncMap {
+func (t gomplateTemplater) funcMap(tpl *template.Template, data interface{}) template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading gomplate template functions")

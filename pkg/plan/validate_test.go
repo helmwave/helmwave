@@ -7,7 +7,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )
@@ -30,7 +29,7 @@ func (s *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
-	s.Require().NoError(v.SetViaRelease(mockedRelease, tmpDir, template.TemplaterSprig))
+	s.Require().NoError(v.SetViaRelease(mockedRelease, tmpDir, "sprig"))
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)

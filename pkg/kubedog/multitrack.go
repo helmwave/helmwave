@@ -82,7 +82,8 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 			err = r.handleAnnotationShowLogsOnlyForContainers(value, spec)
 
 		default:
-			switch { //nolint:gocritic // keep switch in case of more prefix-based annotations in future
+			//nolint:gocritic // keep switch in case of more prefix-based annotations in future
+			switch {
 			case strings.HasPrefix(name, LogRegexForAnnoPrefix):
 				err = r.handleAnnotationLogRegexFor(name, value, spec)
 			}
@@ -200,7 +201,7 @@ func (*Resource) handleAnnotationShowLogsOnlyForContainers(value string, spec *m
 func (*Resource) handleAnnotationLogRegexFor(name, value string, spec *multitrack.MultitrackSpec) error {
 	containerName := strings.TrimPrefix(name, LogRegexForAnnoPrefix)
 	if containerName == "" {
-		log.WithField("annotation", name).Error("annotation is invalid: can't get container name")
+		log.WithField("annotation", name).Error("annotation is invalid: cannot get container name")
 
 		return nil
 	}

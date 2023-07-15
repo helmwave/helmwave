@@ -7,16 +7,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var _ Action = (*Rollback)(nil)
-
-// Rollback is a struct for running 'rollback' command.
+// Rollback is struct for running 'rollback' command.
 type Rollback struct {
 	build     *Build
 	autoBuild bool
 	revision  int
 }
 
-// Run is the main function for 'rollback' command.
+// Run is main function for 'rollback' command.
 func (i *Rollback) Run(ctx context.Context) error {
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
@@ -28,14 +26,14 @@ func (i *Rollback) Run(ctx context.Context) error {
 		return err
 	}
 
-	return p.Rollback(ctx, i.revision)
+	return p.Rollback(i.revision)
 }
 
 // Cmd returns 'rollback' *cli.Command.
 func (i *Rollback) Cmd() *cli.Command {
 	return &cli.Command{
 		Name:   "rollback",
-		Usage:  "⏮  rollback your plan",
+		Usage:  "⏮  Rollback your plan",
 		Flags:  i.flags(),
 		Action: toCtx(i.Run),
 	}
@@ -51,7 +49,7 @@ func (i *Rollback) flags() []cli.Flag {
 		&cli.IntFlag{
 			Name:        "revision",
 			Value:       -1,
-			Usage:       "rollback all releases to this revision",
+			Usage:       "Rollback all releases to this revision",
 			Destination: &i.revision,
 		},
 	}

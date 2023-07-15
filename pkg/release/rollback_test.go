@@ -3,7 +3,6 @@
 package release_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -19,7 +18,7 @@ func (s *RollbackTestSuite) TestNonExistingRollback() {
 	rel.NameF = "blabla"
 	rel.NamespaceF = "blabla"
 
-	err := rel.Rollback(context.Background(), 1)
+	err := rel.Rollback(1)
 
 	s.Require().ErrorContains(err, "failed to rollback release blabla@blabla:")
 }

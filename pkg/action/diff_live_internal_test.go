@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -18,18 +17,8 @@ type DiffLiveTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // uses helm repository.yaml flock
-func TestDiffLiveTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(DiffLiveTestSuite))
-}
-
-func (ts *DiffLiveTestSuite) TestCmd() {
-	s := &DiffLive{}
-	cmd := s.Cmd()
-
-	ts.Require().NotNil(cmd)
-	ts.Require().NotEmpty(cmd.Name)
+func (ts *DiffLiveTestSuite) TestImplementsAction() {
+	ts.Require().Implements((*Action)(nil), &DiffLive{})
 }
 
 func (ts *DiffLiveTestSuite) TestRun() {
@@ -37,7 +26,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: "sprig",
 	}
 
 	s := &Build{
@@ -53,4 +42,10 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().NoError(d.Run(context.Background()))
+}
+
+//nolint:paralleltest // uses helm repository.yaml flock
+func TestDiffLiveTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(DiffLiveTestSuite))
 }

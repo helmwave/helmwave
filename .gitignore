@@ -1,5 +1,4 @@
 .idea/
-!.idea/dictionaries/*
 .vscode/
 !.vscode/settings.json
 dist/

@@ -18,7 +18,7 @@ func (rel *config) Get() (*release.Release, error) {
 	return r, nil
 }
 
-func (rel *config) GetValues() (map[string]any, error) {
+func (rel *config) GetValues() (map[string]interface{}, error) {
 	client := action.NewGetValues(rel.Cfg())
 
 	r, err := client.Run(rel.Name())
