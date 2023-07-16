@@ -31,47 +31,22 @@ func buildGraphMD(releases release.Configs) string {
 }
 
 func buildGraphASCII(releases release.Configs, width int) string {
-	list := make([]core.NodeInput, 0, len(releases))
-
-	maxLength := 0
-	minLength := 9999
-
-	for _, rel := range releases {
-		deps := make([]string, len(rel.DependsOn()))
-		for i, d := range rel.DependsOn() {
-			deps[i] = d.Uniq().String()
-		}
-
-		if len(rel.Uniq().String()) > maxLength {
-			maxLength = len(rel.Uniq().String())
-		}
-
-		if len(rel.Uniq().String()) < minLength {
-			minLength = len(rel.Uniq().String())
-		}
-
-		l := core.NodeInput{
-			Id:   rel.Uniq().String(),
-			Next: deps,
-		}
-
-		list = append(list, l)
-	}
+	list, maxLength, minLength := getGraphNodesForReleases(releases)
 
 	o := ascii.DrawOptions{
 		CellHeight:   3,
 		MinCellWidth: 3,
-		MaxWidth:     18,
+		MaxWidth:     3,
 		Padding:      1,
 	}
 
 	switch {
 	case 0 == width:
-		if maxLength > o.MinCellWidth {
-			o.MinCellWidth = maxLength
+		if minLength < o.MinCellWidth {
+			o.MinCellWidth = minLength
 		}
 		if maxLength > o.MaxWidth {
-			o.MaxWidth = maxLength
+			o.MaxWidth = maxLength + 4 // need to add a little bit so that it won't be shortened
 		}
 	case 1 == width:
 		return ""
@@ -91,12 +66,50 @@ func buildGraphASCII(releases release.Configs, width int) string {
 		"max-cell-width":  o.MaxWidth,
 	}).Debug("graph draw options")
 
+	if o.MinCellWidth < 0 {
+		log.Error("cannot output graph with no width available")
+
+		return ""
+	}
+
 	canvas, err := dgraph.DrawGraph(list, o)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return canvas.String()
+}
+
+func getGraphNodesForReleases(releases release.Configs) ([]core.NodeInput, int, int) {
+	list := make([]core.NodeInput, 0, len(releases))
+
+	maxLength := 0
+	minLength := 9999
+
+	for _, rel := range releases {
+		deps := make([]string, len(rel.DependsOn()))
+		for i, d := range rel.DependsOn() {
+			deps[i] = d.Uniq().String()
+		}
+
+		uniq := rel.Uniq().String()
+		if len(uniq) > maxLength {
+			maxLength = len(uniq)
+		}
+
+		if len(uniq) < minLength {
+			minLength = len(uniq)
+		}
+
+		l := core.NodeInput{
+			Id:   uniq,
+			Next: deps,
+		}
+
+		list = append(list, l)
+	}
+
+	return list, maxLength, minLength
 }
 
 func (p *Plan) BuildGraphASCII(width int) string {

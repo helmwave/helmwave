@@ -14,6 +14,24 @@ import (
 // ErrValidateFailed is returned for failed values validation.
 var ErrValidateFailed = errors.New("validate failed")
 
+type DuplicateReleasesError struct {
+	uniq uniqname.UniqName
+}
+
+func (err DuplicateReleasesError) Error() string {
+	return fmt.Sprintf("release duplicate: %s", err.uniq.String())
+}
+
+//nolint:errorlint
+func (DuplicateReleasesError) Is(target error) bool {
+	switch target.(type) {
+	case DuplicateReleasesError, *DuplicateReleasesError:
+		return true
+	default:
+		return false
+	}
+}
+
 // ValidateValuesImport checks whether all values files exist.
 func (p *Plan) ValidateValuesImport() error {
 	f := false
@@ -135,7 +153,7 @@ func (p *planBody) ValidateReleases() error {
 
 		a[r.Uniq()]++
 		if a[r.Uniq()] > 1 {
-			return errors.New("release duplicate: " + r.Uniq().String())
+			return DuplicateReleasesError{uniq: r.Uniq()}
 		}
 	}
 
