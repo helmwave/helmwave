@@ -1,6 +1,0 @@
-kind: Fixed
-body: Fix panic when provided graph width is negative and too low
-time: 2023-06-30T12:56:07.177209+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
