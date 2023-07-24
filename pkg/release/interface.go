@@ -36,6 +36,7 @@ type Config interface {
 	Chart() *Chart
 	SetChartName(string)
 	DependsOn() []*DependsOnReference
+	SetDependsOn([]*DependsOnReference)
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference

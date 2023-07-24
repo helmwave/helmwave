@@ -136,6 +136,10 @@ func (r *MockReleaseConfig) DependsOn() []*release.DependsOnReference {
 	return r.Called().Get(0).([]*release.DependsOnReference)
 }
 
+func (r *MockReleaseConfig) SetDependsOn(deps []*release.DependsOnReference) {
+	r.Called(deps)
+}
+
 func (r *MockReleaseConfig) Tags() []string {
 	return r.Called().Get(0).([]string)
 }
