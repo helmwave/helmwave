@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
@@ -25,7 +26,7 @@ func (s *RollbackTestSuite) TestRollback() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback(context.Background(), -1)
+	err := p.Rollback(context.Background(), -1, &kubedog.Config{Enabled: false})
 	s.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -42,7 +43,7 @@ func (s *RollbackTestSuite) TestRollbackError() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback(context.Background(), -1)
+	err := p.Rollback(context.Background(), -1, &kubedog.Config{Enabled: false})
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -53,7 +54,7 @@ func (s *RollbackTestSuite) TestRollbackNoReleases() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Rollback(context.Background(), -1)
+	err := p.Rollback(context.Background(), -1, &kubedog.Config{Enabled: false})
 	s.Require().NoError(err)
 }
 

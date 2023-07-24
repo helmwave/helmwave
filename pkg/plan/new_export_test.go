@@ -98,8 +98,8 @@ func (r *MockReleaseConfig) Uninstall(context.Context) (*helmRelease.UninstallRe
 	return args.Get(0).(*helmRelease.UninstallReleaseResponse), args.Error(1)
 }
 
-func (r *MockReleaseConfig) Get() (*helmRelease.Release, error) {
-	args := r.Called()
+func (r *MockReleaseConfig) Get(version int) (*helmRelease.Release, error) {
+	args := r.Called(version)
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
