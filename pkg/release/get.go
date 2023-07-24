@@ -7,8 +7,9 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Get() (*release.Release, error) {
+func (rel *config) Get(version int) (*release.Release, error) {
 	client := action.NewGet(rel.Cfg())
+	client.Version = version
 
 	r, err := client.Run(rel.Name())
 	if err != nil {
