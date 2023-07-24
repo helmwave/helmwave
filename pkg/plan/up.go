@@ -62,7 +62,7 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
 	log.Info("🛥 sync releases...")
 
 	if dog.Enabled {
-		log.Warn("🐶 kubedog is enable")
+		log.Warn("🐶 kubedog is enabled")
 		kubedog.FixLog(dog.LogWidth)
 		err = p.syncReleasesKubedog(ctx, dog)
 	} else {
@@ -319,16 +319,7 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Don't forget!
 
-	opts := multitrack.MultitrackOptions{
-		StatusProgressPeriod: kubedogConfig.StatusInterval,
-		Options: tracker.Options{
-			ParentContext: ctxCancel,
-			Timeout:       kubedogConfig.Timeout,
-			LogsFromTime:  time.Now(),
-		},
-	}
-
-	specs, kubecontext, err := p.kubedogSpecs()
+	specs, kubecontext, err := p.kubedogSyncSpecs(kubedogConfig)
 	if err != nil {
 		return err
 	}
@@ -336,6 +327,18 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	err = helper.KubeInit(kubecontext)
 	if err != nil {
 		return err
+	}
+
+	opts := multitrack.MultitrackOptions{
+		DynamicClient:        kube.DynamicClient,
+		DiscoveryClient:      kube.CachedDiscoveryClient,
+		Mapper:               kube.Mapper,
+		StatusProgressPeriod: kubedogConfig.StatusInterval,
+		Options: tracker.Options{
+			ParentContext: ctxCancel,
+			Timeout:       kubedogConfig.Timeout,
+			LogsFromTime:  time.Now(),
+		},
 	}
 
 	// Run kubedog
@@ -369,7 +372,7 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	return nil
 }
 
-func (p *Plan) kubedogSpecs() (multitrack.MultitrackSpecs, string, error) {
+func (p *Plan) kubedogSyncSpecs(kubedogConfig *kubedog.Config) (multitrack.MultitrackSpecs, string, error) {
 	foundContexts := make(map[string]bool)
 	var kubecontext string
 	specs := multitrack.MultitrackSpecs{}
@@ -384,7 +387,7 @@ func (p *Plan) kubedogSpecs() (multitrack.MultitrackSpecs, string, error) {
 		}
 
 		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
-		spec, err := kubedog.MakeSpecs(manifest, rel.Namespace())
+		spec, err := kubedog.MakeSpecs(manifest, rel.Namespace(), kubedogConfig.TrackGeneric)
 		if err != nil {
 			return specs, "", fmt.Errorf("kubedog can't parse resources: %w", err)
 		}

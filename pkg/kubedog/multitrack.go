@@ -6,12 +6,43 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
+	"github.com/werf/kubedog/pkg/tracker/resid"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
+	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack/generic"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+var ignoredGenericGK = []string{
+	"componentstatus",
+	"namespace",
+	"node",
+	"persistentvolume",
+	"mutatingwebhookconfiguration.admissionregistration.k8s.io",
+	"validatingwebhookconfiguration.admissionregistration.k8s.io",
+	"customresourcedefinition.apiextensions.k8s.io",
+	"apiservice.apiregistration.k8s.io",
+	"tokenreview.authentication.k8s.io",
+	"selfsubjectaccessreview.authorization.k8s.io",
+	"selfsubjectrulesreview.authorization.k8s.io",
+	"subjectaccessreview.authorization.k8s.io",
+	"certificatesigningrequest.certificates.k8s.io",
+	"flowschema.flowcontrol.apiserver.k8s.io",
+	"prioritylevelconfiguration.flowcontrol.apiserver.k8s.io",
+	"ingressclass.networking.k8s.io",
+	"runtimeclass.node.k8s.io",
+	"clusterrolebinding.rbac.authorization.k8s.io",
+	"clusterrole.rbac.authorization.k8s.io",
+	"priorityclass.scheduling.k8s.io",
+	"csidriver.storage.k8s.io",
+	"csinode.storage.k8s.io",
+	"storageclass.storage.k8s.io",
+	"volumeattachment.storage.k8s.io",
+}
+
 // MakeSpecs creates *multitrack.MultitrackSpecs for Resource slice in provided namespace.
-func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
+func MakeSpecs(m []Resource, ns string, trackGeneric bool) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
 	for i := 0; i < len(m); i++ {
@@ -33,6 +64,42 @@ func MakeSpecs(m []Resource, ns string) (*multitrack.MultitrackSpecs, error) {
 			specs.Jobs = append(specs.Jobs, *spec)
 		case "Canary":
 			specs.Canaries = append(specs.Canaries, *spec)
+		case "": // probably some empty manifest due to templating, just skipping it
+		default:
+			if !trackGeneric {
+				continue
+			}
+
+			// skipping some common cluster-wide resources because they are not supported by kubedog
+			if isIgnoredGenericGK(r.GroupVersionKind().GroupKind()) {
+				continue
+			}
+			s := &generic.Spec{
+				ResourceID: &resid.ResourceID{
+					Name:             spec.ResourceName,
+					Namespace:        spec.Namespace,
+					GroupVersionKind: r.GroupVersionKind(),
+				},
+				Timeout:              0,
+				NoActivityTimeout:    nil,
+				TrackTerminationMode: generic.TrackTerminationMode(spec.TrackTerminationMode),
+				FailMode:             generic.FailMode(spec.FailMode),
+				AllowFailuresCount:   spec.AllowFailuresCount,
+				ShowServiceMessages:  spec.ShowServiceMessages,
+				HideEvents:           false,
+				StatusProgressPeriod: 0,
+			}
+			err := s.Init()
+			if err != nil {
+				log.WithError(err).
+					WithField("resource name", spec.ResourceName).
+					WithField("resource type", r.GroupVersionKind().String()).
+					WithField("resource manifest", r.Spec).
+					Warn("failed to create watcher for resource, skipping the resource")
+
+				continue
+			}
+			specs.Generics = append(specs.Generics, s)
 		}
 	}
 
@@ -226,4 +293,10 @@ func splitContainers(annoValue string) (containers []string, err error) {
 	}
 
 	return containers, err
+}
+
+func isIgnoredGenericGK(gk schema.GroupKind) bool {
+	l := strings.ToLower(gk.String())
+
+	return helper.Contains(l, ignoredGenericGK)
 }

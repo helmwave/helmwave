@@ -2,7 +2,9 @@ package action
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/urfave/cli/v2"
@@ -164,5 +166,52 @@ func flagGraphWidth(v *int) *cli.IntFlag {
 		Value:       0,
 		EnvVars:     []string{"HELMWAVE_GRAPH_WIDTH"},
 		Destination: v,
+	}
+}
+
+func flagsKubedog(dog *kubedog.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.BoolFlag{
+			Name:        "kubedog",
+			Usage:       "enable/disable kubedog",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_ENABLED", "HELMWAVE_KUBEDOG"},
+			Destination: &dog.Enabled,
+		},
+		&cli.DurationFlag{
+			Name:        "kubedog-status-interval",
+			Usage:       "interval of kubedog status messages",
+			Value:       5 * time.Second,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
+			Destination: &dog.StatusInterval,
+		},
+		&cli.DurationFlag{
+			Name:        "kubedog-start-delay",
+			Usage:       "delay kubedog start, don't make it too late",
+			Value:       time.Second,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_START_DELAY"},
+			Destination: &dog.StartDelay,
+		},
+		&cli.DurationFlag{
+			Name:        "kubedog-timeout",
+			Usage:       "timeout of kubedog multitrackers",
+			Value:       5 * time.Minute,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
+			Destination: &dog.Timeout,
+		},
+		&cli.IntFlag{
+			Name:        "kubedog-log-width",
+			Usage:       "set kubedog max log line width",
+			Value:       140,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
+			Destination: &dog.LogWidth,
+		},
+		&cli.BoolFlag{
+			Name:        "kubedog-track-all",
+			Usage:       "track almost all resources, experimental",
+			Value:       false,
+			EnvVars:     []string{"HELMWAVE_KUBEDOG_TRACK_ALL"},
+			Destination: &dog.TrackGeneric,
+		},
 	}
 }
