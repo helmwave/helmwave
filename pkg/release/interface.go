@@ -27,7 +27,7 @@ type Config interface {
 	DownloadChart(string) error
 	BuildValues(string, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
-	Get() (*release.Release, error)
+	Get(int) (*release.Release, error)
 	List() (*release.Release, error)
 	Rollback(context.Context, int) error
 	Status() (*release.Release, error)
@@ -36,6 +36,7 @@ type Config interface {
 	Chart() *Chart
 	SetChartName(string)
 	DependsOn() []*DependsOnReference
+	SetDependsOn([]*DependsOnReference)
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference

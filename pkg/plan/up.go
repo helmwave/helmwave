@@ -62,7 +62,7 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
 	log.Info("🛥 sync releases...")
 
 	if dog.Enabled {
-		log.Warn("🐶 kubedog is enable")
+		log.Warn("🐶 kubedog is enabled")
 		kubedog.FixLog(dog.LogWidth)
 		err = p.syncReleasesKubedog(ctx, dog)
 	} else {
@@ -319,16 +319,7 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Don't forget!
 
-	opts := multitrack.MultitrackOptions{
-		StatusProgressPeriod: kubedogConfig.StatusInterval,
-		Options: tracker.Options{
-			ParentContext: ctxCancel,
-			Timeout:       kubedogConfig.Timeout,
-			LogsFromTime:  time.Now(),
-		},
-	}
-
-	specs, kubecontext, err := p.kubedogSpecs()
+	specs, kubecontext, err := p.kubedogSyncSpecs(kubedogConfig)
 	if err != nil {
 		return err
 	}
@@ -336,6 +327,18 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	err = helper.KubeInit(kubecontext)
 	if err != nil {
 		return err
+	}
+
+	opts := multitrack.MultitrackOptions{
+		DynamicClient:        kube.DynamicClient,
+		DiscoveryClient:      kube.CachedDiscoveryClient,
+		Mapper:               kube.Mapper,
+		StatusProgressPeriod: kubedogConfig.StatusInterval,
+		Options: tracker.Options{
+			ParentContext: ctxCancel,
+			Timeout:       kubedogConfig.Timeout,
+			LogsFromTime:  time.Now(),
+		},
 	}
 
 	// Run kubedog
@@ -369,47 +372,10 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	return nil
 }
 
-func (p *Plan) kubedogSpecs() (multitrack.MultitrackSpecs, string, error) {
-	foundContexts := make(map[string]bool)
-	var kubecontext string
-	specs := multitrack.MultitrackSpecs{}
+func (p *Plan) kubedogSyncSpecs(kubedogConfig *kubedog.Config) (multitrack.MultitrackSpecs, string, error) {
+	return p.kubedogSpecs(kubedogConfig, p.kubedogSyncManifest)
+}
 
-	for _, rel := range p.body.Releases {
-		kubecontext = rel.KubeContext()
-		foundContexts[kubecontext] = true
-
-		l := rel.Logger()
-		if !rel.HelmWait() {
-			l.Error("wait flag is disabled so kubedog can't correctly track this release")
-		}
-
-		manifest := kubedog.Parse([]byte(p.manifests[rel.Uniq()]))
-		spec, err := kubedog.MakeSpecs(manifest, rel.Namespace())
-		if err != nil {
-			return specs, "", fmt.Errorf("kubedog can't parse resources: %w", err)
-		}
-
-		l.WithFields(log.Fields{
-			"Deployments":  len(spec.Deployments),
-			"Jobs":         len(spec.Jobs),
-			"DaemonSets":   len(spec.DaemonSets),
-			"StatefulSets": len(spec.StatefulSets),
-			"Canaries":     len(spec.Canaries),
-			"Generics":     len(spec.Generics),
-			"release":      rel.Uniq(),
-		}).Trace("kubedog track resources")
-
-		specs.Jobs = append(specs.Jobs, spec.Jobs...)
-		specs.Deployments = append(specs.Deployments, spec.Deployments...)
-		specs.DaemonSets = append(specs.DaemonSets, spec.DaemonSets...)
-		specs.StatefulSets = append(specs.StatefulSets, spec.StatefulSets...)
-		specs.Canaries = append(specs.Canaries, spec.Canaries...)
-		specs.Generics = append(specs.Generics, spec.Generics...)
-	}
-
-	if len(foundContexts) > 1 {
-		return specs, "", fmt.Errorf("kubedog can't work with releases in multiple kubecontexts")
-	}
-
-	return specs, kubecontext, nil
+func (p *Plan) kubedogSyncManifest(rel release.Config) (string, error) {
+	return p.manifests[rel.Uniq()], nil
 }
