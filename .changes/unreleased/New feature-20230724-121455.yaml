@@ -1,0 +1,6 @@
+kind: New feature
+body: Add support for kubedog in `rollback` command
+time: 2023-07-24T12:14:55.268271+04:00
+custom:
+  Author: r3nic1e
+  Issue: "414"

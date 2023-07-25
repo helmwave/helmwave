@@ -37,7 +37,7 @@ func (s *GetTestSuite) TestGetNotInstalled() {
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 
-	r, err := rel.Get()
+	r, err := rel.Get(0)
 	s.Require().Error(err)
 	s.Require().Nil(r)
 
@@ -56,7 +56,7 @@ func (s *GetTestSuite) TestGet() {
 	s.Require().NoError(err)
 	s.Require().NotNil(r1)
 
-	r2, err := rel.Get()
+	r2, err := rel.Get(0)
 	s.Require().NoError(err)
 	s.Require().NotNil(r2)
 

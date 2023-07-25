@@ -27,7 +27,7 @@ type Config interface {
 	DownloadChart(string) error
 	BuildValues(string, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
-	Get() (*release.Release, error)
+	Get(int) (*release.Release, error)
 	List() (*release.Release, error)
 	Rollback(context.Context, int) error
 	Status() (*release.Release, error)

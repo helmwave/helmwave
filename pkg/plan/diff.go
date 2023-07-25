@@ -285,7 +285,7 @@ func (p *Plan) GetLive(
 		go func(wg *parallel.WaitGroup, mu *sync.Mutex, rel release.Config) {
 			defer wg.Done()
 
-			r, err := rel.Get()
+			r, err := rel.Get(0)
 
 			mu.Lock()
 			defer mu.Unlock()
