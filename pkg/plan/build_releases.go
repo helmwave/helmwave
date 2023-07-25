@@ -4,13 +4,10 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/slices"
 )
 
 func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]release.Config, error) {
-	if len(tags) == 0 {
-		return releases, nil
-	}
-
 	plan := make([]release.Config, 0)
 
 	for _, r := range releases {
@@ -46,8 +43,13 @@ func addToPlan(plan []release.Config, rel release.Config,
 	r := plan
 	r = append(r, rel)
 
-	for _, dep := range rel.DependsOn() {
+	deps := rel.DependsOn()
+
+	for i, dep := range deps {
 		found := false
+		l := rel.Logger().WithField("dependency", dep.Uniq())
+		l.Trace("searching for dependency")
+
 		for _, rel := range releases {
 			if rel.Uniq().Equal(dep.Uniq()) {
 				found = true
@@ -61,14 +63,17 @@ func addToPlan(plan []release.Config, rel release.Config,
 
 		if !found {
 			if dep.Optional {
-				log.Warnf("can't find dependency %q in available releases, skipping", dep.Uniq())
+				l.Warn("can't find dependency in available releases, skipping")
+				deps = slices.Delete(deps, i, i+1)
 			} else {
-				rel.Logger().WithField("dependency", dep.Uniq()).Error("can't find required dependency")
+				l.Error("can't find required dependency")
 
 				return nil, release.ErrDepFailed
 			}
 		}
 	}
+
+	rel.SetDependsOn(deps)
 
 	return r, nil
 }
@@ -83,6 +88,10 @@ func releaseNames(a []release.Config) (n []string) {
 
 // checkTagInclusion checks where any of release tags are included in target tags.
 func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
+	if len(targetTags) == 0 {
+		return true
+	}
+
 	if matchAll {
 		return checkAllTagsInclusion(targetTags, releaseTags)
 	}

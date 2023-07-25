@@ -208,6 +208,13 @@ func (rel *config) DependsOn() []*DependsOnReference {
 	return rel.DependsOnF
 }
 
+func (rel *config) SetDependsOn(deps []*DependsOnReference) {
+	rel.lock.Lock()
+	defer rel.lock.Unlock()
+
+	rel.DependsOnF = deps
+}
+
 func (rel *config) Tags() []string {
 	return rel.TagsF
 }
