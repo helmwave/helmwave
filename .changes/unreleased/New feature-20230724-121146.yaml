@@ -1,6 +1,0 @@
-kind: New feature
-body: Add experimental support for tracking generic resources by kubedog
-time: 2023-07-24T12:11:46.495958+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
