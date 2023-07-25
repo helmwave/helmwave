@@ -1,13 +1,15 @@
 package plan
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
-	"helm.sh/helm/v3/pkg/release"
+	helmRelease "helm.sh/helm/v3/pkg/release"
 )
 
 type KubedogTestSuite struct {
@@ -130,7 +132,7 @@ kind: StatefulSet
 	mockedRelease.On("Uniq").Return(u)
 	mockedRelease.On("Namespace").Return(relNS)
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
-	mockedRelease.On("Get", version).Return(&release.Release{Manifest: manifest}, nil)
+	mockedRelease.On("Get", version).Return(&helmRelease.Release{Manifest: manifest}, nil)
 	p.SetReleases(mockedRelease)
 
 	spec, context, err := p.kubedogRollbackSpecs(version, &kubedog.Config{TrackGeneric: true})
@@ -147,4 +149,55 @@ kind: StatefulSet
 	s.Require().Equal(kubecontext, context)
 
 	mockedRelease.AssertExpectations(s.T())
+}
+
+func (s *KubedogTestSuite) TestRollbackSpecsGetError() {
+	p := New("")
+	p.NewBody()
+
+	kubecontext := "blacontext"
+	version := 666
+	errExpected := errors.New("test error")
+
+	mockedRelease := &MockReleaseConfig{}
+	mockedRelease.On("KubeContext").Return(kubecontext)
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("Get", version).Return((*helmRelease.Release)(nil), errExpected)
+	p.SetReleases(mockedRelease)
+
+	_, _, err := p.kubedogRollbackSpecs(version, &kubedog.Config{TrackGeneric: true})
+
+	s.Require().ErrorIs(err, errExpected)
+	mockedRelease.AssertExpectations(s.T())
+}
+
+func (s *KubedogTestSuite) TestSpecsMultipleContexts() {
+	p := New("")
+	p.NewBody()
+
+	relName := "bla"
+	relNS := "blabla"
+	u, _ := uniqname.Generate(relName, relNS)
+
+	mockedRelease1 := &MockReleaseConfig{}
+	mockedRelease1.On("KubeContext").Return("bla1")
+	mockedRelease1.On("Uniq").Return(u)
+	mockedRelease1.On("Namespace").Return(relNS)
+	mockedRelease1.On("Logger").Return(log.WithField("test", s.T().Name()))
+
+	mockedRelease2 := &MockReleaseConfig{}
+	mockedRelease2.On("KubeContext").Return("bla2")
+	mockedRelease2.On("Uniq").Return(u)
+	mockedRelease2.On("Namespace").Return(relNS)
+	mockedRelease2.On("Logger").Return(log.WithField("test", s.T().Name()))
+
+	p.SetReleases(mockedRelease1, mockedRelease2)
+
+	_, _, err := p.kubedogSpecs(&kubedog.Config{TrackGeneric: true}, func(rel release.Config) (string, error) {
+		return "", nil
+	})
+
+	s.Require().ErrorIs(err, ErrMultipleKubecontexts)
+	mockedRelease1.AssertExpectations(s.T())
+	mockedRelease2.AssertExpectations(s.T())
 }
