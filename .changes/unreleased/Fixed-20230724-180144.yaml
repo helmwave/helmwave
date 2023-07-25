@@ -1,6 +1,0 @@
-kind: Fixed
-body: Do not fail when optional dependency is missing
-time: 2023-07-24T18:01:44.906929+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
