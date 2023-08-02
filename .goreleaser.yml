@@ -247,6 +247,8 @@ brews:
       assert_match version.to_s, shell_output("#{bin/"helmwave"} --version")
     install: |
       bin.install "helmwave"
+      generate_completions_from_executable(bin/"helmwave", "completion", shells: [:bash, :zsh])
+
 # Wait for goreleaser 1.20 release and change to
 #    extra_install: |
 #      generate_completions_from_executable(bin/"helmwave", "completion", shells: [:bash, :zsh])
