@@ -35,9 +35,9 @@ With 🌊 helmwave you will become a superhero:
 
 [![asciicast](https://asciinema.org/a/591181.svg)](https://asciinema.org/a/591181)
 
-## 📖 [Documentation](https://docs.helmwave.app)
+## 📖 [Documentation](https://docs.helmwave.app?utm_source=github&utm_medium=project)
 
-Documentation available at https://docs.helmwave.app
+Documentation available at [docs.helmwave.app](https://docs.helmwave.app?utm_source=github&utm_medium=project)
 
 
 ## Community, discussion, contribution, and support
