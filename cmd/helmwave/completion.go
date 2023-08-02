@@ -8,12 +8,11 @@ import (
 )
 
 const (
-	bash = `
-#! /bin/bash
+	bash = `#!/bin/bash
 
 : ${PROG:=helmwave}
 
-_cli_bash_autocomplete() {
+_helm() {
   if [[ "${COMP_WORDS[0]}" != "source" ]]; then
     local cur opts base
     COMPREPLY=()
@@ -28,14 +27,13 @@ _cli_bash_autocomplete() {
   fi
 }
 
-complete -o bashdefault -o default -o nospace -F _cli_bash_autocomplete $PROG
+complete -o bashdefault -o default -o nospace -F _helm $PROG
 unset PROG
 `
 
-	zsh = `
-#compdef helmwave
+	zsh = `#compdef helmwave
 
-_cli_zsh_autocomplete() {
+_helmwave() {
 
   local -a opts
   local cur
@@ -55,7 +53,12 @@ _cli_zsh_autocomplete() {
   return
 }
 
-compdef _cli_zsh_autocomplete helmwave
+# don't run the completion function when being source-ed or eval-ed
+if [ "$funcstack[1]" = "_helmwave" ]; then
+    _helmwave
+fi
+
+compdef _helmwave helmwave
 `
 )
 

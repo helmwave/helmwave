@@ -232,8 +232,11 @@ brews:
       owner: helmwave
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+      pull_request:
+        enabled: false
     goamd64: v1
-    description: "HelmWave is like docker-compose for helm"
+    homepage: https://helmwave.app
+    description: "True release manager for Kubernetes"
     license: "MIT"
     folder: Formula
     skip_upload: auto
@@ -241,7 +244,9 @@ brews:
     custom_block: |
       head "https://github.com/helmwave/helmwave.git", branch: "main"
     test: |
-      assert_match version.to_s, shell_output("#{bin}/helmwave --version")
+      assert_match version.to_s, shell_output("#{bin/"helmwave"} --version")
+    extra_install: |
+      generate_completions_from_executable(bin/"helmwave", "completion", shells: [:bash, :zsh])
 
 milestones:
   - close: true
