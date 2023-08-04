@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"k8s.io/apimachinery/pkg/version"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"helm.sh/helm/v3/pkg/action"
@@ -48,7 +50,7 @@ func wrapConfigFn(client *rest.Config) *rest.Config {
 func NewCfg(ns string, kubecontext string) (*action.Configuration, error) {
 	cfg := new(action.Configuration)
 	helmDriver := os.Getenv("HELM_DRIVER") // TODO: get rid of getenv in runtime
-	config := genericclioptions.NewConfigFlags(false)
+	config := genericclioptions.NewConfigFlags(true)
 	config.WrapConfigFn = wrapConfigFn
 	config.Namespace = &ns
 	if kubecontext != "" {
@@ -82,4 +84,16 @@ func NewHelm(ns string) (*helm.EnvSettings, error) {
 	}
 
 	return env, nil
+}
+
+// GetKubernetesVersion returns kubernetes server version.
+//
+//nolint:wrapcheck
+func GetKubernetesVersion(cfg *action.Configuration) (*version.Info, error) {
+	clientSet, err := cfg.KubernetesClientSet()
+	if err != nil {
+		return nil, err
+	}
+
+	return clientSet.Discovery().ServerVersion()
 }
