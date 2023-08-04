@@ -266,6 +266,27 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	ts.Require().NoError(s.Run(context.Background()), "build should not fail with diffing with previous plan")
 }
 
+func (ts *BuildTestSuite) TestMissingCRDs() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "15_helmwave.yml"),
+		file:      filepath.Join(tmpDir, "15_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		yml:     y,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+	}
+
+	ts.Require().NoError(s.Run(context.Background()))
+}
+
 type NonParallelBuildTestSuite struct {
 	suite.Suite
 }
