@@ -12,9 +12,8 @@ type DiffTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // uses helm repository.yaml flock
 func TestDiffTestSuite(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	suite.Run(t, new(DiffTestSuite))
 }
 

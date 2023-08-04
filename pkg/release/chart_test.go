@@ -2,18 +2,21 @@ package release_test
 
 import (
 	"context"
-	"path/filepath"
-	"testing"
-
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
+	"path/filepath"
+	"testing"
 )
 
 type ChartTestSuite struct {
 	suite.Suite
+}
+
+func TestChartTestSuite(t *testing.T) {
+	suite.Run(t, new(ChartTestSuite))
 }
 
 func (s *ChartTestSuite) SetupSuite() {
@@ -53,10 +56,4 @@ func (s *ChartTestSuite) TestLoadChartLocal() {
 	s.Require().Contains(err.Error(), "failed to load chart")
 	s.Require().Contains(err.Error(), "Chart.yaml file is missing")
 	s.Require().Nil(c)
-}
-
-//nolintlint:paralleltest
-func TestChartTestSuite(t *testing.T) { //nolint:paralleltest // uses helm repository.yaml flock
-	// t.Parallel()
-	suite.Run(t, new(ChartTestSuite))
 }
