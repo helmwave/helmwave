@@ -4,15 +4,16 @@ package release_test
 
 import (
 	"context"
+	"path/filepath"
+	"strings"
+	"testing"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
-	"path/filepath"
-	"strings"
-	"testing"
 )
 
 type SyncTestSuite struct {
