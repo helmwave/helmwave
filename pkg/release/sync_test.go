@@ -53,25 +53,6 @@ func (s *SyncTestSuite) TestInstallUpgrade() {
 	s.Require().NotNil(r)
 }
 
-//func (s *SyncTestSuite) TestPending() {
-//	rel := release.NewConfig()
-//	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
-//	rel.CreateNamespace = true
-//	rel.Wait = true
-//	rel.ChartF.Name = filepath.Join(tests.Root, "pending")
-//	rel.Timeout = time.Microsecond
-//
-//	r, err := rel.Sync(context.Background())
-//	s.Require().Error(err)
-//	s.Require().NotNil(r)
-//
-//	rel.Timeout = time.Minute
-//
-//	r, err = rel.Sync(context.Background())
-//	s.Require().NoError(err)
-//	s.Require().NotNil(r)
-//}
-
 func (s *SyncTestSuite) TestSyncWithoutCRD() {
 	rel := release.NewConfig()
 	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
