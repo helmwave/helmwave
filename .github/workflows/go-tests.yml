@@ -29,18 +29,11 @@ jobs:
         with:
           go-version: "1.20"
 
-      - uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
       - name: Install go modules
         run: go mod download
 
       - name: Run tests
-        run: go test -p=1 -race -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
+        run: go test -race -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
 
       - uses: codecov/codecov-action@v3
         with:

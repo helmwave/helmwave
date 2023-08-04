@@ -54,6 +54,19 @@ func (s *SyncTestSuite) TestInstallUpgrade() {
 	s.Require().NotNil(r)
 }
 
+func (s *SyncTestSuite) TestInvalidValues() {
+	rel := release.NewConfig()
+	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
+	rel.CreateNamespace = true
+	rel.Wait = false
+	rel.ChartF.Name = "bitnami/nginx"
+	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{})
+
+	r, err := rel.Sync(context.Background())
+	s.Require().Error(err)
+	s.Require().Nil(r)
+}
+
 func (s *SyncTestSuite) TestSyncWithoutCRD() {
 	rel := release.NewConfig()
 	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
