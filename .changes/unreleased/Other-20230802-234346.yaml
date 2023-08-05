@@ -1,6 +1,0 @@
-kind: Other
-body: Update homebrew formula to automatically install shell completions
-time: 2023-08-02T23:43:46.539912+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
