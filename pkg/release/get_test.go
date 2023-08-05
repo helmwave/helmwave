@@ -1,3 +1,5 @@
+//go:build ignore || integration
+
 package release_test
 
 import (

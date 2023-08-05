@@ -71,16 +71,6 @@ jobs:
         with:
           go-version: "1.20"
 
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
       - name: Download changie
         run: go install github.com/miniscruff/changie@v1
 
@@ -148,16 +138,6 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: "1.20"
-
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
 
       - name: Download changelog artifact
         uses: actions/download-artifact@v3

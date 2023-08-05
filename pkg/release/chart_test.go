@@ -16,6 +16,10 @@ type ChartTestSuite struct {
 	suite.Suite
 }
 
+func TestChartTestSuite(t *testing.T) {
+	suite.Run(t, new(ChartTestSuite))
+}
+
 func (s *ChartTestSuite) SetupSuite() {
 	var rs repo.Configs
 	str := `
@@ -53,10 +57,4 @@ func (s *ChartTestSuite) TestLoadChartLocal() {
 	s.Require().Contains(err.Error(), "failed to load chart")
 	s.Require().Contains(err.Error(), "Chart.yaml file is missing")
 	s.Require().Nil(c)
-}
-
-//nolintlint:paralleltest
-func TestChartTestSuite(t *testing.T) { //nolint:paralleltest // uses helm repository.yaml flock
-	// t.Parallel()
-	suite.Run(t, new(ChartTestSuite))
 }
