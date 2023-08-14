@@ -1,7 +1,7 @@
 package release
 
 import (
-	"errors"
+	"regexp"
 	"sync"
 	"time"
 
@@ -13,7 +13,6 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/postrender"
-	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
 type config struct {
@@ -149,17 +148,6 @@ func (rel *config) newUpgrade() *action.Upgrade {
 
 	return client
 }
-
-var (
-	// ErrNotFound is an error for not found release.
-	ErrNotFound = driver.ErrReleaseNotFound
-
-	// ErrFoundMultiple is an error for multiple releases found by name.
-	ErrFoundMultiple = errors.New("found multiple releases o_0")
-
-	// ErrDepFailed is an error thrown when dependency release fails.
-	ErrDepFailed = errors.New("dependency failed")
-)
 
 // Uniq like redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {
@@ -335,4 +323,30 @@ func (rel *config) OfflineKubeVersion() *chartutil.KubeVersion {
 	}
 
 	return nil
+}
+
+func (rel *config) Validate() error {
+	if rel.Name() == "" {
+		return ErrNameEmpty
+	}
+
+	if rel.Namespace() == "" {
+		rel.Logger().Warnf("namespace is empty. I will use the namespace of your k8s context.")
+	}
+
+	if !validateNS(rel.Namespace()) {
+		return InvalidNamespaceError{Namespace: rel.Namespace()}
+	}
+
+	if err := rel.Uniq().Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateNS(ns string) bool {
+	r := regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
+
+	return r.MatchString(ns)
 }

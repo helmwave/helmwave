@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"errors"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -32,7 +31,7 @@ func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []r
 		} else {
 			l.WithField("releases", rm).Warn("🗄 some releases depend on repository that is not defined")
 
-			return nil, errors.New("🗄 not found " + rep)
+			return nil, repo.NotFoundError{Name: rep}
 		}
 	}
 

@@ -36,7 +36,7 @@ func (s *ValidateTestSuite) TestBad() {
 	}
 
 	for _, d := range data {
-		s.Require().ErrorIs(uniqname.UniqName(d).Validate(), uniqname.ErrValidate)
+		s.Require().ErrorIs(uniqname.UniqName(d).Validate(), uniqname.ValidationError{})
 	}
 }
 

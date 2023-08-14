@@ -17,9 +17,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ErrValuesNotExist is returned when values can't be used and are skipped.
-var ErrValuesNotExist = errors.New("values file doesn't exist")
-
 // ValuesReference is used to match source values file path and temporary.
 type ValuesReference struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
@@ -121,7 +118,8 @@ func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesRef
 // Dst needs to marshal for export.
 // Also, dst needs to unmarshal for import from plan.
 func ProhibitDst(values []ValuesReference) error {
-	for _, v := range values {
+	for i := range values {
+		v := values[i]
 		if v.Dst != "" {
 			return fmt.Errorf("dst %q not allowed here, this field reserved", v.Dst)
 		}

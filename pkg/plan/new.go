@@ -3,7 +3,6 @@ package plan
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -34,14 +33,6 @@ const (
 
 	// Values is default directory for values.
 	Values = "values/"
-)
-
-var (
-	// ErrManifestDirNotFound is an error for nonexistent manifest dir.
-	ErrManifestDirNotFound = errors.New(Manifest + " dir not found")
-
-	// ErrManifestDirEmpty is an error for empty manifest dir.
-	ErrManifestDirEmpty = errors.New(Manifest + " is empty")
 )
 
 // Plan contains full helmwave state.

@@ -22,7 +22,7 @@ func (p *Plan) Import(ctx context.Context) error {
 
 	err = p.importManifest()
 	if errors.Is(err, ErrManifestDirEmpty) {
-		log.Warn(err)
+		log.WithError(err).Warn("error caught while importing manifests")
 	}
 
 	if !errors.Is(err, ErrManifestDirEmpty) && err != nil {

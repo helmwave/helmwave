@@ -37,7 +37,7 @@ func (c *Config) IsEnabled() bool {
 	return c.cacheDir != ""
 }
 
-func (c *Config) FindInCache(chart string, version string) (string, error) {
+func (c *Config) FindInCache(chart, version string) (string, error) {
 	if !c.IsEnabled() {
 		return "", fmt.Errorf("cache is disabled")
 	}
@@ -64,6 +64,6 @@ func (c *Config) AddToCache(file string) {
 	defer c.lock.Unlock()
 
 	if err := helper.CopyFile(file, c.cacheDir); err != nil {
-		log.Warn(fmt.Errorf("failed to cache chart %s: %w", file, err))
+		log.WithError(err).Warnf("failed to cache chart %s", file)
 	}
 }
