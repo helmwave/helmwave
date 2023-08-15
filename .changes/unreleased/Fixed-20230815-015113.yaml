@@ -1,0 +1,6 @@
+kind: Fixed
+body: Fix panic for some optional dependencies
+time: 2023-08-15T01:51:13.375459+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""

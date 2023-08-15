@@ -13,6 +13,7 @@ type Config interface {
 	log.LoggerGetter
 	Install() error
 	Host() string
+	Validate() error
 	// Username() string
 	// Password() string
 }

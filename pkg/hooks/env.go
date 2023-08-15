@@ -27,6 +27,6 @@ func (h *hook) getCommandEnviron(ctx context.Context) []string {
 	return env
 }
 
-func addToEnviron(env []string, key string, value string) []string {
+func addToEnviron(env []string, key, value string) []string {
 	return append(env, fmt.Sprintf("%s=%s", key, value))
 }

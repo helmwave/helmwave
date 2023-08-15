@@ -25,9 +25,6 @@ import (
 	helmRepo "helm.sh/helm/v3/pkg/repo"
 )
 
-// ErrDeploy is returned when deploy is failed for whatever reason.
-var ErrDeploy = errors.New("deploy failed")
-
 // Up syncs repositories and releases.
 func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
 	// Run hooks
@@ -98,8 +95,7 @@ func (p *Plan) syncRegistries(ctx context.Context) (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
-// TODO: simplify.
-func SyncRepositories(ctx context.Context, repositories repo.Configs) error { //nolint:gocognit
+func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exists
@@ -159,11 +155,11 @@ func SyncRepositories(ctx context.Context, repositories repo.Configs) error { //
 	return nil
 }
 
-func (p *Plan) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
+func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
 	dependenciesGraph := dependency.NewGraph[uniqname.UniqName, release.Config]()
 
-	for i := range p.body.Releases {
-		rel := p.body.Releases[i]
+	for i := range p.Releases {
+		rel := p.Releases[i]
 		err := dependenciesGraph.NewNode(rel.Uniq(), rel)
 		if err != nil {
 			return nil, err
@@ -195,7 +191,7 @@ func getParallelLimit(ctx context.Context, releases release.Configs) int {
 }
 
 func (p *Plan) syncReleases(ctx context.Context) (err error) {
-	dependenciesGraph, err := p.generateDependencyGraph()
+	dependenciesGraph, err := p.body.generateDependencyGraph()
 	if err != nil {
 		return err
 	}
@@ -256,7 +252,7 @@ func (p *Plan) syncRelease(
 	l.Info("🛥 deploying... ")
 
 	if _, err := rel.Sync(ctx); err != nil {
-		l.WithError(err).Error("❌")
+		l.WithError(err).Error("❌ failed to deploy")
 
 		if rel.AllowFailure() {
 			l.Errorf("release is allowed to fail, markind as succeeded to dependencies")

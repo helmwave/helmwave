@@ -1,15 +1,11 @@
 package release
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"gopkg.in/yaml.v3"
 )
-
-// ErrMissingDependency is returned when values can't be used and are skipped.
-var ErrMissingDependency = errors.New("dependency is missing")
 
 type DependencyType int
 

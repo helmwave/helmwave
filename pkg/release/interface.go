@@ -45,6 +45,7 @@ type Config interface {
 	Cfg() *action.Configuration
 	HooksDisabled() bool
 	OfflineKubeVersion() *chartutil.KubeVersion
+	Validate() error
 }
 
 // Configs type of array Config.
@@ -71,4 +72,18 @@ func (Configs) JSONSchema() *jsonschema.Schema {
 	var l []*config
 
 	return r.Reflect(&l)
+}
+
+func (r Configs) Contains(rel Config) (Config, bool) {
+	return r.ContainsUniq(rel.Uniq())
+}
+
+func (r Configs) ContainsUniq(uniq uniqname.UniqName) (Config, bool) {
+	for _, rel := range r {
+		if rel.Uniq().Equal(uniq) {
+			return rel, true
+		}
+	}
+
+	return nil, false
 }

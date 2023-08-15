@@ -4,7 +4,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/exp/slices"
 )
 
 func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]release.Config, error) {
@@ -25,57 +24,54 @@ func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]r
 	return plan, nil
 }
 
-//nolintlint:nestif
-//nolint:gocognit
-func addToPlan(plan []release.Config, rel release.Config,
-	releases []release.Config,
-) ([]release.Config, error) {
-	for _, r := range plan {
-		if r.Uniq() == rel.Uniq() {
-			if r != rel {
-				return nil, DuplicateReleasesError{uniq: rel.Uniq()}
-			} else {
-				return plan, nil
-			}
+func addToPlan(
+	plan release.Configs,
+	rel release.Config,
+	releases release.Configs,
+) (release.Configs, error) {
+	if r, contains := plan.Contains(rel); contains {
+		if r != rel {
+			return nil, release.DuplicateReleasesError{Uniq: rel.Uniq()}
+		} else {
+			return plan, nil
 		}
 	}
 
-	r := plan
-	r = append(r, rel)
+	newPlan := plan
+	newPlan = append(newPlan, rel)
 
 	deps := rel.DependsOn()
+	newDeps := make([]*release.DependsOnReference, 0, len(deps))
 
-	for i, dep := range deps {
-		found := false
+	for _, dep := range deps {
 		l := rel.Logger().WithField("dependency", dep.Uniq())
 		l.Trace("searching for dependency")
 
-		for _, rel := range releases {
-			if rel.Uniq().Equal(dep.Uniq()) {
-				found = true
-				var err error
-				r, err = addToPlan(r, rel, releases)
-				if err != nil {
-					return nil, err
-				}
+		r, found := releases.ContainsUniq(dep.Uniq())
+		if found {
+			var err error
+			newPlan, err = addToPlan(newPlan, r, releases)
+			if err != nil {
+				return nil, err
 			}
+
+			newDeps = append(newDeps, dep)
+
+			continue
 		}
 
-		if !found {
-			if dep.Optional {
-				l.Warn("can't find dependency in available releases, skipping")
-				deps = slices.Delete(deps, i, i+1)
-			} else {
-				l.Error("can't find required dependency")
+		if dep.Optional {
+			l.Warn("can't find dependency in available releases, skipping")
+		} else {
+			l.Error("can't find required dependency")
 
-				return nil, release.ErrDepFailed
-			}
+			return nil, release.ErrDepFailed
 		}
 	}
 
-	rel.SetDependsOn(deps)
+	rel.SetDependsOn(newDeps)
 
-	return r, nil
+	return newPlan, nil
 }
 
 func releaseNames(a []release.Config) (n []string) {

@@ -2,7 +2,6 @@ package plan
 
 import (
 	"context"
-	"errors"
 	"reflect"
 	"strings"
 	"sync"
@@ -23,17 +22,13 @@ import (
 	"k8s.io/cli-runtime/pkg/resource"
 )
 
-var (
-	// ErrPlansAreTheSame is returned when trying to compare plan with itself.
-	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
-
-	// SkippedAnnotations is a map with all annotations to be skipped by differ.
-	//nolintlint:gochecknoglobals // can't make this const
-	SkippedAnnotations = map[string][]string{
-		live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
-		helper.RootAnnoName + "skip-diff": {"true"},
-	}
-)
+// SkippedAnnotations is a map with all annotations to be skipped by differ.
+//
+//nolintlint:gochecknoglobals // can't make this const
+var SkippedAnnotations = map[string][]string{
+	live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
+	helper.RootAnnoName + "skip-diff": {"true"},
+}
 
 // DiffPlan show diff between 2 plans.
 func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
@@ -188,7 +183,8 @@ func get3WayMergeManifests(rel release.Config, oldManifest string) string { //no
 	return updatedManifest
 }
 
-func diffChartsFilter(path []string, parent reflect.Type, field reflect.StructField) bool {
+//nolint:gocritic // cannot change argument types as it is required by diff library
+func diffChartsFilter(path []string, _ reflect.Type, _ reflect.StructField) bool {
 	return len(path) >= 1 && path[0] == "Metadata"
 }
 
@@ -215,7 +211,8 @@ func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, 
 		return false
 	}
 
-	for _, change := range changelog {
+	for i := range changelog {
+		change := changelog[i]
 		l.WithField("path", strings.Join(change.Path, ".")).Infof("🆚 %q -> %q", change.From, change.To)
 	}
 
@@ -262,7 +259,7 @@ func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k
 	for _, rel := range releases {
 		if !helper.In(rel.Uniq(), visited) {
 			previous = true
-			log.Warn("🆚 ", rel.Uniq(), " was found in previous plan but not affected in new")
+			rel.Logger().Warn("🆚 release was found in previous plan but not affected in new")
 		}
 	}
 
