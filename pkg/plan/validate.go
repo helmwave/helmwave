@@ -113,7 +113,7 @@ func (p *planBody) ValidateReleases() error {
 
 		a[r.Uniq()]++
 		if a[r.Uniq()] > 1 {
-			return release.DuplicateReleasesError{Uniq: r.Uniq()}
+			return release.DuplicateError{Uniq: r.Uniq()}
 		}
 	}
 

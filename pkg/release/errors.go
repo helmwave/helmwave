@@ -28,20 +28,22 @@ var (
 
 	// ErrDepFailed is an error thrown when dependency release fails.
 	ErrDepFailed = errors.New("dependency failed")
+
+	ErrUnknownFormat = errors.New("unknown format")
 )
 
-type DuplicateReleasesError struct {
+type DuplicateError struct {
 	Uniq uniqname.UniqName
 }
 
-func (err DuplicateReleasesError) Error() string {
+func (err DuplicateError) Error() string {
 	return fmt.Sprintf("release duplicate: %s", err.Uniq.String())
 }
 
 //nolint:errorlint
-func (DuplicateReleasesError) Is(target error) bool {
+func (DuplicateError) Is(target error) bool {
 	switch target.(type) {
-	case DuplicateReleasesError, *DuplicateReleasesError:
+	case DuplicateError, *DuplicateError:
 		return true
 	default:
 		return false

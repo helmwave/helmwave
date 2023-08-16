@@ -26,7 +26,7 @@ func (c *Config) Init(dir string) error {
 	}
 	if !helper.IsExists(dir) {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
-			return fmt.Errorf("failed to create cache directory %s: %w", dir, err)
+			return NotCreatedError{Dir: dir, Err: err}
 		}
 	}
 
@@ -39,7 +39,7 @@ func (c *Config) IsEnabled() bool {
 
 func (c *Config) FindInCache(chart, version string) (string, error) {
 	if !c.IsEnabled() {
-		return "", fmt.Errorf("cache is disabled")
+		return "", ErrCacheDisabled
 	}
 
 	chartName := filepath.Base(chart)
@@ -53,7 +53,7 @@ func (c *Config) FindInCache(chart, version string) (string, error) {
 		return chartFile, nil
 	}
 
-	return "", fmt.Errorf("chart not found")
+	return "", ErrChartNotFound
 }
 
 func (c *Config) AddToCache(file string) {

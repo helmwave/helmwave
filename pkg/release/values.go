@@ -63,7 +63,7 @@ func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
 	case yaml.MappingNode:
 		err = node.Decode((*raw)(v))
 	default:
-		err = fmt.Errorf("unknown format")
+		err = ErrUnknownFormat
 	}
 
 	if err != nil {

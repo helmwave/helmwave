@@ -1,9 +1,12 @@
 package plan_test
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/helmwave/helmwave/pkg/repo"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -14,6 +17,42 @@ import (
 
 type ValidateTestSuite struct {
 	suite.Suite
+}
+
+func (s *ValidateTestSuite) TestInvalidRelease() {
+	tmpDir := s.T().TempDir()
+	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	body := p.NewBody()
+
+	err := errors.New("test error")
+
+	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease.On("Validate").Return(err)
+
+	p.SetReleases(mockedRelease)
+
+	s.Require().ErrorIs(err, body.ValidateReleases())
+	s.Require().Error(err, body.Validate())
+
+	mockedRelease.AssertExpectations(s.T())
+}
+
+func (s *ValidateTestSuite) TestInvalidRepository() {
+	tmpDir := s.T().TempDir()
+	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	body := p.NewBody()
+
+	err := errors.New("test error")
+
+	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo.On("Validate").Return(err)
+
+	p.SetRepositories(mockedRepo)
+
+	s.Require().ErrorIs(err, body.ValidateRepositories())
+	s.Require().Error(err, body.Validate())
+
+	mockedRepo.AssertExpectations(s.T())
 }
 
 func (s *ValidateTestSuite) TestValidateValues() {
@@ -69,56 +108,6 @@ func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
 	s.Require().NoError(p.ValidateValuesImport())
 }
 
-func (s *ValidateTestSuite) TestValidateRepositoryName() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
-	body := p.NewBody()
-
-	mockedRepo := &plan.MockRepoConfig{}
-	mockedRepo.On("Name").Return("")
-
-	p.SetRepositories(mockedRepo)
-
-	s.Require().Error(body.ValidateRepositories())
-	s.Require().Error(body.Validate())
-
-	mockedRepo.AssertExpectations(s.T())
-}
-
-func (s *ValidateTestSuite) TestValidateRepositoryURLEmpty() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
-	body := p.NewBody()
-
-	mockedRepo := &plan.MockRepoConfig{}
-	mockedRepo.On("Name").Return("blabla")
-	mockedRepo.On("URL").Return("")
-
-	p.SetRepositories(mockedRepo)
-
-	s.Require().Error(body.ValidateRepositories())
-	s.Require().Error(body.Validate())
-
-	mockedRepo.AssertExpectations(s.T())
-}
-
-func (s *ValidateTestSuite) TestValidateRepositoryURL() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
-	body := p.NewBody()
-
-	mockedRepo := &plan.MockRepoConfig{}
-	mockedRepo.On("Name").Return("blabla")
-	mockedRepo.On("URL").Return("\\asdasd://null")
-
-	p.SetRepositories(mockedRepo)
-
-	s.Require().Error(body.ValidateRepositories())
-	s.Require().Error(body.Validate())
-
-	mockedRepo.AssertExpectations(s.T())
-}
-
 func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
@@ -126,82 +115,14 @@ func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 
 	mockedRepo := &plan.MockRepoConfig{}
 	mockedRepo.On("Name").Return("blabla")
-	mockedRepo.On("URL").Return("http://localhost")
+	mockedRepo.On("Validate").Return(nil)
 
 	p.SetRepositories(mockedRepo, mockedRepo)
 
-	s.Require().Error(body.ValidateRepositories())
-	s.Require().Error(body.Validate())
+	s.Require().ErrorIs(repo.DuplicateError{}, body.ValidateRepositories())
+	s.Require().ErrorIs(repo.DuplicateError{}, body.Validate())
 
 	mockedRepo.AssertExpectations(s.T())
-}
-
-func (s *ValidateTestSuite) TestValidateRepository() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
-	body := p.NewBody()
-
-	mockedRepo := &plan.MockRepoConfig{}
-	mockedRepo.On("Name").Return("blabla")
-	mockedRepo.On("URL").Return("http://localhost")
-
-	p.SetRepositories(mockedRepo)
-
-	s.Require().NoError(body.ValidateRepositories())
-	s.Require().NoError(body.Validate())
-
-	mockedRepo.AssertExpectations(s.T())
-}
-
-func (s *ValidateTestSuite) TestValidateReleaseName() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
-	body := p.NewBody()
-
-	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return("")
-
-	p.SetReleases(mockedRelease)
-
-	s.Require().Error(body.ValidateReleases())
-	s.Require().Error(body.Validate())
-
-	mockedRelease.AssertExpectations(s.T())
-}
-
-func (s *ValidateTestSuite) TestValidateReleaseNamespace() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
-	body := p.NewBody()
-
-	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return("blabla")
-	mockedRelease.On("Namespace").Return("///")
-
-	p.SetReleases(mockedRelease)
-
-	s.Require().Error(body.ValidateReleases())
-	s.Require().Error(body.Validate())
-
-	mockedRelease.AssertExpectations(s.T())
-}
-
-func (s *ValidateTestSuite) TestValidateReleaseUniq() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
-	body := p.NewBody()
-
-	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return("blabla")
-	mockedRelease.On("Namespace").Return("defaultblabla")
-	mockedRelease.On("Uniq").Return()
-
-	p.SetReleases(mockedRelease)
-
-	s.Require().NoError(body.ValidateReleases())
-	s.Require().NoError(body.Validate())
-
-	mockedRelease.AssertExpectations(s.T())
 }
 
 func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
@@ -213,11 +134,12 @@ func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
 	mockedRelease.On("Name").Return("blabla")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("Validate").Return(nil)
 
 	p.SetReleases(mockedRelease, mockedRelease)
 
-	s.Require().Error(body.ValidateReleases())
-	s.Require().Error(body.Validate())
+	s.Require().ErrorIs(release.DuplicateError{}, body.ValidateReleases())
+	s.Require().ErrorIs(release.DuplicateError{}, body.Validate())
 
 	mockedRelease.AssertExpectations(s.T())
 }
@@ -228,7 +150,7 @@ func (s *ValidateTestSuite) TestValidateEmpty() {
 	body := p.NewBody()
 
 	err := body.Validate()
-	s.Require().Error(err)
+	s.Require().ErrorIs(plan.ErrEmptyPlan, err)
 }
 
 func TestValidateTestSuite(t *testing.T) {

@@ -52,7 +52,7 @@ func (h *hook) UnmarshalYAML(node *yaml.Node) error {
 	case yaml.MappingNode:
 		err = node.Decode((*raw)(h))
 	default:
-		err = fmt.Errorf("unknown format")
+		err = ErrUnknownFormat
 	}
 
 	if err != nil {
