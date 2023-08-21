@@ -1,7 +1,6 @@
 package release
 
 import (
-	"errors"
 	"sync"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/postrender"
-	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
 type config struct {
@@ -149,17 +147,6 @@ func (rel *config) newUpgrade() *action.Upgrade {
 
 	return client
 }
-
-var (
-	// ErrNotFound is an error for not found release.
-	ErrNotFound = driver.ErrReleaseNotFound
-
-	// ErrFoundMultiple is an error for multiple releases found by name.
-	ErrFoundMultiple = errors.New("found multiple releases o_0")
-
-	// ErrDepFailed is an error thrown when dependency release fails.
-	ErrDepFailed = errors.New("dependency failed")
-)
 
 // Uniq like redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {

@@ -116,7 +116,7 @@ func (p *Plan) rollbackReleasesKubedog(ctx context.Context, version int, kubedog
 	err = dogroup.WaitWithContext(ctx)
 	if err != nil && !errors.Is(err, context.Canceled) {
 		// Ignore kubedog error
-		log.WithError(err).Warn("kubedog has error while watching resources.")
+		log.WithError(err).Warn("kubedog caught error while watching resources.")
 	}
 
 	return nil

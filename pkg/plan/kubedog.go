@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -9,8 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 )
-
-var ErrMultipleKubecontexts = errors.New("kubedog can't work with releases in multiple kubecontexts")
 
 type manifestGetter func(release.Config) (string, error)
 

@@ -1,15 +1,10 @@
 package repo
 
 import (
-	"errors"
-
 	"helm.sh/helm/v3/pkg/repo"
 
 	log "github.com/sirupsen/logrus"
 )
-
-// ErrNotFound is an error for not declared repository name.
-var ErrNotFound = errors.New("repository not found")
 
 type config struct {
 	log        *log.Entry `yaml:"-" json:"-"`

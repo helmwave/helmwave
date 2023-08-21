@@ -25,7 +25,7 @@ linters:
     - gocyclo # we use cyclop
     - godox # get rid of TODOs
     - goerr113 # need to create wrapped static errors
-    - goimports # we`ve already lint with gofumpt
+    - goimports # we use gofumpt
     - golint # deprecated
     - gomnd # we want to keep magic numbers
     - ifshort # deprecated
@@ -145,16 +145,6 @@ linters-settings:
       - typeSwitchVar
       - whyNoLint
       - yodaStyleExpr
-
-      # these checks fail on generics
-      # https://github.com/go-critic/go-critic/issues/1219
-      # https://github.com/go-critic/go-critic/issues/1223
-      # https://github.com/go-critic/go-critic/issues/1224
-      # https://github.com/go-critic/go-critic/issues/1242
-      - rangeValCopy
-      - typeDefFirst
-      - hugeParam
-      - paramTypeCombine
 
     settings:
       captLocal: # must be valid enabled check name

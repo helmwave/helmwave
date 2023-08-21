@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/release"
+
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/template"
@@ -164,8 +166,8 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 	err = sb.tags.Set("nginx-b")
 	ts.Require().NoError(err)
 
-	ts.Require().ErrorIs(sfail.Run(context.Background()), plan.DuplicateReleasesError{})
-	ts.Require().ErrorIs(sfailByTag.Run(context.Background()), plan.DuplicateReleasesError{})
+	ts.Require().ErrorIs(sfail.Run(context.Background()), release.DuplicateError{})
+	ts.Require().ErrorIs(sfailByTag.Run(context.Background()), release.DuplicateError{})
 	ts.Require().NoError(sa.Run(context.Background()))
 	ts.Require().NoError(sb.Run(context.Background()))
 }

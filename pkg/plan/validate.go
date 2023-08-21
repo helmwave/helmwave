@@ -1,36 +1,13 @@
 package plan
 
 import (
-	"errors"
-	"fmt"
-	"net/url"
 	"os"
-	"regexp"
 
+	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/helmwave/helmwave/pkg/repo"
 )
-
-// ErrValidateFailed is returned for failed values validation.
-var ErrValidateFailed = errors.New("validate failed")
-
-type DuplicateReleasesError struct {
-	uniq uniqname.UniqName
-}
-
-func (err DuplicateReleasesError) Error() string {
-	return fmt.Sprintf("release duplicate: %s", err.uniq.String())
-}
-
-//nolint:errorlint
-func (DuplicateReleasesError) Is(target error) bool {
-	switch target.(type) {
-	case DuplicateReleasesError, *DuplicateReleasesError:
-		return true
-	default:
-		return false
-	}
-}
 
 // ValidateValuesImport checks whether all values files exist.
 func (p *Plan) ValidateValuesImport() error {
@@ -72,7 +49,7 @@ func (p *Plan) ValidateValuesBuild() error {
 // Validate validates releases and repositories in plan.
 func (p *planBody) Validate() error {
 	if len(p.Releases) == 0 && len(p.Repositories) == 0 && len(p.Registries) == 0 {
-		return errors.New("releases, repositories and registries are empty")
+		return ErrEmptyPlan
 	}
 
 	if err := p.ValidateRegistries(); err != nil {
@@ -94,21 +71,14 @@ func (p *planBody) Validate() error {
 func (p *planBody) ValidateRepositories() error {
 	a := make(map[string]int8)
 	for _, r := range p.Repositories {
-		if r.Name() == "" {
-			return errors.New("repository name is empty")
-		}
-
-		if r.URL() == "" {
-			return errors.New("repository url is empty")
-		}
-
-		if _, err := url.Parse(r.URL()); err != nil {
-			return errors.New("cant parse url: " + r.URL())
+		err := r.Validate()
+		if err != nil {
+			return err
 		}
 
 		a[r.Name()]++
 		if a[r.Name()] > 1 {
-			return fmt.Errorf("repository %s duplicate", r.Name())
+			return repo.DuplicateError{Name: r.Name()}
 		}
 	}
 
@@ -118,13 +88,14 @@ func (p *planBody) ValidateRepositories() error {
 func (p *planBody) ValidateRegistries() error {
 	a := make(map[string]int8)
 	for _, r := range p.Registries {
-		if r.Host() == "" {
-			return errors.New("registry name is empty")
+		err := r.Validate()
+		if err != nil {
+			return err
 		}
 
 		a[r.Host()]++
 		if a[r.Host()] > 1 {
-			return fmt.Errorf("registry %s duplicate", r.Host())
+			return registry.DuplicateError{Host: r.Host()}
 		}
 	}
 
@@ -135,33 +106,21 @@ func (p *planBody) ValidateRegistries() error {
 func (p *planBody) ValidateReleases() error {
 	a := make(map[uniqname.UniqName]int8)
 	for _, r := range p.Releases {
-		if r.Name() == "" {
-			return errors.New("release name is empty")
-		}
-
-		if r.Namespace() == "" {
-			r.Logger().Warnf("namespace is empty. I will use the namespace of your k8s context.")
-		}
-
-		if !validateNS(r.Namespace()) {
-			return errors.New("bad namespace: " + r.Namespace())
-		}
-
-		if err := r.Uniq().Validate(); err != nil {
-			return errors.New("bad uniqname: " + r.Uniq().String())
+		err := r.Validate()
+		if err != nil {
+			return err
 		}
 
 		a[r.Uniq()]++
 		if a[r.Uniq()] > 1 {
-			return DuplicateReleasesError{uniq: r.Uniq()}
+			return release.DuplicateError{Uniq: r.Uniq()}
 		}
 	}
 
+	_, err := p.generateDependencyGraph()
+	if err != nil {
+		return err
+	}
+
 	return nil
-}
-
-func validateNS(ns string) bool {
-	r := regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
-
-	return r.MatchString(ns)
 }

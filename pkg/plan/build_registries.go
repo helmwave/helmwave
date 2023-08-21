@@ -1,8 +1,6 @@
 package plan
 
 import (
-	"errors"
-
 	regi "github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -34,7 +32,7 @@ func buildRegistries(m map[string][]release.Config, in []regi.Config) (out []reg
 		} else {
 			l.WithField("releases", rm).Warn("🗄 some releases depend on repository that is not defined")
 
-			return nil, errors.New("🗄 not found " + reg)
+			return nil, regi.NotFoundError{Host: reg}
 		}
 	}
 

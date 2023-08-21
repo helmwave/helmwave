@@ -19,6 +19,7 @@ type Config interface {
 	Install(context.Context, *helm.EnvSettings, *repo.File) error
 	Name() string
 	URL() string
+	Validate() error
 }
 
 // Configs type of array Config.

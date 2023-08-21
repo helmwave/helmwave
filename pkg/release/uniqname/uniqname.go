@@ -1,7 +1,6 @@
 package uniqname
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -10,11 +9,7 @@ import (
 // Separator is a separator between release name and namespace.
 const Separator = "@"
 
-var (
-	// ErrValidate is an error for failed uniqname validation.
-	ErrValidate    = errors.New("failed to validate uniqname")
-	validateRegexp = regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
-)
+var validateRegexp = regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
 
 // UniqName is an alias for string.
 type UniqName string
@@ -49,15 +44,15 @@ func (n UniqName) Equal(a UniqName) bool {
 func (n UniqName) Validate() error {
 	s := strings.Split(n.String(), Separator)
 	if len(s) != 2 {
-		return ErrValidate
+		return ValidationError{Uniq: n.String()}
 	}
 
 	if !validateRegexp.MatchString(s[0]) {
-		return ErrValidate
+		return ValidationError{Uniq: n.String()}
 	}
 
 	if !validateRegexp.MatchString(s[1]) {
-		return ErrValidate
+		return ValidationError{Uniq: n.String()}
 	}
 
 	return nil

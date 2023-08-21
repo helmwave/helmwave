@@ -182,6 +182,10 @@ func (r *MockReleaseConfig) HooksDisabled() bool {
 	return false
 }
 
+func (r *MockReleaseConfig) Validate() error {
+	return r.Called().Error(0)
+}
+
 type MockRepoConfig struct {
 	mock.Mock
 }
@@ -204,6 +208,10 @@ func (r *MockRepoConfig) URL() string {
 
 func (r *MockRepoConfig) Logger() *log.Entry {
 	return r.Called().Get(0).(*log.Entry)
+}
+
+func (r *MockRepoConfig) Validate() error {
+	return r.Called().Error(0)
 }
 
 func (p *Plan) NewBody() *planBody {
