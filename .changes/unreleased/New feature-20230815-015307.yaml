@@ -1,6 +1,0 @@
-kind: New feature
-body: Check dependencies cycles during build
-time: 2023-08-15T01:53:07.980818+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
