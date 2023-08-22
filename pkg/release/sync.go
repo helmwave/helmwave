@@ -39,7 +39,13 @@ func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
 		}()
 	}
 
-	return rel.upgrade(ctx)
+	r, err := rel.upgrade(ctx)
+
+	if err == nil && !rel.dryRun && rel.ShowNotes {
+		rel.Logger().Infof("🗒️ release notes:\n%s", r.Info.Notes)
+	}
+
+	return r, err
 }
 
 func (rel *config) SyncDryRun(ctx context.Context) (*release.Release, error) {
