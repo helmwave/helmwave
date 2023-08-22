@@ -3,7 +3,6 @@ package hooks
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"os/exec"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -49,14 +48,14 @@ func (h *hook) run(ctx context.Context) error {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("failed to create stdout pipe: %w", err)
+		return NewCreatePipeError(err)
 	}
 
 	cmd.Env = h.getCommandEnviron(ctx)
 
 	// start the command after having set up the pipe
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to run command: %w", err)
+		return NewCommandRunError(err)
 	}
 
 	// read command's stdout line by line
@@ -72,11 +71,11 @@ func (h *hook) run(ctx context.Context) error {
 	}
 
 	if err := in.Err(); err != nil {
-		return fmt.Errorf("failed to read command stdout: %w", err)
+		return NewCommandReadOutputError(err)
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("command returned error: %w", err)
+		return NewCommandRunError(err)
 	}
 
 	return nil

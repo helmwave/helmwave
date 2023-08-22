@@ -1,7 +1,6 @@
 package hooks
 
 import (
-	"fmt"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -12,7 +11,7 @@ func (h *Hooks) UnmarshalYAML(node *yaml.Node) error {
 	rr := make([]*hook, 0)
 	err := node.Decode(&rr)
 	if err != nil {
-		return fmt.Errorf("failed to decode lifecycle config from YAML: %w", err)
+		return NewYAMLDecodeError(err)
 	}
 
 	*h = make([]Hook, len(rr))
@@ -56,7 +55,7 @@ func (h *hook) UnmarshalYAML(node *yaml.Node) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed to decode values reference %q from YAML: %w", node.Value, err)
+		return NewYAMLDecodeError(err)
 	}
 
 	return nil
