@@ -1,8 +1,6 @@
 package log
 
 import (
-	"fmt"
-
 	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	"github.com/mgutz/ansi"
@@ -76,7 +74,7 @@ func (l *Settings) Init() error {
 func (l *Settings) setLevel() error {
 	level, err := log.ParseLevel(l.level)
 	if err != nil {
-		return fmt.Errorf("failed to parse log level %s: %w", l.level, err)
+		return NewInvalidLogLevelError(l.level, err)
 	}
 	log.SetLevel(level)
 	if level >= log.DebugLevel {

@@ -85,7 +85,7 @@ func (s *ChartTestSuite) TestUnmarshalYAMLInvalid() {
 	str := "[1, 2, 3]"
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().ErrorContains(err, "unknown format")
+	s.Require().ErrorIs(err, release.ErrUnknownFormat)
 }
 
 func TestConfigTestSuite(t *testing.T) {

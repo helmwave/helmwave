@@ -44,15 +44,15 @@ func (n UniqName) Equal(a UniqName) bool {
 func (n UniqName) Validate() error {
 	s := strings.Split(n.String(), Separator)
 	if len(s) != 2 {
-		return ValidationError{Uniq: n.String()}
+		return NewValidationError(n.String())
 	}
 
 	if !validateRegexp.MatchString(s[0]) {
-		return ValidationError{Uniq: n.String()}
+		return NewValidationError(n.String())
 	}
 
 	if !validateRegexp.MatchString(s[1]) {
-		return ValidationError{Uniq: n.String()}
+		return NewValidationError(n.String())
 	}
 
 	return nil

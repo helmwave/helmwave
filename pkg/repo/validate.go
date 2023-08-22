@@ -12,7 +12,7 @@ func (c *config) Validate() error {
 	}
 
 	if _, err := url.Parse(c.URL()); err != nil {
-		return InvalidURLError{URL: c.URL()}
+		return NewInvalidURLError(c.URL())
 	}
 
 	return nil

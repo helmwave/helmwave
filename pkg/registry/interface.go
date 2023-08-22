@@ -1,8 +1,6 @@
 package registry
 
 import (
-	"fmt"
-
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
@@ -26,7 +24,7 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 	rr := make([]*config, 0)
 	err := node.Decode(&rr)
 	if err != nil {
-		return fmt.Errorf("failed to decode reg config from YAML: %w", err)
+		return NewYAMLDecodeError(err)
 	}
 
 	*r = make([]Config, len(rr))

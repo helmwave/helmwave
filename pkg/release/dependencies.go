@@ -1,8 +1,6 @@
 package release
 
 import (
-	"fmt"
-
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"gopkg.in/yaml.v3"
 )
@@ -39,7 +37,7 @@ func (d *DependsOnReference) UnmarshalYAML(node *yaml.Node) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed to decode depends_on reference %q from YAML: %w", node.Value, err)
+		return NewYAMLDecodeDependsOnError(node.Value, err)
 	}
 
 	return nil

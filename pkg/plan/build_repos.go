@@ -31,7 +31,7 @@ func buildRepositories(m map[string][]release.Config, in []repo.Config) (out []r
 		} else {
 			l.WithField("releases", rm).Warn("🗄 some releases depend on repository that is not defined")
 
-			return nil, repo.NotFoundError{Name: rep}
+			return nil, repo.NewNotFoundError(rep)
 		}
 	}
 

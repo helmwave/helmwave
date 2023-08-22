@@ -12,7 +12,7 @@ func (rel *config) Validate() error {
 	}
 
 	if !validateNS(rel.Namespace()) {
-		return InvalidNamespaceError{Namespace: rel.Namespace()}
+		return NewInvalidNamespaceError(rel.Namespace())
 	}
 
 	if err := rel.Uniq().Validate(); err != nil {
