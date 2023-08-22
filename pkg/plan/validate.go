@@ -78,7 +78,7 @@ func (p *planBody) ValidateRepositories() error {
 
 		a[r.Name()]++
 		if a[r.Name()] > 1 {
-			return repo.DuplicateError{Name: r.Name()}
+			return repo.NewDuplicateError(r.Name())
 		}
 	}
 
@@ -95,7 +95,7 @@ func (p *planBody) ValidateRegistries() error {
 
 		a[r.Host()]++
 		if a[r.Host()] > 1 {
-			return registry.DuplicateError{Host: r.Host()}
+			return registry.NewDuplicateError(r.Host())
 		}
 	}
 
@@ -113,7 +113,7 @@ func (p *planBody) ValidateReleases() error {
 
 		a[r.Uniq()]++
 		if a[r.Uniq()] > 1 {
-			return release.DuplicateError{Uniq: r.Uniq()}
+			return release.NewDuplicateError(r.Uniq())
 		}
 	}
 

@@ -31,7 +31,7 @@ func addToPlan(
 ) (release.Configs, error) {
 	if r, contains := plan.Contains(rel); contains {
 		if r != rel {
-			return nil, release.DuplicateError{Uniq: rel.Uniq()}
+			return nil, release.NewDuplicateError(rel.Uniq())
 		} else {
 			return plan, nil
 		}

@@ -26,7 +26,7 @@ func (c *Config) Init(dir string) error {
 	}
 	if !helper.IsExists(dir) {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
-			return NotCreatedError{Dir: dir, Err: err}
+			return NewNotCreatedError(dir, err)
 		}
 	}
 

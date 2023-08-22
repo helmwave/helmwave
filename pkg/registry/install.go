@@ -1,8 +1,6 @@
 package registry
 
 import (
-	"fmt"
-
 	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/registry"
 )
@@ -21,7 +19,7 @@ func (c *config) Install() error {
 		registry.LoginOptInsecure(c.Insecure),
 	)
 	if err != nil {
-		return fmt.Errorf("failed to login in helm registry: %w", err)
+		return NewLoginError(err)
 	}
 
 	return nil

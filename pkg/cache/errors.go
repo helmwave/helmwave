@@ -15,8 +15,12 @@ type NotCreatedError struct {
 	Dir string
 }
 
+func NewNotCreatedError(dir string, err error) error {
+	return &NotCreatedError{Dir: dir, Err: err}
+}
+
 func (err NotCreatedError) Error() string {
-	return fmt.Sprintf("failed to create cache directory %s: %v", err.Dir, err.Err)
+	return fmt.Sprintf("failed to create cache directory %q: %s", err.Dir, err.Err)
 }
 
 func (err NotCreatedError) Unwrap() error {

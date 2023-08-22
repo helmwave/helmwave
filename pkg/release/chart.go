@@ -64,7 +64,7 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	case yaml.MappingNode:
 		err = node.Decode((*raw)(u))
 	default:
-		err = fmt.Errorf("unknown format")
+		err = ErrUnknownFormat
 	}
 
 	if err != nil {

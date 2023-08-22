@@ -32,7 +32,7 @@ func buildRegistries(m map[string][]release.Config, in []regi.Config) (out []reg
 		} else {
 			l.WithField("releases", rm).Warn("🗄 some releases depend on repository that is not defined")
 
-			return nil, regi.NotFoundError{Host: reg}
+			return nil, regi.NewNotFoundError(reg)
 		}
 	}
 

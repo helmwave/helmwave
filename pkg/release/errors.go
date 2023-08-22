@@ -36,6 +36,10 @@ type DuplicateError struct {
 	Uniq uniqname.UniqName
 }
 
+func NewDuplicateError(uniq uniqname.UniqName) error {
+	return &DuplicateError{Uniq: uniq}
+}
+
 func (err DuplicateError) Error() string {
 	return fmt.Sprintf("release duplicate: %s", err.Uniq.String())
 }
@@ -54,6 +58,10 @@ type InvalidNamespaceError struct {
 	Namespace string
 }
 
+func NewInvalidNamespaceError(namespace string) error {
+	return &InvalidNamespaceError{Namespace: namespace}
+}
+
 func (err InvalidNamespaceError) Error() string {
 	return fmt.Sprintf("invalid namespace: %s", err.Namespace)
 }
@@ -62,6 +70,33 @@ func (err InvalidNamespaceError) Error() string {
 func (InvalidNamespaceError) Is(target error) bool {
 	switch target.(type) {
 	case InvalidNamespaceError, *InvalidNamespaceError:
+		return true
+	default:
+		return false
+	}
+}
+
+type YAMLDecodeDependsOnError struct {
+	Err       error
+	DependsOn string
+}
+
+func NewYAMLDecodeDependsOnError(depends_on string, err error) error {
+	return &YAMLDecodeDependsOnError{DependsOn: depends_on, Err: err}
+}
+
+func (err YAMLDecodeDependsOnError) Error() string {
+	return fmt.Sprintf("failed to decode depends_on reference %q from YAML: %s", err.DependsOn, err.Err)
+}
+
+func (err YAMLDecodeDependsOnError) Unwrap() error {
+	return err.Err
+}
+
+//nolint:errorlint
+func (YAMLDecodeDependsOnError) Is(target error) bool {
+	switch target.(type) {
+	case YAMLDecodeDependsOnError, *YAMLDecodeDependsOnError:
 		return true
 	default:
 		return false

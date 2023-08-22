@@ -34,6 +34,7 @@ type config struct {
 	ValuesF       []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release,oneof_type=string;object"`
 	TagsF         []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
 	PostRendererF []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
+	ShowNotes     bool                  `yaml:"show_notes,omitempty" json:"show_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install"`
 
 	Timeout time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;int,default=5m"`
 
