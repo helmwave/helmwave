@@ -1,7 +1,6 @@
 package kubedog
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/werf/kubedog/pkg/tracker/resid"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack/generic"
+	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -127,30 +127,30 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 
 		switch name {
 		// Parse Value
-		case SkipLogsAnnoName:
+		case SkipLogsAnnoName, OldSkipLogsAnnoName:
 			err = r.handleAnnotationSkipLogs(value, spec)
-		case ShowEventsAnnoName:
+		case ShowEventsAnnoName, OldShowEventsAnnoName:
 			err = r.handleAnnotationShowEvents(value, spec)
-		case LogRegexAnnoName:
+		case LogRegexAnnoName, OldLogRegexAnnoName:
 			err = r.handleAnnotationLogRegex(value, spec)
-		case FailuresAllowedPerReplicaAnnoName:
+		case FailuresAllowedPerReplicaAnnoName, OldFailuresAllowedPerReplicaAnnoName:
 			err = r.handleAnnotationFailuresAllowedPerReplica(value, spec)
 
 		// Choose value
-		case TrackTerminationModeAnnoName:
-			err = r.handleAnnotationTrackTerminationMode(value, spec)
-		case FailModeAnnoName:
-			err = r.handleAnnotationFailMode(value, spec)
+		case TrackTerminationModeAnnoName, OldTrackTerminationModeAnnoName:
+			err = r.handleAnnotationTrackTerminationMode(name, value, spec)
+		case FailModeAnnoName, OldFailModeAnnoName:
+			err = r.handleAnnotationFailMode(name, value, spec)
 
 		// Parse array
-		case SkipLogsForContainersAnnoName:
-			err = r.handleAnnotationSkipLogsForContainers(value, spec)
-		case ShowLogsOnlyForContainersAnnoName:
-			err = r.handleAnnotationShowLogsOnlyForContainers(value, spec)
+		case SkipLogsForContainersAnnoName, OldSkipLogsForContainersAnnoName:
+			err = r.handleAnnotationSkipLogsForContainers(name, value, spec)
+		case ShowLogsOnlyForContainersAnnoName, OldShowLogsOnlyForContainersAnnoName:
+			err = r.handleAnnotationShowLogsOnlyForContainers(name, value, spec)
 
 		default:
-			switch { //nolint:gocritic // keep switch in case of more prefix-based annotations in future
-			case strings.HasPrefix(name, LogRegexForAnnoPrefix):
+			switch {
+			case strings.HasPrefix(name, LogRegexForAnnoPrefix), strings.HasPrefix(name, OldLogRegexForAnnoPrefix):
 				err = r.handleAnnotationLogRegexFor(name, value, spec)
 			}
 		}
@@ -166,7 +166,7 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 func (*Resource) handleAnnotationSkipLogs(value string, spec *multitrack.MultitrackSpec) error {
 	v, err := strconv.ParseBool(value)
 	if err != nil {
-		return fmt.Errorf("failed to parse %s as boolean: %w", value, err)
+		return NewParseError("boolean", value, err)
 	}
 	spec.SkipLogs = v
 
@@ -176,7 +176,7 @@ func (*Resource) handleAnnotationSkipLogs(value string, spec *multitrack.Multitr
 func (*Resource) handleAnnotationShowEvents(value string, spec *multitrack.MultitrackSpec) error {
 	v, err := strconv.ParseBool(value)
 	if err != nil {
-		return fmt.Errorf("failed to parse %s as boolean: %w", value, err)
+		return NewParseError("boolean", value, err)
 	}
 	spec.ShowServiceMessages = v
 
@@ -186,7 +186,7 @@ func (*Resource) handleAnnotationShowEvents(value string, spec *multitrack.Multi
 func (*Resource) handleAnnotationLogRegex(value string, spec *multitrack.MultitrackSpec) error {
 	v, err := regexp.Compile(value)
 	if err != nil {
-		return fmt.Errorf("failed to compile %s as regexp: %w", value, err)
+		return NewParseError("regexp", value, err)
 	}
 	spec.LogRegex = v
 
@@ -196,7 +196,7 @@ func (*Resource) handleAnnotationLogRegex(value string, spec *multitrack.Multitr
 func (r *Resource) handleAnnotationFailuresAllowedPerReplica(value string, spec *multitrack.MultitrackSpec) error {
 	v, err := strconv.ParseUint(value, 10, 32)
 	if err != nil {
-		return fmt.Errorf("failed to parse %s as uint: %w", value, err)
+		return NewParseError("uint", value, err)
 	}
 
 	replicas := 1
@@ -209,43 +209,41 @@ func (r *Resource) handleAnnotationFailuresAllowedPerReplica(value string, spec 
 	return nil
 }
 
-func (*Resource) handleAnnotationTrackTerminationMode(value string, spec *multitrack.MultitrackSpec) error {
+func (*Resource) handleAnnotationTrackTerminationMode(anno, value string, spec *multitrack.MultitrackSpec) error {
 	v := multitrack.TrackTerminationMode(value)
 	values := []multitrack.TrackTerminationMode{
 		multitrack.WaitUntilResourceReady,
 		multitrack.NonBlocking,
 	}
-	for _, mode := range values {
-		if mode == v {
-			spec.TrackTerminationMode = v
 
-			return nil
-		}
+	if slices.Contains(values, v) {
+		spec.TrackTerminationMode = v
+
+		return nil
 	}
 
-	return fmt.Errorf("%s not found", v)
+	return NewInvalidValueError(anno, v, values)
 }
 
-func (*Resource) handleAnnotationFailMode(value string, spec *multitrack.MultitrackSpec) error {
+func (*Resource) handleAnnotationFailMode(anno, value string, spec *multitrack.MultitrackSpec) error {
 	v := multitrack.FailMode(value)
 	values := []multitrack.FailMode{
 		multitrack.IgnoreAndContinueDeployProcess,
 		multitrack.FailWholeDeployProcessImmediately,
 		multitrack.HopeUntilEndOfDeployProcess,
 	}
-	for _, mode := range values {
-		if mode == v {
-			spec.FailMode = v
 
-			return nil
-		}
+	if slices.Contains(values, v) {
+		spec.FailMode = v
+
+		return nil
 	}
 
-	return fmt.Errorf("%s not found", v)
+	return NewInvalidValueError(anno, v, values)
 }
 
-func (*Resource) handleAnnotationSkipLogsForContainers(value string, spec *multitrack.MultitrackSpec) error {
-	containers, err := splitContainers(value)
+func (*Resource) handleAnnotationSkipLogsForContainers(name, value string, spec *multitrack.MultitrackSpec) error {
+	containers, err := splitContainers(name, value)
 	if err != nil {
 		return err
 	}
@@ -254,8 +252,8 @@ func (*Resource) handleAnnotationSkipLogsForContainers(value string, spec *multi
 	return nil
 }
 
-func (*Resource) handleAnnotationShowLogsOnlyForContainers(value string, spec *multitrack.MultitrackSpec) error {
-	containers, err := splitContainers(value)
+func (*Resource) handleAnnotationShowLogsOnlyForContainers(name, value string, spec *multitrack.MultitrackSpec) error {
+	containers, err := splitContainers(name, value)
 	if err != nil {
 		return err
 	}
@@ -265,7 +263,14 @@ func (*Resource) handleAnnotationShowLogsOnlyForContainers(value string, spec *m
 }
 
 func (*Resource) handleAnnotationLogRegexFor(name, value string, spec *multitrack.MultitrackSpec) error {
-	containerName := strings.TrimPrefix(name, LogRegexForAnnoPrefix)
+	var containerName string
+	switch {
+	case strings.HasPrefix(name, LogRegexForAnnoPrefix):
+		containerName = strings.TrimPrefix(name, LogRegexForAnnoPrefix)
+	case strings.HasPrefix(name, OldLogRegexForAnnoPrefix):
+		containerName = strings.TrimPrefix(name, OldLogRegexForAnnoPrefix)
+	}
+
 	if containerName == "" {
 		log.WithField("annotation", name).Error("annotation is invalid: can't get container name")
 
@@ -274,7 +279,7 @@ func (*Resource) handleAnnotationLogRegexFor(name, value string, spec *multitrac
 
 	regexpValue, err := regexp.Compile(value)
 	if err != nil {
-		return fmt.Errorf("failed to parse %s as uint: %w", value, err)
+		return NewParseError("uint", value, err)
 	}
 
 	spec.LogRegexByContainerName[containerName] = regexpValue
@@ -282,11 +287,11 @@ func (*Resource) handleAnnotationLogRegexFor(name, value string, spec *multitrac
 	return nil
 }
 
-func splitContainers(annoValue string) (containers []string, err error) {
-	for _, v := range strings.Split(annoValue, ",") {
+func splitContainers(name, value string) (containers []string, err error) {
+	for _, v := range strings.Split(value, ",") {
 		container := strings.TrimSpace(v)
 		if container == "" {
-			return nil, fmt.Errorf("%s: containers names separated by comma expected", annoValue)
+			return nil, NewEmptyContainerNameError(name, value)
 		}
 
 		containers = append(containers, container)
