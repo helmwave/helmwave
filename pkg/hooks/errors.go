@@ -23,7 +23,6 @@ func (err CreatePipeError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (CreatePipeError) Is(target error) bool {
 	switch target.(type) {
 	case CreatePipeError, *CreatePipeError:
@@ -49,7 +48,6 @@ func (err CommandRunError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (CommandRunError) Is(target error) bool {
 	switch target.(type) {
 	case CommandRunError, *CommandRunError:
@@ -75,7 +73,6 @@ func (err CommandReadOutputError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (CommandReadOutputError) Is(target error) bool {
 	switch target.(type) {
 	case CommandReadOutputError, *CommandReadOutputError:
@@ -101,7 +98,6 @@ func (err YAMLDecodeError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (YAMLDecodeError) Is(target error) bool {
 	switch target.(type) {
 	case YAMLDecodeError, *YAMLDecodeError:

@@ -1,0 +1,6 @@
+kind: Fixed
+body: Pass `wait`, `disable_hooks` and `timeout` to `down` command
+time: 2023-08-27T18:46:15.275159+04:00
+custom:
+  Author: r3nic1e
+  Issue: "697"

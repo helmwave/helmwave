@@ -19,7 +19,6 @@ func (err DuplicateError) Error() string {
 	return fmt.Sprintf("registry duplicate: %s", err.Host)
 }
 
-//nolint:errorlint
 func (DuplicateError) Is(target error) bool {
 	switch target.(type) {
 	case DuplicateError, *DuplicateError:
@@ -41,7 +40,6 @@ func (err NotFoundError) Error() string {
 	return fmt.Sprintf("🗄 registry not found: %s", err.Host)
 }
 
-//nolint:errorlint
 func (NotFoundError) Is(target error) bool {
 	switch target.(type) {
 	case NotFoundError, *NotFoundError:
@@ -67,7 +65,6 @@ func (err LoginError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (LoginError) Is(target error) bool {
 	switch target.(type) {
 	case LoginError, *LoginError:
@@ -93,7 +90,6 @@ func (err YAMLDecodeError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (YAMLDecodeError) Is(target error) bool {
 	switch target.(type) {
 	case LoginError, *LoginError:

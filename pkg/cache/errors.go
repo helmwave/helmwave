@@ -27,7 +27,6 @@ func (err NotCreatedError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (NotCreatedError) Is(target error) bool {
 	switch target.(type) {
 	case NotCreatedError, *NotCreatedError:

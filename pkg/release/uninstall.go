@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 )
 
@@ -25,8 +24,7 @@ func (rel *config) Uninstall(ctx context.Context) (*release.UninstallReleaseResp
 		}
 	}()
 
-	client := action.NewUninstall(rel.Cfg())
-	client.Timeout = rel.Timeout
+	client := rel.newUninstall()
 
 	resp, err := client.Run(rel.Name())
 	if err != nil {
