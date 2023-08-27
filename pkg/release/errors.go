@@ -44,7 +44,6 @@ func (err DuplicateError) Error() string {
 	return fmt.Sprintf("release duplicate: %s", err.Uniq.String())
 }
 
-//nolint:errorlint
 func (DuplicateError) Is(target error) bool {
 	switch target.(type) {
 	case DuplicateError, *DuplicateError:
@@ -66,7 +65,6 @@ func (err InvalidNamespaceError) Error() string {
 	return fmt.Sprintf("invalid namespace: %s", err.Namespace)
 }
 
-//nolint:errorlint
 func (InvalidNamespaceError) Is(target error) bool {
 	switch target.(type) {
 	case InvalidNamespaceError, *InvalidNamespaceError:
@@ -93,7 +91,6 @@ func (err YAMLDecodeDependsOnError) Unwrap() error {
 	return err.Err
 }
 
-//nolint:errorlint
 func (YAMLDecodeDependsOnError) Is(target error) bool {
 	switch target.(type) {
 	case YAMLDecodeDependsOnError, *YAMLDecodeDependsOnError:
