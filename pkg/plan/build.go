@@ -46,9 +46,6 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	if err != nil {
 		return err
 	}
-	if len(p.body.Releases) == 0 {
-		return nil
-	}
 
 	// Build Values
 	log.Info("🔨 Building values...")
@@ -59,7 +56,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 
 	// Build Repositories
 	log.Info("🔨 Building repositories...")
-	_, err = p.buildRepositories()
+	p.body.Repositories, err = p.buildRepositories()
 	if err != nil {
 		return err
 	}
@@ -72,7 +69,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 
 	// Build Registries
 	log.Info("🔨 Building registries...")
-	_, err = p.buildRegistries()
+	p.body.Registries, err = p.buildRegistries()
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,6 @@
+kind: Fixed
+body: Fix bug when repositories and registries were always included into plan
+time: 2023-08-28T01:14:51.03597+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""
