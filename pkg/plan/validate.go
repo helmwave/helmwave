@@ -51,6 +51,7 @@ func (p *Plan) ValidateValuesBuild() error {
 func (p *planBody) Validate() error {
 	if len(p.Releases) == 0 && len(p.Repositories) == 0 && len(p.Registries) == 0 {
 		log.Warn("releases, repositories and registries are empty")
+
 		return nil
 	}
 
