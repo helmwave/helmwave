@@ -30,15 +30,16 @@ func (ParseError) Is(target error) bool {
 }
 
 type InvalidValueError[T any] struct {
+	value      T
 	annotation string
 	choices    []T
-	value      T
 }
 
 func NewInvalidValueError[T any](annotation string, value T, choices []T) error {
 	return &InvalidValueError[T]{annotation: annotation, value: value, choices: choices}
 }
 
+//nolint:govet // %q works perfectly
 func (err InvalidValueError[T]) Error() string {
 	return fmt.Sprintf(
 		"invalid value %q for annotation %q, should be one of %q",

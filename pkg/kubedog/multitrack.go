@@ -149,7 +149,7 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 			err = r.handleAnnotationShowLogsOnlyForContainers(name, value, spec)
 
 		default:
-			switch { //nolint:gocritic // keep switch in case of more prefix-based annotations in future
+			switch {
 			case strings.HasPrefix(name, LogRegexForAnnoPrefix), strings.HasPrefix(name, OldLogRegexForAnnoPrefix):
 				err = r.handleAnnotationLogRegexFor(name, value, spec)
 			}
@@ -209,7 +209,7 @@ func (r *Resource) handleAnnotationFailuresAllowedPerReplica(value string, spec 
 	return nil
 }
 
-func (*Resource) handleAnnotationTrackTerminationMode(anno string, value string, spec *multitrack.MultitrackSpec) error {
+func (*Resource) handleAnnotationTrackTerminationMode(anno, value string, spec *multitrack.MultitrackSpec) error {
 	v := multitrack.TrackTerminationMode(value)
 	values := []multitrack.TrackTerminationMode{
 		multitrack.WaitUntilResourceReady,
@@ -218,13 +218,14 @@ func (*Resource) handleAnnotationTrackTerminationMode(anno string, value string,
 
 	if slices.Contains(values, v) {
 		spec.TrackTerminationMode = v
+
 		return nil
 	}
 
 	return NewInvalidValueError(anno, v, values)
 }
 
-func (*Resource) handleAnnotationFailMode(anno string, value string, spec *multitrack.MultitrackSpec) error {
+func (*Resource) handleAnnotationFailMode(anno, value string, spec *multitrack.MultitrackSpec) error {
 	v := multitrack.FailMode(value)
 	values := []multitrack.FailMode{
 		multitrack.IgnoreAndContinueDeployProcess,
@@ -234,6 +235,7 @@ func (*Resource) handleAnnotationFailMode(anno string, value string, spec *multi
 
 	if slices.Contains(values, v) {
 		spec.FailMode = v
+
 		return nil
 	}
 
