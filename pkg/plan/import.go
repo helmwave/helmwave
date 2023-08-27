@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,11 +22,11 @@ func (p *Plan) Import(ctx context.Context) error {
 	}
 
 	err = p.importManifest()
-	if errors.Is(err, ErrManifestDirEmpty) {
-		log.WithError(err).Warn("error caught while importing manifests")
-	}
 
-	if !errors.Is(err, ErrManifestDirEmpty) && err != nil {
+	switch {
+	case errors.Is(err, ErrManifestDirEmpty), errors.Is(err, fs.ErrNotExist):
+		log.WithError(err).Warn("error caught while importing manifests")
+	case err != nil:
 		return err
 	}
 

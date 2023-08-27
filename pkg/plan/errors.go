@@ -14,13 +14,8 @@ var (
 
 	ErrMultipleKubecontexts = errors.New("kubedog can't work with releases in multiple kubecontexts")
 
-	// ErrManifestDirNotFound is an error for nonexistent manifest dir.
-	ErrManifestDirNotFound = fmt.Errorf("%s dir not found", Manifest)
-
 	// ErrManifestDirEmpty is an error for empty manifest dir.
-	ErrManifestDirEmpty = fmt.Errorf("%s is empty", Manifest)
-
-	ErrEmptyPlan = errors.New("releases, repositories and registries are empty")
+	ErrManifestDirEmpty = fmt.Errorf("manifests dir %s is empty", Manifest)
 
 	// ErrDeploy is returned when deploy is failed for whatever reason.
 	ErrDeploy = errors.New("deploy failed")
