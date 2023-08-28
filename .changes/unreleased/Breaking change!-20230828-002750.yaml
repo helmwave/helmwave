@@ -1,0 +1,6 @@
+kind: Breaking change!
+body: Empty plan (no repos, registries and releases) is no longer a fatal error
+time: 2023-08-28T00:27:50.471867+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""

@@ -149,8 +149,7 @@ func (s *ValidateTestSuite) TestValidateEmpty() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
-	err := body.Validate()
-	s.Require().ErrorIs(plan.ErrEmptyPlan, err)
+	s.Require().NoError(body.Validate())
 }
 
 func TestValidateTestSuite(t *testing.T) {

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/invopop/jsonschema"
-	"helm.sh/helm/v3/pkg/release"
 )
 
 // PendingStrategy is a type for enumerating strategies for handling pending releases.
@@ -34,12 +33,7 @@ func (rel *config) isPending() (bool, error) {
 		return false, err
 	}
 
-	switch status.Info.Status {
-	case release.StatusPendingInstall, release.StatusPendingRollback, release.StatusPendingUpgrade:
-		return true, nil
-	default:
-		return false, nil
-	}
+	return status.Info.Status.IsPending(), nil
 }
 
 func (rel *config) fixPending(ctx context.Context) error {

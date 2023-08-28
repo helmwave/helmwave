@@ -7,6 +7,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
+	log "github.com/sirupsen/logrus"
 )
 
 // ValidateValuesImport checks whether all values files exist.
@@ -49,7 +50,9 @@ func (p *Plan) ValidateValuesBuild() error {
 // Validate validates releases and repositories in plan.
 func (p *planBody) Validate() error {
 	if len(p.Releases) == 0 && len(p.Repositories) == 0 && len(p.Registries) == 0 {
-		return ErrEmptyPlan
+		log.Warn("releases, repositories and registries are empty")
+
+		return nil
 	}
 
 	if err := p.ValidateRegistries(); err != nil {
