@@ -1,8 +1,6 @@
 <p align="center">
-  <img  src="https://raw.githubusercontent.com/helmwave/logo/main/logo.png" style="max-height:100%;" height="300px" />
+  <img  src="https://raw.githubusercontent.com/helmwave/logo/main/signed_logo_top.svg" style="max-height:100%;" height="300px" />
 </p>
-
-<h1 align="center"> Helmwave</h1>
 
 <p align="center">
   <a href="https://github.com/helmwave/helmwave/actions?query=workflow%3Arelease"><img src="https://github.com/helmwave/helmwave/workflows/release/badge.svg" /></a>
