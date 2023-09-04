@@ -60,10 +60,16 @@ func (s *KubedogTestSuite) TestSyncSpecs() {
 
 	p.manifests[u] = `
 kind: Canary
+metadata:
+  name: blabla
 ---
 kind: DaemonSet
+metadata:
+  name: blabla
 ---
 kind: Deployment
+metadata:
+  name: blabla
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -71,8 +77,12 @@ metadata:
   name: bla
 ---
 kind: Job
+metadata:
+  name: blabla
 ---
 kind: StatefulSet
+metadata:
+  name: blabla
 ---
 `
 
@@ -111,10 +121,16 @@ func (s *KubedogTestSuite) TestRollbackSpecs() {
 
 	manifest := `
 kind: Canary
+metadata:
+  name: blabla
 ---
 kind: DaemonSet
+metadata:
+  name: blabla
 ---
 kind: Deployment
+metadata:
+  name: blabla
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -122,8 +138,12 @@ metadata:
   name: bla
 ---
 kind: Job
+metadata:
+  name: blabla
 ---
 kind: StatefulSet
+metadata:
+  name: blabla
 ---
 `
 

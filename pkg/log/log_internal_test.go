@@ -1,70 +1,82 @@
 package log
 
 import (
-	"bytes"
-	"os"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
+	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/suite"
 	"github.com/werf/logboek"
 	"k8s.io/klog/v2"
 )
 
-var buf bytes.Buffer
-
 type LogTestSuite struct {
 	suite.Suite
+
+	defaultHooks log.LevelHooks
+	logHook      *logTest.Hook
 }
 
-func (s *LogTestSuite) SetupTest() {
-	log.StandardLogger().SetOutput(&buf)
+func (ts *LogTestSuite) SetupSuite() {
+	ts.defaultHooks = log.StandardLogger().Hooks
+	ts.logHook = logTest.NewLocal(log.StandardLogger())
 }
 
-func (s *LogTestSuite) TearDownTest() {
-	log.StandardLogger().SetOutput(os.Stderr)
+func (ts *LogTestSuite) TearDownTestSuite() {
+	ts.logHook.Reset()
 }
 
-func (s *LogTestSuite) TestKLogHandler() {
+func (ts *LogTestSuite) TearDownSuite() {
+	log.StandardLogger().ReplaceHooks(ts.defaultHooks)
+}
+
+func (ts *LogTestSuite) getLoggerMessages() []string {
+	res := make([]string, len(ts.logHook.Entries))
+	for i, entry := range ts.logHook.AllEntries() {
+		res[i] = entry.Message
+	}
+
+	return res
+}
+
+func (ts *LogTestSuite) TestKLogHandler() {
 	settings := &Settings{
 		format: "json",
 		level:  "info",
 	}
-	s.Require().NoError(settings.Init())
+	ts.Require().NoError(settings.Init())
 
 	message := "123"
 	klog.Info(message)
 
-	s.Require().Zero(buf.Len())
-	buf.Reset()
+	ts.Require().Empty(ts.getLoggerMessages())
 }
 
-func (s *LogTestSuite) TestLogLevel() {
+func (ts *LogTestSuite) TestLogLevel() {
 	settings := &Settings{
 		format: "text",
 		level:  "info",
 	}
-	s.Require().NoError(settings.Init())
+	ts.Require().NoError(settings.Init())
 
 	log.Debug("test 123")
-	defer buf.Reset()
-	s.Require().Empty(buf.String(), "message below minimum level should not be logged")
+	ts.Require().Empty(ts.getLoggerMessages(), "message below minimum level should not be logged")
 }
 
-func (s *LogTestSuite) TestDebugLogLevel() {
+func (ts *LogTestSuite) TestDebugLogLevel() {
 	settings := &Settings{
 		format: "text",
 		level:  "debug",
 	}
-	s.Require().NoError(settings.Init())
+	ts.Require().NoError(settings.Init())
 
-	s.Require().True(helper.Helm.Debug, "helm debug should be enabled")
+	ts.Require().True(helper.Helm.Debug, "helm debug should be enabled")
 }
 
-func (s *LogTestSuite) TestInvalidLogLevel() {
+func (ts *LogTestSuite) TestInvalidLogLevel() {
 	settings := []struct {
 		s   *Settings
 		msg string
@@ -85,11 +97,11 @@ func (s *LogTestSuite) TestInvalidLogLevel() {
 	}
 
 	for _, item := range settings {
-		s.Require().Error(item.s.Init(), item.msg)
+		ts.Require().Error(item.s.Init(), item.msg)
 	}
 }
 
-func (s *LogTestSuite) TestFormatter() {
+func (ts *LogTestSuite) TestFormatter() {
 	settings := []struct {
 		s         *Settings
 		formatter log.Formatter
@@ -139,12 +151,12 @@ func (s *LogTestSuite) TestFormatter() {
 	}
 
 	for i := range settings {
-		s.Require().NoError(settings[i].s.Init())
-		s.Require().Equal(settings[i].formatter, log.StandardLogger().Formatter, settings[i].msg)
+		ts.Require().NoError(settings[i].s.Init())
+		ts.Require().Equal(settings[i].formatter, log.StandardLogger().Formatter, settings[i].msg)
 	}
 }
 
-func (s *LogTestSuite) TestDefaultFormatter() {
+func (ts *LogTestSuite) TestDefaultFormatter() {
 	defaultFormatter := &log.TextFormatter{}
 	log.SetFormatter(defaultFormatter)
 
@@ -168,16 +180,16 @@ func (s *LogTestSuite) TestDefaultFormatter() {
 	}
 
 	for _, item := range settings {
-		s.Require().NoError(item.s.Init())
-		s.Require().Same(defaultFormatter, log.StandardLogger().Formatter, item.msg)
+		ts.Require().NoError(item.s.Init())
+		ts.Require().Same(defaultFormatter, log.StandardLogger().Formatter, item.msg)
 	}
 }
 
-func (s *LogTestSuite) TestLogboekWidth() {
+func (ts *LogTestSuite) TestLogboekWidth() {
 	width := 1
 
 	kubedog.FixLog(width)
-	s.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
+	ts.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 
 func TestLogTestSuite(t *testing.T) { //nolintlint:paralleltest // helmwave uses single logger for the whole program

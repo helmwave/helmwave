@@ -1,7 +1,6 @@
 package action
 
 import (
-	"bytes"
 	"context"
 	"path/filepath"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
+	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
 )
@@ -270,12 +270,37 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 
 type NonParallelBuildTestSuite struct {
 	suite.Suite
+
+	defaultHooks log.LevelHooks
+	logHook      *logTest.Hook
 }
 
 //nolintlint:paralleltest // can't parallel because of setenv and uses helm repository.yaml flock
 func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(NonParallelBuildTestSuite))
+}
+
+func (ts *NonParallelBuildTestSuite) SetupSuite() {
+	ts.defaultHooks = log.StandardLogger().Hooks
+	ts.logHook = logTest.NewLocal(log.StandardLogger())
+}
+
+func (ts *NonParallelBuildTestSuite) TearDownTestSuite() {
+	ts.logHook.Reset()
+}
+
+func (ts *NonParallelBuildTestSuite) TearDownSuite() {
+	log.StandardLogger().ReplaceHooks(ts.defaultHooks)
+}
+
+func (ts *NonParallelBuildTestSuite) getLoggerMessages() []string {
+	res := make([]string, len(ts.logHook.Entries))
+	for i, entry := range ts.logHook.AllEntries() {
+		res[i] = entry.Message
+	}
+
+	return res
 }
 
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
@@ -343,17 +368,12 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 		yml:     y,
 	}
 
-	var buf bytes.Buffer
-	oldOut := log.StandardLogger().Out
-	log.StandardLogger().SetOutput(&buf)
-	defer log.StandardLogger().SetOutput(oldOut)
-
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 
-	output := buf.String()
-	ts.Require().Contains(output, "running pre_build script for nginx")
-	ts.Require().Contains(output, "run global pre_build script")
-	ts.Require().Contains(output, "running post_build script for nginx")
-	ts.Require().Contains(output, "run global post_build script")
+	logMessages := ts.getLoggerMessages()
+	ts.Require().Contains(logMessages, "running pre_build script for nginx")
+	ts.Require().Contains(logMessages, "run global pre_build script")
+	ts.Require().Contains(logMessages, "running post_build script for nginx")
+	ts.Require().Contains(logMessages, "run global post_build script")
 }

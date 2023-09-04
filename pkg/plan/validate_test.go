@@ -19,6 +19,11 @@ type ValidateTestSuite struct {
 	suite.Suite
 }
 
+func TestValidateTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(ValidateTestSuite))
+}
+
 func (s *ValidateTestSuite) TestInvalidRelease() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
@@ -150,9 +155,4 @@ func (s *ValidateTestSuite) TestValidateEmpty() {
 	body := p.NewBody()
 
 	s.Require().NoError(body.Validate())
-}
-
-func TestValidateTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(ValidateTestSuite))
 }
