@@ -62,7 +62,7 @@ jobs:
     needs:
       - tagger
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: main
@@ -111,7 +111,7 @@ jobs:
       - tagger
       - generate-changelog
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ needs.tagger.outputs.tag }}
