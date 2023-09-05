@@ -88,7 +88,7 @@ func (s *ExtraTestSuite) TestExecInvalidArg() {
 }
 
 func (s *ExtraTestSuite) TestExecError() {
-	res, err := template.Exec(s.T().Name(), []any{})
+	res, err := template.Exec("pwd", []any{"test"})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
@@ -106,6 +106,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			"b": "123",
 		},
 		"c": 123,
+		"d": map[any]any{
+			"e": "f",
+		},
 	}
 
 	tests := []struct {
@@ -120,6 +123,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			result: template.Values{
 				"a": map[string]any{"b": "123"},
 				"c": 321,
+				"d": map[any]any{
+					"e": "f",
+				},
 			},
 			fails: false,
 		},
@@ -129,6 +135,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			result: template.Values{
 				"a": map[string]any{"b": "321"},
 				"c": 321,
+				"d": map[any]any{
+					"e": "f",
+				},
 			},
 			fails: false,
 		},
@@ -138,6 +147,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			result: template.Values{
 				"a": map[string]any{"b": "321", "c": "321"},
 				"c": 321,
+				"d": map[any]any{
+					"e": "f",
+				},
 			},
 			fails: false,
 		},
@@ -146,6 +158,18 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			value:  "321",
 			result: nil,
 			fails:  true,
+		},
+		{
+			path:  "d.e",
+			value: "321",
+			result: template.Values{
+				"a": map[string]any{"b": "321", "c": "321"},
+				"c": 321,
+				"d": map[any]any{
+					"e": "321",
+				},
+			},
+			fails: false,
 		},
 	}
 
@@ -222,6 +246,9 @@ func (s *ExtraTestSuite) TestGet() {
 			"b": "123",
 		},
 		"c": 123,
+		"d": map[any]any{
+			"e": "f",
+		},
 	}
 
 	tests := []struct {
@@ -249,6 +276,11 @@ func (s *ExtraTestSuite) TestGet() {
 			result: nil,
 			fails:  true,
 		},
+		{
+			path:   "d.e",
+			result: "f",
+			fails:  false,
+		},
 	}
 
 	for i := range tests {
@@ -269,6 +301,9 @@ func (s *ExtraTestSuite) TestHasKey() {
 			"b": "123",
 		},
 		"c": 123,
+		"d": map[any]any{
+			"e": "f",
+		},
 	}
 
 	tests := []struct {
@@ -295,6 +330,11 @@ func (s *ExtraTestSuite) TestHasKey() {
 			path:   "c.a",
 			result: false,
 			fails:  true,
+		},
+		{
+			path:   "d.e",
+			result: true,
+			fails:  false,
 		},
 	}
 
