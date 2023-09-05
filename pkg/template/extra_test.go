@@ -79,6 +79,10 @@ func (s *ExtraTestSuite) TestExec() {
 	s.Require().NoError(err)
 
 	s.Require().Equal(pwd, strings.TrimSpace(res))
+
+	res, err = template.Exec("echo", []any{"-n", "123"})
+	s.Require().NoError(err)
+	s.Require().Equal("123", res)
 }
 
 func (s *ExtraTestSuite) TestExecInvalidArg() {
@@ -88,7 +92,7 @@ func (s *ExtraTestSuite) TestExecInvalidArg() {
 }
 
 func (s *ExtraTestSuite) TestExecError() {
-	res, err := template.Exec("pwd", []any{"test"})
+	res, err := template.Exec(s.T().Name(), []any{})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
