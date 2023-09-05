@@ -26,6 +26,7 @@ func (ts *InstallTestSuite) TestInstallPublic() {
 
 func (ts *InstallTestSuite) TestInstallPrivateError() {
 	reg := registry.NewConfig()
+	reg.HostF = "127.0.0.1"
 	reg.Username = ts.T().Name()
 
 	err := reg.Install()
