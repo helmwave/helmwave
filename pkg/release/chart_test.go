@@ -20,7 +20,7 @@ func TestChartTestSuite(t *testing.T) {
 	suite.Run(t, new(ChartTestSuite))
 }
 
-func (s *ChartTestSuite) SetupSuite() {
+func (ts *ChartTestSuite) SetupSuite() {
 	var rs repo.Configs
 	str := `
 - name: bitnami
@@ -28,47 +28,47 @@ func (s *ChartTestSuite) SetupSuite() {
 `
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().NoError(err)
-	s.Require().Len(rs, 1)
+	ts.Require().NoError(err)
+	ts.Require().Len(rs, 1)
 
-	s.Require().NoError(plan.SyncRepositories(context.Background(), rs))
+	ts.Require().NoError(plan.SyncRepositories(context.Background(), rs))
 }
 
-func (s *ChartTestSuite) TestLocateChartLocal() {
-	tmpDir := s.T().TempDir()
+func (ts *ChartTestSuite) TestLocateChartLocal() {
+	tmpDir := ts.T().TempDir()
 
 	rel := release.NewConfig()
 	rel.ChartF.Name = filepath.Join(tmpDir, "blabla")
 
 	c, err := rel.GetChart()
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "failed to locate chart")
-	s.Require().Nil(c)
+	ts.Require().Error(err)
+	ts.Require().Contains(err.Error(), "failed to locate chart")
+	ts.Require().Nil(c)
 }
 
-func (s *ChartTestSuite) TestLoadChartLocal() {
-	tmpDir := s.T().TempDir()
+func (ts *ChartTestSuite) TestLoadChartLocal() {
+	tmpDir := ts.T().TempDir()
 
 	rel := release.NewConfig()
 	rel.ChartF.Name = tmpDir
 
 	c, err := rel.GetChart()
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "failed to load chart")
-	s.Require().Contains(err.Error(), "Chart.yaml file is missing")
-	s.Require().Nil(c)
+	ts.Require().Error(err)
+	ts.Require().Contains(err.Error(), "failed to load chart")
+	ts.Require().Contains(err.Error(), "Chart.yaml file is missing")
+	ts.Require().Nil(c)
 }
 
-func (s *ChartTestSuite) TestUnmarshalYAMLString() {
+func (ts *ChartTestSuite) TestUnmarshalYAMLString() {
 	var rs release.Chart
 	str := "blabla"
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().NoError(err)
-	s.Require().Equal(rs.Name, str)
+	ts.Require().NoError(err)
+	ts.Require().Equal(rs.Name, str)
 }
 
-func (s *ChartTestSuite) TestUnmarshalYAMLMapping() {
+func (ts *ChartTestSuite) TestUnmarshalYAMLMapping() {
 	var rs release.Chart
 	str := `
 name: blabla
@@ -76,15 +76,70 @@ version: 1.2.3
 `
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().NoError(err)
-	s.Require().Equal(rs.Name, "blabla")
-	s.Require().Equal(rs.Version, "1.2.3")
+	ts.Require().NoError(err)
+	ts.Require().Equal(rs.Name, "blabla")
+	ts.Require().Equal(rs.Version, "1.2.3")
 }
 
-func (s *ChartTestSuite) TestUnmarshalYAMLInvalid() {
+func (ts *ChartTestSuite) TestUnmarshalYAMLInvalid() {
 	var rs release.Chart
 	str := "[1, 2, 3]"
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().ErrorIs(err, release.ErrUnknownFormat)
+	ts.Require().ErrorIs(err, release.ErrUnknownFormat)
+}
+
+func (ts *ChartTestSuite) TestIsRemote() {
+	c := &release.Chart{Name: "/nonexisting"}
+
+	ts.Require().True(c.IsRemote())
+
+	c.Name = ts.T().TempDir()
+
+	ts.Require().False(c.IsRemote())
+}
+
+func (ts *ChartTestSuite) TestChartDepsUpdRemote() {
+	rel := release.NewConfig()
+	rel.SetChartName("bitnami/redis")
+
+	err := rel.ChartDepsUpd()
+
+	ts.Require().NoError(err)
+}
+
+func (ts *ChartTestSuite) TestSkipChartDepsUpd() {
+	rel := release.NewConfig()
+	rel.ChartF.Name = ts.T().TempDir()
+	rel.ChartF.SkipDependencyUpdate = true
+
+	err := rel.ChartDepsUpd()
+
+	ts.Require().NoError(err)
+}
+
+func (ts *ChartTestSuite) TestChartDepsUpdInvalid() {
+	rel := release.NewConfig()
+	rel.ChartF.Name = ts.T().TempDir()
+
+	err := rel.ChartDepsUpd()
+
+	ts.Require().ErrorContains(err, "Chart.yaml file is missing")
+}
+
+func (ts *ChartTestSuite) TestDownloadChartRemote() {
+	rel := release.NewConfig()
+	rel.SetChartName("bitnami/redis")
+
+	err := rel.DownloadChart(ts.T().TempDir())
+
+	ts.Require().NoError(err)
+}
+
+func (ts *ChartTestSuite) TestDownloadChartLocal() {
+	rel := release.NewConfig()
+
+	err := rel.DownloadChart(ts.T().TempDir())
+
+	ts.Require().NoError(err)
 }
