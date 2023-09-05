@@ -42,7 +42,7 @@ func (s *NewTestSuite) TestLogger() {
 	uniq := uniqname.UniqName("blabla@namespace")
 	rel.On("Uniq").Return(uniq)
 
-	repo := &plan.MockRepoConfig{}
+	repo := &plan.MockRepositoryConfig{}
 	repoName := "blarepo"
 	repo.On("Name").Return(repoName)
 

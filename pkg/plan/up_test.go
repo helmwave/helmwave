@@ -24,7 +24,7 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	repoName := "blablanami"
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Name").Return(repoName)
 	e := errors.New(s.T().Name())
 	mockedRepo.On("Install").Return(e)
@@ -41,7 +41,7 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
@@ -87,7 +87,7 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)

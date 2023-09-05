@@ -42,7 +42,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 
 	// Build Releases
 	log.Info("🔨 Building releases...")
-	p.body.Releases, err = buildReleases(o.Tags, p.body.Releases, o.MatchAll)
+	p.body.Releases, err = p.buildReleases(o.Tags, o.MatchAll)
 	if err != nil {
 		return err
 	}

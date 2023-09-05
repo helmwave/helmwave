@@ -49,7 +49,7 @@ func (s *ValidateTestSuite) TestInvalidRepository() {
 
 	err := errors.New("test error")
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Validate").Return(err)
 
 	p.SetRepositories(mockedRepo)
@@ -118,7 +118,7 @@ func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Name").Return("blabla")
 	mockedRepo.On("Validate").Return(nil)
 

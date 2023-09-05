@@ -794,6 +794,7 @@ issues:
         - dupl
         - dupword
         - forcetypeassert
+        - funlen
         - gochecknoglobals
         - goconst
         - godot

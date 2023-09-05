@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -18,36 +17,60 @@ func TestBuildRepositoriesTestSuite(t *testing.T) {
 	suite.Run(t, new(BuildRepositoriesTestSuite))
 }
 
-func (s *BuildRepositoriesTestSuite) TestReposEmpty() {
-	tmpDir := s.T().TempDir()
+func (ts *BuildRepositoriesTestSuite) TestReposEmpty() {
+	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	p.body = &planBody{}
+	p.NewBody()
 
 	repos, err := p.buildRepositories()
-	s.Require().NoError(err)
-	s.Require().Empty(repos)
+	ts.Require().NoError(err)
+	ts.Require().Empty(repos)
 }
 
-func (s *BuildRepositoriesTestSuite) TestUnusedRepo() {
-	tmpDir := s.T().TempDir()
+func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
+	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	mockedRepo := &MockRepoConfig{}
+	repoName := ""
 
-	p.body = &planBody{
-		Repositories: repo.Configs{mockedRepo},
-	}
+	mockedRelease := &MockReleaseConfig{}
+	mockedRelease.On("Name").Return("redis")
+	mockedRelease.On("Repo").Return(repoName)
+	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("Chart").Return(&release.Chart{})
+
+	mockedRepo := &MockRepositoryConfig{}
+
+	p.SetRepositories(mockedRepo)
+	p.SetReleases(mockedRelease)
 
 	repos, err := p.buildRepositories()
-	s.Require().NoError(err)
-	s.Require().Empty(repos)
+	ts.Require().NoError(err)
+	ts.Require().Empty(repos, 0)
 
-	mockedRepo.AssertExpectations(s.T())
+	mockedRepo.AssertExpectations(ts.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *BuildRepositoriesTestSuite) TestSuccess() {
-	tmpDir := s.T().TempDir()
+func (ts *BuildRepositoriesTestSuite) TestUnusedRepo() {
+	tmpDir := ts.T().TempDir()
+	p := New(filepath.Join(tmpDir, Dir))
+
+	mockedRepo := &MockRepositoryConfig{}
+
+	p.SetRepositories(mockedRepo)
+
+	repos, err := p.buildRepositories()
+	ts.Require().NoError(err)
+	ts.Require().Empty(repos)
+
+	mockedRepo.AssertExpectations(ts.T())
+}
+
+func (ts *BuildRepositoriesTestSuite) TestSuccess() {
+	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
 	repoName := "blablanami"
@@ -59,25 +82,23 @@ func (s *BuildRepositoriesTestSuite) TestSuccess() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Chart").Return(&release.Chart{})
 
-	mockedRepo := &MockRepoConfig{}
+	mockedRepo := &MockRepositoryConfig{}
 	mockedRepo.On("Name").Return(repoName)
 
-	p.body = &planBody{
-		Repositories: repo.Configs{mockedRepo},
-		Releases:     release.Configs{mockedRelease},
-	}
+	p.SetRepositories(mockedRepo)
+	p.SetReleases(mockedRelease)
 
 	repos, err := p.buildRepositories()
-	s.Require().NoError(err)
-	s.Require().Len(repos, 1)
-	s.Require().Contains(repos, mockedRepo)
+	ts.Require().NoError(err)
+	ts.Require().Len(repos, 1)
+	ts.Require().Contains(repos, mockedRepo)
 
-	mockedRepo.AssertExpectations(s.T())
-	mockedRelease.AssertExpectations(s.T())
+	mockedRepo.AssertExpectations(ts.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *BuildRepositoriesTestSuite) TestMissingRepo() {
-	tmpDir := s.T().TempDir()
+func (ts *BuildRepositoriesTestSuite) TestMissingRepo() {
+	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
 	repoName := "blablanami"
@@ -89,13 +110,15 @@ func (s *BuildRepositoriesTestSuite) TestMissingRepo() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Chart").Return(&release.Chart{})
 
-	p.body = &planBody{
-		Releases: release.Configs{mockedRelease},
-	}
+	p.SetReleases(mockedRelease)
 
 	repos, err := p.buildRepositories()
-	s.Require().Error(err)
-	s.Require().Empty(repos)
+	ts.Require().Error(err)
+	ts.Require().Empty(repos)
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
+}
+
+func (ts *BuildRepositoriesTestSuite) TestRepoIsLocal() {
+	ts.Require().True(repoIsLocal(ts.T().TempDir()))
 }

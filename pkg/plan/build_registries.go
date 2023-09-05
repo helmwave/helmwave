@@ -30,7 +30,7 @@ func buildRegistries(m map[string][]release.Config, in []regi.Config) (out []reg
 			out = append(out, in[index])
 			l.Info("🗄 registry has been added to the plan")
 		} else {
-			l.WithField("releases", rm).Warn("🗄 some releases depend on repository that is not defined")
+			l.WithField("releases", rm).Warn("🗄 some releases depend on a registry that is not defined")
 
 			return nil, regi.NewNotFoundError(reg)
 		}
