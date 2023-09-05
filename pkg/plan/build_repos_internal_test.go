@@ -13,6 +13,11 @@ type BuildRepositoriesTestSuite struct {
 	suite.Suite
 }
 
+func TestBuildRepositoriesTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(BuildRepositoriesTestSuite))
+}
+
 func (s *BuildRepositoriesTestSuite) TestReposEmpty() {
 	tmpDir := s.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
@@ -93,9 +98,4 @@ func (s *BuildRepositoriesTestSuite) TestMissingRepo() {
 	s.Require().Empty(repos)
 
 	mockedRelease.AssertExpectations(s.T())
-}
-
-func TestBuildRepositoriesTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(BuildRepositoriesTestSuite))
 }

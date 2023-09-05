@@ -179,7 +179,7 @@ func (r *MockReleaseConfig) Cfg() *action.Configuration {
 }
 
 func (r *MockReleaseConfig) HooksDisabled() bool {
-	return false
+	return r.Called().Bool(0)
 }
 
 func (r *MockReleaseConfig) Validate() error {
