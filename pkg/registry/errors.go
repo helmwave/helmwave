@@ -92,7 +92,7 @@ func (err YAMLDecodeError) Unwrap() error {
 
 func (YAMLDecodeError) Is(target error) bool {
 	switch target.(type) {
-	case LoginError, *LoginError:
+	case YAMLDecodeError, *YAMLDecodeError:
 		return true
 	default:
 		return false

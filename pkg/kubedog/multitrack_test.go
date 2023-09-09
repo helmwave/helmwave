@@ -1,6 +1,7 @@
 package kubedog_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -43,6 +44,12 @@ func (s *MultitrackTestSuite) TestGenerics() {
 				Name: "bla",
 			},
 		},
+		{
+			TypeMeta: meta1.TypeMeta{
+				Kind: "ComponentStatus",
+			},
+		},
+		{},
 	}
 
 	spec, err := kubedog.MakeSpecs(res, "", false)
@@ -223,4 +230,216 @@ func (s *MultitrackTestSuite) TestAnnotations() {
 	s.Require().Len(d.LogRegexByContainerName, 1)
 	s.Require().Contains(d.LogRegexByContainerName, "bla")
 	s.Require().Equal("true", d.LogRegexByContainerName["bla"].String())
+}
+
+func (s *MultitrackTestSuite) TestAnnotationSkipLogsInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.SkipLogsAnnoName: "bla",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.ParseError{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationShowEventsInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.ShowEventsAnnoName: "bla",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.ParseError{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationLogRegexInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.LogRegexAnnoName: "*.",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.ParseError{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationFailuresAllowedPerReplicaInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.FailuresAllowedPerReplicaAnnoName: "bla",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.ParseError{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationFailuresAllowedPerReplicaMultiply() {
+	failuresAllowed := 2
+	var replicas uint32 = 10
+
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.FailuresAllowedPerReplicaAnnoName: strconv.Itoa(failuresAllowed),
+			},
+		},
+		Spec: kubedog.Spec{
+			Replicas: &replicas,
+		},
+	}
+
+	spec, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().NoError(err)
+
+	s.Require().Len(spec.Deployments, 1)
+	d := spec.Deployments[0]
+	s.Require().Equal(failuresAllowed*int(replicas), *d.AllowFailuresCount)
+}
+
+func (s *MultitrackTestSuite) TestAnnotationTrackTerminationModeInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.TrackTerminationModeAnnoName: "bla",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.InvalidValueError[multitrack.TrackTerminationMode]{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationFailModeInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.FailModeAnnoName: "bla",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.InvalidValueError[multitrack.FailMode]{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationSkipLogsForContainersInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.SkipLogsForContainersAnnoName: "",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.EmptyContainerNameError{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationShowLogsOnlyForContainersInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.ShowLogsOnlyForContainersAnnoName: "",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.EmptyContainerNameError{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationLogRegexForInvalid() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.LogRegexForAnnoPrefix + "bla": "*",
+			},
+		},
+	}
+
+	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().ErrorIs(err, kubedog.ParseError{})
+}
+
+func (s *MultitrackTestSuite) TestAnnotationLogRegexForEmptyContainer() {
+	res := kubedog.Resource{
+		TypeMeta: meta1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+		ObjectMeta: meta1.ObjectMeta{
+			Name: "bla",
+			Annotations: map[string]string{
+				kubedog.LogRegexForAnnoPrefix: "*",
+			},
+		},
+	}
+
+	spec, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
+	s.Require().NoError(err)
+
+	s.Require().Len(spec.Deployments, 1)
+	d := spec.Deployments[0]
+	s.Require().Empty(d.LogRegexByContainerName)
 }

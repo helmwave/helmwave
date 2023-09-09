@@ -44,7 +44,7 @@ func IsExists(s string) bool {
 	case os.IsNotExist(err):
 		return false
 	default:
-		// Schrodinger: file may or may not exist. See err for details.
+		// Schrödinger: file may or may not exist. See err for details.
 		// Therefore, do *NOT* use !os.IsNotExist(err) to test for file existence
 		log.Fatal(err)
 

@@ -1,6 +1,6 @@
 package main
 
-func (s *CliTestSuite) TestCompletion() {
+func (ts *CliTestSuite) TestCompletion() {
 	tests := []struct {
 		args  []string
 		fails bool
@@ -23,14 +23,14 @@ func (s *CliTestSuite) TestCompletion() {
 		},
 	}
 
-	app, _, _, _ := s.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
+	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
 
 	for _, tt := range tests {
 		err := app.Run(tt.args)
 		if tt.fails {
-			s.Error(err)
+			ts.Error(err)
 		} else {
-			s.NoError(err)
+			ts.NoError(err)
 		}
 	}
 }

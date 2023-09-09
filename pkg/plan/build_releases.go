@@ -6,13 +6,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func buildReleases(tags []string, releases []release.Config, matchAll bool) ([]release.Config, error) {
+func (p *Plan) buildReleases(tags []string, matchAll bool) ([]release.Config, error) {
 	plan := make([]release.Config, 0)
 
-	for _, r := range releases {
+	for _, r := range p.body.Releases {
 		if checkTagInclusion(tags, r.Tags(), matchAll) {
 			var err error
-			plan, err = addToPlan(plan, r, releases)
+			plan, err = addToPlan(plan, r, p.body.Releases)
 			if err != nil {
 				log.WithError(err).Error("failed to build releases plan")
 

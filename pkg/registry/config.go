@@ -25,11 +25,3 @@ func (c *config) Logger() *log.Entry {
 
 	return c.log
 }
-
-func (c *config) Validate() error {
-	if c.Host() == "" {
-		return ErrNameEmpty
-	}
-
-	return nil
-}
