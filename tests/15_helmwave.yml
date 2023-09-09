@@ -7,13 +7,14 @@ repositories:
 monitors:
   - name: main-monitor
     type: prometheus
-    url: http://localhost:9090
-    expr: |
-      up == 1
-    interval: 3s
-    success_threshold: 3
-    failure_threshold: 3
     timeout: 1s # fail if it flaps between success and failure for so long
+    prometheus:
+      url: http://localhost:9090
+      expr: |
+        up == 1
+      interval: 3s
+      success_threshold: 3
+      failure_threshold: 3
 
 .default: &default
   timeout: 1m

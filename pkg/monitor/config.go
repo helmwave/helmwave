@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/monitor/prometheus"
-	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -17,7 +16,7 @@ const (
 
 // Config is the main monitor Config.
 type config struct {
-	Prometheus *prometheus.Config `yaml:",inline" json:",inline"`
+	Prometheus *prometheus.Config `yaml:"prometheus" json:"prometheus" jsonschema:"title=Config for prometheus type,oneof_required=prometheus"`
 	subConfig  SubConfig          `yaml:"-" json:"-"`
 	log        *log.Entry         `yaml:"-" json:"-"`
 	NameF      string             `yaml:"name" json:"name" jsonschema:"required"`
@@ -77,24 +76,4 @@ func (r *config) UnmarshalYAML(node *yaml.Node) error {
 	}
 
 	return nil
-}
-
-//nolint:forcetypeassert
-func (config) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{
-		DoNotReference:             true,
-		RequiredFromJSONSchemaTags: true,
-	}
-
-	schema := r.Reflect(&_config{})
-
-	pSchema, _ := schema.Properties.Get("Prometheus")
-	promSchema := pSchema.(*jsonschema.Schema)
-	schema.Properties.Delete("Prometheus")
-	for _, k := range promSchema.Properties.Keys() {
-		v, _ := promSchema.Properties.Get(k)
-		schema.Properties.Set(k, v)
-	}
-
-	return schema
 }

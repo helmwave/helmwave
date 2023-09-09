@@ -4,21 +4,37 @@ import (
 	"context"
 
 	"github.com/helmwave/helmwave/pkg/monitor"
+	"github.com/invopop/jsonschema"
 )
+
+// MonitorFailedAction is a type for enumerating actions for handling failed monitors.
+type MonitorFailedAction string
 
 const (
-	ActionNone      = ""
-	ActionRollback  = "rollback"
-	ActionUninstall = "uninstall"
+	MonitorActionNone      MonitorFailedAction = ""
+	MonitorActionRollback  MonitorFailedAction = "rollback"
+	MonitorActionUninstall MonitorFailedAction = "uninstall"
 )
 
+func (MonitorFailedAction) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type:    "string",
+		Default: MonitorActionNone,
+		Enum: []any{
+			MonitorActionNone,
+			MonitorActionRollback,
+			MonitorActionUninstall,
+		},
+	}
+}
+
 type MonitorReference struct {
-	Name   string `yaml:"name" json:"name" jsonschema:"required"`
-	Action string `yaml:"action" json:"action" jsonschema:"enum=,enum=rollback,enum=uninstall,title=Action if monitor fails"`
+	Name   string              `yaml:"name" json:"name" jsonschema:"required"`
+	Action MonitorFailedAction `yaml:"action" json:"action" jsonschema:"title=Action if monitor fails"`
 }
 
 func (rel *config) NotifyMonitorsFailed(ctx context.Context, mons ...monitor.Config) {
-	action := ActionNone
+	action := MonitorActionNone
 
 	for _, mon := range mons {
 		allMons := rel.Monitors()
@@ -29,7 +45,7 @@ func (rel *config) NotifyMonitorsFailed(ctx context.Context, mons ...monitor.Con
 			}
 
 			if action != monRef.Action {
-				if action != ActionNone {
+				if action != MonitorActionNone {
 					rel.Logger().Warn("multiple actions to perform found, will use latest one")
 				}
 				action = monRef.Action
@@ -37,7 +53,7 @@ func (rel *config) NotifyMonitorsFailed(ctx context.Context, mons ...monitor.Con
 		}
 	}
 
-	if action == ActionNone {
+	if action == MonitorActionNone {
 		rel.Logger().Info("no actions will be performed for failed monitors")
 	} else {
 		rel.Logger().WithField("action", action).Info("chose action to perform for failed monitors")
@@ -45,14 +61,14 @@ func (rel *config) NotifyMonitorsFailed(ctx context.Context, mons ...monitor.Con
 	}
 }
 
-func (rel *config) performMonitorAction(ctx context.Context, action string) {
+func (rel *config) performMonitorAction(ctx context.Context, action MonitorFailedAction) {
 	switch action {
-	case ActionRollback:
+	case MonitorActionRollback:
 		err := rel.Rollback(ctx, 0)
 		if err != nil {
 			rel.Logger().WithError(err).Error("caught error while handling failed monitors")
 		}
-	case ActionUninstall:
+	case MonitorActionUninstall:
 		_, err := rel.Uninstall(ctx)
 		if err != nil {
 			rel.Logger().WithError(err).Error("caught error while handling failed monitors")
