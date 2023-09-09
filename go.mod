@@ -23,7 +23,6 @@ require (
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/werf/kubedog v0.9.12
 	github.com/werf/logboek v0.5.5
-	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.12.3
 	k8s.io/apimachinery v0.27.4

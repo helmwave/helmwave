@@ -2,6 +2,7 @@ package kubedog
 
 import (
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/werf/kubedog/pkg/tracker/resid"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack/generic"
-	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
