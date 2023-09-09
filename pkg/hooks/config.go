@@ -40,14 +40,7 @@ type hook struct {
 	AllowFailure bool     `yaml:"allow_failure" json:"allow_failure" jsonschema:"title=allow_failure,description=whether to fail the whole helmwave if command fail,default=false"`
 }
 
-func (hook) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{
-		DoNotReference:             true,
-		RequiredFromJSONSchemaTags: true,
-	}
-
-	type values hook
-	schema := r.Reflect(values{})
+func (hook) JSONSchemaExtend(schema *jsonschema.Schema) {
 	schema.OneOf = []*jsonschema.Schema{
 		{
 			Type: "string",
@@ -57,8 +50,6 @@ func (hook) JSONSchema() *jsonschema.Schema {
 		},
 	}
 	schema.Type = ""
-
-	return schema
 }
 
 func (h *hook) Log() *log.Entry {
