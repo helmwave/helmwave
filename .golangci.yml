@@ -760,6 +760,7 @@ linters-settings:
     ignoreSigRegexps:
       - \.New.*Error\(
     ignorePackageGlobs:
+      - context
       - encoding/*
       - github.com/pkg/*
       - github.com/helmwave/helmwave/*

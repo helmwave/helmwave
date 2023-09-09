@@ -20,6 +20,17 @@ type Lifecycle struct {
 	PreDown  Hooks `yaml:"pre_down" json:"pre_down" jsonschema:"title=pre_down,description=pre_down hooks"`
 	PostDown Hooks `yaml:"post_down" json:"post_down" jsonschema:"title=post_down,description=post_down hooks"`
 }
+type _lifecycle Lifecycle
+
+func (Lifecycle) JSONSchema() *jsonschema.Schema {
+	r := &jsonschema.Reflector{
+		DoNotReference:             false,
+		RequiredFromJSONSchemaTags: true,
+	}
+	var l _lifecycle
+
+	return r.Reflect(&l)
+}
 
 type Hooks []Hook
 
