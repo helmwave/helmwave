@@ -5,7 +5,10 @@ import (
 	"fmt"
 )
 
-var ErrFailureStreak = errors.New("monitor triggered failure threshold")
+var (
+	ErrResultNotVector = errors.New("failed to get result as vector")
+	ErrResultEmpty     = errors.New("result is empty")
+)
 
 type PrometheusClientError struct {
 	Err error

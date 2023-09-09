@@ -11,7 +11,8 @@ import (
 
 // SubConfig is an interface to manage particular typed monitor.
 type SubConfig interface {
-	Run(context.Context, *logrus.Entry) error
+	Init(context.Context, *logrus.Entry) error
+	Run(context.Context) error
 }
 
 // Config is an interface to manage particular monitor.

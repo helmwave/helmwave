@@ -11,102 +11,64 @@ import (
 )
 
 const (
-	TYPE                      = "prometheus"
-	DEFAULT_TIMEOUT           = time.Minute
-	DEFAULT_SUCCESS_THRESHOLD = 3
-	DEFAULT_FAILURE_THRESHOLD = 3
+	TYPE = "prometheus"
 )
 
 // Config is the main monitor Config.
 type Config struct {
-	URL              string        `yaml:"url" json:"url" jsonschema:"required,title=Prometheus URL"`
-	Expr             string        `yaml:"expr" json:"expr" jsonschema:"required,title=Prometheus expression"`
-	Interval         time.Duration `yaml:"interval" json:"interval" jsonschema:"default=1m"`
-	SuccessThreshold uint8         `yaml:"success_threshold" json:"success_threshold" jsonschema:"default=3"`
-	FailureThreshold uint8         `yaml:"failure_threshold" json:"failure_threshold" jsonschema:"default=3"`
-	Insecure         bool          `yaml:"insecure" json:"insecure" jsonschema:"default=false"`
+	client   v1.API     `yaml:"-" json:"-"`
+	log      *log.Entry `yaml:"-" json:"-"`
+	URL      string     `yaml:"url" json:"url" jsonschema:"required,title=Prometheus URL"`
+	Expr     string     `yaml:"expr" json:"expr" jsonschema:"required,title=Prometheus expression"`
+	Insecure bool       `yaml:"insecure" json:"insecure" jsonschema:"default=false"`
 }
 
 func NewConfig() *Config {
-	return &Config{
-		Interval:         DEFAULT_TIMEOUT,
-		SuccessThreshold: DEFAULT_SUCCESS_THRESHOLD,
-		FailureThreshold: DEFAULT_FAILURE_THRESHOLD,
-	}
+	return &Config{}
 }
 
-func (c *Config) getAPIClient() (v1.API, error) {
+func (c *Config) Init(ctx context.Context, logger *log.Entry) error {
 	client, err := api.NewClient(api.Config{Address: c.URL})
 	if err != nil {
-		return nil, NewPrometheusClientError(err)
+		return NewPrometheusClientError(err)
 	}
 
-	return v1.NewAPI(client), nil
-}
-
-func (c *Config) Run(ctx context.Context, logger *log.Entry) error {
-	client, err := c.getAPIClient()
-	if err != nil {
-		return err
-	}
-
-	ticker := time.NewTicker(c.Interval)
-	defer ticker.Stop()
-
-	var successStreak uint8 = 0
-	var failureStreak uint8 = 0
-
-	for (successStreak < c.SuccessThreshold) && (failureStreak < c.FailureThreshold) {
-		select {
-		case <-ticker.C:
-			result, l, succeeded := c.runQuery(ctx, logger, client)
-
-			if succeeded {
-				successStreak += 1
-				failureStreak = 0
-				l.WithField("streak", successStreak).Debug("monitor succeeded")
-			} else {
-				successStreak = 0
-				failureStreak += 1
-				l.WithField("streak", failureStreak).WithField("result", result).Debug("monitor did not succeed")
-			}
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-
-	if failureStreak > 0 {
-		return ErrFailureStreak
-	}
+	c.client = v1.NewAPI(client)
+	c.log = logger
 
 	return nil
 }
 
-func (c *Config) runQuery(ctx context.Context, logger *log.Entry, client v1.API) (model.Value, *log.Entry, bool) {
-	result, warns, err := client.Query(ctx, c.Expr, time.Now(), v1.WithTimeout(c.Interval))
-	l := logger
-	succeeded := true
+func (c *Config) Run(ctx context.Context) error {
+	l := c.log
 
-	if err != nil {
-		l = l.WithError(err)
-		succeeded = false
+	now := time.Now()
+
+	var queryOpts []v1.Option
+	if deadline, ok := ctx.Deadline(); ok {
+		queryOpts = append(queryOpts, v1.WithTimeout(deadline.Sub(now)))
 	}
+
+	result, warns, err := c.client.Query(ctx, c.Expr, now, queryOpts...)
 
 	if len(warns) > 0 {
 		l = l.WithField("warnings", warns)
 	}
 
-	logger.WithField("result", result).Trace("monitor response")
+	if err != nil {
+		return NewPrometheusClientError(err)
+	}
+
+	l.WithField("result", result).Trace("monitor response")
 
 	v, ok := result.(model.Vector)
 	if !ok {
-		l.Warn("failed to get result as vector")
-		succeeded = false
+		err = ErrResultNotVector
 	}
 
 	if len(v) == 0 {
-		succeeded = false
+		err = ErrResultEmpty
 	}
 
-	return result, l, succeeded
+	return err
 }
