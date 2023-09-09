@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/invopop/jsonschema"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -18,7 +17,7 @@ func TestInterfaceTestSuite(t *testing.T) {
 }
 
 func (s *InterfaceTestSuite) TestConfigsJSONSchema() {
-	schema := jsonschema.Reflect(release.Configs{})
+	schema := release.Configs{}.JSONSchema()
 
 	s.Require().NotNil(schema)
 	s.Require().Equal("array", schema.Type)

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/registry"
-	"github.com/invopop/jsonschema"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
 )
@@ -19,10 +18,10 @@ func TestInterfaceTestSuite(t *testing.T) {
 }
 
 func (ts *InterfaceTestSuite) TestConfigsJSONSchema() {
-	schema := jsonschema.Reflect(registry.Configs{})
+	schema := registry.Configs{}.JSONSchema()
 
 	ts.Require().NotNil(schema)
-	ts.Require().Equal("array", schema.Type)
+	ts.Require().Equal("array", schema.Type, schema)
 }
 
 func (ts *InterfaceTestSuite) TestUnmarshalYAMLEmpty() {
