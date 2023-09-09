@@ -44,7 +44,7 @@ We use https://pre-commit.com for git hooks
 > change a version in next files:
 
 1. [go.mod](go.mod)
-2. [Dockerfile](Dockerfile): GOLANG_VERSION=1.20
+2. [Dockerfile](Dockerfile): GOLANG_VERSION=1.21
 3. [ci](.github/workflows/goreleaser.yml)
 
 ## How to upgrade alpine version?
