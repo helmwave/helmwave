@@ -17,9 +17,9 @@ const (
 //
 // nolintlint:lll
 type DependsOnReference struct {
-	Name     string `yaml:"name" json:"name" jsonschema:"description=Uniqname (or just name if in same namespace) of dependency release"`                    //nolint:lll
-	Tag      string `yaml:"tag,omitempty" json:"tag,omitempty" jsonschema:"description=All available releases with the tag will be applied as dependencies"` //nolint:lll
-	Optional bool   `yaml:"optional" json:"optional" jsonschema:"description=Whether the dependency is required to be present in plan,default=false"`        //nolint:lll
+	Name     string `yaml:"name" json:"name" jsonschema:"description=Uniqname (or just name if in same namespace) of dependency release,oneof_required=name"`                   //nolint:lll
+	Tag      string `yaml:"tag,omitempty" json:"tag,omitempty" jsonschema:"description=All available releases with the tag will be applied as dependencies,oneof_required=tag"` //nolint:lll
+	Optional bool   `yaml:"optional" json:"optional" jsonschema:"description=Whether the dependency is required to be present in plan,default=false"`                           //nolint:lll
 }
 
 // UnmarshalYAML is used to implement InterfaceUnmarshaler interface of gopkg.in/yaml.v3.

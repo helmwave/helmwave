@@ -1,6 +1,6 @@
 module github.com/helmwave/helmwave
 
-go 1.20
+go 1.21
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/asciigraph v1.0.0
 	github.com/helmwave/logrus-emoji-formatter v1.1.0
-	github.com/invopop/jsonschema v0.7.0
+	github.com/invopop/jsonschema v0.8.0
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.12.0
@@ -23,7 +23,6 @@ require (
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/werf/kubedog v0.9.12
 	github.com/werf/logboek v0.5.5
-	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.12.3
 	k8s.io/apimachinery v0.27.4

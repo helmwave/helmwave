@@ -68,7 +68,10 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (Configs) JSONSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{DoNotReference: true}
+	r := &jsonschema.Reflector{
+		DoNotReference:             true,
+		RequiredFromJSONSchemaTags: true,
+	}
 	var l []*config
 
 	return r.Reflect(&l)

@@ -10,11 +10,11 @@ jobs:
   scanning:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Trivy
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.11.2
+        uses: aquasecurity/trivy-action@0.12.0
         with:
           image-ref: "ghcr.io/${{ github.repository }}:latest"
           format: "sarif"

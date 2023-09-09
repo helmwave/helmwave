@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/invopop/jsonschema"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,14 +18,14 @@ func TestConfigTestSuite(t *testing.T) {
 }
 
 func (s *ConfigTestSuite) TestHooksJSONSchema() {
-	schema := hooks.Hooks{}.JSONSchema()
+	schema := jsonschema.Reflect(hooks.Hooks{})
 
 	s.Require().NotNil(schema)
 	s.Require().Equal("array", schema.Type)
 }
 
 func (s *ConfigTestSuite) TestHookJSONSchema() {
-	schema := hooks.NewHook().JSONSchema()
+	schema := jsonschema.Reflect(hooks.NewHook())
 
 	s.Require().NotNil(schema)
 

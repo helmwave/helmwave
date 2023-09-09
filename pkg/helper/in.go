@@ -1,6 +1,6 @@
 package helper
 
-import "golang.org/x/exp/slices"
+import "slices"
 
 // EqualChecker is an interface that allows to check interface for equality.
 type EqualChecker[T any] interface {

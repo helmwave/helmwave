@@ -62,14 +62,14 @@ jobs:
     needs:
       - tagger
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: main
 
       - uses: actions/setup-go@v4
         with:
-          go-version: "1.20"
+          go-version: "1.21"
 
       - name: Download changie
         run: go install github.com/miniscruff/changie@v1
@@ -111,7 +111,7 @@ jobs:
       - tagger
       - generate-changelog
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ needs.tagger.outputs.tag }}
@@ -137,7 +137,7 @@ jobs:
 
       - uses: actions/setup-go@v4
         with:
-          go-version: "1.20"
+          go-version: "1.21"
 
       - name: Download changelog artifact
         uses: actions/download-artifact@v3
