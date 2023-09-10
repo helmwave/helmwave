@@ -19,7 +19,7 @@ type DownTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // uses helm repository.yaml flock
+//nolint:paralleltest // uses helm repository.yaml flock
 func TestDownTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DownTestSuite))

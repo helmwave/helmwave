@@ -378,7 +378,7 @@ func (s *NonParallelExtraTestSuite) TestRequiredEnv() {
 	s.Require().Equal(data, res)
 }
 
-//nolintlint:paralleltest // can't parallel because of setenv
+//nolint:paralleltest // can't parallel because of setenv
 func TestNonParallelExtraTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(NonParallelExtraTestSuite))
