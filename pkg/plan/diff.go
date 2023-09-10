@@ -24,7 +24,7 @@ import (
 
 // SkippedAnnotations is a map with all annotations to be skipped by differ.
 //
-//nolintlint:gochecknoglobals // can't make this const
+//nolint:gochecknoglobals // can't make this const
 var SkippedAnnotations = map[string][]string{
 	live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
 	helper.RootAnnoName + "skip-diff": {"true"},
@@ -289,10 +289,10 @@ func (p *Plan) GetLive(
 
 			if err != nil {
 				log.Warnf("I can't get release from k8s: %v", err)
-				//nolintlint:revive // we are under mutex here
+				//nolint:revive // we are under mutex here
 				notFound = append(notFound, rel.Uniq())
 			} else {
-				//nolintlint:revive // we are under mutex here
+				//nolint:revive // we are under mutex here
 				found[rel.Uniq()] = r
 			}
 		}(wg, mu, p.body.Releases[i])

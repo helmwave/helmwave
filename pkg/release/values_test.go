@@ -5,7 +5,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
-	"github.com/invopop/jsonschema"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
 )
@@ -118,7 +117,7 @@ func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
 }
 
 func (s *ValuesTestSuite) TestJSONSchema() {
-	schema := jsonschema.Reflect(release.ValuesReference{})
+	schema := release.ValuesReference{}.JSONSchema()
 
 	s.Require().NotNil(schema)
 

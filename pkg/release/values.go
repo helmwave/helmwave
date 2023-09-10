@@ -18,13 +18,15 @@ import (
 )
 
 // ValuesReference is used to match source values file path and temporary.
+//
+//nolint:lll
 type ValuesReference struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
 	Dst            string `yaml:"dst" json:"dst" `
-	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`   //nolint:lll
-	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"` //nolint:lll
-	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`                         //nolint:lll
-	Render         bool   `yaml:"render" json:"render"  jsonschema:"description=Whether to use templater to render values,default=true"`                      //nolint:lll
+	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`
+	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
+	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
+	Render         bool   `yaml:"render" json:"render"  jsonschema:"description=Whether to use templater to render values,default=true"`
 }
 
 func (v ValuesReference) JSONSchema() *jsonschema.Schema {
@@ -171,7 +173,6 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	return nil
 }
 
-//nolintlint:nestif // it is still pretty easy to understand
 func (v *ValuesReference) fetch(l *log.Entry) error {
 	if v.isURL() {
 		err := v.Download()

@@ -22,7 +22,7 @@ type DiffLocalTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
+//nolint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
 func TestDiffLocalTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DiffLocalTestSuite))

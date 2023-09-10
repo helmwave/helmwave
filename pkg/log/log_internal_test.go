@@ -192,7 +192,8 @@ func (ts *LogTestSuite) TestLogboekWidth() {
 	ts.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }
 
-func TestLogTestSuite(t *testing.T) { //nolintlint:paralleltest // helmwave uses single logger for the whole program
+//nolint:paralleltest // helmwave uses single logger for the whole program
+func TestLogTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(LogTestSuite))
 }

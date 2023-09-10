@@ -18,14 +18,15 @@ func TestConfigTestSuite(t *testing.T) {
 }
 
 func (s *ConfigTestSuite) TestHooksJSONSchema() {
-	schema := jsonschema.Reflect(hooks.Hooks{})
+	schema := hooks.Hooks{}.JSONSchema()
 
 	s.Require().NotNil(schema)
 	s.Require().Equal("array", schema.Type)
 }
 
 func (s *ConfigTestSuite) TestHookJSONSchema() {
-	schema := jsonschema.Reflect(hooks.NewHook())
+	reflector := &jsonschema.Reflector{DoNotReference: true}
+	schema := reflector.Reflect(hooks.NewHook())
 
 	s.Require().NotNil(schema)
 
