@@ -56,8 +56,8 @@ values:
 
 	s.Require().Equal(&config{
 		Values: []release.ValuesReference{
-			{Src: "a", Render: true},
-			{Src: "b", Render: true},
+			{Src: "a"},
+			{Src: "b"},
 		},
 	}, c)
 }
@@ -81,8 +81,8 @@ values:
 
 	s.Require().Equal(&config{
 		Values: []release.ValuesReference{
-			{Src: "1", Render: false, Strict: false},
-			{Src: "2", Render: true, Strict: true},
+			{Src: "1", Strict: false},
+			{Src: "2", Strict: true},
 		},
 	}, c)
 }
@@ -117,7 +117,7 @@ func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
 }
 
 func (s *ValuesTestSuite) TestJSONSchema() {
-	schema := release.ValuesReference{}.JSONSchema()
+	schema := (&release.ValuesReference{}).JSONSchema()
 
 	s.Require().NotNil(schema)
 
@@ -127,5 +127,5 @@ func (s *ValuesTestSuite) TestJSONSchema() {
 	s.Require().Contains(keys, "delimiter_left")
 	s.Require().Contains(keys, "delimiter_right")
 	s.Require().Contains(keys, "strict")
-	s.Require().Contains(keys, "render")
+	s.Require().Contains(keys, "renderer")
 }

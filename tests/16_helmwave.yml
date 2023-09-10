@@ -12,6 +12,5 @@ releases:
     create_namespace: true
     values:
       - src: tests/16_values.yaml
-        render: false
-        sops_decode: true
+        renderer: sops
 
