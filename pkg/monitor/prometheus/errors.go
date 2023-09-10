@@ -6,8 +6,13 @@ import (
 )
 
 var (
+	ErrURLEmpty = errors.New("URL cannot be empty")
+
+	ErrExprEmpty = errors.New("expression cannot be empty")
+
 	ErrResultNotVector = errors.New("failed to get result as vector")
-	ErrResultEmpty     = errors.New("result is empty")
+
+	ErrResultEmpty = errors.New("result is empty")
 )
 
 type PrometheusClientError struct {

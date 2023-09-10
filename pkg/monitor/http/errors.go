@@ -1,8 +1,11 @@
 package http
 
 import (
+	"errors"
 	"fmt"
 )
+
+var ErrURLEmpty = errors.New("URL cannot be empty")
 
 type RequestError struct {
 	Err error

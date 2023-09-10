@@ -3,6 +3,7 @@ package plan
 import (
 	"os"
 
+	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -67,6 +68,10 @@ func (p *planBody) Validate() error {
 		return err
 	}
 
+	if err := p.ValidateMonitors(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -123,6 +128,33 @@ func (p *planBody) ValidateReleases() error {
 	_, err := p.generateDependencyGraph()
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (p *planBody) ValidateMonitors() error {
+	a := make(map[string]int8)
+	for _, r := range p.Monitors {
+		err := r.Validate()
+		if err != nil {
+			return err
+		}
+
+		a[r.Name()]++
+		if a[r.Name()] > 1 {
+			return monitor.NewDuplicateError(r.Name())
+		}
+	}
+
+	for _, r := range p.Releases {
+		mons := r.Monitors()
+		for i := range mons {
+			mon := mons[i]
+			if a[mon.Name] != 1 {
+				return monitor.NewNotExistsError(mon.Name)
+			}
+		}
 	}
 
 	return nil

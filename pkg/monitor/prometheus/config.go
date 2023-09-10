@@ -72,3 +72,15 @@ func (c *Config) Run(ctx context.Context) error {
 
 	return err
 }
+
+func (c *Config) Validate() error {
+	if c.URL == "" {
+		return ErrURLEmpty
+	}
+
+	if c.Expr == "" {
+		return ErrExprEmpty
+	}
+
+	return nil
+}

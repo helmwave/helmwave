@@ -77,3 +77,11 @@ func (c *Config) Run(ctx context.Context) error {
 
 	return nil
 }
+
+func (c *Config) Validate() error {
+	if c.URL == "" {
+		return ErrURLEmpty
+	}
+
+	return nil
+}

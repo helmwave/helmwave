@@ -13,6 +13,7 @@ import (
 type SubConfig interface {
 	Init(context.Context, *logrus.Entry) error
 	Run(context.Context) error
+	Validate() error
 }
 
 // Config is an interface to manage particular monitor.
@@ -20,6 +21,7 @@ type Config interface {
 	log.LoggerGetter
 	Name() string
 	Run(context.Context) error
+	Validate() error
 }
 
 // Configs type of array Config.
