@@ -17,13 +17,14 @@ const (
 
 // Config is the main monitor Config.
 type Config struct {
-	client        *http.Client `yaml:"-" json:"-"`
-	log           *log.Entry   `yaml:"-" json:"-"`
-	URL           string       `yaml:"url" json:"url" jsonschema:"required,title=URL to query"`
-	Method        string       `yaml:"method" json:"method" jsonschema:"title=HTTP method,default=HEAD"`
-	Body          string       `yaml:"body" json:"body" jsonschema:"title=HTTP body,default="`
-	ExpectedCodes []int        `yaml:"expected_codes" json:"expected_codes" jsonschema:"required,title=Expected response codes"`
-	Insecure      bool         `yaml:"insecure" json:"insecure" jsonschema:"default=false"`
+	client        *http.Client      `yaml:"-" json:"-"`
+	log           *log.Entry        `yaml:"-" json:"-"`
+	URL           string            `yaml:"url" json:"url" jsonschema:"required,title=URL to query"`
+	Method        string            `yaml:"method" json:"method" jsonschema:"title=HTTP method,default=HEAD"`
+	Body          string            `yaml:"body" json:"body" jsonschema:"title=HTTP body,default="`
+	Headers       map[string]string `yaml:"headers" json:"headers" jsonschema:"title=HTTP headers to set"`
+	ExpectedCodes []int             `yaml:"expected_codes" json:"expected_codes" jsonschema:"required,title=Expected response codes"`
+	Insecure      bool              `yaml:"insecure" json:"insecure" jsonschema:"default=false"`
 }
 
 func NewConfig() *Config {
@@ -53,6 +54,10 @@ func (c *Config) Run(ctx context.Context) error {
 	req, err := http.NewRequestWithContext(ctx, c.Method, c.URL, body)
 	if err != nil {
 		return NewRequestError(err)
+	}
+
+	for k, v := range c.Headers {
+		req.Header.Set(k, v)
 	}
 
 	resp, err := c.client.Do(req)
