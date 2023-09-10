@@ -10,12 +10,23 @@ monitors:
     total_timeout: 1m # fail if it flaps between success and failure for so long
     iteration_timeout: 5s
     interval: 3s
+    success_threshold: 3
+    failure_threshold: 3
     prometheus:
       url: http://localhost:9090
       expr: |
         up == 1
-      success_threshold: 3
-      failure_threshold: 3
+  - name: second-monitor
+    type: http
+    total_timeout: 1m # fail if it flaps between success and failure for so long
+    iteration_timeout: 5s
+    interval: 3s
+    success_threshold: 3
+    failure_threshold: 3
+    http:
+      url: http://localhost:9090
+      expected_codes:
+        - 200
 
 .default: &default
   timeout: 1m
@@ -23,9 +34,6 @@ monitors:
   wait: false
   wait_for_jobs: false
   pending_release_strategy: rollback
-  monitors:
-    - name: main-monitor
-      action: uninstall
 
 releases:
   - name: nginx-a
@@ -33,6 +41,9 @@ releases:
       name: bitnami/nginx
     namespace: test
     <<: *default
+    monitors:
+      - name: main-monitor
+        action: uninstall
     tags:
       - nginx
 
@@ -41,5 +52,8 @@ releases:
       name: bitnami/nginx
     namespace: test
     <<: *default
+    monitors:
+      - name: second-monitor
+        action: uninstall
     tags:
       - nginx

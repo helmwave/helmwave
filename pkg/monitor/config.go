@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/helmwave/helmwave/pkg/monitor/http"
 	"github.com/helmwave/helmwave/pkg/monitor/prometheus"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -21,10 +22,11 @@ const (
 // Config is the main monitor Config.
 type config struct {
 	Prometheus       *prometheus.Config `yaml:"prometheus" json:"prometheus" jsonschema:"title=Config for prometheus type,oneof_required=prometheus"`
+	HTTP             *http.Config       `yaml:"http" json:"http" jsonschema:"title=Config for http type,oneof_required=http"`
 	subConfig        SubConfig          `yaml:"-" json:"-"`
 	log              *log.Entry         `yaml:"-" json:"-"`
 	NameF            string             `yaml:"name" json:"name" jsonschema:"required"`
-	Type             string             `yaml:"type" json:"type" jsonschema:"enum=prometheus"`
+	Type             string             `yaml:"type" json:"type" jsonschema:"enum=prometheus,enum=http,required"`
 	TotalTimeout     time.Duration      `yaml:"total_timeout" json:"total_timeout" jsonschema:"title=Timeout for the whole monitor,description=After this timeout hits monitor will fail regardless of current streak,default=5m"`
 	IterationTimeout time.Duration      `yaml:"iteration_timeout" json:"iteration_timeout" jsonschema:"title=Timeout for each timeout execution,description=After this timeout hits monitor iteration will be considered as failed,default=10s"`
 	Interval         time.Duration      `yaml:"interval" json:"interval" jsonschema:"default=1m"`
@@ -86,11 +88,16 @@ func (c *config) Run(ctx context.Context) error {
 			if err == nil {
 				successStreak += 1
 				failureStreak = 0
-				c.Logger().WithField("streak", successStreak).Debug("monitor succeeded")
+				c.Logger().
+					WithField("streak", fmt.Sprintf("%d/%d", successStreak, c.SuccessThreshold)).
+					Info("monitor succeeded")
 			} else {
 				successStreak = 0
 				failureStreak += 1
-				c.Logger().WithField("streak", failureStreak).WithField("error", err).Debug("monitor did not succeed")
+				c.Logger().
+					WithField("streak", fmt.Sprintf("%d/%d", failureStreak, c.FailureThreshold)).
+					WithField("error", err).
+					Info("monitor did not succeed")
 			}
 		case <-ctx.Done():
 			return ctx.Err()
@@ -120,6 +127,9 @@ func (c *config) UnmarshalYAML(node *yaml.Node) error {
 	case prometheus.TYPE:
 		cfg.Prometheus = prometheus.NewConfig()
 		cfg.subConfig = cfg.Prometheus
+	case http.TYPE:
+		cfg.HTTP = http.NewConfig()
+		cfg.subConfig = cfg.HTTP
 	default:
 		return fmt.Errorf("unknown monitor type %q", t.Type)
 	}
