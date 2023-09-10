@@ -18,7 +18,7 @@ type DiffLiveTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // uses helm repository.yaml flock
+//nolint:paralleltest // uses helm repository.yaml flock
 func TestDiffLiveTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DiffLiveTestSuite))

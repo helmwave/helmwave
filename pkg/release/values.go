@@ -23,10 +23,10 @@ import (
 type ValuesReference struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
 	Dst            string `yaml:"dst" json:"dst" jsonschema:"readOnly"`
-	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`   //nolint:lll
-	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"` //nolint:lll
+	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`
+	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
 	Renderer       string `yaml:"renderer" json:"renderer" jsonschema:"description=How to render the file,enum=sprig,enum=gomplate,enum=copy,enum=sops"`
-	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"` //nolint:lll
+	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
 }
 
 func (v *ValuesReference) JSONSchema() *jsonschema.Schema {
@@ -170,7 +170,6 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	return nil
 }
 
-//nolintlint:nestif // it is still pretty easy to understand
 func (v *ValuesReference) fetch(l *log.Entry) error {
 	if v.isURL() {
 		err := v.Download()
