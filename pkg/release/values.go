@@ -14,17 +14,21 @@ import (
 	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
+	"go.mozilla.org/sops/v3/decrypt"
 	"gopkg.in/yaml.v3"
 )
 
 // ValuesReference is used to match source values file path and temporary.
+//
+//nolint:lll
 type ValuesReference struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
-	Dst            string `yaml:"dst" json:"dst" `
+	Dst            string `yaml:"dst" json:"dst" jsonschema:"readOnly"`
 	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`   //nolint:lll
 	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"` //nolint:lll
 	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`                         //nolint:lll
-	Render         bool   `yaml:"render" json:"render"  jsonschema:"description=Whether to use templater to render values,default=true"`                      //nolint:lll
+	SOPSDecode     bool   `yaml:"sops_decode" json:"sops_decode" jsonschema:"description=Whether file needs to be decoded with SOPS,default=false"`
+	Render         bool   `yaml:"render" json:"render"  jsonschema:"description=Whether to use templater to render values,default=true"` //nolint:lll
 }
 
 func (v ValuesReference) JSONSchema() *jsonschema.Schema {
@@ -158,10 +162,24 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	}
 
 	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
-	if v.isURL() {
-		err = template.Tpl2yml(v.Dst, v.Dst, data, templater, delimOption)
+	if v.SOPSDecode {
+		l.Debug("need to decode values via SOPS")
+		if v.Render {
+			return ErrSOPSRender
+		}
+
+		err = v.DecodeSOPS()
+		if err != nil {
+			l.WithError(err).Error("failed to decode values")
+
+			return err
+		}
 	} else {
-		err = template.Tpl2yml(v.Src, v.Dst, data, templater, delimOption)
+		if v.isURL() {
+			err = template.Tpl2yml(v.Dst, v.Dst, data, templater, delimOption)
+		} else {
+			err = template.Tpl2yml(v.Src, v.Dst, data, templater, delimOption)
+		}
 	}
 
 	if err != nil {
@@ -169,6 +187,28 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	}
 
 	return nil
+}
+
+func (v *ValuesReference) DecodeSOPS() error {
+	data, err := decrypt.File(v.Src, "yaml")
+	if err != nil {
+		return NewSOPSDecodeError(err)
+	}
+
+	f, err := helper.CreateFile(v.Dst)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err := f.Close()
+		if err != nil {
+			log.WithError(err).Error("failed to close file")
+		}
+	}()
+
+	_, err = f.Write(data)
+
+	return NewSOPSDecodeError(err)
 }
 
 //nolintlint:nestif // it is still pretty easy to understand
@@ -190,8 +230,9 @@ func (v *ValuesReference) fetch(l *log.Entry) error {
 }
 
 func (rel *config) BuildValues(dir, templater string) error {
-	for i := len(rel.Values()) - 1; i >= 0; i-- {
-		v := rel.Values()[i]
+	vals := rel.Values()
+	for i := len(vals) - 1; i >= 0; i-- {
+		v := vals[i]
 		err := v.SetViaRelease(rel, dir, templater)
 		switch {
 		case !v.Strict && errors.Is(ErrValuesNotExist, err):

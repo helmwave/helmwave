@@ -1,0 +1,26 @@
+installCRDs: ENC[AES256_GCM,data:3egplA==,iv:vAMQRO6EarMJyNt82Z/psB7+mIj3b6k+EEQBu2EWJ1g=,tag:b5mcMM1jyWgeojb1KVhnug==,type:str]
+prometheus:
+    enabled: ENC[AES256_GCM,data:HQBtn1s=,iv:Y35uog8naobHpLv/og3YArSeHJFoE+FOIKIHK4wrSGc=,tag:S2y/1dHHmIcHlSBQDZRIEw==,type:bool]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age: []
+    lastmodified: "2023-09-10T13:41:33Z"
+    mac: ENC[AES256_GCM,data:9s7XRVW54t/g2YoDyEcyxZJoS/auotvH8YBPUMyK6KiFDweVcK6wQJDDzUxSKPK/+h+eCm94odufxx08VPCaZBmBXNJtTIO+6LecV6tGndYdwaMrMWFdiGM8SO2DTMiYhuMY7NH2lDeGkFmAFxwOLem8k+37a9tUpjJZ7w3+EtY=,iv:X6ZFc3a0FZSPsU0EDOy0TC9SO409UZ2hlYa/2qLXTHE=,tag:t9spaeLASC+n+vaiEzzp6w==,type:str]
+    pgp:
+        - created_at: "2023-09-10T13:41:33Z"
+          enc: |
+            -----BEGIN PGP MESSAGE-----
+
+            hF4DMeHY6nye/U4SAQdApu6jgA6D9senZ6wFMp05jlKHE8TlPtZDspHC4OHvr0cw
+            ZWh6hjii/bw4Hs5/FSZonHu4sCO/fmWvPSfAbAlr6Nsp6OSCRV1NK1IUhfpWxtyM
+            1GgBCQIQdVY/OlwVXCiU4N21E/BOM84WUZf6Sjuy0T2lO87UQHfcpT7jErXucOMh
+            OjkQOVnBdqDfTw1orvoTz2A5MNxeUwaABIWEgwD0M/RDPeaCU2EBGeXWl7qbjebS
+            GCWBHINwsjVhMQ==
+            =7+2G
+            -----END PGP MESSAGE-----
+          fp: DCB1B50CC55217886566ED93FFA4CA11112C922E
+    unencrypted_suffix: _unencrypted
+    version: 3.7.3
