@@ -145,7 +145,7 @@ jobs:
           name: changelog
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --skip-validate --clean --release-notes ${{ needs.tagger.outputs.tag }}.md
