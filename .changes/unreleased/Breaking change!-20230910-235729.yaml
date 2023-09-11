@@ -1,6 +1,0 @@
-kind: Breaking change!
-body: 'You can no longer set `render: false` for values. Use `renderer: copy` instead'
-time: 2023-09-10T23:57:29.004736+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""

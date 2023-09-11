@@ -1,6 +1,0 @@
-kind: Fixed
-body: Fix invalid timeout for prometheus monitors
-time: 2023-09-11T23:04:00.74511+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
