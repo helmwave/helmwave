@@ -66,6 +66,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 	e := errors.New(s.T().Name())
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, e)
 	mockedRelease.On("AllowFailure").Return(false)
+	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 
 	p.SetReleases(mockedRelease)
 
@@ -86,6 +87,7 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, nil)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 
 	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Install").Return(nil)
