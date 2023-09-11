@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -88,6 +89,7 @@ func (p *Plan) Logger() *log.Entry {
 type planBody struct {
 	Project      string           `yaml:"project" json:"project" jsonschema:"title=project name,description=reserved for future,example=my-awesome-project"`
 	Version      string           `yaml:"version" json:"version" jsonschema:"title=version of helmwave,description=will check current version and project version,pattern=^[0-9]+\\.[0-9]+\\.[0-9]+$,example=0.23.0,example=0.22.1"`
+	Monitors     monitor.Configs  `yaml:"monitors" json:"monitors" jsonschema:"title=monitors list"`
 	Repositories repo.Configs     `yaml:"repositories" json:"repositories" jsonschema:"title=repositories list,description=helm repositories"`
 	Registries   registry.Configs `yaml:"registries" json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`
 	Releases     release.Configs  `yaml:"releases" json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`
