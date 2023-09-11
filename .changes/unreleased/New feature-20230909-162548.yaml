@@ -1,7 +1,0 @@
-kind: New feature
-body: Add support for monitors. Monitors allow to validate releases after upgrading
-  and performing some actions if something goes wrong
-time: 2023-09-09T16:25:48.81577+04:00
-custom:
-  Author: r3nic1e
-  Issue: "712"
