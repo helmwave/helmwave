@@ -275,7 +275,7 @@ linters-settings:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: false
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: false
+    require-specific: true
     allow-leading-space: true
 
   prealloc:
@@ -760,6 +760,7 @@ linters-settings:
     ignoreSigRegexps:
       - \.New.*Error\(
     ignorePackageGlobs:
+      - context
       - encoding/*
       - github.com/pkg/*
       - github.com/helmwave/helmwave/*
@@ -794,6 +795,7 @@ issues:
         - dupl
         - dupword
         - forcetypeassert
+        - funlen
         - gochecknoglobals
         - goconst
         - godot

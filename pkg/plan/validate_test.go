@@ -19,6 +19,11 @@ type ValidateTestSuite struct {
 	suite.Suite
 }
 
+func TestValidateTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(ValidateTestSuite))
+}
+
 func (s *ValidateTestSuite) TestInvalidRelease() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
@@ -44,7 +49,7 @@ func (s *ValidateTestSuite) TestInvalidRepository() {
 
 	err := errors.New("test error")
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Validate").Return(err)
 
 	p.SetRepositories(mockedRepo)
@@ -113,7 +118,7 @@ func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Name").Return("blabla")
 	mockedRepo.On("Validate").Return(nil)
 
@@ -150,9 +155,4 @@ func (s *ValidateTestSuite) TestValidateEmpty() {
 	body := p.NewBody()
 
 	s.Require().NoError(body.Validate())
-}
-
-func TestValidateTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(ValidateTestSuite))
 }

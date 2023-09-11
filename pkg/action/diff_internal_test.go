@@ -1,4 +1,4 @@
-//go:build ignore || integration
+//go:build integration
 
 package action
 

@@ -13,8 +13,6 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 )
 
-// Todo:  optimize?
-
 // Resource is base structure for all k8s resources that have replicas.
 // Used to parse out replicas count.
 type Resource struct {
@@ -53,6 +51,11 @@ func Parse(yamlFile []byte) []Resource {
 		_, _, err := d.Decode(doc, nil, &t)
 		if err != nil {
 			log.WithError(err).Info("failed to parse resource manifest for kubedog")
+
+			continue
+		}
+		if t.GetName() == "" {
+			log.Info("failed to parse resource manifest for kubedog")
 
 			continue
 		}

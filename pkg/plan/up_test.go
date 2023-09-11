@@ -24,7 +24,7 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	repoName := "blablanami"
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Name").Return(repoName)
 	e := errors.New(s.T().Name())
 	mockedRepo.On("Install").Return(e)
@@ -41,7 +41,7 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
@@ -66,6 +66,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 	e := errors.New(s.T().Name())
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, e)
 	mockedRelease.On("AllowFailure").Return(false)
+	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 
 	p.SetReleases(mockedRelease)
 
@@ -86,8 +87,9 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, nil)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 
-	mockedRepo := &plan.MockRepoConfig{}
+	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
@@ -100,7 +102,8 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease.AssertExpectations(s.T())
 }
 
-func TestApplyTestSuite(t *testing.T) { //nolintlint:paralleltest // can't parallel because of flock timeout
+//nolint:paralleltest // can't parallel because of flock timeout
+func TestApplyTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(ApplyTestSuite))
 }

@@ -20,12 +20,14 @@ type Templater interface {
 
 func getTemplater(name string) (Templater, error) {
 	switch name {
-	case gomplateTemplater{}.Name():
+	case TemplaterGomplate:
 		return &gomplateTemplater{}, nil
-	case sprigTemplater{}.Name():
+	case TemplaterSprig:
 		return &sprigTemplater{}, nil
-	case noTemplater{}.Name():
+	case TemplaterNone:
 		return noTemplater{}, nil
+	case TemplaterSOPS:
+		return sopsTemplater{}, nil
 	default:
 		return nil, fmt.Errorf("templater %s is not registered", name)
 	}

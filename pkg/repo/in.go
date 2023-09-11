@@ -1,6 +1,6 @@
 package repo
 
-import "golang.org/x/exp/slices"
+import "slices"
 
 // Equal checks repo configs to have equal names.
 func (rep *config) Equal(a Config) bool {

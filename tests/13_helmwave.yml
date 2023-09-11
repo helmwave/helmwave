@@ -6,9 +6,9 @@ lifecycle:
     - cmd: "ls"
       args: ["-l", "-a"]
       show: false
-    - echo "run global pre_build script"
+    - echo run global pre_build script
   post_build:
-    - echo "run global post_build script"
+    - echo run global post_build script
 
 
 repositories:
@@ -20,13 +20,13 @@ releases:
   - name: nginx
     lifecycle:
       pre_up:
-        - echo "running pre_up script for nginx"
+        - echo running pre_up script for nginx
       post_up:
-        - echo "running post_up script for nginx"
+        - echo running post_up script for nginx
       pre_build:
-        - echo "running pre_build script for nginx"
+        - echo running pre_build script for nginx
       post_build:
-        - echo "running post_build script for nginx"
+        - echo running post_build script for nginx
     chart:
       name: bitnami/nginx
     namespace: test

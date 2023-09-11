@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -12,9 +13,14 @@ type CliTestSuite struct {
 	suite.Suite
 }
 
+func TestCliTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(CliTestSuite))
+}
+
 //nolint:unparam // we may use not all buffers
-func (s *CliTestSuite) prepareApp() (*cli.App, *bytes.Buffer, *bytes.Buffer, *bytes.Buffer) {
-	s.T().Helper()
+func (ts *CliTestSuite) prepareApp() (*cli.App, *bytes.Buffer, *bytes.Buffer, *bytes.Buffer) {
+	ts.T().Helper()
 
 	stdin := &bytes.Buffer{}
 	stdout := &bytes.Buffer{}
@@ -27,13 +33,13 @@ func (s *CliTestSuite) prepareApp() (*cli.App, *bytes.Buffer, *bytes.Buffer, *by
 	return app, stdin, stdout, stderr
 }
 
-func (s *CliTestSuite) TestCommandNotFound() {
-	app, _, _, _ := s.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
+func (ts *CliTestSuite) TestCommandNotFound() {
+	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
 
-	cmd := s.T().Name()
+	cmd := ts.T().Name()
 	expectedError := CommandNotFoundError{Command: cmd}.Error()
 
-	s.Require().PanicsWithError(
+	ts.Require().PanicsWithError(
 		expectedError,
 		func() {
 			_ = app.Run([]string{"helmwave", cmd})
@@ -41,10 +47,10 @@ func (s *CliTestSuite) TestCommandNotFound() {
 	)
 }
 
-func (s *CliTestSuite) TestCommandsList() {
+func (ts *CliTestSuite) TestCommandsList() {
 	requiredCommands := []string{"build", "up", "down", "yml"}
 
-	app, _, _, _ := s.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
+	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
 
 	commands := app.VisibleCommands()
 	cmds := make([]string, 0, len(commands))
@@ -54,10 +60,17 @@ func (s *CliTestSuite) TestCommandsList() {
 		cmds = append(cmds, cmd.Aliases...)
 	}
 
-	s.Require().Subset(cmds, requiredCommands)
+	ts.Require().Subset(cmds, requiredCommands)
 }
 
-func TestCliTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(CliTestSuite))
+func (ts *CliTestSuite) TestRecoverWithoutPanic() {
+	ts.Require().NotPanics(recoverPanic)
+}
+
+func (ts *CliTestSuite) TestRecoverPanic() {
+	err := errors.New(ts.T().Name())
+	ts.Require().Panics(func() {
+		defer recoverPanic()
+		panic(err)
+	})
 }

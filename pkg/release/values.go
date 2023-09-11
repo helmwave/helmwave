@@ -18,23 +18,25 @@ import (
 )
 
 // ValuesReference is used to match source values file path and temporary.
+//
+//nolint:lll
 type ValuesReference struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
-	Dst            string `yaml:"dst" json:"dst" `
-	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`   //nolint:lll
-	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"` //nolint:lll
-	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`                         //nolint:lll
-	Render         bool   `yaml:"render" json:"render"  jsonschema:"description=Whether to use templater to render values,default=true"`                      //nolint:lll
+	Dst            string `yaml:"dst" json:"dst" jsonschema:"readOnly"`
+	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`
+	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
+	Renderer       string `yaml:"renderer" json:"renderer" jsonschema:"description=How to render the file,enum=sprig,enum=gomplate,enum=copy,enum=sops"`
+	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
 }
 
-func (v ValuesReference) JSONSchema() *jsonschema.Schema {
+func (v *ValuesReference) JSONSchema() *jsonschema.Schema {
 	r := &jsonschema.Reflector{
 		DoNotReference:             true,
 		RequiredFromJSONSchemaTags: true,
 		KeyNamer:                   strcase.SnakeCase, // for action.ChartPathOptions
 	}
 
-	type values ValuesReference
+	type values *ValuesReference
 	schema := r.Reflect(values(v))
 	schema.OneOf = []*jsonschema.Schema{
 		{
@@ -51,9 +53,6 @@ func (v ValuesReference) JSONSchema() *jsonschema.Schema {
 
 // UnmarshalYAML flexible config.
 func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
-	// render by default
-	v.Render = true
-
 	type raw ValuesReference
 	var err error
 	switch node.Kind {
@@ -74,7 +73,7 @@ func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
 }
 
 // MarshalYAML is used to implement Marshaler interface of gopkg.in/yaml.v3.
-func (v ValuesReference) MarshalYAML() (any, error) {
+func (v *ValuesReference) MarshalYAML() (any, error) {
 	return struct {
 		Src string
 		Dst string
@@ -136,8 +135,8 @@ func ProhibitDst(values []ValuesReference) error {
 // SetViaRelease downloads and templates values file.
 // Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
 func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
-	if !v.Render {
-		templater = template.TemplaterNone
+	if v.Renderer == "" {
+		v.Renderer = templater
 	}
 
 	v.SetUniq(dir, rel.Uniq())
@@ -159,9 +158,9 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 
 	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
 	if v.isURL() {
-		err = template.Tpl2yml(v.Dst, v.Dst, data, templater, delimOption)
+		err = template.Tpl2yml(v.Dst, v.Dst, data, v.Renderer, delimOption)
 	} else {
-		err = template.Tpl2yml(v.Src, v.Dst, data, templater, delimOption)
+		err = template.Tpl2yml(v.Src, v.Dst, data, v.Renderer, delimOption)
 	}
 
 	if err != nil {
@@ -171,7 +170,6 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	return nil
 }
 
-//nolintlint:nestif // it is still pretty easy to understand
 func (v *ValuesReference) fetch(l *log.Entry) error {
 	if v.isURL() {
 		err := v.Download()
@@ -190,8 +188,9 @@ func (v *ValuesReference) fetch(l *log.Entry) error {
 }
 
 func (rel *config) BuildValues(dir, templater string) error {
-	for i := len(rel.Values()) - 1; i >= 0; i-- {
-		v := rel.Values()[i]
+	vals := rel.Values()
+	for i := len(vals) - 1; i >= 0; i-- {
+		v := vals[i]
 		err := v.SetViaRelease(rel, dir, templater)
 		switch {
 		case !v.Strict && errors.Is(ErrValuesNotExist, err):

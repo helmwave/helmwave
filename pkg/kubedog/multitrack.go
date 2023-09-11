@@ -2,6 +2,7 @@ package kubedog
 
 import (
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/werf/kubedog/pkg/tracker/resid"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack/generic"
-	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -127,30 +127,31 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 
 		switch name {
 		// Parse Value
-		case SkipLogsAnnoName, OldSkipLogsAnnoName:
+		case SkipLogsAnnoName:
 			err = r.handleAnnotationSkipLogs(value, spec)
-		case ShowEventsAnnoName, OldShowEventsAnnoName:
+		case ShowEventsAnnoName:
 			err = r.handleAnnotationShowEvents(value, spec)
-		case LogRegexAnnoName, OldLogRegexAnnoName:
+		case LogRegexAnnoName:
 			err = r.handleAnnotationLogRegex(value, spec)
-		case FailuresAllowedPerReplicaAnnoName, OldFailuresAllowedPerReplicaAnnoName:
+		case FailuresAllowedPerReplicaAnnoName:
 			err = r.handleAnnotationFailuresAllowedPerReplica(value, spec)
 
 		// Choose value
-		case TrackTerminationModeAnnoName, OldTrackTerminationModeAnnoName:
+		case TrackTerminationModeAnnoName:
 			err = r.handleAnnotationTrackTerminationMode(name, value, spec)
-		case FailModeAnnoName, OldFailModeAnnoName:
+		case FailModeAnnoName:
 			err = r.handleAnnotationFailMode(name, value, spec)
 
 		// Parse array
-		case SkipLogsForContainersAnnoName, OldSkipLogsForContainersAnnoName:
+		case SkipLogsForContainersAnnoName:
 			err = r.handleAnnotationSkipLogsForContainers(name, value, spec)
-		case ShowLogsOnlyForContainersAnnoName, OldShowLogsOnlyForContainersAnnoName:
+		case ShowLogsOnlyForContainersAnnoName:
 			err = r.handleAnnotationShowLogsOnlyForContainers(name, value, spec)
 
 		default:
+			//nolint:gocritic // leaving switch case just in case (LUL)
 			switch {
-			case strings.HasPrefix(name, LogRegexForAnnoPrefix), strings.HasPrefix(name, OldLogRegexForAnnoPrefix):
+			case strings.HasPrefix(name, LogRegexForAnnoPrefix):
 				err = r.handleAnnotationLogRegexFor(name, value, spec)
 			}
 		}
@@ -263,13 +264,7 @@ func (*Resource) handleAnnotationShowLogsOnlyForContainers(name, value string, s
 }
 
 func (*Resource) handleAnnotationLogRegexFor(name, value string, spec *multitrack.MultitrackSpec) error {
-	var containerName string
-	switch {
-	case strings.HasPrefix(name, LogRegexForAnnoPrefix):
-		containerName = strings.TrimPrefix(name, LogRegexForAnnoPrefix)
-	case strings.HasPrefix(name, OldLogRegexForAnnoPrefix):
-		containerName = strings.TrimPrefix(name, OldLogRegexForAnnoPrefix)
-	}
+	containerName := strings.TrimPrefix(name, LogRegexForAnnoPrefix)
 
 	if containerName == "" {
 		log.WithField("annotation", name).Error("annotation is invalid: can't get container name")

@@ -79,6 +79,10 @@ func (s *ExtraTestSuite) TestExec() {
 	s.Require().NoError(err)
 
 	s.Require().Equal(pwd, strings.TrimSpace(res))
+
+	res, err = template.Exec("echo", []any{"-n", "123"})
+	s.Require().NoError(err)
+	s.Require().Equal("123", res)
 }
 
 func (s *ExtraTestSuite) TestExecInvalidArg() {
@@ -106,6 +110,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			"b": "123",
 		},
 		"c": 123,
+		"d": map[any]any{
+			"e": "f",
+		},
 	}
 
 	tests := []struct {
@@ -120,6 +127,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			result: template.Values{
 				"a": map[string]any{"b": "123"},
 				"c": 321,
+				"d": map[any]any{
+					"e": "f",
+				},
 			},
 			fails: false,
 		},
@@ -129,6 +139,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			result: template.Values{
 				"a": map[string]any{"b": "321"},
 				"c": 321,
+				"d": map[any]any{
+					"e": "f",
+				},
 			},
 			fails: false,
 		},
@@ -138,6 +151,9 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			result: template.Values{
 				"a": map[string]any{"b": "321", "c": "321"},
 				"c": 321,
+				"d": map[any]any{
+					"e": "f",
+				},
 			},
 			fails: false,
 		},
@@ -146,6 +162,18 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			value:  "321",
 			result: nil,
 			fails:  true,
+		},
+		{
+			path:  "d.e",
+			value: "321",
+			result: template.Values{
+				"a": map[string]any{"b": "321", "c": "321"},
+				"c": 321,
+				"d": map[any]any{
+					"e": "321",
+				},
+			},
+			fails: false,
 		},
 	}
 
@@ -222,6 +250,9 @@ func (s *ExtraTestSuite) TestGet() {
 			"b": "123",
 		},
 		"c": 123,
+		"d": map[any]any{
+			"e": "f",
+		},
 	}
 
 	tests := []struct {
@@ -249,6 +280,11 @@ func (s *ExtraTestSuite) TestGet() {
 			result: nil,
 			fails:  true,
 		},
+		{
+			path:   "d.e",
+			result: "f",
+			fails:  false,
+		},
 	}
 
 	for i := range tests {
@@ -269,6 +305,9 @@ func (s *ExtraTestSuite) TestHasKey() {
 			"b": "123",
 		},
 		"c": 123,
+		"d": map[any]any{
+			"e": "f",
+		},
 	}
 
 	tests := []struct {
@@ -295,6 +334,11 @@ func (s *ExtraTestSuite) TestHasKey() {
 			path:   "c.a",
 			result: false,
 			fails:  true,
+		},
+		{
+			path:   "d.e",
+			result: true,
+			fails:  false,
 		},
 	}
 
@@ -334,7 +378,7 @@ func (s *NonParallelExtraTestSuite) TestRequiredEnv() {
 	s.Require().Equal(data, res)
 }
 
-//nolintlint:paralleltest // can't parallel because of setenv
+//nolint:paralleltest // can't parallel because of setenv
 func TestNonParallelExtraTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(NonParallelExtraTestSuite))

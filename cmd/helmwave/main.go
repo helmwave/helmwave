@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-//nolintlint:gochecknoglobals // we need a global list of commands
+//nolint:gochecknoglobals // we need a global list of commands
 var commands = []*cli.Command{
 	new(action.Build).Cmd(),
 	new(action.Diff).Cmd(),

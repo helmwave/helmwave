@@ -70,7 +70,6 @@ var (
 	ErrNotChose = errors.New("you did not specify a shell")
 )
 
-//nolintlint:forbidigo // we need to use fmt.Print
 func completion() *cli.Command {
 	return &cli.Command{
 		Name:  "completion",

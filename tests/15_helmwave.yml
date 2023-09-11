@@ -1,0 +1,59 @@
+project: Test15
+
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+monitors:
+  - name: main-monitor
+    type: prometheus
+    total_timeout: 1m # fail if it flaps between success and failure for so long
+    iteration_timeout: 5s
+    interval: 3s
+    success_threshold: 3
+    failure_threshold: 3
+    prometheus:
+      url: http://localhost:9090
+      expr: |
+        up == 1
+  - name: second-monitor
+    type: http
+    total_timeout: 1m # fail if it flaps between success and failure for so long
+    iteration_timeout: 5s
+    interval: 3s
+    success_threshold: 3
+    failure_threshold: 3
+    http:
+      url: http://localhost:9090
+      expected_codes:
+        - 200
+
+.default: &default
+  timeout: 1m
+  create_namespace: true
+  wait: false
+  wait_for_jobs: false
+  pending_release_strategy: rollback
+
+releases:
+  - name: nginx-a
+    chart:
+      name: bitnami/nginx
+    namespace: test
+    <<: *default
+    monitors:
+      - name: main-monitor
+        action: uninstall
+    tags:
+      - nginx
+
+  - name: nginx-b
+    chart:
+      name: bitnami/nginx
+    namespace: test
+    <<: *default
+    monitors:
+      - name: second-monitor
+        action: uninstall
+    tags:
+      - nginx

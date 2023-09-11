@@ -1,0 +1,3 @@
+installCRDs: "true"
+prometheus:
+    enabled: false

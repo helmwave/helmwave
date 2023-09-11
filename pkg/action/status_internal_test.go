@@ -16,7 +16,7 @@ type StatusTestSuite struct {
 	suite.Suite
 }
 
-//nolintlint:paralleltest // can't parallel because of setenv
+//nolint:paralleltest // can't parallel because of setenv
 func TestStatusTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(StatusTestSuite))
