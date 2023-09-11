@@ -1,0 +1,6 @@
+kind: Fixed
+body: Start monitors immediately, don't wait interval before first run
+time: 2023-09-11T23:13:53.779572+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""

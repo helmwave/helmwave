@@ -72,15 +72,16 @@ func (c *config) Run(ctx context.Context) error {
 
 	c.Logger().Debug("starting monitor")
 
-	ticker := time.NewTicker(c.Interval)
-	defer ticker.Stop()
+	timer := time.NewTimer(c.Interval)
+	defer timer.Stop()
 
 	var successStreak uint8 = 0
 	var failureStreak uint8 = 0
 
 	for (successStreak < c.SuccessThreshold) && (failureStreak < c.FailureThreshold) {
 		select {
-		case <-ticker.C:
+		case <-timer.C:
+			timer.Reset(c.Interval)
 			ctx, cancel := context.WithTimeout(ctx, c.IterationTimeout)
 			err := c.subConfig.Run(ctx)
 			cancel()
