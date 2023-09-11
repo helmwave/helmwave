@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/flock"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	regi "github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -22,6 +23,7 @@ import (
 	"github.com/werf/kubedog/pkg/kube"
 	"github.com/werf/kubedog/pkg/tracker"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
+	"golang.org/x/exp/maps"
 	helmRepo "helm.sh/helm/v3/pkg/repo"
 )
 
@@ -190,6 +192,24 @@ func getParallelLimit(ctx context.Context, releases release.Configs) int {
 	return parallelLimit
 }
 
+func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
+	res := make(map[string]*parallel.WaitGroup)
+
+	for _, rel := range p.Releases {
+		allMons := rel.Monitors()
+		for i := range allMons {
+			mon := allMons[i]
+			if _, ok := res[mon.Name]; !ok {
+				res[mon.Name] = parallel.NewWaitGroup()
+			}
+
+			res[mon.Name].Add(1)
+		}
+	}
+
+	return res
+}
+
 func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	dependenciesGraph, err := p.body.generateDependencyGraph()
 	if err != nil {
@@ -205,24 +225,52 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 		log.WithField("limit", parallelLimit).Info(msg)
 	}
 
-	nodesChan := dependenciesGraph.Run()
+	monitorsLockMap := p.body.generateMonitorsLockMap()
+	monitorsCtx, monitorsCancel := context.WithCancel(ctx)
+	defer monitorsCancel()
 
-	wg := parallel.NewWaitGroup()
-	wg.Add(parallelLimit)
+	releasesNodesChan := dependenciesGraph.Run()
 
-	fails := make(map[release.Config]error)
+	releasesWG := parallel.NewWaitGroup()
+	releasesWG.Add(parallelLimit)
 
-	mu := &sync.Mutex{}
+	monitorsWG := parallel.NewWaitGroup()
+	monitorsWG.Add(len(p.body.Monitors))
+
+	releasesFails := make(map[release.Config]error)
+	monitorsFails := make(map[monitor.Config]error)
+
+	releasesMutex := &sync.Mutex{}
 
 	for i := 0; i < parallelLimit; i++ {
-		go p.syncReleasesWorker(ctx, wg, nodesChan, mu, fails)
+		go p.syncReleasesWorker(ctx, releasesWG, releasesNodesChan, releasesMutex, releasesFails, monitorsLockMap)
 	}
 
-	if err := wg.WaitWithContext(ctx); err != nil {
+	for _, mon := range p.body.Monitors {
+		go p.monitorsWorker(monitorsCtx, monitorsWG, mon, monitorsFails, monitorsLockMap)
+	}
+
+	if err := releasesWG.WaitWithContext(ctx); err != nil {
 		return err
 	}
 
-	return p.ApplyReport(fails)
+	if err := monitorsWG.WaitWithContext(monitorsCtx); err != nil {
+		log.WithError(err).Error("monitors failed, need to take actions")
+		p.runMonitorsActions(ctx, monitorsFails)
+	}
+
+	return p.ApplyReport(releasesFails, monitorsFails)
+}
+
+func (p *Plan) runMonitorsActions(
+	ctx context.Context,
+	fails map[monitor.Config]error,
+) {
+	mons := maps.Keys(fails)
+
+	for _, rel := range p.body.Releases {
+		rel.NotifyMonitorsFailed(ctx, mons...)
+	}
 }
 
 func (p *Plan) syncReleasesWorker(
@@ -231,9 +279,10 @@ func (p *Plan) syncReleasesWorker(
 	nodesChan <-chan *dependency.Node[release.Config],
 	mu *sync.Mutex,
 	fails map[release.Config]error,
+	monitorsLockMap map[string]*parallel.WaitGroup,
 ) {
 	for n := range nodesChan {
-		p.syncRelease(ctx, wg, n, mu, fails)
+		p.syncRelease(ctx, wg, n, mu, fails, monitorsLockMap)
 	}
 	wg.Done()
 }
@@ -244,6 +293,7 @@ func (p *Plan) syncRelease(
 	node *dependency.Node[release.Config],
 	mu *sync.Mutex,
 	fails map[release.Config]error,
+	monitorsLockMap map[string]*parallel.WaitGroup,
 ) {
 	rel := node.Data
 
@@ -269,23 +319,72 @@ func (p *Plan) syncRelease(
 	} else {
 		node.SetSucceeded()
 		l.Info("✅")
+
+		allMons := rel.Monitors()
+		for i := range allMons {
+			mon := allMons[i]
+			m := monitorsLockMap[mon.Name]
+			if m != nil {
+				m.Done()
+			}
+		}
+	}
+}
+
+func (p *Plan) monitorsWorker(
+	ctx context.Context,
+	wg *parallel.WaitGroup,
+	mon monitor.Config,
+	fails map[monitor.Config]error,
+	monitorsLockMap map[string]*parallel.WaitGroup,
+) {
+	defer wg.Done()
+
+	l := mon.Logger()
+
+	lock := monitorsLockMap[mon.Name()]
+	if lock == nil {
+		l.Error("BUG: monitor lock is empty, skipping monitor")
+
+		return
+	}
+	err := lock.WaitWithContext(ctx)
+	if err != nil {
+		l.WithError(err).Error("❌ monitor canceled")
+		fails[mon] = err
+		wg.ErrChan() <- err
+	}
+
+	err = mon.Run(ctx)
+	if err != nil {
+		l.WithError(err).Error("❌ monitor failed")
+		fails[mon] = err
+		wg.ErrChan() <- err
+	} else {
+		l.Info("✅")
 	}
 }
 
 // ApplyReport renders a table report for failed releases.
-func (p *Plan) ApplyReport(fails map[release.Config]error) error {
-	n := len(p.body.Releases)
-	k := len(fails)
+func (p *Plan) ApplyReport(
+	releasesFails map[release.Config]error,
+	monitorsFails map[monitor.Config]error,
+) error {
+	nReleases := len(p.body.Releases)
+	kReleases := len(releasesFails)
+	nMonitors := len(p.body.Monitors)
+	kMonitors := len(monitorsFails)
 
-	log.Infof("Success %d / %d", n-k, n)
+	log.Infof("Releases Success %d / %d", nReleases-kReleases, nReleases)
+	log.Infof("Monitors Success %d / %d", nMonitors-kMonitors, nMonitors)
 
-	if len(fails) > 0 {
+	if len(releasesFails) > 0 {
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"name", "namespace", "chart", "version", "err"})
+		table.SetHeader([]string{"name", "namespace", "chart", "version", "error"})
 		table.SetAutoFormatHeaders(true)
 		table.SetBorder(false)
 
-		for r, err := range fails {
+		for r, err := range releasesFails {
 			row := []string{
 				r.Name(),
 				r.Namespace(),
@@ -298,6 +397,29 @@ func (p *Plan) ApplyReport(fails map[release.Config]error) error {
 				{},
 				{},
 				{},
+				{},
+				FailStatusColor,
+			})
+		}
+
+		table.Render()
+
+		return ErrDeploy
+	}
+
+	if len(monitorsFails) > 0 {
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"name", "error"})
+		table.SetAutoFormatHeaders(true)
+		table.SetBorder(false)
+
+		for r, err := range monitorsFails {
+			row := []string{
+				r.Name(),
+				err.Error(),
+			}
+
+			table.Rich(row, []tablewriter.Colors{
 				{},
 				FailStatusColor,
 			})

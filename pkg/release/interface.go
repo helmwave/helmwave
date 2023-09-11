@@ -6,6 +6,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
+	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
@@ -46,6 +47,8 @@ type Config interface {
 	HooksDisabled() bool
 	OfflineKubeVersion() *chartutil.KubeVersion
 	Validate() error
+	Monitors() []MonitorReference
+	NotifyMonitorsFailed(context.Context, ...monitor.Config)
 }
 
 // Configs type of array Config.

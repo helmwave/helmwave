@@ -1,0 +1,6 @@
+kind: Fixed
+body: Failed releases table is now shown if any releases failed
+time: 2023-09-09T16:08:13.712043+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""
