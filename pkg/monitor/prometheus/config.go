@@ -44,12 +44,7 @@ func (c *Config) Run(ctx context.Context) error {
 
 	now := time.Now()
 
-	var queryOpts []v1.Option
-	if deadline, ok := ctx.Deadline(); ok {
-		queryOpts = append(queryOpts, v1.WithTimeout(deadline.Sub(now)))
-	}
-
-	result, warns, err := c.client.Query(ctx, c.Expr, now, queryOpts...)
+	result, warns, err := c.client.Query(ctx, c.Expr, now)
 
 	if len(warns) > 0 {
 		l = l.WithField("warnings", warns)
