@@ -4,9 +4,12 @@ package release_test
 
 import (
 	"context"
+	"net/url"
+	"os"
 	"strings"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -54,7 +57,9 @@ func (s *GetTestSuite) TestGet() {
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 
-	r1, err := rel.Sync(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	r1, err := rel.Sync(context.Background(), baseFS)
 	s.Require().NoError(err)
 	s.Require().NotNil(r1)
 

@@ -2,10 +2,14 @@ package plan
 
 import (
 	"errors"
+	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
@@ -30,7 +34,9 @@ func (s *BuildValuesTestSuite) TestValuesEmpty() {
 
 	p.body = &planBody{}
 
-	s.Require().NoError(p.buildValues())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	s.Require().NoError(p.buildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS)))
 }
 
 func (s *BuildValuesTestSuite) TestValuesBuildError() {
@@ -55,7 +61,9 @@ func (s *BuildValuesTestSuite) TestValuesBuildError() {
 		Releases: release.Configs{mockedRelease},
 	}
 
-	s.Require().ErrorIs(p.buildValues(), errBuildValues)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	s.Require().ErrorIs(p.buildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS)), errBuildValues)
 	mockedRelease.AssertExpectations(s.T())
 }
 
@@ -81,7 +89,9 @@ func (s *BuildValuesTestSuite) TestSuccess() {
 		Releases: release.Configs{mockedRelease},
 	}
 
-	s.Require().NoError(p.buildValues())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	s.Require().NoError(p.buildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS)))
 	mockedRelease.AssertExpectations(s.T())
 }
 

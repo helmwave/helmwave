@@ -1,9 +1,9 @@
 package plan
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -50,10 +50,10 @@ type Plan struct {
 }
 
 // NewAndImport wrapper for New and Import in one.
-func NewAndImport(ctx context.Context, src string) (p *Plan, err error) {
+func NewAndImport(ctx context.Context, baseFS PlanImportFS, src string) (p *Plan, err error) {
 	p = New(src)
 
-	err = p.Import(ctx)
+	err = p.Import(ctx, baseFS)
 	if err != nil {
 		return p, err
 	}
@@ -109,17 +109,23 @@ func GenSchema() *jsonschema.Schema {
 }
 
 // NewBody parses plan from file.
-func NewBody(ctx context.Context, file string, validate bool) (*planBody, error) {
+func NewBody(ctx context.Context, baseFS fs.FS, file string, validate bool) (*planBody, error) {
 	b := &planBody{
 		Version: version.Version,
 	}
 
-	src, err := os.ReadFile(file)
+	srcFile, err := baseFS.Open(file)
 	if err != nil {
 		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
+	defer func() {
+		err := srcFile.Close()
+		if err != nil {
+			log.WithError(err).WithField("file", file).Error("failed to close file")
+		}
+	}()
 
-	decoder := yaml.NewDecoder(bytes.NewBuffer(src))
+	decoder := yaml.NewDecoder(srcFile)
 	err = decoder.Decode(b)
 	if err != nil {
 		return b, fmt.Errorf("failed to unmarshal YAML plan %s: %w", file, err)

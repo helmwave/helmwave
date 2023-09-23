@@ -1,8 +1,13 @@
 package release_test
 
 import (
+	"io/fs"
+	"net/url"
+	"os"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
@@ -96,7 +101,9 @@ func (s *ValuesTestSuite) TestBuildNonExistingNonStrict() {
 		},
 	}
 
-	err := r.BuildValues(".", template.TemplaterSprig)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := r.BuildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ".", template.TemplaterSprig)
 
 	s.Require().NoError(err)
 	s.Require().Len(r.Values(), 0)
@@ -111,7 +118,9 @@ func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
 		},
 	}
 
-	err := r.BuildValues(".", template.TemplaterSprig)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := r.BuildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ".", template.TemplaterSprig)
 
 	s.Require().Error(err)
 }

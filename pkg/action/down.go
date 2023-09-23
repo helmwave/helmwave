@@ -12,18 +12,22 @@ var _ Action = (*Down)(nil)
 // Down is a struct for running 'down' command.
 type Down struct {
 	build     *Build
+	planFS    plan.PlanImportFS
 	autoBuild bool
 }
 
 // Run is the main function for 'down' command.
 func (i *Down) Run(ctx context.Context) error {
+	// TODO: get filesystems dynamically from args
+	i.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
+
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
 	}
 
-	p, err := plan.NewAndImport(ctx, i.build.plandir)
+	p, err := plan.NewAndImport(ctx, i.planFS, i.build.plandir)
 	if err != nil {
 		return err
 	}

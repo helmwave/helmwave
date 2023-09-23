@@ -14,31 +14,37 @@ var _ Action = (*DiffLocal)(nil)
 // DiffLocal is a struct for running 'diff plan' command.
 type DiffLocal struct {
 	diff     *Diff
+	plan1FS  plan.PlanImportFS
+	plan2FS  plan.PlanImportFS
 	plandir1 string
 	plandir2 string
 }
 
 // Run is the main function for 'diff plan' command.
 func (d *DiffLocal) Run(ctx context.Context) error {
+	// TODO: get filesystems dynamically from args
+	d.plan1FS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
+	d.plan2FS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
+
 	if d.plandir1 == d.plandir2 {
 		log.Warn(plan.ErrPlansAreTheSame)
 	}
 
 	// Plan 1
-	plan1, err := plan.NewAndImport(ctx, d.plandir1)
+	plan1, err := plan.NewAndImport(ctx, d.plan1FS, d.plandir1)
 	if err != nil {
 		return err
 	}
-	if ok := plan1.IsManifestExist(); !ok {
+	if ok := plan1.IsManifestExist(d.plan1FS); !ok {
 		return os.ErrNotExist
 	}
 
 	// Plan 2
-	plan2, err := plan.NewAndImport(ctx, d.plandir2)
+	plan2, err := plan.NewAndImport(ctx, d.plan2FS, d.plandir2)
 	if err != nil {
 		return err
 	}
-	if ok := plan2.IsManifestExist(); !ok {
+	if ok := plan2.IsManifestExist(d.plan2FS); !ok {
 		return os.ErrNotExist
 	}
 

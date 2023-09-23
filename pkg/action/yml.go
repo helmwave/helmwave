@@ -2,7 +2,12 @@ package action
 
 import (
 	"context"
+	"io/fs"
+	"net/url"
+	"os"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -12,13 +17,26 @@ var _ Action = (*Yml)(nil)
 
 // Yml is a struct for running 'yml' command.
 type Yml struct {
+	srcFS     fs.FS
+	destFS    fsimpl.WriteableFS
 	tpl, file string
 	templater string
 }
 
+func getBaseFS() fsimpl.WriteableFS {
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+
+	return baseFS.(fsimpl.WriteableFS) //nolint:forcetypeassert
+}
+
 // Run is the main function for 'yml' command.
 func (i *Yml) Run(ctx context.Context) error {
-	err := template.Tpl2yml(i.tpl, i.file, nil, i.templater)
+	// TODO: get filesystems dynamically from args
+	i.srcFS = getBaseFS()
+	i.destFS = getBaseFS()
+
+	err := template.Tpl2yml(i.srcFS, i.destFS, i.tpl, i.file, nil, i.templater)
 	if err != nil {
 		return err
 	}

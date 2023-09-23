@@ -2,9 +2,14 @@ package release_test
 
 import (
 	"context"
+	"io/fs"
+	"net/url"
+	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -40,7 +45,9 @@ func (ts *ChartTestSuite) TestLocateChartLocal() {
 	rel := release.NewConfig()
 	rel.ChartF.Name = filepath.Join(tmpDir, "blabla")
 
-	c, err := rel.GetChart()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	c, err := rel.GetChart(baseFS)
 	ts.Require().Error(err)
 	ts.Require().Contains(err.Error(), "failed to locate chart")
 	ts.Require().Nil(c)
@@ -52,7 +59,9 @@ func (ts *ChartTestSuite) TestLoadChartLocal() {
 	rel := release.NewConfig()
 	rel.ChartF.Name = tmpDir
 
-	c, err := rel.GetChart()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	c, err := rel.GetChart(baseFS)
 	ts.Require().Error(err)
 	ts.Require().Contains(err.Error(), "failed to load chart")
 	ts.Require().Contains(err.Error(), "Chart.yaml file is missing")
@@ -91,19 +100,23 @@ func (ts *ChartTestSuite) TestUnmarshalYAMLInvalid() {
 
 func (ts *ChartTestSuite) TestIsRemote() {
 	c := &release.Chart{Name: "/nonexisting"}
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
 
-	ts.Require().True(c.IsRemote())
+	ts.Require().True(c.IsRemote(baseFS.(fs.StatFS)))
 
 	c.Name = ts.T().TempDir()
 
-	ts.Require().False(c.IsRemote())
+	ts.Require().False(c.IsRemote(baseFS.(fs.StatFS)))
 }
 
 func (ts *ChartTestSuite) TestChartDepsUpdRemote() {
 	rel := release.NewConfig()
 	rel.SetChartName("bitnami/redis")
 
-	err := rel.ChartDepsUpd()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := rel.ChartDepsUpd(baseFS.(fs.StatFS))
 
 	ts.Require().NoError(err)
 }
@@ -113,7 +126,9 @@ func (ts *ChartTestSuite) TestSkipChartDepsUpd() {
 	rel.ChartF.Name = ts.T().TempDir()
 	rel.ChartF.SkipDependencyUpdate = true
 
-	err := rel.ChartDepsUpd()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := rel.ChartDepsUpd(baseFS.(fs.StatFS))
 
 	ts.Require().NoError(err)
 }
@@ -122,7 +137,9 @@ func (ts *ChartTestSuite) TestChartDepsUpdInvalid() {
 	rel := release.NewConfig()
 	rel.ChartF.Name = ts.T().TempDir()
 
-	err := rel.ChartDepsUpd()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := rel.ChartDepsUpd(baseFS.(fs.StatFS))
 
 	ts.Require().ErrorContains(err, "Chart.yaml file is missing")
 }
@@ -131,7 +148,9 @@ func (ts *ChartTestSuite) TestDownloadChartRemote() {
 	rel := release.NewConfig()
 	rel.SetChartName("bitnami/redis")
 
-	err := rel.DownloadChart(ts.T().TempDir())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := rel.DownloadChart(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ts.T().TempDir())
 
 	ts.Require().NoError(err)
 }
@@ -139,7 +158,9 @@ func (ts *ChartTestSuite) TestDownloadChartRemote() {
 func (ts *ChartTestSuite) TestDownloadChartLocal() {
 	rel := release.NewConfig()
 
-	err := rel.DownloadChart(ts.T().TempDir())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := rel.DownloadChart(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ts.T().TempDir())
 
 	ts.Require().NoError(err)
 }

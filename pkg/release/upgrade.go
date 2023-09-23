@@ -3,6 +3,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -16,8 +17,8 @@ import (
 // So we have to find this substring in error string.
 const errMissingCRD = "unable to build kubernetes objects from release manifest:"
 
-func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
-	ch, err := rel.GetChart()
+func (rel *config) upgrade(ctx context.Context, baseFS fs.FS) (*release.Release, error) {
+	ch, err := rel.GetChart(baseFS)
 	if err != nil {
 		return nil, err
 	}

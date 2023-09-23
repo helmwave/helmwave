@@ -2,9 +2,11 @@ package action
 
 import (
 	"context"
+	"io/fs"
 	"sort"
 	"strings"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
@@ -18,6 +20,8 @@ type Build struct {
 	yml            *Yml
 	diff           *Diff
 	options        plan.BuildOptions
+	srcFS          fs.StatFS
+	planFS         fsimpl.WriteableFS
 	plandir        string
 	diffMode       string
 	chartsCacheDir string
@@ -35,7 +39,11 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		}
 	}
 
-	err = cache.ChartsCache.Init(i.chartsCacheDir)
+	// TODO: get filesystems dynamically from args
+	i.srcFS = getBaseFS()
+	i.planFS = getBaseFS()
+
+	err = cache.ChartsCache.Init(i.planFS, i.chartsCacheDir)
 	if err != nil {
 		return err
 	}
@@ -46,7 +54,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	i.options.Yml = i.yml.file
 	i.options.Templater = i.yml.templater
 
-	err = newPlan.Build(ctx, i.options)
+	err = newPlan.Build(ctx, i.srcFS, i.planFS, i.options)
 	if err != nil {
 		return err
 	}
@@ -57,9 +65,10 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	switch i.diffMode {
 	case DiffModeLocal:
 		oldPlan := plan.New(i.plandir)
-		if oldPlan.IsExist() {
+		if oldPlan.IsExist(i.planFS) {
 			log.Info("🆚 Diff with previous local plan")
-			if err := oldPlan.Import(ctx); err != nil {
+			//nolint:forcetypeassert
+			if err := oldPlan.Import(ctx, i.planFS.(plan.PlanImportFS)); err != nil {
 				return err
 			}
 
@@ -68,14 +77,14 @@ func (i *Build) Run(ctx context.Context) (err error) {
 
 	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
-		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
+		newPlan.DiffLive(ctx, i.planFS, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
 	case DiffModeNone:
 		log.Info("🆚 Skip diffing")
 	default:
 		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
 	}
 
-	err = newPlan.Export(ctx, i.skipUnchanged)
+	err = newPlan.Export(ctx, i.planFS, i.skipUnchanged)
 	if err != nil {
 		return err
 	}

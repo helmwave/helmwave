@@ -2,10 +2,13 @@ package action
 
 import (
 	"context"
+	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -191,8 +194,10 @@ func (ts *BuildTestSuite) TestRepositories() {
 
 	ts.Require().NoError(s.Run(context.Background()))
 
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
 	const rep = "bitnami"
-	b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File), true)
+	b, _ := plan.NewBody(context.Background(), baseFS, filepath.Join(s.plandir, plan.File), true)
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
 		ts.Failf("%q not found", rep)
@@ -233,7 +238,9 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		ts.Require().NoError(s.Run(context.Background()))
 
-		b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File), true)
+		wd, _ := os.Getwd()
+		baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+		b, _ := plan.NewBody(context.Background(), baseFS, filepath.Join(s.plandir, plan.File), true)
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {

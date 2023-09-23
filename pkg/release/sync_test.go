@@ -4,10 +4,13 @@ package release_test
 
 import (
 	"context"
+	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -45,11 +48,13 @@ func (s *SyncTestSuite) TestInstallUpgrade() {
 		Dst: filepath.Join(tests.Root, "06_values.yaml"),
 	})
 
-	r, err := rel.Sync(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	r, err := rel.Sync(context.Background(), baseFS)
 	s.Require().NoError(err)
 	s.Require().NotNil(r)
 
-	r, err = rel.Sync(context.Background())
+	r, err = rel.Sync(context.Background(), baseFS)
 	s.Require().NoError(err)
 	s.Require().NotNil(r)
 }
@@ -62,7 +67,9 @@ func (s *SyncTestSuite) TestInvalidValues() {
 	rel.ChartF.Name = "bitnami/nginx"
 	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{})
 
-	r, err := rel.Sync(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	r, err := rel.Sync(context.Background(), baseFS)
 	s.Require().Error(err)
 	s.Require().Nil(r)
 }
@@ -76,7 +83,9 @@ func (s *SyncTestSuite) TestSyncWithoutCRD() {
 
 	rel.DryRun(true)
 
-	r, err := rel.Sync(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	r, err := rel.Sync(context.Background(), baseFS)
 	s.Require().NoError(err)
 	s.Require().NotNil(r)
 }

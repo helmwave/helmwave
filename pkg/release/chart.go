@@ -2,10 +2,11 @@ package release
 
 import (
 	"fmt"
-	"os"
+	"io/fs"
 	"path"
 	"path/filepath"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
@@ -74,11 +75,11 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
-func (u *Chart) IsRemote() bool {
-	return !helper.IsExists(filepath.Clean(u.Name))
+func (u *Chart) IsRemote(baseFS fs.StatFS) bool {
+	return !helper.IsExists(baseFS, filepath.Clean(u.Name))
 }
 
-func (rel *config) LocateChartWithCache() (string, error) {
+func (rel *config) LocateChartWithCache(baseFS fs.FS) (string, error) {
 	c := rel.Chart()
 	ch, err := cache.ChartsCache.FindInCache(c.Name, c.Version)
 	if err == nil {
@@ -95,13 +96,13 @@ func (rel *config) LocateChartWithCache() (string, error) {
 		return "", fmt.Errorf("failed to locate chart %s: %w", c.Name, err)
 	}
 
-	cache.ChartsCache.AddToCache(ch)
+	cache.ChartsCache.AddToCache(baseFS, ch)
 
 	return ch, nil
 }
 
-func (rel *config) GetChart() (*chart.Chart, error) {
-	ch, err := rel.LocateChartWithCache()
+func (rel *config) GetChart(baseFS fs.FS) (*chart.Chart, error) {
+	ch, err := rel.LocateChartWithCache(baseFS)
 	if err != nil {
 		return nil, err
 	}
@@ -136,8 +137,8 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 	return nil
 }
 
-func (rel *config) ChartDepsUpd() error {
-	if rel.Chart().IsRemote() {
+func (rel *config) ChartDepsUpd(baseFS fs.StatFS) error {
+	if rel.Chart().IsRemote(baseFS) {
 		rel.Logger().Info("❎ skipping updating dependencies for remote chart")
 
 		return nil
@@ -173,24 +174,24 @@ func (rel *config) ChartDepsUpd() error {
 	return nil
 }
 
-func (rel *config) DownloadChart(tmpDir string) error {
-	if !rel.Chart().IsRemote() {
+func (rel *config) DownloadChart(baseFS fs.StatFS, tmpFS fsimpl.WriteableFS, tmpDir string) error {
+	if !rel.Chart().IsRemote(baseFS) {
 		rel.Logger().Info("❎ chart is local, skipping exporting")
 
 		return nil
 	}
 
 	destDir := path.Join(tmpDir, "charts", rel.Uniq().String())
-	if err := os.MkdirAll(destDir, 0o750); err != nil {
+	if err := tmpFS.MkdirAll(destDir, 0o750); err != nil {
 		return fmt.Errorf("failed to create temporary directory for chart: %w", err)
 	}
 
-	ch, err := rel.LocateChartWithCache()
+	ch, err := rel.LocateChartWithCache(baseFS)
 	if err != nil {
 		return err
 	}
 
-	return helper.CopyFile(ch, destDir)
+	return helper.CopyFile(baseFS, tmpFS, ch, destDir)
 }
 
 func (rel *config) SetChartName(name string) {

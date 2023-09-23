@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -14,14 +13,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type PlanImportFS interface {
+	fs.ReadDirFS
+	fs.ReadFileFS
+	fs.StatFS
+}
+
 // Import parses directory with plan files and imports them into structure.
-func (p *Plan) Import(ctx context.Context) error {
-	body, err := NewBody(ctx, p.fullPath, true)
+func (p *Plan) Import(ctx context.Context, baseFS PlanImportFS) error {
+	body, err := NewBody(ctx, baseFS, p.fullPath, true)
 	if err != nil {
 		return err
 	}
 
-	err = p.importManifest()
+	err = p.importManifest(baseFS)
 
 	switch {
 	case errors.Is(err, ErrManifestDirEmpty), errors.Is(err, fs.ErrNotExist):
@@ -33,7 +38,7 @@ func (p *Plan) Import(ctx context.Context) error {
 	p.body = body
 
 	// Validate all files exist.
-	err = p.ValidateValuesImport()
+	err = p.ValidateValuesImport(baseFS)
 	if err != nil {
 		return err
 	}
@@ -43,9 +48,9 @@ func (p *Plan) Import(ctx context.Context) error {
 	return nil
 }
 
-func (p *Plan) importManifest() error {
+func (p *Plan) importManifest(baseFS PlanImportFS) error {
 	d := filepath.Join(p.dir, Manifest)
-	ls, err := os.ReadDir(d)
+	ls, err := baseFS.ReadDir(d)
 	if err != nil {
 		return fmt.Errorf("failed to read manifest dir %s: %w", d, err)
 	}
@@ -60,7 +65,7 @@ func (p *Plan) importManifest() error {
 		}
 
 		f := filepath.Join(p.dir, Manifest, l.Name())
-		c, err := os.ReadFile(f)
+		c, err := baseFS.ReadFile(f)
 		if err != nil {
 			return fmt.Errorf("failed to read manifest %s: %w", f, err)
 		}

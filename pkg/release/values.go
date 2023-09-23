@@ -6,8 +6,10 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
@@ -88,8 +90,8 @@ func (v *ValuesReference) isURL() bool {
 }
 
 // Download downloads values by source URL and places to destination path.
-func (v *ValuesReference) Download() error {
-	if err := helper.Download(v.Dst, v.Src); err != nil {
+func (v *ValuesReference) Download(baseFS fsimpl.WriteableFS) error {
+	if err := helper.Download(baseFS, v.Dst, v.Src); err != nil {
 		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, v.Dst, err)
 	}
 
@@ -134,7 +136,7 @@ func ProhibitDst(values []ValuesReference) error {
 
 // SetViaRelease downloads and templates values file.
 // Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
-func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error {
+func (v *ValuesReference) SetViaRelease(rel Config, srcFS fs.StatFS, destFS fsimpl.WriteableFS, dir, templater string) error {
 	if v.Renderer == "" {
 		v.Renderer = templater
 	}
@@ -151,16 +153,16 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 		Release: rel,
 	}
 
-	err := v.fetch(l)
+	err := v.fetch(l, srcFS, destFS)
 	if err != nil {
 		return err
 	}
 
 	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
 	if v.isURL() {
-		err = template.Tpl2yml(v.Dst, v.Dst, data, v.Renderer, delimOption)
+		err = template.Tpl2yml(srcFS, destFS, v.Dst, v.Dst, data, v.Renderer, delimOption)
 	} else {
-		err = template.Tpl2yml(v.Src, v.Dst, data, v.Renderer, delimOption)
+		err = template.Tpl2yml(srcFS, destFS, v.Src, v.Dst, data, v.Renderer, delimOption)
 	}
 
 	if err != nil {
@@ -170,15 +172,15 @@ func (v *ValuesReference) SetViaRelease(rel Config, dir, templater string) error
 	return nil
 }
 
-func (v *ValuesReference) fetch(l *log.Entry) error {
+func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.StatFS, destFS fsimpl.WriteableFS) error {
 	if v.isURL() {
-		err := v.Download()
+		err := v.Download(destFS)
 		if err != nil {
 			l.WithError(err).Warnf("%q skipping: cant download", v.Src)
 
 			return ErrValuesNotExist
 		}
-	} else if !helper.IsExists(v.Src) {
+	} else if !helper.IsExists(srcFS, v.Src) {
 		l.Warn("skipping: local file not found")
 
 		return ErrValuesNotExist
@@ -187,11 +189,11 @@ func (v *ValuesReference) fetch(l *log.Entry) error {
 	return nil
 }
 
-func (rel *config) BuildValues(dir, templater string) error {
+func (rel *config) BuildValues(srcFS fs.StatFS, destFS fsimpl.WriteableFS, dir, templater string) error {
 	vals := rel.Values()
 	for i := len(vals) - 1; i >= 0; i-- {
 		v := vals[i]
-		err := v.SetViaRelease(rel, dir, templater)
+		err := v.SetViaRelease(rel, srcFS, destFS, dir, templater)
 		switch {
 		case !v.Strict && errors.Is(ErrValuesNotExist, err):
 			rel.Logger().WithError(err).WithField("values", v).Warn("skipping values...")

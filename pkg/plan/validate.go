@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"io/fs"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -12,12 +13,12 @@ import (
 )
 
 // ValidateValuesImport checks whether all values files exist.
-func (p *Plan) ValidateValuesImport() error {
+func (p *Plan) ValidateValuesImport(baseFS fs.StatFS) error {
 	f := false
 	for _, rel := range p.body.Releases {
 		for i := range rel.Values() {
 			y := rel.Values()[i].Dst
-			_, err := os.Stat(y)
+			_, err := baseFS.Stat(y)
 			if os.IsNotExist(err) {
 				f = true
 				rel.Logger().Errorf("❌ values %q", rel.Values()[i].Src)

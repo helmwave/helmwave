@@ -2,9 +2,13 @@ package helper_test
 
 import (
 	"fmt"
+	"net/url"
+	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/stretchr/testify/suite"
 )
@@ -17,25 +21,31 @@ func (s *HTTPTestSuite) TestDownloadBadURL() {
 	tmpDir := s.T().TempDir()
 	filePath := filepath.Join(tmpDir, "test")
 
-	err := helper.Download(filePath, "\\asd://null")
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := helper.Download(baseFS.(fsimpl.WriteableFS), filePath, "\\asd://null")
 	s.Require().Error(err)
 }
 
 func (s *HTTPTestSuite) TestDownloadBadResponse() {
 	tmpDir := s.T().TempDir()
 	filePath := filepath.Join(tmpDir, "test")
-	url := fmt.Sprintf("https://helmwave.github.io/%s", s.T().Name())
+	u := fmt.Sprintf("https://helmwave.github.io/%s", s.T().Name())
 
-	err := helper.Download(filePath, url)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := helper.Download(baseFS.(fsimpl.WriteableFS), filePath, u)
 	s.Require().Error(err)
 }
 
 func (s *HTTPTestSuite) TestDownload() {
 	tmpDir := s.T().TempDir()
 	filePath := filepath.Join(tmpDir, "test")
-	url := "https://helmwave.github.io/"
+	u := "https://helmwave.github.io/"
 
-	err := helper.Download(filePath, url)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := helper.Download(baseFS.(fsimpl.WriteableFS), filePath, u)
 	s.Require().NoError(err)
 }
 

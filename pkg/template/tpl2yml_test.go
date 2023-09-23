@@ -1,10 +1,13 @@
 package template_test
 
 import (
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
@@ -19,7 +22,9 @@ func (s *Tpl2YmlTestSuite) TestNonExistingTemplate() {
 	tpl := filepath.Join(tmpDir, "values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := template.Tpl2yml(baseFS, baseFS.(fsimpl.WriteableFS), tpl, dst, nil, template.TemplaterSprig)
 	s.Require().ErrorIs(err, os.ErrNotExist)
 }
 
@@ -28,7 +33,9 @@ func (s *Tpl2YmlTestSuite) TestNonExistingDestDir() {
 	tpl := filepath.Join(tests.Root, "05_values.yaml")
 	dst := filepath.Join(tmpDir, "blabla", "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := template.Tpl2yml(baseFS, baseFS.(fsimpl.WriteableFS), tpl, dst, nil, template.TemplaterSprig)
 	s.Require().NoError(err)
 }
 
@@ -37,7 +44,9 @@ func (s *Tpl2YmlTestSuite) TestMissingData() {
 	tpl := filepath.Join(tests.Root, "08_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := template.Tpl2yml(baseFS, baseFS.(fsimpl.WriteableFS), tpl, dst, nil, template.TemplaterSprig)
 	s.Require().EqualError(err, "failed to render template: failed to parse template: template: tpl:1: function \"defineDatasource\" not defined")
 }
 
@@ -46,7 +55,9 @@ func (s *Tpl2YmlTestSuite) TestDisabledGomplate() {
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterSprig)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := template.Tpl2yml(baseFS, baseFS.(fsimpl.WriteableFS), tpl, dst, nil, template.TemplaterSprig)
 	s.Require().Error(err)
 }
 
@@ -55,7 +66,9 @@ func (s *Tpl2YmlTestSuite) TestEnabledGomplate() {
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(tpl, dst, nil, template.TemplaterGomplate)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := template.Tpl2yml(baseFS, baseFS.(fsimpl.WriteableFS), tpl, dst, nil, template.TemplaterGomplate)
 	s.Require().NoError(err)
 }
 

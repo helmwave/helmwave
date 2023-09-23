@@ -1,9 +1,12 @@
 package release
 
 import (
+	"cmp"
 	"context"
 	"fmt"
+	"io/fs"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -20,13 +23,13 @@ type Config interface {
 	helper.EqualChecker[Config]
 	log.LoggerGetter
 	Uniq() uniqname.UniqName
-	Sync(context.Context) (*release.Release, error)
-	SyncDryRun(context.Context) (*release.Release, error)
+	Sync(context.Context, fs.FS) (*release.Release, error)
+	SyncDryRun(context.Context, fs.FS) (*release.Release, error)
 	AllowFailure() bool
 	DryRun(bool)
-	ChartDepsUpd() error
-	DownloadChart(string) error
-	BuildValues(string, string) error
+	ChartDepsUpd(fs.StatFS) error
+	DownloadChart(fs.StatFS, fsimpl.WriteableFS, string) error
+	BuildValues(fs.StatFS, fsimpl.WriteableFS, string, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get(int) (*release.Release, error)
 	List() (*release.Release, error)
@@ -92,4 +95,8 @@ func (r Configs) ContainsUniq(uniq uniqname.UniqName) (Config, bool) {
 	}
 
 	return nil, false
+}
+
+func Compare(rel1, rel2 Config) int {
+	return cmp.Compare(rel1.Uniq().String(), rel2.Uniq().String())
 }

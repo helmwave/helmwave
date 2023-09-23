@@ -2,8 +2,10 @@ package plan
 
 import (
 	"context"
+	"io/fs"
 	"path/filepath"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -47,24 +49,24 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	return u
 }
 
-func (r *MockReleaseConfig) Sync(context.Context) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) Sync(_ context.Context, _ fs.FS) (*helmRelease.Release, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) SyncDryRun(ctx context.Context) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) SyncDryRun(ctx context.Context, baseFS fs.FS) (*helmRelease.Release, error) {
 	r.DryRun(true)
 	defer r.DryRun(false)
 
-	return r.Sync(ctx)
+	return r.Sync(ctx, baseFS)
 }
 
 func (r *MockReleaseConfig) DryRun(bool) {
 	r.Called()
 }
 
-func (r *MockReleaseConfig) ChartDepsUpd() error {
+func (r *MockReleaseConfig) ChartDepsUpd(_ fs.StatFS) error {
 	return r.Called().Error(0)
 }
 
@@ -72,7 +74,7 @@ func (r *MockReleaseConfig) Equal(release.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockReleaseConfig) BuildValues(dir, templater string) error {
+func (r *MockReleaseConfig) BuildValues(statFS fs.StatFS, writeableFS fsimpl.WriteableFS, dir, templater string) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn
@@ -81,7 +83,7 @@ func (r *MockReleaseConfig) BuildValues(dir, templater string) error {
 	for i := len(r.Values()) - 1; i >= 0; i-- {
 		v := r.Values()[i]
 		dst := filepath.Join(dir, Values, filepath.Base(v.Src))
-		err := template.Tpl2yml(v.Src, dst, nil, templater)
+		err := template.Tpl2yml(statFS, writeableFS, v.Src, dst, nil, templater)
 		if err != nil {
 			return err
 		}
@@ -162,7 +164,7 @@ func (r *MockReleaseConfig) HelmWait() bool {
 	return true
 }
 
-func (r *MockReleaseConfig) DownloadChart(string) error {
+func (r *MockReleaseConfig) DownloadChart(_ fs.StatFS, _ fsimpl.WriteableFS, _ string) error {
 	return r.Called().Error(0)
 }
 

@@ -2,7 +2,9 @@ package plan
 
 import (
 	"context"
+	"io/fs"
 
+	"github.com/helmwave/go-fsimpl"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,11 +19,11 @@ type BuildOptions struct { //nolint:govet
 // Build plan with yml and tags/matchALL options.
 //
 //nolint:cyclop // TODO: reduce cyclomatic complexity
-func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funlen
+func (p *Plan) Build(ctx context.Context, srcFS fs.StatFS, destFS fsimpl.WriteableFS, o BuildOptions) error { //nolint:funlen
 	p.templater = o.Templater
 
 	// Create Body
-	body, err := NewBody(ctx, o.Yml, false)
+	body, err := NewBody(ctx, srcFS, o.Yml, false)
 	if err != nil {
 		return err
 	}
@@ -49,7 +51,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 
 	// Build Values
 	log.Info("🔨 Building values...")
-	err = p.buildValues()
+	err = p.buildValues(srcFS, destFS)
 	if err != nil {
 		return err
 	}
@@ -81,7 +83,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 
 	// to build charts, we need repositories and registries first
 	log.Info("🔨 Building charts...")
-	err = p.buildCharts()
+	err = p.buildCharts(srcFS, destFS)
 	if err != nil {
 		return err
 	}
@@ -94,7 +96,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 
 	// Build Manifest
 	log.Info("🔨 Building manifests...")
-	err = p.buildManifest(ctx)
+	err = p.buildManifest(ctx, srcFS)
 	if err != nil {
 		return err
 	}

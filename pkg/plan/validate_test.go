@@ -2,10 +2,14 @@ package plan_test
 
 import (
 	"errors"
+	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/repo"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -62,6 +66,8 @@ func (s *ValidateTestSuite) TestInvalidRepository() {
 
 func (s *ValidateTestSuite) TestValidateValues() {
 	tmpDir := s.T().TempDir()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	valuesContents := []byte("a: b")
@@ -74,12 +80,12 @@ func (s *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
-	s.Require().NoError(v.SetViaRelease(mockedRelease, tmpDir, template.TemplaterSprig))
+	s.Require().NoError(v.SetViaRelease(mockedRelease, baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), tmpDir, template.TemplaterSprig))
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
 
-	s.Require().NoError(p.ValidateValuesImport())
+	s.Require().NoError(p.ValidateValuesImport(baseFS.(fs.StatFS)))
 
 	mockedRelease.AssertExpectations(s.T())
 }
@@ -94,12 +100,14 @@ func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
-	v := release.ValuesReference{Src: tmpValues}
+	v := release.ValuesReference{Src: tmpValues, Dst: s.T().Name()}
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
 
-	s.Require().Error(p.ValidateValuesImport())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	s.Require().Error(p.ValidateValuesImport(baseFS.(fs.StatFS)))
 
 	mockedRelease.AssertExpectations(s.T())
 }
@@ -110,7 +118,9 @@ func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
 
 	p.NewBody()
 
-	s.Require().NoError(p.ValidateValuesImport())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	s.Require().NoError(p.ValidateValuesImport(baseFS.(fs.StatFS)))
 }
 
 func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {

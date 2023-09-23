@@ -16,11 +16,15 @@ var _ Action = (*Up)(nil)
 type Up struct {
 	build     *Build
 	dog       *kubedog.Config
+	planFS    plan.PlanImportFS
 	autoBuild bool
 }
 
 // Run is the main function for 'up' command.
 func (i *Up) Run(ctx context.Context) error {
+	// TODO: get filesystems dynamically from args
+	i.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
+
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
 			return err
@@ -29,14 +33,14 @@ func (i *Up) Run(ctx context.Context) error {
 		i.warnOnBuildFlags(ctx)
 	}
 
-	p, err := plan.NewAndImport(ctx, i.build.plandir)
+	p, err := plan.NewAndImport(ctx, i.planFS, i.build.plandir)
 	if err != nil {
 		return err
 	}
 
 	p.Logger().Info("🏗 Plan")
 
-	return p.Up(ctx, i.dog)
+	return p.Up(ctx, i.planFS, i.dog)
 }
 
 func (i *Up) warnOnBuildFlags(ctx context.Context) {

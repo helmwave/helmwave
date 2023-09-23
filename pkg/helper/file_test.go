@@ -1,9 +1,13 @@
 package helper_test
 
 import (
+	"io/fs"
+	"net/url"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/stretchr/testify/suite"
 )
@@ -38,49 +42,53 @@ func (s *FileTestSuite) TestContainsBad() {
 
 func (s *FileTestSuite) TestCreateFile() {
 	tmpDir := s.T().TempDir()
-	filePath := filepath.Join(tmpDir, "testdir", "test")
+	tmpFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
+	filePath := filepath.Join("testdir", "test")
 
-	f, err := helper.CreateFile(filePath)
+	f, err := helper.CreateFile(tmpFS.(fsimpl.WriteableFS), filePath)
 	s.Require().NoError(err)
 	s.Require().NotNil(f)
 	s.Require().NoError(f.Close())
 
-	s.Require().FileExists(filePath)
+	s.Require().FileExists(filepath.Join(tmpDir, filePath))
 }
 
 func (s *FileTestSuite) TestCreateFileMkdir() {
 	tmpDir := s.T().TempDir()
+	tmpFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
 
-	f, err := helper.CreateFile(tmpDir)
+	f, err := helper.CreateFile(tmpFS.(fsimpl.WriteableFS), ".")
 	s.Require().Error(err)
 	s.Require().Nil(f)
 
-	filePath := filepath.Join(tmpDir, "test")
+	filePath := "test"
 
-	f, err = helper.CreateFile(filePath)
+	f, err = helper.CreateFile(tmpFS.(fsimpl.WriteableFS), filePath)
 	s.Require().NoError(err)
 	s.Require().NotNil(f)
 	s.Require().NoError(f.Close())
 
 	filePath = filepath.Join(filePath, "test")
 
-	f, err = helper.CreateFile(filePath)
+	f, err = helper.CreateFile(tmpFS.(fsimpl.WriteableFS), filePath)
 	s.Require().Error(err)
 	s.Require().Nil(f)
 }
 
 func (s *FileTestSuite) TestIsExists() {
 	tmpDir := s.T().TempDir()
-	filePath := filepath.Join(tmpDir, "test")
+	tmpFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
 
-	s.Require().False(helper.IsExists(filePath))
+	filePath := "test"
 
-	f, err := helper.CreateFile(filePath)
+	s.Require().False(helper.IsExists(tmpFS.(fs.StatFS), filePath))
+
+	f, err := helper.CreateFile(tmpFS.(fsimpl.WriteableFS), filePath)
 	s.Require().NoError(err)
 	s.Require().NotNil(f)
 	s.Require().NoError(f.Close())
 
-	s.Require().True(helper.IsExists(filePath))
+	s.Require().True(helper.IsExists(tmpFS.(fs.StatFS), filePath))
 }
 
 func TestFileTestSuite(t *testing.T) {

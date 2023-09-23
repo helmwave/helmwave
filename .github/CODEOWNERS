@@ -1,0 +1,4 @@
+.github @helmwave/maintainers
+cmd @helmwave/maintainers
+pkg @helmwave/maintainers
+tests @helmwave/maintainers

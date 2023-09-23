@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
+	"github.com/helmwave/go-fsimpl"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,15 +19,15 @@ const (
 )
 
 // Download downloads uri to file.
-func Download(file, uri string) error {
-	f, err := CreateFile(file)
+func Download(destFS fsimpl.WriteableFS, destFile, uri string) error {
+	f, err := CreateFile(destFS, destFile)
 	if err != nil {
 		return err
 	}
-	defer func(f *os.File) {
+	defer func(f fs.File) {
 		err := f.Close()
 		if err != nil {
-			log.Errorf("failed to close file %s: %v", f.Name(), err)
+			log.WithError(err).Error("failed to close file")
 		}
 	}(f)
 

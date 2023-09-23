@@ -1,9 +1,11 @@
 package template
 
 import (
+	"bytes"
 	"fmt"
-	"os"
+	"io/fs"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 )
@@ -34,7 +36,14 @@ func getTemplater(name string) (Templater, error) {
 }
 
 // Tpl2yml renders 'tpl' file to 'yml' file as go template.
-func Tpl2yml(tpl, yml string, data any, templaterName string, opts ...TemplaterOptions) error {
+func Tpl2yml(
+	tplFS fs.FS,
+	ymlFS fsimpl.WriteableFS,
+	tpl, yml string,
+	data any,
+	templaterName string,
+	opts ...TemplaterOptions,
+) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
@@ -44,10 +53,23 @@ func Tpl2yml(tpl, yml string, data any, templaterName string, opts ...TemplaterO
 		data = map[string]any{}
 	}
 
-	src, err := os.ReadFile(tpl)
+	srcFile, err := tplFS.Open(tpl)
 	if err != nil {
 		return fmt.Errorf("failed to read template file %s: %w", tpl, err)
 	}
+	defer func() {
+		err := srcFile.Close()
+		if err != nil {
+			log.WithError(err).WithField("file", tpl).Error("failed to close file")
+		}
+	}()
+
+	buf := &bytes.Buffer{}
+	_, err = buf.ReadFrom(srcFile)
+	if err != nil {
+		log.WithError(err).WithField("file", tpl).Error("failed to read file")
+	}
+	src := buf.String()
 
 	templater, err := getTemplater(templaterName)
 	if err != nil {
@@ -59,14 +81,14 @@ func Tpl2yml(tpl, yml string, data any, templaterName string, opts ...TemplaterO
 		opt(templater)
 	}
 
-	d, err := templater.Render(string(src), data)
+	d, err := templater.Render(src, data)
 	if err != nil {
 		return fmt.Errorf("failed to render template: %w", err)
 	}
 
 	log.Trace(yml, " contents\n", string(d))
 
-	f, err := helper.CreateFile(yml)
+	f, err := helper.CreateFile(ymlFS, yml)
 	if err != nil {
 		return fmt.Errorf("failed to create destination file %s: %w", yml, err)
 	}

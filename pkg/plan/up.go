@@ -4,11 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
+	"net/url"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/gofrs/flock"
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -28,7 +32,7 @@ import (
 )
 
 // Up syncs repositories and releases.
-func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
+func (p *Plan) Up(ctx context.Context, baseFS fs.FS, dog *kubedog.Config) error {
 	// Run hooks
 	err := p.body.Lifecycle.RunPreUp(ctx)
 	if err != nil {
@@ -63,9 +67,9 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
 	if dog.Enabled {
 		log.Warn("🐶 kubedog is enabled")
 		kubedog.FixLog(dog.LogWidth)
-		err = p.syncReleasesKubedog(ctx, dog)
+		err = p.syncReleasesKubedog(ctx, baseFS, dog)
 	} else {
-		err = p.syncReleases(ctx)
+		err = p.syncReleases(ctx, baseFS)
 	}
 
 	if err != nil {
@@ -97,12 +101,21 @@ func (p *Plan) syncRegistries(ctx context.Context) (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
+//
+//nolint:gocognit
 func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
+	// TODO: refactor it as global helmFS
+	helmROFS, err := filefs.New(&url.URL{Scheme: "file", Path: "/"})
+	if err != nil {
+		return err //nolint:wrapcheck
+	}
+	helmFS := helmROFS.(fsimpl.WriteableFS) //nolint:forcetypeassert
+
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exists
-	if !helper.IsExists(helper.Helm.RepositoryConfig) {
-		f, err := helper.CreateFile(helper.Helm.RepositoryConfig)
+	if !helper.IsExists(helmFS, helper.Helm.RepositoryConfig) {
+		f, err := helper.CreateFile(helmFS, helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
@@ -210,7 +223,7 @@ func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 	return res
 }
 
-func (p *Plan) syncReleases(ctx context.Context) (err error) {
+func (p *Plan) syncReleases(ctx context.Context, baseFS fs.FS) (err error) {
 	dependenciesGraph, err := p.body.generateDependencyGraph()
 	if err != nil {
 		return err
@@ -243,7 +256,7 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	releasesMutex := &sync.Mutex{}
 
 	for i := 0; i < parallelLimit; i++ {
-		go p.syncReleasesWorker(ctx, releasesWG, releasesNodesChan, releasesMutex, releasesFails, monitorsLockMap)
+		go p.syncReleasesWorker(ctx, releasesWG, releasesNodesChan, releasesMutex, releasesFails, monitorsLockMap, baseFS)
 	}
 
 	for _, mon := range p.body.Monitors {
@@ -280,9 +293,10 @@ func (p *Plan) syncReleasesWorker(
 	mu *sync.Mutex,
 	fails map[release.Config]error,
 	monitorsLockMap map[string]*parallel.WaitGroup,
+	baseFS fs.FS,
 ) {
 	for n := range nodesChan {
-		p.syncRelease(ctx, wg, n, mu, fails, monitorsLockMap)
+		p.syncRelease(ctx, wg, n, mu, fails, monitorsLockMap, baseFS)
 	}
 	wg.Done()
 }
@@ -294,6 +308,7 @@ func (p *Plan) syncRelease(
 	mu *sync.Mutex,
 	fails map[release.Config]error,
 	monitorsLockMap map[string]*parallel.WaitGroup,
+	baseFS fs.FS,
 ) {
 	rel := node.Data
 
@@ -301,7 +316,7 @@ func (p *Plan) syncRelease(
 
 	l.Info("🛥 deploying... ")
 
-	if _, err := rel.Sync(ctx); err != nil {
+	if _, err := rel.Sync(ctx, baseFS); err != nil {
 		l.WithError(err).Error("❌ failed to deploy")
 
 		if rel.AllowFailure() {
@@ -433,7 +448,7 @@ func (p *Plan) ApplyReport(
 	return nil
 }
 
-func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.Config) error {
+func (p *Plan) syncReleasesKubedog(ctx context.Context, baseFS fs.FS, kubedogConfig *kubedog.Config) error {
 	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Don't forget!
 
@@ -470,7 +485,7 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 
 	// Run helm
 	time.Sleep(kubedogConfig.StartDelay)
-	err = p.syncReleases(ctx)
+	err = p.syncReleases(ctx, baseFS)
 	if err != nil {
 		cancel()
 

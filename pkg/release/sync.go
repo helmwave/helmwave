@@ -2,6 +2,7 @@ package release
 
 import (
 	"context"
+	"io/fs"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/action"
@@ -9,7 +10,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
+func (rel *config) Sync(ctx context.Context, baseFS fs.FS) (*release.Release, error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
@@ -39,7 +40,7 @@ func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
 		}()
 	}
 
-	r, err := rel.upgrade(ctx)
+	r, err := rel.upgrade(ctx, baseFS)
 
 	if err == nil && !rel.dryRun && rel.ShowNotes {
 		rel.Logger().Infof("🗒️ release notes:\n%s", r.Info.Notes)
@@ -48,12 +49,12 @@ func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
 	return r, err
 }
 
-func (rel *config) SyncDryRun(ctx context.Context) (*release.Release, error) {
+func (rel *config) SyncDryRun(ctx context.Context, baseFS fs.FS) (*release.Release, error) {
 	old := rel.dryRun
 	defer rel.DryRun(old)
 	rel.DryRun(true)
 
-	return rel.Sync(ctx)
+	return rel.Sync(ctx, baseFS)
 }
 
 func (rel *config) Cfg() *action.Configuration {

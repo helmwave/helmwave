@@ -20,3 +20,29 @@ var (
 	// ErrDeploy is returned when deploy is failed for whatever reason.
 	ErrDeploy = errors.New("deploy failed")
 )
+
+type YAMLDecodeDependsOnError struct {
+	Err       error
+	DependsOn string
+}
+
+func NewYAMLDecodeDependsOnError(depends_on string, err error) error {
+	return &YAMLDecodeDependsOnError{DependsOn: depends_on, Err: err}
+}
+
+func (err YAMLDecodeDependsOnError) Error() string {
+	return fmt.Sprintf("failed to decode depends_on reference %q from YAML: %s", err.DependsOn, err.Err)
+}
+
+func (err YAMLDecodeDependsOnError) Unwrap() error {
+	return err.Err
+}
+
+func (YAMLDecodeDependsOnError) Is(target error) bool {
+	switch target.(type) {
+	case YAMLDecodeDependsOnError, *YAMLDecodeDependsOnError:
+		return true
+	default:
+		return false
+	}
+}

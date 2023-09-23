@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ErrCacheDisabled = errors.New("cache is disabled")
-	ErrChartNotFound = errors.New("chart not found")
+	ErrCacheDisabled  = errors.New("cache is disabled")
+	ErrChartNotFound  = errors.New("chart not found")
+	ErrNotWriteableFS = errors.New("filesystem for cache doesn't support writes")
 )
 
 type NotCreatedError struct {

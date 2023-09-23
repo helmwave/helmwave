@@ -3,35 +3,42 @@ package plan
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"sync"
 
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 )
 
-func (p *Plan) buildManifest(ctx context.Context) error {
+func (p *Plan) buildManifest(ctx context.Context, baseFS fs.StatFS) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
 	mu := &sync.Mutex{}
 
 	for _, rel := range p.body.Releases {
-		go p.buildReleaseManifest(ctx, wg, rel, mu)
+		go p.buildReleaseManifest(ctx, wg, rel, mu, baseFS)
 	}
 
 	return wg.Wait()
 }
 
-func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
+func (p *Plan) buildReleaseManifest(
+	ctx context.Context,
+	wg *parallel.WaitGroup,
+	rel release.Config,
+	mu *sync.Mutex,
+	baseFS fs.StatFS,
+) {
 	defer wg.Done()
 
 	l := rel.Logger()
 
-	if err := rel.ChartDepsUpd(); err != nil {
+	if err := rel.ChartDepsUpd(baseFS); err != nil {
 		l.WithError(err).Warn("❌ can't get dependencies")
 	}
 
-	r, err := rel.SyncDryRun(ctx)
+	r, err := rel.SyncDryRun(ctx, baseFS)
 	if err != nil || r == nil {
 		l.Errorf("❌ can't get manifests: %v", err)
 		wg.ErrChan() <- err

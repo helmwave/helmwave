@@ -3,22 +3,23 @@ package plan
 import (
 	"context"
 	"fmt"
-	"os"
+	"io/fs"
 	"path"
 	"path/filepath"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 )
 
 // Export allows save plan to file.
-func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
-	if err := os.RemoveAll(p.dir); err != nil {
+func (p *Plan) Export(ctx context.Context, baseFS fsimpl.WriteableFS, skipUnchanged bool) error {
+	if err := baseFS.RemoveAll(p.dir); err != nil {
 		return fmt.Errorf("failed to clean plan directory %s: %w", p.dir, err)
 	}
 	defer func(dir string) {
-		err := os.RemoveAll(dir)
+		err := baseFS.RemoveAll(dir)
 		if err != nil {
 			p.Logger().WithError(err).Error("failed to remove temporary directory")
 		}
@@ -34,25 +35,25 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 
 	go func() {
 		defer wg.Done()
-		if err := p.exportCharts(); err != nil {
+		if err := p.exportCharts(baseFS); err != nil {
 			wg.ErrChan() <- err
 		}
 	}()
 	go func() {
 		defer wg.Done()
-		if err := p.exportManifest(); err != nil {
+		if err := p.exportManifest(baseFS); err != nil {
 			wg.ErrChan() <- err
 		}
 	}()
 	go func() {
 		defer wg.Done()
-		if err := p.exportValues(); err != nil {
+		if err := p.exportValues(baseFS); err != nil {
 			wg.ErrChan() <- err
 		}
 	}()
 	go func() {
 		defer wg.Done()
-		if err := p.exportGraphMD(); err != nil {
+		if err := p.exportGraphMD(baseFS); err != nil {
 			wg.ErrChan() <- err
 		}
 	}()
@@ -63,7 +64,7 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 	}
 
 	// Save Planfile after everything is exported
-	return helper.SaveInterface(ctx, p.fullPath, p.body)
+	return helper.SaveInterface(ctx, baseFS, p.fullPath, p.body)
 }
 
 func (p *Plan) removeUnchanged() {
@@ -78,11 +79,11 @@ func (p *Plan) removeUnchanged() {
 	p.body.Releases = filtered
 }
 
-func (p *Plan) exportCharts() error {
+func (p *Plan) exportCharts(baseFS fsimpl.WriteableFS) error {
 	for i, rel := range p.body.Releases {
 		l := p.Logger().WithField("release", rel.Uniq())
 
-		if !rel.Chart().IsRemote() {
+		if !rel.Chart().IsRemote(baseFS) {
 			l.Info("chart is local, skipping exporting it")
 
 			continue
@@ -91,6 +92,8 @@ func (p *Plan) exportCharts() error {
 		src := path.Join(p.tmpDir, "charts", rel.Uniq().String())
 		dst := path.Join(p.dir, "charts", rel.Uniq().String())
 		err := helper.MoveFile(
+			baseFS,
+			baseFS,
 			src,
 			dst,
 		)
@@ -100,7 +103,7 @@ func (p *Plan) exportCharts() error {
 
 		// Chart is places as an archive under this directory.
 		// So we need to find it and use.
-		entries, err := os.ReadDir(dst)
+		entries, err := baseFS.(fs.ReadDirFS).ReadDir(dst)
 		if err != nil {
 			l.WithError(err).Warn("failed to read directory with downloaded chart, skipping")
 
@@ -120,30 +123,30 @@ func (p *Plan) exportCharts() error {
 	return nil
 }
 
-func (p *Plan) exportManifest() error {
+func (p *Plan) exportManifest(baseFS fsimpl.WriteableFS) error {
 	for k, v := range p.manifests {
 		m := filepath.Join(p.dir, Manifest, k.String()+".yml")
 
-		f, err := helper.CreateFile(m)
+		f, err := helper.CreateFile(baseFS, m)
 		if err != nil {
 			return err
 		}
 
-		_, err = f.WriteString(v)
+		_, err = f.Write([]byte(v))
 		if err != nil {
-			return fmt.Errorf("failed to write manifest %s: %w", f.Name(), err)
+			return fmt.Errorf("failed to write manifest %s: %w", m, err)
 		}
 
 		err = f.Close()
 		if err != nil {
-			return fmt.Errorf("failed to close manifest %s: %w", f.Name(), err)
+			return fmt.Errorf("failed to close manifest %s: %w", m, err)
 		}
 	}
 
 	return nil
 }
 
-func (p *Plan) exportGraphMD() error {
+func (p *Plan) exportGraphMD(baseFS fsimpl.WriteableFS) error {
 	found := false
 	for _, rel := range p.body.Releases {
 		if len(rel.DependsOn()) > 0 {
@@ -158,24 +161,25 @@ func (p *Plan) exportGraphMD() error {
 	}
 
 	const filename = "graph.md"
-	f, err := helper.CreateFile(filepath.Join(p.dir, filename))
+	filePath := filepath.Join(p.dir, filename)
+	f, err := helper.CreateFile(baseFS, filePath)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.WriteString(p.graphMD)
+	_, err = f.Write([]byte(p.graphMD))
 	if err != nil {
-		return fmt.Errorf("failed to write graph file %s: %w", f.Name(), err)
+		return fmt.Errorf("failed to write graph file %s: %w", filePath, err)
 	}
 
 	if err := f.Close(); err != nil {
-		return fmt.Errorf("failed to close graph file %s: %w", f.Name(), err)
+		return fmt.Errorf("failed to close graph file %s: %w", filePath, err)
 	}
 
 	return nil
 }
 
-func (p *Plan) exportValues() error {
+func (p *Plan) exportValues(baseFS fsimpl.WriteableFS) error {
 	found := false
 
 	for i, rel := range p.body.Releases {
@@ -191,6 +195,8 @@ func (p *Plan) exportValues() error {
 
 	// It doesnt work if workdir has been mounted.
 	err := helper.MoveFile(
+		baseFS,
+		baseFS,
 		filepath.Join(p.tmpDir, Values),
 		filepath.Join(p.dir, Values),
 	)
@@ -202,11 +208,11 @@ func (p *Plan) exportValues() error {
 }
 
 // IsExist returns true if planfile exists.
-func (p *Plan) IsExist() bool {
-	return helper.IsExists(p.fullPath)
+func (p *Plan) IsExist(baseFS fs.StatFS) bool {
+	return helper.IsExists(baseFS, p.fullPath)
 }
 
 // IsManifestExist returns true if planfile exists.
-func (p *Plan) IsManifestExist() bool {
-	return helper.IsExists(filepath.Join(p.dir, Manifest))
+func (p *Plan) IsManifestExist(baseFS fs.StatFS) bool {
+	return helper.IsExists(baseFS, filepath.Join(p.dir, Manifest))
 }

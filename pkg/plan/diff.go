@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"io/fs"
 	"reflect"
 	"strings"
 	"sync"
@@ -66,7 +67,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
-func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, threeWayMerge bool) {
+func (p *Plan) DiffLive(ctx context.Context, baseFS fs.FS, showSecret bool, diffWide int, threeWayMerge bool) {
 	alive, _, err := p.GetLive(ctx)
 	if err != nil {
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
@@ -93,7 +94,7 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, thre
 			newSpecs := parseManifests(newManifest, rel.Namespace())
 
 			change := diff.Manifests(oldSpecs, newSpecs, opts, rel.Logger().Logger.Out)
-			chartChange := diffCharts(ctx, active.Chart, rel, rel.Logger())
+			chartChange := diffCharts(ctx, baseFS, active.Chart, rel, rel.Logger())
 
 			if !change && !chartChange {
 				k++
@@ -188,10 +189,10 @@ func diffChartsFilter(path []string, _ reflect.Type, _ reflect.StructField) bool
 	return len(path) >= 1 && path[0] == "Metadata"
 }
 
-func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, l log.FieldLogger) bool {
+func diffCharts(ctx context.Context, baseFS fs.FS, oldChart *chart.Chart, rel release.Config, l log.FieldLogger) bool {
 	l.Info("getting charts diff")
 
-	dryRunRelease, err := rel.SyncDryRun(ctx)
+	dryRunRelease, err := rel.SyncDryRun(ctx, baseFS)
 	if err != nil {
 		l.WithError(err).Error("failed to get dry-run release")
 

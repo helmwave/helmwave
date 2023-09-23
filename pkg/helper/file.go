@@ -2,11 +2,13 @@ package helper
 
 import (
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
 
-	cp "github.com/otiai10/copy"
+	"github.com/helmwave/go-fsimpl"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,22 +24,39 @@ func Contains(t string, a []string) bool {
 }
 
 // CreateFile creates recursively basedir of file and returns created file object.
-func CreateFile(p string) (*os.File, error) {
-	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+func CreateFile(f fsimpl.WriteableFS, p string) (fsimpl.WriteableFile, error) {
+	if err := f.MkdirAll(filepath.Dir(p), 0o755); err != nil {
 		return nil, fmt.Errorf("failed to create base directories for %s: %w", p, err)
 	}
 
-	f, err := os.Create(p)
+	file, err := f.Create(p)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create file %s: %w", p, err)
 	}
 
-	return f, nil
+	return file, nil
+}
+
+func Path(f fs.FS) (string, error) {
+	file, err := f.Open(".")
+	if err != nil {
+		return "", err //nolint:wrapcheck
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return "", err //nolint:wrapcheck
+	}
+
+	return stat.Name(), nil
 }
 
 // IsExists return true if file exists.
-func IsExists(s string) bool {
-	_, err := os.Stat(s)
+func IsExists(f fs.StatFS, s string) bool {
+	_, err := f.Stat(s)
 	switch {
 	case err == nil:
 		return true
@@ -53,8 +72,8 @@ func IsExists(s string) bool {
 }
 
 // CopyFile copy file to dest. Destination is either file or dir.
-func CopyFile(src, dest string) error {
-	destStat, err := os.Stat(dest)
+func CopyFile(srcFS fs.FS, destFS fsimpl.WriteableFS, src, dest string) error {
+	destStat, err := destFS.Stat(dest)
 
 	if err == nil {
 		if destStat.Mode().IsDir() {
@@ -64,9 +83,40 @@ func CopyFile(src, dest string) error {
 		}
 	}
 
-	err = cp.Copy(src, dest)
+	readcloser, err := srcFS.Open(src)
 	if err != nil {
-		return fmt.Errorf("failed to copy file '%s' to '%s': %w", src, dest, err)
+		return fmt.Errorf("failed to copy file '%s': %w", src, err)
+	}
+	defer func() {
+		err := readcloser.Close()
+		if err != nil {
+			log.WithError(err).Error("failed to close file")
+		}
+	}()
+
+	err = destFS.MkdirAll(filepath.Dir(dest), fs.ModePerm)
+	if err != nil {
+		return err //nolint:wrapcheck
+	}
+
+	f, err := destFS.Create(dest)
+	if err != nil {
+		return err //nolint:wrapcheck
+	}
+	defer func() {
+		err := f.Close()
+		if err != nil {
+			log.WithError(err).Error("failed to close file")
+		}
+	}()
+
+	var buf []byte = nil
+	var w io.Writer = f
+	var r io.Reader = readcloser
+
+	_, err = io.CopyBuffer(w, r, buf)
+	if err != nil {
+		return err //nolint:wrapcheck
 	}
 
 	return nil

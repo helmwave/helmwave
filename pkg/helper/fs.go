@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/helmwave/go-fsimpl"
 	dir "github.com/otiai10/copy"
 	log "github.com/sirupsen/logrus"
 )
 
 // MoveFile moves files or directories. It also handles move between different mounts (copy + rm).
-func MoveFile(src, dst string) error {
+func MoveFile(srcFS, dstFS fsimpl.WriteableFS, src, dst string) error {
+	// TODO: use srcFS and dstFS
 	// It doesnt work if workdir has been mounted.
 	err := os.Rename(src, dst)
 	if err != nil {

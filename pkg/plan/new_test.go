@@ -2,8 +2,12 @@ package plan_test
 
 import (
 	"context"
+	"io/fs"
+	"net/url"
+	"os"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
@@ -23,12 +27,16 @@ func (s *NewTestSuite) TestNew() {
 	p := plan.New(dir)
 
 	s.Require().NotNil(p)
-	s.Require().False(p.IsExist())
-	s.Require().False(p.IsManifestExist())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	s.Require().False(p.IsExist(baseFS.(fs.StatFS)))
+	s.Require().False(p.IsManifestExist(baseFS.(fs.StatFS)))
 }
 
 func (s *NewTestSuite) TestNewAndImportError() {
-	_, err := plan.NewAndImport(context.Background(), "/proc/1/blabla")
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	_, err := plan.NewAndImport(context.Background(), baseFS.(plan.PlanImportFS), "/proc/1/blabla")
 
 	s.Require().Error(err)
 	s.Require().ErrorContains(err, "failed to read plan file")

@@ -14,18 +14,22 @@ var _ Action = (*Rollback)(nil)
 type Rollback struct {
 	build     *Build
 	dog       *kubedog.Config
+	planFS    plan.PlanImportFS
 	autoBuild bool
 	revision  int
 }
 
 // Run is the main function for 'rollback' command.
 func (i *Rollback) Run(ctx context.Context) error {
+	// TODO: get filesystems dynamically from args
+	i.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
+
 	if i.autoBuild {
 		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
 	}
-	p, err := plan.NewAndImport(ctx, i.build.plandir)
+	p, err := plan.NewAndImport(ctx, i.planFS, i.build.plandir)
 	if err != nil {
 		return err
 	}

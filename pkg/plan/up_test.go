@@ -3,9 +3,12 @@ package plan_test
 import (
 	"context"
 	"errors"
+	"net/url"
+	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -31,7 +34,9 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.Up(context.Background(), baseFS, &kubedog.Config{})
 	s.Require().ErrorIs(err, e)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -47,7 +52,9 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 	p.SetRepositories(mockedRepo)
 	dog := &kubedog.Config{}
 
-	err := p.Up(context.Background(), dog)
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.Up(context.Background(), baseFS, dog)
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())
@@ -70,7 +77,9 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.Up(context.Background(), baseFS, &kubedog.Config{})
 	s.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(s.T())
@@ -95,7 +104,9 @@ func (s *ApplyTestSuite) TestApply() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.Up(context.Background(), baseFS, &kubedog.Config{})
 	s.Require().NoError(err)
 
 	mockedRepo.AssertExpectations(s.T())

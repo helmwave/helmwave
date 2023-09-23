@@ -4,8 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
+	"net/url"
+	"os"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
@@ -25,7 +29,9 @@ func (ts *BuildManifestsTestSuite) TestEmptyReleases() {
 	p := New(".")
 	p.NewBody()
 
-	err := p.buildManifest(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildManifest(context.Background(), baseFS.(fs.StatFS))
 
 	ts.Require().NoError(err)
 }
@@ -53,7 +59,9 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 
 	p.SetReleases(rel1, rel2)
 
-	err := p.buildManifest(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildManifest(context.Background(), baseFS.(fs.StatFS))
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 2)
@@ -81,7 +89,9 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildManifest(context.Background(), baseFS.(fs.StatFS))
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 1)
@@ -103,7 +113,9 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildManifest(context.Background(), baseFS.(fs.StatFS))
 
 	ts.Require().ErrorIs(err, errExpected)
 
@@ -127,7 +139,9 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildManifest(context.Background(), baseFS.(fs.StatFS))
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 1)
@@ -159,7 +173,9 @@ func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildManifest(context.Background(), baseFS.(fs.StatFS))
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 1)

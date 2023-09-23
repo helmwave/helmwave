@@ -1,10 +1,14 @@
 package plan
 
 import (
+	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/stretchr/testify/suite"
@@ -21,7 +25,9 @@ func (s *ExportTestSuite) TestValuesEmpty() {
 
 	p.body = &planBody{}
 
-	err := p.exportValues()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.exportValues(baseFS.(fsimpl.WriteableFS))
 	s.Require().NoError(err)
 }
 
@@ -48,8 +54,10 @@ func (s *ExportTestSuite) TestValuesOneRelease() {
 		Releases: release.Configs{mockedRelease},
 	}
 
-	s.Require().NoError(p.buildValues())
-	s.Require().NoError(p.exportValues())
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	s.Require().NoError(p.buildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS)))
+	s.Require().NoError(p.exportValues(baseFS.(fsimpl.WriteableFS)))
 	mockedRelease.AssertExpectations(s.T())
 	s.Require().DirExists(filepath.Join(tmpDir, Dir, Values))
 	s.Require().FileExists(filepath.Join(tmpDir, Dir, Values, valuesName))

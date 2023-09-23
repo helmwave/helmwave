@@ -2,8 +2,13 @@ package plan
 
 import (
 	"errors"
+	"io/fs"
+	"net/url"
+	"os"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -20,7 +25,9 @@ func (ts *BuildRepositoriesTestSuite) TestEmptyReleases() {
 	p := New(".")
 	p.NewBody()
 
-	err := p.buildCharts()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildCharts(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS))
 
 	ts.Require().NoError(err)
 }
@@ -35,7 +42,9 @@ func (ts *BuildRepositoriesTestSuite) TestMultipleReleases() {
 
 	p.SetReleases(rel1, rel2)
 
-	err := p.buildCharts()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildCharts(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS))
 
 	ts.Require().NoError(err)
 	rel1.AssertExpectations(ts.T())
@@ -53,7 +62,9 @@ func (ts *BuildRepositoriesTestSuite) TestError() {
 
 	p.SetReleases(rel1, rel2)
 
-	err := p.buildCharts()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	err := p.buildCharts(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS))
 
 	ts.Require().ErrorIs(err, errExpected)
 	rel1.AssertExpectations(ts.T())
