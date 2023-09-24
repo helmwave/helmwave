@@ -6,9 +6,9 @@ import (
 	"bytes"
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
@@ -46,30 +46,32 @@ func (ts *DiffLocalTestSuite) TestCmd() {
 
 func (ts *DiffLocalTestSuite) TestRun() {
 	s1 := &Build{
-		plandir: ts.T().TempDir(),
-		tags:    cli.StringSlice{},
+		tags: cli.StringSlice{},
 		yml: &Yml{
-			tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
-			file:      filepath.Join(tests.Root, "02_helmwave.yml"),
 			templater: template.TemplaterSprig,
 		},
 		diff:     &Diff{},
 		diffMode: DiffModeLive,
 	}
+	createGenericFS(&s1.yml.srcFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s1.yml.destFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s1.planFS, ts.T().TempDir())
 
 	s2 := &Build{
-		plandir: ts.T().TempDir(),
-		tags:    cli.StringSlice{},
+		tags: cli.StringSlice{},
 		yml: &Yml{
-			tpl:       filepath.Join(tests.Root, "03_helmwave.yml"),
-			file:      filepath.Join(tests.Root, "03_helmwave.yml"),
 			templater: template.TemplaterSprig,
 		},
 		diff:     &Diff{},
 		diffMode: DiffModeLive,
 	}
+	createGenericFS(&s2.yml.srcFS, tests.Root, "03_helmwave.yml")
+	createGenericFS(&s2.yml.destFS, tests.Root, "03_helmwave.yml")
+	createGenericFS(&s2.planFS, ts.T().TempDir())
 
-	d := DiffLocal{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
+	d := DiffLocal{diff: s1.diff, plan1FS: s1.planFS.(plan.PlanImportFS), plan2FS: s2.planFS.(plan.PlanImportFS)}
+	createGenericFS(&d.plan1FS)
+	createGenericFS(&d.plan2FS)
 
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s1.Run(context.Background()))

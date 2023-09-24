@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -18,8 +17,7 @@ func TestBuildRepositoriesTestSuite(t *testing.T) {
 }
 
 func (ts *BuildRepositoriesTestSuite) TestReposEmpty() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	p.NewBody()
 
@@ -29,8 +27,7 @@ func (ts *BuildRepositoriesTestSuite) TestReposEmpty() {
 }
 
 func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	repoName := ""
 
@@ -55,8 +52,7 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 }
 
 func (ts *BuildRepositoriesTestSuite) TestUnusedRepo() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	mockedRepo := &MockRepositoryConfig{}
 
@@ -70,8 +66,7 @@ func (ts *BuildRepositoriesTestSuite) TestUnusedRepo() {
 }
 
 func (ts *BuildRepositoriesTestSuite) TestSuccess() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	repoName := "blablanami"
 
@@ -98,8 +93,7 @@ func (ts *BuildRepositoriesTestSuite) TestSuccess() {
 }
 
 func (ts *BuildRepositoriesTestSuite) TestMissingRepo() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	repoName := "blablanami"
 

@@ -19,6 +19,8 @@ var (
 
 	// ErrDeploy is returned when deploy is failed for whatever reason.
 	ErrDeploy = errors.New("deploy failed")
+
+	ErrInvalidPlandir = errors.New("filesystem not supported")
 )
 
 type YAMLDecodeDependsOnError struct {

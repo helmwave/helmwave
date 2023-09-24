@@ -3,7 +3,6 @@ package release
 import (
 	"fmt"
 	"io/fs"
-	"path"
 	"path/filepath"
 
 	"github.com/helmwave/go-fsimpl"
@@ -91,7 +90,13 @@ func (rel *config) LocateChartWithCache(baseFS fs.FS) (string, error) {
 	// nice action bro
 	client := rel.newInstall()
 
-	ch, err = client.ChartPathOptions.LocateChart(c.Name, rel.Helm())
+	// get absolute path so that helm can find the chart
+	absBasePath, err := helper.Path(baseFS)
+	if err != nil {
+		rel.Logger().WithError(err).Warn("failed to determine absolute location")
+	}
+
+	ch, err = client.ChartPathOptions.LocateChart(filepath.Join(absBasePath, c.Name), rel.Helm())
 	if err != nil {
 		return "", fmt.Errorf("failed to locate chart %s: %w", c.Name, err)
 	}
@@ -174,14 +179,13 @@ func (rel *config) ChartDepsUpd(baseFS fs.StatFS) error {
 	return nil
 }
 
-func (rel *config) DownloadChart(baseFS fs.StatFS, tmpFS fsimpl.WriteableFS, tmpDir string) error {
+func (rel *config) DownloadChart(baseFS fs.StatFS, tmpFS fsimpl.WriteableFS, destDir string) error {
 	if !rel.Chart().IsRemote(baseFS) {
 		rel.Logger().Info("❎ chart is local, skipping exporting")
 
 		return nil
 	}
 
-	destDir := path.Join(tmpDir, "charts", rel.Uniq().String())
 	if err := tmpFS.MkdirAll(destDir, 0o750); err != nil {
 		return fmt.Errorf("failed to create temporary directory for chart: %w", err)
 	}

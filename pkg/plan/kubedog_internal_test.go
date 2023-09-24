@@ -22,7 +22,7 @@ func TestKubedogTestSuite(t *testing.T) {
 }
 
 func (s *KubedogTestSuite) TestNoReleases() {
-	p := New("")
+	p := New()
 	p.NewBody()
 
 	spec, _, err := p.kubedogSpecs(&kubedog.Config{}, nil)
@@ -38,7 +38,7 @@ func (s *KubedogTestSuite) TestNoReleases() {
 }
 
 func (s *KubedogTestSuite) TestCallsManifestFunction() {
-	p := New("")
+	p := New()
 	p.NewBody()
 
 	rel := &MockReleaseConfig{}
@@ -50,7 +50,7 @@ func (s *KubedogTestSuite) TestCallsManifestFunction() {
 }
 
 func (s *KubedogTestSuite) TestSyncSpecs() {
-	p := New("")
+	p := New()
 	p.NewBody()
 
 	relName := "bla"
@@ -110,7 +110,7 @@ metadata:
 }
 
 func (s *KubedogTestSuite) TestRollbackSpecs() {
-	p := New("")
+	p := New()
 	p.NewBody()
 
 	relName := "bla"
@@ -172,7 +172,7 @@ metadata:
 }
 
 func (s *KubedogTestSuite) TestRollbackSpecsGetError() {
-	p := New("")
+	p := New()
 	p.NewBody()
 
 	kubecontext := "blacontext"
@@ -192,7 +192,7 @@ func (s *KubedogTestSuite) TestRollbackSpecsGetError() {
 }
 
 func (s *KubedogTestSuite) TestSpecsMultipleContexts() {
-	p := New("")
+	p := New()
 	p.NewBody()
 
 	relName := "bla"

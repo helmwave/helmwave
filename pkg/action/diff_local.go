@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/plan"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -13,25 +12,15 @@ var _ Action = (*DiffLocal)(nil)
 
 // DiffLocal is a struct for running 'diff plan' command.
 type DiffLocal struct {
-	diff     *Diff
-	plan1FS  plan.PlanImportFS
-	plan2FS  plan.PlanImportFS
-	plandir1 string
-	plandir2 string
+	diff    *Diff
+	plan1FS plan.PlanImportFS
+	plan2FS plan.PlanImportFS
 }
 
 // Run is the main function for 'diff plan' command.
 func (d *DiffLocal) Run(ctx context.Context) error {
-	// TODO: get filesystems dynamically from args
-	d.plan1FS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
-	d.plan2FS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
-
-	if d.plandir1 == d.plandir2 {
-		log.Warn(plan.ErrPlansAreTheSame)
-	}
-
 	// Plan 1
-	plan1, err := plan.NewAndImport(ctx, d.plan1FS, d.plandir1)
+	plan1, err := plan.NewAndImport(ctx, d.plan1FS)
 	if err != nil {
 		return err
 	}
@@ -40,7 +29,7 @@ func (d *DiffLocal) Run(ctx context.Context) error {
 	}
 
 	// Plan 2
-	plan2, err := plan.NewAndImport(ctx, d.plan2FS, d.plandir2)
+	plan2, err := plan.NewAndImport(ctx, d.plan2FS)
 	if err != nil {
 		return err
 	}
@@ -67,19 +56,17 @@ func (d *DiffLocal) Cmd() *cli.Command {
 // flags return flag set of CLI urfave.
 func (d *DiffLocal) flags() []cli.Flag {
 	return []cli.Flag{
-		&cli.StringFlag{
+		&cli.GenericFlag{
 			Name:        "plandir1",
-			Value:       ".helmwave/",
-			Usage:       "path to plandir1",
+			Destination: createGenericFS(&d.plan1FS, plan.Dir),
+			DefaultText: getDefaultFSValue(plan.Dir),
 			EnvVars:     []string{"HELMWAVE_PLANDIR_1", "HELMWAVE_PLANDIR"},
-			Destination: &d.plandir1,
 		},
-		&cli.StringFlag{
+		&cli.GenericFlag{
 			Name:        "plandir2",
-			Value:       ".helmwave/",
-			Usage:       "path to plandir2",
+			Destination: createGenericFS(&d.plan2FS, plan.Dir),
+			DefaultText: getDefaultFSValue(plan.Dir),
 			EnvVars:     []string{"HELMWAVE_PLANDIR_2"},
-			Destination: &d.plandir2,
 		},
 	}
 }

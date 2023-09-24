@@ -74,7 +74,7 @@ func (r *MockReleaseConfig) Equal(release.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockReleaseConfig) BuildValues(statFS fs.StatFS, writeableFS fsimpl.WriteableFS, dir, templater string) error {
+func (r *MockReleaseConfig) ExportValues(statFS fs.StatFS, writeableFS fsimpl.WriteableFS, templater string) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn
@@ -82,11 +82,13 @@ func (r *MockReleaseConfig) BuildValues(statFS fs.StatFS, writeableFS fsimpl.Wri
 
 	for i := len(r.Values()) - 1; i >= 0; i-- {
 		v := r.Values()[i]
-		dst := filepath.Join(dir, Values, filepath.Base(v.Src))
+		dst := filepath.Join(Values, v.Src)
 		err := template.Tpl2yml(statFS, writeableFS, v.Src, dst, nil, templater)
 		if err != nil {
 			return err
 		}
+
+		v.Src = dst
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 
 	"github.com/helmwave/go-fsimpl"
@@ -10,7 +11,7 @@ import (
 
 type BuildOptions struct { //nolint:govet
 	Tags       []string
-	Yml        string
+	Yml        fs.FS
 	Templater  string
 	MatchAll   bool
 	GraphWidth int
@@ -19,11 +20,21 @@ type BuildOptions struct { //nolint:govet
 // Build plan with yml and tags/matchALL options.
 //
 //nolint:cyclop // TODO: reduce cyclomatic complexity
-func (p *Plan) Build(ctx context.Context, srcFS fs.StatFS, destFS fsimpl.WriteableFS, o BuildOptions) error { //nolint:funlen
+func (p *Plan) Build(ctx context.Context, srcFSUntyped fs.FS, destFSUntyped fs.FS, o BuildOptions) error { //nolint:funlen
+	destFS, ok := destFSUntyped.(fsimpl.WriteableFS)
+	if !ok {
+		return fmt.Errorf("invalid plandir for build: %w", ErrInvalidPlandir)
+	}
+
+	srcFS, ok := srcFSUntyped.(fs.StatFS)
+	if !ok {
+		return fmt.Errorf("invalid source dir for build: %w", ErrInvalidPlandir)
+	}
+
 	p.templater = o.Templater
 
 	// Create Body
-	body, err := NewBody(ctx, srcFS, o.Yml, false)
+	body, err := NewBody(ctx, o.Yml, false)
 	if err != nil {
 		return err
 	}
@@ -77,13 +88,6 @@ func (p *Plan) Build(ctx context.Context, srcFS fs.StatFS, destFS fsimpl.Writeab
 	}
 	// Sync Registries
 	err = p.syncRegistries(ctx)
-	if err != nil {
-		return err
-	}
-
-	// to build charts, we need repositories and registries first
-	log.Info("🔨 Building charts...")
-	err = p.buildCharts(srcFS, destFS)
 	if err != nil {
 		return err
 	}

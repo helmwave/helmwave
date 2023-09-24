@@ -12,17 +12,13 @@ var _ Action = (*DiffLive)(nil)
 
 // DiffLive is a struct for running 'diff live' command.
 type DiffLive struct {
-	diff    *Diff
-	planFS  plan.PlanImportFS
-	plandir string
+	diff   *Diff
+	planFS plan.PlanImportFS
 }
 
 // Run is the main function for 'diff live' command.
 func (d *DiffLive) Run(ctx context.Context) error {
-	// TODO: get filesystems dynamically from args
-	d.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
-
-	p, err := plan.NewAndImport(ctx, d.planFS, d.plandir)
+	p, err := plan.NewAndImport(ctx, d.planFS)
 	if err != nil {
 		return err
 	}
@@ -49,6 +45,6 @@ func (d *DiffLive) Cmd() *cli.Command {
 // flags return flag set of CLI urfave.
 func (d *DiffLive) flags() []cli.Flag {
 	return []cli.Flag{
-		flagPlandir(&d.plandir),
+		flagPlandirLocation(&d.planFS),
 	}
 }

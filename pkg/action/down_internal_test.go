@@ -5,7 +5,6 @@ package action
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -36,17 +35,17 @@ func (ts *DownTestSuite) TestCmd() {
 func (ts *DownTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
 		tags:    cli.StringSlice{},
 		autoYml: true,
 		yml:     y,
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	d := Down{
 		build: s,

@@ -4,7 +4,6 @@ package action
 
 import (
 	"context"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -36,14 +35,11 @@ func (ts *UpTestSuite) TestCmd() {
 func (ts *UpTestSuite) TestAutoBuild() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tmpDir, "02_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	u := &Up{
 		build: &Build{
-			plandir: tmpDir,
 			tags:    cli.StringSlice{},
 			autoYml: true,
 			yml:     y,
@@ -51,6 +47,9 @@ func (ts *UpTestSuite) TestAutoBuild() {
 		dog:       &kubedog.Config{},
 		autoBuild: true,
 	}
+	createGenericFS(&u.build.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&u.build.yml.destFS, tmpDir, "02_helmwave.yml")
+	createGenericFS(&u.build.planFS, tmpDir)
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)

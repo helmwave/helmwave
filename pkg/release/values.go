@@ -24,7 +24,6 @@ import (
 //nolint:lll
 type ValuesReference struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
-	Dst            string `yaml:"dst" json:"dst" jsonschema:"readOnly"`
 	DelimiterLeft  string `yaml:"delimiter_left,omitempty" json:"delimiter_left,omitempty"  jsonschema:"Set left delimiter for template engine,default={{"`
 	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
 	Renderer       string `yaml:"renderer" json:"renderer" jsonschema:"description=How to render the file,enum=sprig,enum=gomplate,enum=copy,enum=sops"`
@@ -78,10 +77,8 @@ func (v *ValuesReference) UnmarshalYAML(node *yaml.Node) error {
 func (v *ValuesReference) MarshalYAML() (any, error) {
 	return struct {
 		Src string
-		Dst string
 	}{
 		Src: v.Src,
-		Dst: v.Dst,
 	}, nil
 }
 
@@ -90,9 +87,9 @@ func (v *ValuesReference) isURL() bool {
 }
 
 // Download downloads values by source URL and places to destination path.
-func (v *ValuesReference) Download(baseFS fsimpl.WriteableFS) error {
-	if err := helper.Download(baseFS, v.Dst, v.Src); err != nil {
-		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, v.Dst, err)
+func (v *ValuesReference) Download(plandirFS fsimpl.WriteableFS, dst string) error {
+	if err := helper.Download(plandirFS, dst, v.Src); err != nil {
+		return fmt.Errorf("failed to download values %s -> %s: %w", v.Src, dst, err)
 	}
 
 	return nil
@@ -103,30 +100,14 @@ func (v *ValuesReference) Download(baseFS fsimpl.WriteableFS) error {
 //	return v.Dst
 // }
 
-// SetUniq generates unique file path based on provided base directory, release uniqname and sha1 of source path.
-func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
+// getUniqPath generates unique file path based on provided base directory, release uniqname and sha1 of source path.
+func (v *ValuesReference) getUniqPath(name uniqname.UniqName) string {
 	h := crypto.MD5.New()
 	h.Write([]byte(v.Src))
 	hash := h.Sum(nil)
 	s := hex.EncodeToString(hash)
 
-	v.Dst = filepath.Join(dir, "values", name.String(), s+".yml")
-
-	return v
-}
-
-// ProhibitDst Dst now is public method.
-// Dst needs to marshal for export.
-// Also, dst needs to unmarshal for import from plan.
-func ProhibitDst(values []ValuesReference) error {
-	for i := range values {
-		v := values[i]
-		if v.Dst != "" {
-			return fmt.Errorf("dst %q not allowed here, this field reserved", v.Dst)
-		}
-	}
-
-	return nil
+	return filepath.Join("values", name.String(), s+".yml")
 }
 
 // func (v *ValuesReference) Set(Dst string) *ValuesReference {
@@ -136,14 +117,14 @@ func ProhibitDst(values []ValuesReference) error {
 
 // SetViaRelease downloads and templates values file.
 // Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
-func (v *ValuesReference) SetViaRelease(rel Config, srcFS fs.StatFS, destFS fsimpl.WriteableFS, dir, templater string) error {
+func (v *ValuesReference) SetViaRelease(rel Config, srcFS fs.StatFS, plandirFS fsimpl.WriteableFS, templater string) error {
 	if v.Renderer == "" {
 		v.Renderer = templater
 	}
 
-	v.SetUniq(dir, rel.Uniq())
+	dst := v.getUniqPath(rel.Uniq())
 
-	l := rel.Logger().WithField("values src", v.Src).WithField("values Dst", v.Dst)
+	l := rel.Logger().WithField("values src", v.Src).WithField("values dst", dst)
 
 	l.Trace("Building values reference")
 
@@ -153,34 +134,36 @@ func (v *ValuesReference) SetViaRelease(rel Config, srcFS fs.StatFS, destFS fsim
 		Release: rel,
 	}
 
-	err := v.fetch(l, srcFS, destFS)
+	err := v.fetch(l, srcFS, plandirFS, dst)
 	if err != nil {
 		return err
 	}
 
 	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
 	if v.isURL() {
-		err = template.Tpl2yml(srcFS, destFS, v.Dst, v.Dst, data, v.Renderer, delimOption)
+		err = template.Tpl2yml(plandirFS, plandirFS, dst, dst, data, v.Renderer, delimOption)
 	} else {
-		err = template.Tpl2yml(srcFS, destFS, v.Src, v.Dst, data, v.Renderer, delimOption)
+		err = template.Tpl2yml(srcFS, plandirFS, v.Src, dst, data, v.Renderer, delimOption)
 	}
 
 	if err != nil {
 		return fmt.Errorf("failed to render %q values: %w", v.Src, err)
 	}
 
+	v.Src = dst
+
 	return nil
 }
 
-func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.StatFS, destFS fsimpl.WriteableFS) error {
+func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.StatFS, plandirFS fsimpl.WriteableFS, dst string) error {
 	if v.isURL() {
-		err := v.Download(destFS)
+		err := v.Download(plandirFS, dst)
 		if err != nil {
 			l.WithError(err).Warnf("%q skipping: cant download", v.Src)
 
 			return ErrValuesNotExist
 		}
-	} else if !helper.IsExists(srcFS, v.Src) {
+	} else if !helper.IsExists(srcFS, dst) {
 		l.Warn("skipping: local file not found")
 
 		return ErrValuesNotExist
@@ -189,17 +172,17 @@ func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.StatFS, destFS fsimpl.Wri
 	return nil
 }
 
-func (rel *config) BuildValues(srcFS fs.StatFS, destFS fsimpl.WriteableFS, dir, templater string) error {
+func (rel *config) ExportValues(srcFS fs.StatFS, plandirFS fsimpl.WriteableFS, templater string) error {
 	vals := rel.Values()
 	for i := len(vals) - 1; i >= 0; i-- {
 		v := vals[i]
-		err := v.SetViaRelease(rel, srcFS, destFS, dir, templater)
+		err := v.SetViaRelease(rel, srcFS, plandirFS, templater)
 		switch {
 		case !v.Strict && errors.Is(ErrValuesNotExist, err):
 			rel.Logger().WithError(err).WithField("values", v).Warn("skipping values...")
 			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
 		case err != nil:
-			rel.Logger().WithError(err).WithField("values", v).Error("failed to build values")
+			rel.Logger().WithError(err).WithField("values", v).Error("failed to export values")
 
 			return err
 		default:

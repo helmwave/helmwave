@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+	"io/fs"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -9,18 +10,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/urfave/cli/v2"
 )
-
-// flagPlandir pass val to urfave flag.
-func flagPlandir(v *string) *cli.StringFlag {
-	return &cli.StringFlag{
-		Name:        "plandir",
-		Aliases:     []string{"p"},
-		Value:       plan.Dir,
-		Usage:       "path to plandir",
-		EnvVars:     []string{"HELMWAVE_PLANDIR", "HELMWAVE_PLAN"},
-		Destination: v,
-	}
-}
 
 // flagTags pass val to urfave flag.
 func flagTags(v *cli.StringSlice) *cli.StringSliceFlag {
@@ -45,25 +34,25 @@ func flagMatchAllTags(v *bool) *cli.BoolFlag {
 }
 
 // flagYmlFile pass val to urfave flag.
-func flagYmlFile(v *string) *cli.StringFlag {
-	return &cli.StringFlag{
+func flagYmlFile(v *fs.SubFS) *cli.GenericFlag {
+	return &cli.GenericFlag{
 		Name:        "file",
 		Aliases:     []string{"f"},
-		Value:       plan.Body,
+		Destination: createGenericFS(v, plan.Body),
+		DefaultText: getDefaultFSValue(plan.Body),
 		Usage:       "main yml file",
 		EnvVars:     []string{"HELMWAVE_YAML", "HELMWAVE_YML"},
-		Destination: v,
 	}
 }
 
 // flagTplFile pass val to urfave flag.
-func flagTplFile(v *string) *cli.StringFlag {
-	return &cli.StringFlag{
+func flagTplFile(v *fs.StatFS) *cli.GenericFlag {
+	return &cli.GenericFlag{
 		Name:        "tpl",
-		Value:       "helmwave.yml.tpl",
+		Destination: createGenericFS(v, "helmwave.yml.tpl"),
+		DefaultText: getDefaultFSValue("helmwave.yml.tpl"),
 		Usage:       "main tpl file",
 		EnvVars:     []string{"HELMWAVE_TPL"},
-		Destination: v,
 	}
 }
 
@@ -213,5 +202,15 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_TRACK_ALL"},
 			Destination: &dog.TrackGeneric,
 		},
+	}
+}
+
+func flagPlandirLocation[T fs.FS](v *T) *cli.GenericFlag {
+	return &cli.GenericFlag{
+		Name:        "plandir",
+		Aliases:     []string{"p"},
+		Destination: createGenericFS(v, plan.Dir),
+		DefaultText: getDefaultFSValue(plan.Dir),
+		EnvVars:     []string{"HELMWAVE_PLANDIR", "HELMWAVE_PLAN"},
 	}
 }

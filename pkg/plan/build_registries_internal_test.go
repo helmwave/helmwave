@@ -2,7 +2,6 @@ package plan
 
 import (
 	"fmt"
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/registry"
@@ -22,8 +21,7 @@ func TestBuildRegistriesTestSuite(t *testing.T) {
 }
 
 func (ts *BuildRegistriesTestSuite) TestUnusedRegistry() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	regi := &MockRegistryConfig{}
 	p.SetRegistries(regi)
@@ -36,8 +34,7 @@ func (ts *BuildRegistriesTestSuite) TestUnusedRegistry() {
 }
 
 func (ts *BuildRegistriesTestSuite) TestNoOCIRegistries() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Chart").Return(&release.Chart{})
@@ -52,8 +49,7 @@ func (ts *BuildRegistriesTestSuite) TestNoOCIRegistries() {
 }
 
 func (ts *BuildRegistriesTestSuite) TestMissingRegistry() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	regiName := "blablanami"
 
@@ -76,8 +72,7 @@ func (ts *BuildRegistriesTestSuite) TestMissingRegistry() {
 }
 
 func (ts *BuildRegistriesTestSuite) TestSuccess() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	regiHost := "blablanami"
 

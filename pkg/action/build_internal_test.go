@@ -2,13 +2,10 @@ package action
 
 import (
 	"context"
-	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -41,18 +38,19 @@ func (ts *BuildTestSuite) TestCmd() {
 func (ts *BuildTestSuite) TestYmlError() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		file:      filepath.Join(tests.Root, "helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 	}
+	createGenericFS(&s.yml.srcFS)
+	createGenericFS(&s.yml.destFS, tests.Root, "helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().Error(s.Run(context.Background()))
 }
@@ -60,20 +58,20 @@ func (ts *BuildTestSuite) TestYmlError() {
 func (ts *BuildTestSuite) TestInvalidCacheDir() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		chartsCacheDir: "/proc/1/bla",
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().Error(s.Run(context.Background()))
 }
@@ -81,91 +79,75 @@ func (ts *BuildTestSuite) TestInvalidCacheDir() {
 func (ts *BuildTestSuite) TestManifest() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(tmpDir, plan.Manifest))
 }
-
-// func (ts *BuildTestSuite) TestRepositories404() {
-//	s := &Build{
-//		plandir:  tmpDir,
-//		ymlFile:      filepath.Join(tests.Root, "04_helmwave.yml"),
-//		tags:     cli.StringSlice{},
-//		options: plan.BuildOptions{
-//				MatchAll: true,
-//			},
-//	}
-//
-//	err := s.Run()
-//	if !errors.Is(err, repo.ErrNotFound) && err != nil {
-//		t.Error("'bitnami' must be not found")
-//	}
-// }
 
 func (ts *BuildTestSuite) TestNonUniqueReleases() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "14_helmwave.yml"),
-		file:      filepath.Join(tmpDir, "14_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
+	createGenericFS(&y.srcFS, tests.Root, "14_helmwave.yml")
+	createGenericFS(&y.destFS, tmpDir, "14_helmwave.yml")
 
 	sfail := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		autoYml: true,
 	}
+	createGenericFS(&sfail.planFS, tmpDir)
 
 	sfailByTag := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		autoYml: true,
 	}
+	createGenericFS(&sfailByTag.planFS, tmpDir)
 	err := sfailByTag.tags.Set("nginx")
 	ts.Require().NoError(err)
 
 	sa := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		autoYml: true,
 	}
+	createGenericFS(&sa.planFS, tmpDir)
 	err = sa.tags.Set("nginx-a")
 	ts.Require().NoError(err)
 
 	sb := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		autoYml: true,
 	}
+	createGenericFS(&sb.planFS, tmpDir)
 	err = sb.tags.Set("nginx-b")
 	ts.Require().NoError(err)
 
@@ -178,26 +160,24 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 func (ts *BuildTestSuite) TestRepositories() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
+		yml:  y,
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
 
-	wd, _ := os.Getwd()
-	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
 	const rep = "bitnami"
-	b, _ := plan.NewBody(context.Background(), baseFS, filepath.Join(s.plandir, plan.File), true)
+	b, _ := plan.NewBody(context.Background(), s.planFS, true)
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
 		ts.Failf("%q not found", rep)
@@ -207,10 +187,10 @@ func (ts *BuildTestSuite) TestRepositories() {
 func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tests.Root, "03_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
+	createGenericFS(&y.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&y.destFS, tests.Root, "03_helmwave.yml")
 
 	cases := []struct {
 		tags  *cli.StringSlice
@@ -228,19 +208,17 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 	for i := range cases {
 		s := &Build{
-			plandir: tmpDir,
-			yml:     y,
-			tags:    *cases[i].tags,
+			yml:  y,
+			tags: *cases[i].tags,
 			options: plan.BuildOptions{
 				MatchAll: true,
 			},
 		}
+		createGenericFS(&s.planFS, tmpDir)
 
 		ts.Require().NoError(s.Run(context.Background()))
 
-		wd, _ := os.Getwd()
-		baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-		b, _ := plan.NewBody(context.Background(), baseFS, filepath.Join(s.plandir, plan.File), true)
+		b, _ := plan.NewBody(context.Background(), s.planFS, true)
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {
@@ -254,14 +232,11 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 func (ts *BuildTestSuite) TestDiffLocal() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "07_helmwave.yml"),
-		file:      filepath.Join(tests.Root, "07_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
@@ -270,6 +245,9 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 		diff:     &Diff{},
 		diffMode: DiffModeLocal,
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "07_helmwave.yml")
+	createGenericFS(&s.yml.destFS, tests.Root, "07_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()), "build should not fail without diffing")
 	ts.Require().NoError(s.Run(context.Background()), "build should not fail with diffing with previous plan")
@@ -313,70 +291,70 @@ func (ts *NonParallelBuildTestSuite) getLoggerMessages() []string {
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		autoYml: true,
 		yml:     y,
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&s.yml.destFS, tmpDir, "01_auto_yaml_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(s.Run(context.Background()))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(tmpDir, plan.Manifest))
 }
 
 func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "08_helmwave.yml"),
-		file:      filepath.Join(tmpDir, "08_helmwave.yml"),
 		templater: template.TemplaterGomplate,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		autoYml: true,
 		yml:     y,
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "08_helmwave.yml")
+	createGenericFS(&s.yml.destFS, tmpDir, "08_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(tmpDir, plan.Manifest))
 }
 
 func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "13_helmwave.yml"),
-		file:      filepath.Join(tmpDir, "13_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir: tmpDir,
-		tags:    cli.StringSlice{},
+		tags: cli.StringSlice{},
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
 		autoYml: true,
 		yml:     y,
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "13_helmwave.yml")
+	createGenericFS(&s.yml.destFS, tmpDir, "13_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(tmpDir, plan.Manifest))
 
 	logMessages := ts.getLoggerMessages()
 	ts.Require().Contains(logMessages, "running pre_build script for nginx")

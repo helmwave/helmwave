@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"os"
-	"path/filepath"
 
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -21,7 +19,7 @@ import (
 
 const (
 	// Dir is the default directory for generated files.
-	Dir = ".helmwave/"
+	Dir = ".helmwave"
 
 	// File is the default file name for planfile.
 	File = "planfile"
@@ -30,16 +28,17 @@ const (
 	Body = "helmwave.yml"
 
 	// Manifest is the default directory under Dir for manifests.
-	Manifest = "manifest/"
+	Manifest = "manifest"
 
 	// Values is default directory for values.
-	Values = "values/"
+	Values = "values"
+
+	Charts = "charts"
 )
 
 // Plan contains full helmwave state.
 type Plan struct {
 	body      *planBody
-	dir       string
 	fullPath  string
 	tmpDir    string
 	graphMD   string
@@ -50,8 +49,8 @@ type Plan struct {
 }
 
 // NewAndImport wrapper for New and Import in one.
-func NewAndImport(ctx context.Context, baseFS PlanImportFS, src string) (p *Plan, err error) {
-	p = New(src)
+func NewAndImport(ctx context.Context, baseFS fs.FS) (p *Plan, err error) {
+	p = New()
 
 	err = p.Import(ctx, baseFS)
 	if err != nil {
@@ -109,12 +108,12 @@ func GenSchema() *jsonschema.Schema {
 }
 
 // NewBody parses plan from file.
-func NewBody(ctx context.Context, baseFS fs.FS, file string, validate bool) (*planBody, error) {
+func NewBody(ctx context.Context, file fs.FS, validate bool) (*planBody, error) {
 	b := &planBody{
 		Version: version.Version,
 	}
 
-	srcFile, err := baseFS.Open(file)
+	srcFile, err := file.Open("")
 	if err != nil {
 		return b, fmt.Errorf("failed to read plan file %s: %w", file, err)
 	}
@@ -142,18 +141,10 @@ func NewBody(ctx context.Context, baseFS fs.FS, file string, validate bool) (*pl
 	return b, nil
 }
 
-// New returns empty *Plan for provided directory.
-func New(dir string) *Plan {
-	tmpDir, err := os.MkdirTemp("", "")
-	if err != nil {
-		log.WithError(err).Warn("failed to create temporary directory")
-		tmpDir = os.TempDir()
-	}
-
+// New returns empty plan.
+func New() *Plan {
 	plan := &Plan{
-		tmpDir:    tmpDir,
-		dir:       dir,
-		fullPath:  filepath.Join(dir, File),
+		fullPath:  File,
 		manifests: make(map[uniqname.UniqName]string),
 	}
 

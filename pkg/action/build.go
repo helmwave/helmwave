@@ -3,10 +3,11 @@ package action
 import (
 	"context"
 	"io/fs"
+	"net/url"
 	"sort"
 	"strings"
 
-	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
@@ -20,9 +21,7 @@ type Build struct {
 	yml            *Yml
 	diff           *Diff
 	options        plan.BuildOptions
-	srcFS          fs.StatFS
-	planFS         fsimpl.WriteableFS
-	plandir        string
+	planFS         fs.StatFS
 	diffMode       string
 	chartsCacheDir string
 	tags           cli.StringSlice
@@ -31,30 +30,31 @@ type Build struct {
 }
 
 // Run is the main function for 'build' CLI command.
-func (i *Build) Run(ctx context.Context) (err error) {
+func (i *Build) Run(ctx context.Context) error {
 	if i.autoYml {
-		err = i.yml.Run(ctx)
+		err := i.yml.Run(ctx)
 		if err != nil {
 			return err
 		}
 	}
 
-	// TODO: get filesystems dynamically from args
-	i.srcFS = getBaseFS()
-	i.planFS = getBaseFS()
-
-	err = cache.ChartsCache.Init(i.planFS, i.chartsCacheDir)
+	err := cache.ChartsCache.Init(i.planFS, i.chartsCacheDir)
 	if err != nil {
 		return err
 	}
 
-	newPlan := plan.New(i.plandir)
+	newPlan := plan.New()
 
 	i.options.Tags = i.normalizeTags()
-	i.options.Yml = i.yml.file
+	i.options.Yml = i.yml.destFS
 	i.options.Templater = i.yml.templater
 
-	err = newPlan.Build(ctx, i.srcFS, i.planFS, i.options)
+	workdirFS, err := filefs.New(&url.URL{Scheme: "file", Path: "."})
+	if err != nil {
+		return err
+	}
+
+	err = newPlan.Build(ctx, workdirFS, i.planFS, i.options)
 	if err != nil {
 		return err
 	}
@@ -64,11 +64,10 @@ func (i *Build) Run(ctx context.Context) (err error) {
 
 	switch i.diffMode {
 	case DiffModeLocal:
-		oldPlan := plan.New(i.plandir)
+		oldPlan := plan.New()
 		if oldPlan.IsExist(i.planFS) {
 			log.Info("🆚 Diff with previous local plan")
-			//nolint:forcetypeassert
-			if err := oldPlan.Import(ctx, i.planFS.(plan.PlanImportFS)); err != nil {
+			if err := oldPlan.Import(ctx, i.planFS); err != nil {
 				return err
 			}
 
@@ -111,13 +110,13 @@ func (i *Build) flags() []cli.Flag {
 	i.diff = &Diff{}
 
 	self := []cli.Flag{
-		flagPlandir(&i.plandir),
 		flagTags(&i.tags),
 		flagMatchAllTags(&i.options.MatchAll),
 		flagGraphWidth(&i.options.GraphWidth),
 		flagSkipUnchanged(&i.skipUnchanged),
 		flagDiffMode(&i.diffMode),
 		flagChartsCacheDir(&i.chartsCacheDir),
+		flagPlandirLocation(&i.planFS),
 
 		&cli.BoolFlag{
 			Name:        "yml",

@@ -1,7 +1,12 @@
 package template
 
 import (
+	"errors"
 	"fmt"
+)
+
+var (
+	ErrInvalidFilesystem = errors.New("filesystem not supported")
 )
 
 type SOPSDecodeError struct {

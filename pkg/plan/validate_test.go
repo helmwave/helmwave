@@ -29,8 +29,7 @@ func TestValidateTestSuite(t *testing.T) {
 }
 
 func (s *ValidateTestSuite) TestInvalidRelease() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	body := p.NewBody()
 
 	err := errors.New("test error")
@@ -47,8 +46,7 @@ func (s *ValidateTestSuite) TestInvalidRelease() {
 }
 
 func (s *ValidateTestSuite) TestInvalidRepository() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	body := p.NewBody()
 
 	err := errors.New("test error")
@@ -66,9 +64,8 @@ func (s *ValidateTestSuite) TestInvalidRepository() {
 
 func (s *ValidateTestSuite) TestValidateValues() {
 	tmpDir := s.T().TempDir()
-	wd, _ := os.Getwd()
-	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
+	p := plan.New()
 
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, "valuesName")
@@ -80,7 +77,7 @@ func (s *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
-	s.Require().NoError(v.SetViaRelease(mockedRelease, baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), tmpDir, template.TemplaterSprig))
+	s.Require().NoError(v.SetViaRelease(mockedRelease, baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), template.TemplaterSprig))
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
@@ -92,7 +89,7 @@ func (s *ValidateTestSuite) TestValidateValues() {
 
 func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, "valuesName")
@@ -100,7 +97,7 @@ func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
-	v := release.ValuesReference{Src: tmpValues, Dst: s.T().Name()}
+	v := release.ValuesReference{Src: tmpValues}
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
@@ -113,8 +110,7 @@ func (s *ValidateTestSuite) TestValidateValuesNotFound() {
 }
 
 func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	p.NewBody()
 
@@ -124,8 +120,7 @@ func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
 }
 
 func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	body := p.NewBody()
 
 	mockedRepo := &plan.MockRepositoryConfig{}
@@ -141,8 +136,7 @@ func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 }
 
 func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	body := p.NewBody()
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -160,8 +154,7 @@ func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
 }
 
 func (s *ValidateTestSuite) TestValidateEmpty() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	body := p.NewBody()
 
 	s.Require().NoError(body.Validate())

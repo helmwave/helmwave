@@ -13,15 +13,11 @@ var _ Action = (*Graph)(nil)
 // Graph is a struct for running 'graph' command.
 type Graph struct {
 	build     *Build
-	planFS    plan.PlanImportFS
 	autoBuild bool
 }
 
 // Run is the main function for 'status' command.
 func (l *Graph) Run(ctx context.Context) error {
-	// TODO: get filesystems dynamically from args
-	l.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
-
 	if 1 == l.build.options.GraphWidth {
 		log.Info("🔺it is not possible to turn off the graph in this command")
 
@@ -38,7 +34,7 @@ func (l *Graph) Run(ctx context.Context) error {
 	}
 	l.build.options.GraphWidth = old
 
-	p, err := plan.NewAndImport(ctx, l.planFS, l.build.plandir)
+	p, err := plan.NewAndImport(ctx, l.build.planFS)
 	if err != nil {
 		return err
 	}

@@ -23,27 +23,6 @@ func TestValuesTestSuite(t *testing.T) {
 	suite.Run(t, new(ValuesTestSuite))
 }
 
-func (s *ValuesTestSuite) TestProhibitDst() {
-	type config struct {
-		Values []release.ValuesReference
-	}
-
-	src := `
-values:
-- src: 1
-  dst: a
-- src: 2
-  dst: b
-`
-	c := &config{}
-
-	err := yaml.Unmarshal([]byte(src), c)
-	s.Require().NoError(err)
-
-	err = release.ProhibitDst(c.Values)
-	s.Require().Error(err)
-}
-
 func (s *ValuesTestSuite) TestList() {
 	type config struct {
 		Values []release.ValuesReference
@@ -103,7 +82,7 @@ func (s *ValuesTestSuite) TestBuildNonExistingNonStrict() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	err := r.BuildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ".", template.TemplaterSprig)
+	err := r.ExportValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), template.TemplaterSprig)
 
 	s.Require().NoError(err)
 	s.Require().Len(r.Values(), 0)
@@ -120,7 +99,7 @@ func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	err := r.BuildValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ".", template.TemplaterSprig)
+	err := r.ExportValues(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), template.TemplaterSprig)
 
 	s.Require().Error(err)
 }

@@ -2,7 +2,6 @@ package action
 
 import (
 	"context"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -32,15 +31,15 @@ func (ts *StatusTestSuite) TestCmd() {
 
 func (ts *StatusTestSuite) TestRun() {
 	r := &Build{
-		plandir: ts.T().TempDir(),
 		tags:    cli.StringSlice{},
 		autoYml: true,
 		yml: &Yml{
-			tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-			file:      filepath.Join(ts.T().TempDir(), "02_helmwave.yml"),
 			templater: template.TemplaterSprig,
 		},
 	}
+	createGenericFS(&r.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&r.yml.destFS, ts.T().TempDir(), "02_helmwave.yml")
+	createGenericFS(&r.planFS, ts.T().TempDir())
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)

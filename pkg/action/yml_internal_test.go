@@ -5,8 +5,6 @@ package action
 import (
 	"context"
 	"net/url"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/go-fsimpl/filefs"
@@ -37,21 +35,19 @@ func (ts *YmlTestSuite) TestCmd() {
 func (ts *YmlTestSuite) TestRenderEnv() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tmpDir, "01_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
+	createGenericFS(&y.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&y.destFS, tmpDir, "01_helmwave.yml")
 
 	value := "test01"
 	ts.T().Setenv("NAMESPACE", value)
 	ts.T().Setenv("PROJECT_NAME", value)
 
 	ts.Require().NoError(y.Run(context.Background()))
-	ts.Require().FileExists(y.file)
 
-	wd, _ := os.Getwd()
-	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	b, err := plan.NewBody(context.Background(), baseFS, y.file, true)
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
+	b, err := plan.NewBody(context.Background(), baseFS, true)
 	ts.Require().NoError(err)
 
 	ts.Require().Equal(value, b.Project)

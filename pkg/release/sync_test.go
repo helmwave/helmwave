@@ -45,7 +45,7 @@ func (s *SyncTestSuite) TestInstallUpgrade() {
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{
-		Dst: filepath.Join(tests.Root, "06_values.yaml"),
+		Src: filepath.Join(tests.Root, "06_values.yaml"),
 	})
 
 	wd, _ := os.Getwd()

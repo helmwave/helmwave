@@ -38,12 +38,17 @@ func getTemplater(name string) (Templater, error) {
 // Tpl2yml renders 'tpl' file to 'yml' file as go template.
 func Tpl2yml(
 	tplFS fs.FS,
-	ymlFS fsimpl.WriteableFS,
+	ymlFSUntyped fs.FS,
 	tpl, yml string,
 	data any,
 	templaterName string,
 	opts ...TemplaterOptions,
 ) error {
+	ymlFS, ok := ymlFSUntyped.(fsimpl.WriteableFS)
+	if !ok {
+		return ErrInvalidFilesystem
+	}
+
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,

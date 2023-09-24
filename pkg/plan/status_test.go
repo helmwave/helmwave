@@ -2,7 +2,6 @@ package plan_test
 
 import (
 	"errors"
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -17,8 +16,7 @@ type StatusTestSuite struct {
 }
 
 func (s *StatusTestSuite) TestStatusByName() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -46,8 +44,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 
 // TestStatusFailedRelease tests that Status method should just skip releases that fail Status method.
 func (s *StatusTestSuite) TestStatusFailedRelease() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Status").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
@@ -62,8 +59,7 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 }
 
 func (s *StatusTestSuite) TestStatusNoReleases() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	p.NewBody()
 
 	err := p.Status()

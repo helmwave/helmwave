@@ -17,7 +17,7 @@ func (p *Plan) ValidateValuesImport(baseFS fs.StatFS) error {
 	f := false
 	for _, rel := range p.body.Releases {
 		for i := range rel.Values() {
-			y := rel.Values()[i].Dst
+			y := rel.Values()[i].Src
 			_, err := baseFS.Stat(y)
 			if os.IsNotExist(err) {
 				f = true
@@ -39,13 +39,6 @@ func (p *Plan) ValidateValuesImport(baseFS fs.StatFS) error {
 // Dst needs to marshal for export.
 // Also, dst needs to unmarshal for import from plan.
 func (p *Plan) ValidateValuesBuild() error {
-	for _, rel := range p.body.Releases {
-		err := release.ProhibitDst(rel.Values())
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 

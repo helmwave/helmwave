@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -126,8 +125,7 @@ func (ts *BuildReleasesTestSuite) TestCheckTagInclusion() {
 }
 
 func (ts *BuildReleasesTestSuite) TestNoReleases() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 	p.NewBody()
 
 	releases, err := p.buildReleases([]string{}, false)
@@ -137,8 +135,7 @@ func (ts *BuildReleasesTestSuite) TestNoReleases() {
 }
 
 func (ts *BuildReleasesTestSuite) TestNoMatchingReleases() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Tags").Return([]string{"bla"})
@@ -153,8 +150,7 @@ func (ts *BuildReleasesTestSuite) TestNoMatchingReleases() {
 }
 
 func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	tags := []string{"bla"}
 	u := uniqname.UniqName(ts.T().Name())
@@ -180,8 +176,7 @@ func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
 }
 
 func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	tags := []string{"bla"}
 	u := uniqname.UniqName(ts.T().Name())
@@ -202,8 +197,7 @@ func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
 }
 
 func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	tags := []string{"bla"}
 	u := uniqname.UniqName(ts.T().Name())
@@ -226,8 +220,7 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 }
 
 func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
-	tmpDir := ts.T().TempDir()
-	p := New(filepath.Join(tmpDir, Dir))
+	p := New()
 
 	tags := []string{"bla"}
 	u1 := uniqname.UniqName(ts.T().Name())

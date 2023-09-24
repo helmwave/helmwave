@@ -26,7 +26,7 @@ func TestBuildManifestsTestSuite(t *testing.T) {
 }
 
 func (ts *BuildManifestsTestSuite) TestEmptyReleases() {
-	p := New(".")
+	p := New()
 	p.NewBody()
 
 	wd, _ := os.Getwd()
@@ -37,7 +37,7 @@ func (ts *BuildManifestsTestSuite) TestEmptyReleases() {
 }
 
 func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
-	p := New(".")
+	p := New()
 
 	rel1 := &MockReleaseConfig{}
 	u1 := uniqname.UniqName("redis1@defaultblabla")
@@ -75,7 +75,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 }
 
 func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
-	p := New(".")
+	p := New()
 
 	rel := &MockReleaseConfig{}
 	uniq := uniqname.UniqName("redis1@defaultblabla")
@@ -102,7 +102,7 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 }
 
 func (ts *BuildManifestsTestSuite) TestSyncError() {
-	p := New(".")
+	p := New()
 
 	rel := &MockReleaseConfig{}
 	errExpected := errors.New(ts.T().Name())
@@ -123,7 +123,7 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 }
 
 func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
-	p := New(".")
+	p := New()
 
 	rel := &MockReleaseConfig{}
 	uniq := uniqname.UniqName("redis1@defaultblabla")
@@ -152,7 +152,7 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 }
 
 func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
-	p := New(".")
+	p := New()
 
 	rel := &MockReleaseConfig{}
 	uniq := uniqname.UniqName("redis1@defaultblabla")

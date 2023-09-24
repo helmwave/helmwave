@@ -29,7 +29,7 @@ type Config interface {
 	DryRun(bool)
 	ChartDepsUpd(fs.StatFS) error
 	DownloadChart(fs.StatFS, fsimpl.WriteableFS, string) error
-	BuildValues(fs.StatFS, fsimpl.WriteableFS, string, string) error
+	ExportValues(fs.StatFS, fsimpl.WriteableFS, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get(int) (*release.Release, error)
 	List() (*release.Release, error)

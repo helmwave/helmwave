@@ -25,7 +25,11 @@ func Contains(t string, a []string) bool {
 
 // CreateFile creates recursively basedir of file and returns created file object.
 func CreateFile(f fsimpl.WriteableFS, p string) (fsimpl.WriteableFile, error) {
-	if err := f.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+	baseDir := filepath.Dir(p)
+	if p == "" {
+		baseDir = ".."
+	}
+	if err := f.MkdirAll(baseDir, 0o755); err != nil {
 		return nil, fmt.Errorf("failed to create base directories for %s: %w", p, err)
 	}
 
@@ -35,23 +39,6 @@ func CreateFile(f fsimpl.WriteableFS, p string) (fsimpl.WriteableFile, error) {
 	}
 
 	return file, nil
-}
-
-func Path(f fs.FS) (string, error) {
-	file, err := f.Open(".")
-	if err != nil {
-		return "", err //nolint:wrapcheck
-	}
-	defer func() {
-		_ = file.Close()
-	}()
-
-	stat, err := file.Stat()
-	if err != nil {
-		return "", err //nolint:wrapcheck
-	}
-
-	return stat.Name(), nil
 }
 
 // IsExists return true if file exists.
@@ -120,4 +107,57 @@ func CopyFile(srcFS fs.FS, destFS fsimpl.WriteableFS, src, dest string) error {
 	}
 
 	return nil
+}
+
+func CopyDir(srcFS interface {
+	fs.StatFS
+	fs.ReadDirFS
+}, destFS fsimpl.WriteableFS, srcdir, destdir string) error {
+	var contents []os.FileInfo
+	entries, err := srcFS.ReadDir(srcdir)
+	if err != nil {
+		return err
+	}
+	for _, e := range entries {
+		info, err := e.Info()
+		if err != nil {
+			return err
+		}
+		contents = append(contents, info)
+	}
+
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	for _, content := range contents {
+		cs, cd := filepath.Join(srcdir, content.Name()), filepath.Join(destdir, content.Name())
+
+		if err = switchBoard(srcFS, destFS, cs, cd); err != nil {
+			// If any error, exit immediately
+			return err
+		}
+	}
+
+	return nil
+}
+
+func switchBoard(srcFS interface {
+	fs.StatFS
+	fs.ReadDirFS
+}, destFS fsimpl.WriteableFS, srcpath, destpath string) error {
+	stat, err := srcFS.Stat(srcpath)
+	if err != nil {
+		return err
+	}
+
+	switch {
+	case stat.IsDir():
+		return CopyDir(srcFS, destFS, srcpath, destpath)
+	default:
+		return CopyFile(srcFS, destFS, srcpath, destpath)
+	}
 }

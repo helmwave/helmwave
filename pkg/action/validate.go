@@ -11,16 +11,12 @@ var _ Action = (*Validate)(nil)
 
 // Validate is a struct for running 'validate' command.
 type Validate struct {
-	planFS  plan.PlanImportFS
-	plandir string
+	planFS plan.PlanImportFS
 }
 
 // Run is the main function for 'validate' command.
 func (l *Validate) Run(ctx context.Context) error {
-	// TODO: get filesystems dynamically from args
-	l.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
-
-	p, err := plan.NewAndImport(ctx, l.planFS, l.plandir)
+	p, err := plan.NewAndImport(ctx, l.planFS)
 	if err != nil {
 		return err
 	}
@@ -41,6 +37,6 @@ func (l *Validate) Cmd() *cli.Command {
 // flags return flag set of CLI urfave.
 func (l *Validate) flags() []cli.Flag {
 	return []cli.Flag{
-		flagPlandir(&l.plandir),
+		flagPlandirLocation(&l.planFS),
 	}
 }

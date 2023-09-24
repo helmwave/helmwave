@@ -12,21 +12,17 @@ var _ Action = (*List)(nil)
 // List is a struct for running 'list' command.
 type List struct {
 	build     *Build
-	planFS    plan.PlanImportFS
 	autoBuild bool
 }
 
 // Run is the main function for 'list' command.
 func (l *List) Run(ctx context.Context) error {
-	// TODO: get filesystems dynamically from args
-	l.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
-
 	if l.autoBuild {
 		if err := l.build.Run(ctx); err != nil {
 			return err
 		}
 	}
-	p, err := plan.NewAndImport(ctx, l.planFS, l.build.plandir)
+	p, err := plan.NewAndImport(ctx, l.build.planFS)
 	if err != nil {
 		return err
 	}

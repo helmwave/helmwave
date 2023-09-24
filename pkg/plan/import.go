@@ -17,11 +17,22 @@ type PlanImportFS interface {
 	fs.ReadDirFS
 	fs.ReadFileFS
 	fs.StatFS
+	fs.SubFS
 }
 
 // Import parses directory with plan files and imports them into structure.
-func (p *Plan) Import(ctx context.Context, baseFS PlanImportFS) error {
-	body, err := NewBody(ctx, baseFS, p.fullPath, true)
+func (p *Plan) Import(ctx context.Context, baseFSUntyped fs.FS) error {
+	baseFS, ok := baseFSUntyped.(PlanImportFS)
+	if !ok {
+		return fmt.Errorf("invalid plandir for import: %w", ErrInvalidPlandir)
+	}
+
+	yml, err := baseFS.Sub(File)
+	if err != nil {
+		return err
+	}
+
+	body, err := NewBody(ctx, yml, true)
 	if err != nil {
 		return err
 	}
@@ -49,10 +60,9 @@ func (p *Plan) Import(ctx context.Context, baseFS PlanImportFS) error {
 }
 
 func (p *Plan) importManifest(baseFS PlanImportFS) error {
-	d := filepath.Join(p.dir, Manifest)
-	ls, err := baseFS.ReadDir(d)
+	ls, err := baseFS.ReadDir(Manifest)
 	if err != nil {
-		return fmt.Errorf("failed to read manifest dir %s: %w", d, err)
+		return fmt.Errorf("failed to read manifest dir %s: %w", Manifest, err)
 	}
 
 	if len(ls) == 0 {
@@ -64,7 +74,7 @@ func (p *Plan) importManifest(baseFS PlanImportFS) error {
 			continue
 		}
 
-		f := filepath.Join(p.dir, Manifest, l.Name())
+		f := filepath.Join(Manifest, l.Name())
 		c, err := baseFS.ReadFile(f)
 		if err != nil {
 			return fmt.Errorf("failed to read manifest %s: %w", f, err)

@@ -26,7 +26,7 @@ func (rel *config) upgrade(ctx context.Context, baseFS fs.FS) (*release.Release,
 	// Values
 	valuesFiles := make([]string, 0, len(rel.Values()))
 	for i := range rel.Values() {
-		valuesFiles = append(valuesFiles, rel.Values()[i].Dst)
+		valuesFiles = append(valuesFiles, rel.Values()[i].Src)
 	}
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}

@@ -2,7 +2,6 @@ package plan_test
 
 import (
 	"errors"
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -17,8 +16,7 @@ type ListTestSuite struct {
 }
 
 func (s *ListTestSuite) TestList() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	r := &helmRelease.Release{
@@ -39,8 +37,7 @@ func (s *ListTestSuite) TestList() {
 
 // TestListError tests that List method should just skip releases that fail List method.
 func (s *ListTestSuite) TestListError() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("List").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
@@ -55,8 +52,7 @@ func (s *ListTestSuite) TestListError() {
 }
 
 func (s *ListTestSuite) TestListNoReleases() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	p.NewBody()
 
 	err := p.List()

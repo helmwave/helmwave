@@ -23,27 +23,26 @@ func TestNewTestSuite(t *testing.T) {
 }
 
 func (s *NewTestSuite) TestNew() {
-	dir := "/proc/1/bla"
-	p := plan.New(dir)
+	p := plan.New()
 
 	s.Require().NotNil(p)
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+
 	s.Require().False(p.IsExist(baseFS.(fs.StatFS)))
 	s.Require().False(p.IsManifestExist(baseFS.(fs.StatFS)))
 }
 
 func (s *NewTestSuite) TestNewAndImportError() {
-	wd, _ := os.Getwd()
-	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	_, err := plan.NewAndImport(context.Background(), baseFS.(plan.PlanImportFS), "/proc/1/blabla")
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: "/proc/1/blabla"})
+	_, err := plan.NewAndImport(context.Background(), baseFS.(plan.PlanImportFS))
 
 	s.Require().Error(err)
 	s.Require().ErrorContains(err, "failed to read plan file")
 }
 
 func (s *NewTestSuite) TestLogger() {
-	p := plan.New(".")
+	p := plan.New()
 	body := p.NewBody()
 
 	rel := &plan.MockReleaseConfig{}

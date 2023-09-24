@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/url"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/go-fsimpl/filefs"
@@ -22,8 +21,7 @@ type ApplyTestSuite struct {
 }
 
 func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	repoName := "blablanami"
 
@@ -43,8 +41,7 @@ func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
 }
 
 func (s *ApplyTestSuite) TestApplyNoReleases() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Install").Return(nil)
@@ -61,8 +58,7 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 }
 
 func (s *ApplyTestSuite) TestApplyFailedRelease() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -86,8 +82,7 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 }
 
 func (s *ApplyTestSuite) TestApply() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")

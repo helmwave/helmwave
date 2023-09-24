@@ -3,7 +3,6 @@ package plan_test
 import (
 	"context"
 	"errors"
-	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -16,8 +15,7 @@ type DestroyTestSuite struct {
 }
 
 func (s *DestroyTestSuite) TestDestroy() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -34,8 +32,7 @@ func (s *DestroyTestSuite) TestDestroy() {
 }
 
 func (s *DestroyTestSuite) TestDestroyFailedRelease() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -53,8 +50,7 @@ func (s *DestroyTestSuite) TestDestroyFailedRelease() {
 }
 
 func (s *DestroyTestSuite) TestDestroyNoReleases() {
-	tmpDir := s.T().TempDir()
-	p := plan.New(filepath.Join(tmpDir, plan.Dir))
+	p := plan.New()
 	p.NewBody()
 
 	err := p.Down(context.Background())

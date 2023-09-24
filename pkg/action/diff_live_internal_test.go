@@ -5,9 +5,9 @@ package action
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
@@ -35,20 +35,21 @@ func (ts *DiffLiveTestSuite) TestCmd() {
 func (ts *DiffLiveTestSuite) TestRun() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
 		templater: template.TemplaterSprig,
 	}
 
 	s := &Build{
-		plandir:  tmpDir,
 		tags:     cli.StringSlice{},
 		yml:      y,
 		diff:     &Diff{},
 		diffMode: DiffModeLive,
 	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
 
-	d := DiffLive{diff: s.diff, plandir: s.plandir}
+	d := DiffLive{diff: s.diff, planFS: s.planFS.(plan.PlanImportFS)}
+	createGenericFS(&d.planFS)
 
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s.Run(context.Background()))

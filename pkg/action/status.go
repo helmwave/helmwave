@@ -12,22 +12,18 @@ var _ Action = (*Status)(nil)
 // Status is a struct for running 'status' command.
 type Status struct {
 	build     *Build
-	planFS    plan.PlanImportFS
 	names     cli.StringSlice
 	autoBuild bool
 }
 
 // Run is the main function for 'status' command.
 func (l *Status) Run(ctx context.Context) error {
-	// TODO: get filesystems dynamically from args
-	l.planFS = getBaseFS().(plan.PlanImportFS) //nolint:forcetypeassert
-
 	if l.autoBuild {
 		if err := l.build.Run(ctx); err != nil {
 			return err
 		}
 	}
-	p, err := plan.NewAndImport(ctx, l.planFS, l.build.plandir)
+	p, err := plan.NewAndImport(ctx, l.build.planFS)
 	if err != nil {
 		return err
 	}
