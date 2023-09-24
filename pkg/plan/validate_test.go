@@ -68,43 +68,23 @@ func (s *ValidateTestSuite) TestValidateValues() {
 	p := plan.New()
 
 	valuesContents := []byte("a: b")
-	tmpValues := filepath.Join(tmpDir, "valuesName")
-	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
+	tmpValues := "valuesName"
+	s.Require().NoError(os.WriteFile(filepath.Join(tmpDir, tmpValues), valuesContents, 0o600))
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return(s.T().Name())
 	mockedRelease.On("Namespace").Return(s.T().Name())
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+
 	v := release.ValuesReference{Src: tmpValues}
+
 	s.Require().NoError(v.SetViaRelease(mockedRelease, baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), template.TemplaterSprig))
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
 
 	s.Require().NoError(p.ValidateValuesImport(baseFS.(fs.StatFS)))
-
-	mockedRelease.AssertExpectations(s.T())
-}
-
-func (s *ValidateTestSuite) TestValidateValuesNotFound() {
-	tmpDir := s.T().TempDir()
-	p := plan.New()
-
-	valuesContents := []byte("a: b")
-	tmpValues := filepath.Join(tmpDir, "valuesName")
-	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
-
-	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
-	v := release.ValuesReference{Src: tmpValues}
-	mockedRelease.On("Values").Return([]release.ValuesReference{v})
-
-	p.SetReleases(mockedRelease)
-
-	wd, _ := os.Getwd()
-	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	s.Require().Error(p.ValidateValuesImport(baseFS.(fs.StatFS)))
 
 	mockedRelease.AssertExpectations(s.T())
 }

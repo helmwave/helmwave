@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/fs"
 	"net/url"
 	"os"
 	"sync"
@@ -32,7 +31,7 @@ import (
 )
 
 // Up syncs repositories and releases.
-func (p *Plan) Up(ctx context.Context, baseFS fs.FS, dog *kubedog.Config) error {
+func (p *Plan) Up(ctx context.Context, baseFS fsimpl.CurrentPathFS, dog *kubedog.Config) error {
 	// Run hooks
 	err := p.body.Lifecycle.RunPreUp(ctx)
 	if err != nil {
@@ -223,7 +222,7 @@ func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 	return res
 }
 
-func (p *Plan) syncReleases(ctx context.Context, baseFS fs.FS) (err error) {
+func (p *Plan) syncReleases(ctx context.Context, baseFS fsimpl.CurrentPathFS) (err error) {
 	dependenciesGraph, err := p.body.generateDependencyGraph()
 	if err != nil {
 		return err
@@ -293,7 +292,7 @@ func (p *Plan) syncReleasesWorker(
 	mu *sync.Mutex,
 	fails map[release.Config]error,
 	monitorsLockMap map[string]*parallel.WaitGroup,
-	baseFS fs.FS,
+	baseFS fsimpl.CurrentPathFS,
 ) {
 	for n := range nodesChan {
 		p.syncRelease(ctx, wg, n, mu, fails, monitorsLockMap, baseFS)
@@ -308,7 +307,7 @@ func (p *Plan) syncRelease(
 	mu *sync.Mutex,
 	fails map[release.Config]error,
 	monitorsLockMap map[string]*parallel.WaitGroup,
-	baseFS fs.FS,
+	baseFS fsimpl.CurrentPathFS,
 ) {
 	rel := node.Data
 
@@ -448,7 +447,7 @@ func (p *Plan) ApplyReport(
 	return nil
 }
 
-func (p *Plan) syncReleasesKubedog(ctx context.Context, baseFS fs.FS, kubedogConfig *kubedog.Config) error {
+func (p *Plan) syncReleasesKubedog(ctx context.Context, baseFS fsimpl.CurrentPathFS, kubedogConfig *kubedog.Config) error {
 	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Don't forget!
 

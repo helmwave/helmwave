@@ -40,7 +40,6 @@ const (
 type Plan struct {
 	body      *planBody
 	fullPath  string
-	tmpDir    string
 	graphMD   string
 	templater string
 

@@ -11,6 +11,7 @@ import (
 	"github.com/helmwave/go-fsimpl/blobfs"
 	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/go-fsimpl/gitfs"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/urfave/cli/v2"
 )
 
@@ -43,7 +44,7 @@ func (f *genericFS[T]) Set(val string) error {
 
 	resFS, err := mux.Lookup(stringFSToURLFS(val).String())
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	castedFS, ok := resFS.(T)
@@ -52,6 +53,7 @@ func (f *genericFS[T]) Set(val string) error {
 	}
 
 	*f.dest = castedFS
+
 	return nil
 }
 
@@ -66,6 +68,7 @@ func stringFSToURLFS(val string) *url.URL {
 	}
 
 	absPath, _ := filepath.Abs(val)
+
 	return &url.URL{Scheme: "file", Path: absPath}
 }
 
@@ -83,5 +86,5 @@ func getDefaultFSValue(subPaths ...string) string {
 		return "."
 	}
 
-	return filepath.Join(subPaths...)
+	return helper.FilepathJoin(subPaths...)
 }

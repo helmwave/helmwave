@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -42,8 +43,20 @@ func CreateFile(f fsimpl.WriteableFS, p string) (fsimpl.WriteableFile, error) {
 }
 
 // IsExists return true if file exists.
-func IsExists(f fs.StatFS, s string) bool {
-	_, err := f.Stat(s)
+func IsExists(f fs.FS, s string) bool {
+	var err error
+
+	switch f := f.(type) {
+	case fs.StatFS:
+		_, err = f.Stat(s)
+	default:
+		var file fs.File
+		file, err = f.Open(s)
+		if file != nil {
+			_ = file.Close()
+		}
+	}
+
 	switch {
 	case err == nil:
 		return true
@@ -55,6 +68,31 @@ func IsExists(f fs.StatFS, s string) bool {
 		log.Fatal(err)
 
 		return false
+	}
+}
+
+// IsExists return true if path is a dir.
+func IsDir(f fs.FS, s string) bool {
+	switch f := f.(type) {
+	case fs.ReadDirFS:
+		_, err := f.ReadDir(s)
+
+		return err == nil
+	case fs.StatFS:
+		stat, err := f.Stat(s)
+		if err != nil {
+			return false
+		}
+
+		return stat.IsDir()
+	default:
+		var file fs.File
+		file, err := f.Open(s)
+		if file != nil {
+			_ = file.Close()
+		}
+
+		return errors.Is(err, fs.ErrInvalid) || errors.Is(err, fs.ErrExist)
 	}
 }
 
@@ -112,31 +150,26 @@ func CopyFile(srcFS fs.FS, destFS fsimpl.WriteableFS, src, dest string) error {
 func CopyDir(srcFS interface {
 	fs.StatFS
 	fs.ReadDirFS
-}, destFS fsimpl.WriteableFS, srcdir, destdir string) error {
-	var contents []os.FileInfo
+}, destFS fsimpl.WriteableFS, srcdir, destdir string,
+) error {
+	var contents []os.FileInfo //nolint:prealloc
 	entries, err := srcFS.ReadDir(srcdir)
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 	for _, e := range entries {
 		info, err := e.Info()
 		if err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 		contents = append(contents, info)
 	}
 
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return err
-	}
-
 	for _, content := range contents {
-		cs, cd := filepath.Join(srcdir, content.Name()), filepath.Join(destdir, content.Name())
+		cs, cd := FilepathJoin(srcdir, content.Name()), filepath.Join(destdir, content.Name())
 
-		if err = switchBoard(srcFS, destFS, cs, cd); err != nil {
+		err = switchBoard(srcFS, destFS, cs, cd)
+		if err != nil {
 			// If any error, exit immediately
 			return err
 		}
@@ -148,10 +181,11 @@ func CopyDir(srcFS interface {
 func switchBoard(srcFS interface {
 	fs.StatFS
 	fs.ReadDirFS
-}, destFS fsimpl.WriteableFS, srcpath, destpath string) error {
+}, destFS fsimpl.WriteableFS, srcpath, destpath string,
+) error {
 	stat, err := srcFS.Stat(srcpath)
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	switch {

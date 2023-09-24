@@ -49,13 +49,13 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	return u
 }
 
-func (r *MockReleaseConfig) Sync(_ context.Context, _ fs.FS) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) Sync(_ context.Context, _ fsimpl.CurrentPathFS) (*helmRelease.Release, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) SyncDryRun(ctx context.Context, baseFS fs.FS) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) SyncDryRun(ctx context.Context, baseFS fsimpl.CurrentPathFS) (*helmRelease.Release, error) {
 	r.DryRun(true)
 	defer r.DryRun(false)
 
@@ -66,7 +66,7 @@ func (r *MockReleaseConfig) DryRun(bool) {
 	r.Called()
 }
 
-func (r *MockReleaseConfig) ChartDepsUpd(_ fs.StatFS) error {
+func (r *MockReleaseConfig) ChartDepsUpd(_ fsimpl.CurrentPathFS) error {
 	return r.Called().Error(0)
 }
 
@@ -74,7 +74,7 @@ func (r *MockReleaseConfig) Equal(release.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockReleaseConfig) ExportValues(statFS fs.StatFS, writeableFS fsimpl.WriteableFS, templater string) error {
+func (r *MockReleaseConfig) ExportValues(statFS fs.FS, writeableFS fsimpl.WriteableFS, templater string) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn
@@ -166,7 +166,7 @@ func (r *MockReleaseConfig) HelmWait() bool {
 	return true
 }
 
-func (r *MockReleaseConfig) DownloadChart(_ fs.StatFS, _ fsimpl.WriteableFS, _ string) error {
+func (r *MockReleaseConfig) DownloadChart(_ fsimpl.CurrentPathFS, _ fsimpl.WriteableFS, _ string) error {
 	return r.Called().Error(0)
 }
 

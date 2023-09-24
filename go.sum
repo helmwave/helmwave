@@ -645,8 +645,8 @@ github.com/hashicorp/vault/api v1.9.2 h1:YjkZLJ7K3inKgMZ0wzCU9OHqc+UqMQyXsPXnf3C
 github.com/hashicorp/vault/api v1.9.2/go.mod h1:jo5Y/ET+hNyz+JnKDt8XLAdKs+AM0G5W0Vp1IrFI8N8=
 github.com/helmwave/asciigraph v1.0.0 h1:xTmqyOPUuaudsEw0BU3T/LC9YkZQRDY/QMur1k+DBps=
 github.com/helmwave/asciigraph v1.0.0/go.mod h1:f8DLnrh1Rnb3jrnTjFLPdB1hunfQ9L/zxFcxQHX8WGM=
-github.com/helmwave/go-fsimpl v0.0.0-20230923151803-7d77a246ade7 h1:X6aiWmtBZswp4j8WlB0pIBPIx2txJIYcymda35SVbjk=
-github.com/helmwave/go-fsimpl v0.0.0-20230923151803-7d77a246ade7/go.mod h1:KT4hCzm40UrJIrPPe6zFb7KLbbHEKGuRdG1JqVq5w/4=
+github.com/helmwave/go-fsimpl v0.0.0-20230924212038-cb1fc050bcc0 h1:Hvr3Vr3ZIIESzizePwLUXQ74Tq9qL8aaj3w9Vadbnco=
+github.com/helmwave/go-fsimpl v0.0.0-20230924212038-cb1fc050bcc0/go.mod h1:KT4hCzm40UrJIrPPe6zFb7KLbbHEKGuRdG1JqVq5w/4=
 github.com/helmwave/logrus-emoji-formatter v1.1.0 h1:LMVt9hWp0+8nNJlKYzXAgaQ2C7y43+VWDUItXk7MEv0=
 github.com/helmwave/logrus-emoji-formatter v1.1.0/go.mod h1:4rNQF//jg0jPPtIAmTmuOHUGpoy5gzEWN+toUv+2F8A=
 github.com/homeport/dyff v1.5.7 h1:24IrdSAb2fprR67XHMIagGoc1c4VNBV9ibNFKICsSis=

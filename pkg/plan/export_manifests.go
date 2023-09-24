@@ -3,32 +3,29 @@ package plan
 import (
 	"context"
 	"fmt"
-	"io/fs"
-	"sync"
+	"path/filepath"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 )
 
-func (p *Plan) buildManifest(ctx context.Context, baseFS fs.StatFS) error {
+func (p *Plan) exportManifests(ctx context.Context, plandirFS ExportFS) error {
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 
-	mu := &sync.Mutex{}
-
 	for _, rel := range p.body.Releases {
-		go p.buildReleaseManifest(ctx, wg, rel, mu, baseFS)
+		go p.exportReleaseManifest(ctx, wg, rel, plandirFS)
 	}
 
 	return wg.Wait()
 }
 
-func (p *Plan) buildReleaseManifest(
+func (p *Plan) exportReleaseManifest(
 	ctx context.Context,
 	wg *parallel.WaitGroup,
 	rel release.Config,
-	mu *sync.Mutex,
-	baseFS fs.StatFS,
+	baseFS ExportFS,
 ) {
 	defer wg.Done()
 
@@ -59,10 +56,30 @@ func (p *Plan) buildReleaseManifest(
 	}
 
 	l.Trace(document)
-
-	mu.Lock()
 	p.manifests[rel.Uniq()] = document
-	mu.Unlock()
 
-	l.Info("✅  manifest done")
+	l.Info("✅ manifest done")
+
+	m := filepath.Join(Manifest, rel.Uniq().String()+".yml")
+
+	f, err := helper.CreateFile(baseFS, m)
+	if err != nil {
+		wg.ErrChan() <- err
+
+		return
+	}
+
+	_, err = f.Write([]byte(document))
+	if err != nil {
+		wg.ErrChan() <- fmt.Errorf("failed to write manifest %s: %w", m, err)
+
+		return
+	}
+
+	err = f.Close()
+	if err != nil {
+		wg.ErrChan() <- fmt.Errorf("failed to close manifest %s: %w", m, err)
+
+		return
+	}
 }

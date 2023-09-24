@@ -2,10 +2,8 @@ package plan
 
 import (
 	"context"
-	"fmt"
 	"io/fs"
 
-	"github.com/helmwave/go-fsimpl"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,19 +16,7 @@ type BuildOptions struct { //nolint:govet
 }
 
 // Build plan with yml and tags/matchALL options.
-//
-//nolint:cyclop // TODO: reduce cyclomatic complexity
-func (p *Plan) Build(ctx context.Context, srcFSUntyped fs.FS, destFSUntyped fs.FS, o BuildOptions) error { //nolint:funlen
-	destFS, ok := destFSUntyped.(fsimpl.WriteableFS)
-	if !ok {
-		return fmt.Errorf("invalid plandir for build: %w", ErrInvalidPlandir)
-	}
-
-	srcFS, ok := srcFSUntyped.(fs.StatFS)
-	if !ok {
-		return fmt.Errorf("invalid source dir for build: %w", ErrInvalidPlandir)
-	}
-
+func (p *Plan) Build(ctx context.Context, o BuildOptions) error {
 	p.templater = o.Templater
 
 	// Create Body
@@ -56,13 +42,6 @@ func (p *Plan) Build(ctx context.Context, srcFSUntyped fs.FS, destFSUntyped fs.F
 	// Build Releases
 	log.Info("🔨 Building releases...")
 	p.body.Releases, err = p.buildReleases(o.Tags, o.MatchAll)
-	if err != nil {
-		return err
-	}
-
-	// Build Values
-	log.Info("🔨 Building values...")
-	err = p.buildValues(srcFS, destFS)
 	if err != nil {
 		return err
 	}
@@ -94,13 +73,6 @@ func (p *Plan) Build(ctx context.Context, srcFSUntyped fs.FS, destFSUntyped fs.F
 
 	// Validating plan after it was changed
 	err = p.body.Validate()
-	if err != nil {
-		return err
-	}
-
-	// Build Manifest
-	log.Info("🔨 Building manifests...")
-	err = p.buildManifest(ctx, srcFS)
 	if err != nil {
 		return err
 	}

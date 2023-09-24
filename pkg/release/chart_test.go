@@ -47,7 +47,7 @@ func (ts *ChartTestSuite) TestLocateChartLocal() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	c, err := rel.GetChart(baseFS)
+	c, err := rel.GetChart(baseFS.(fsimpl.CurrentPathFS))
 	ts.Require().Error(err)
 	ts.Require().Contains(err.Error(), "failed to locate chart")
 	ts.Require().Nil(c)
@@ -61,7 +61,7 @@ func (ts *ChartTestSuite) TestLoadChartLocal() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	c, err := rel.GetChart(baseFS)
+	c, err := rel.GetChart(baseFS.(fsimpl.CurrentPathFS))
 	ts.Require().Error(err)
 	ts.Require().Contains(err.Error(), "failed to load chart")
 	ts.Require().Contains(err.Error(), "Chart.yaml file is missing")
@@ -116,7 +116,7 @@ func (ts *ChartTestSuite) TestChartDepsUpdRemote() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	err := rel.ChartDepsUpd(baseFS.(fs.StatFS))
+	err := rel.ChartDepsUpd(baseFS.(fsimpl.CurrentPathFS))
 
 	ts.Require().NoError(err)
 }
@@ -128,7 +128,7 @@ func (ts *ChartTestSuite) TestSkipChartDepsUpd() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	err := rel.ChartDepsUpd(baseFS.(fs.StatFS))
+	err := rel.ChartDepsUpd(baseFS.(fsimpl.CurrentPathFS))
 
 	ts.Require().NoError(err)
 }
@@ -139,7 +139,7 @@ func (ts *ChartTestSuite) TestChartDepsUpdInvalid() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	err := rel.ChartDepsUpd(baseFS.(fs.StatFS))
+	err := rel.ChartDepsUpd(baseFS.(fsimpl.CurrentPathFS))
 
 	ts.Require().ErrorContains(err, "Chart.yaml file is missing")
 }
@@ -150,7 +150,7 @@ func (ts *ChartTestSuite) TestDownloadChartRemote() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	err := rel.DownloadChart(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ts.T().TempDir())
+	err := rel.DownloadChart(baseFS.(fsimpl.CurrentPathFS), baseFS.(fsimpl.WriteableFS), ts.T().TempDir())
 
 	ts.Require().NoError(err)
 }
@@ -160,7 +160,7 @@ func (ts *ChartTestSuite) TestDownloadChartLocal() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	err := rel.DownloadChart(baseFS.(fs.StatFS), baseFS.(fsimpl.WriteableFS), ts.T().TempDir())
+	err := rel.DownloadChart(baseFS.(fsimpl.CurrentPathFS), baseFS.(fsimpl.WriteableFS), ts.T().TempDir())
 
 	ts.Require().NoError(err)
 }

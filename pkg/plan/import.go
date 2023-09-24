@@ -8,28 +8,35 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/helmwave/go-fsimpl"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 )
 
-type PlanImportFS interface {
+type ImportFS interface {
 	fs.ReadDirFS
 	fs.ReadFileFS
 	fs.StatFS
 	fs.SubFS
 }
 
+type ExportFS interface {
+	fsimpl.WriteableFS
+	fsimpl.CurrentPathFS
+}
+
 // Import parses directory with plan files and imports them into structure.
 func (p *Plan) Import(ctx context.Context, baseFSUntyped fs.FS) error {
-	baseFS, ok := baseFSUntyped.(PlanImportFS)
+	baseFS, ok := baseFSUntyped.(ImportFS)
 	if !ok {
 		return fmt.Errorf("invalid plandir for import: %w", ErrInvalidPlandir)
 	}
 
 	yml, err := baseFS.Sub(File)
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	body, err := NewBody(ctx, yml, true)
@@ -59,7 +66,7 @@ func (p *Plan) Import(ctx context.Context, baseFSUntyped fs.FS) error {
 	return nil
 }
 
-func (p *Plan) importManifest(baseFS PlanImportFS) error {
+func (p *Plan) importManifest(baseFS ImportFS) error {
 	ls, err := baseFS.ReadDir(Manifest)
 	if err != nil {
 		return fmt.Errorf("failed to read manifest dir %s: %w", Manifest, err)
@@ -74,7 +81,7 @@ func (p *Plan) importManifest(baseFS PlanImportFS) error {
 			continue
 		}
 
-		f := filepath.Join(Manifest, l.Name())
+		f := helper.FilepathJoin(Manifest, l.Name())
 		c, err := baseFS.ReadFile(f)
 		if err != nil {
 			return fmt.Errorf("failed to read manifest %s: %w", f, err)

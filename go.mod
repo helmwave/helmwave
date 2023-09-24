@@ -9,7 +9,7 @@ require (
 	github.com/hairyhenderson/gomplate/v3 v3.11.3
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/asciigraph v1.0.0
-	github.com/helmwave/go-fsimpl v0.0.0-20230923151803-7d77a246ade7
+	github.com/helmwave/go-fsimpl v0.0.0-20230924212038-cb1fc050bcc0
 	github.com/helmwave/logrus-emoji-formatter v1.1.0
 	github.com/invopop/jsonschema v0.8.0
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d

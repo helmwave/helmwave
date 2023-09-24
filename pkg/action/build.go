@@ -2,11 +2,11 @@ package action
 
 import (
 	"context"
-	"io/fs"
 	"net/url"
 	"sort"
 	"strings"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -21,7 +21,7 @@ type Build struct {
 	yml            *Yml
 	diff           *Diff
 	options        plan.BuildOptions
-	planFS         fs.StatFS
+	planFS         fsimpl.CurrentPathFS
 	diffMode       string
 	chartsCacheDir string
 	tags           cli.StringSlice
@@ -30,6 +30,8 @@ type Build struct {
 }
 
 // Run is the main function for 'build' CLI command.
+//
+//nolint:gocognit,funlen,cyclop
 func (i *Build) Run(ctx context.Context) error {
 	if i.autoYml {
 		err := i.yml.Run(ctx)
@@ -51,10 +53,10 @@ func (i *Build) Run(ctx context.Context) error {
 
 	workdirFS, err := filefs.New(&url.URL{Scheme: "file", Path: "."})
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
-	err = newPlan.Build(ctx, workdirFS, i.planFS, i.options)
+	err = newPlan.Build(ctx, i.options)
 	if err != nil {
 		return err
 	}
@@ -71,21 +73,40 @@ func (i *Build) Run(ctx context.Context) error {
 				return err
 			}
 
+			err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+			if err != nil {
+				return err
+			}
+
 			newPlan.DiffPlan(oldPlan, i.diff.ShowSecret, i.diff.Wide)
+		} else {
+			err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+			if err != nil {
+				return err
+			}
+		}
+	case DiffModeLive:
+		err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+		if err != nil {
+			return err
 		}
 
-	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
 		newPlan.DiffLive(ctx, i.planFS, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
 	case DiffModeNone:
+		err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+		if err != nil {
+			return err
+		}
+
 		log.Info("🆚 Skip diffing")
 	default:
-		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
-	}
+		err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+		if err != nil {
+			return err
+		}
 
-	err = newPlan.Export(ctx, i.planFS, i.skipUnchanged)
-	if err != nil {
-		return err
+		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
 	}
 
 	log.Info("🏗 Planfile is ready!")

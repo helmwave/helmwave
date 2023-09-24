@@ -34,6 +34,8 @@ func flagMatchAllTags(v *bool) *cli.BoolFlag {
 }
 
 // flagYmlFile pass val to urfave flag.
+//
+//nolint:gocritic
 func flagYmlFile(v *fs.SubFS) *cli.GenericFlag {
 	return &cli.GenericFlag{
 		Name:        "file",
@@ -46,6 +48,8 @@ func flagYmlFile(v *fs.SubFS) *cli.GenericFlag {
 }
 
 // flagTplFile pass val to urfave flag.
+//
+//nolint:gocritic
 func flagTplFile(v *fs.StatFS) *cli.GenericFlag {
 	return &cli.GenericFlag{
 		Name:        "tpl",

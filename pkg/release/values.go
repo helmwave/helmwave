@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"path/filepath"
 
 	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -107,7 +106,7 @@ func (v *ValuesReference) getUniqPath(name uniqname.UniqName) string {
 	hash := h.Sum(nil)
 	s := hex.EncodeToString(hash)
 
-	return filepath.Join("values", name.String(), s+".yml")
+	return helper.FilepathJoin("values", name.String(), s+".yml")
 }
 
 // func (v *ValuesReference) Set(Dst string) *ValuesReference {
@@ -117,7 +116,7 @@ func (v *ValuesReference) getUniqPath(name uniqname.UniqName) string {
 
 // SetViaRelease downloads and templates values file.
 // Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
-func (v *ValuesReference) SetViaRelease(rel Config, srcFS fs.StatFS, plandirFS fsimpl.WriteableFS, templater string) error {
+func (v *ValuesReference) SetViaRelease(rel Config, srcFS fs.FS, plandirFS fsimpl.WriteableFS, templater string) error {
 	if v.Renderer == "" {
 		v.Renderer = templater
 	}
@@ -155,7 +154,7 @@ func (v *ValuesReference) SetViaRelease(rel Config, srcFS fs.StatFS, plandirFS f
 	return nil
 }
 
-func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.StatFS, plandirFS fsimpl.WriteableFS, dst string) error {
+func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.FS, plandirFS fsimpl.WriteableFS, dst string) error {
 	if v.isURL() {
 		err := v.Download(plandirFS, dst)
 		if err != nil {
@@ -163,7 +162,7 @@ func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.StatFS, plandirFS fsimpl.
 
 			return ErrValuesNotExist
 		}
-	} else if !helper.IsExists(srcFS, dst) {
+	} else if !helper.IsExists(srcFS, v.Src) {
 		l.Warn("skipping: local file not found")
 
 		return ErrValuesNotExist
@@ -172,13 +171,13 @@ func (v *ValuesReference) fetch(l *log.Entry, srcFS fs.StatFS, plandirFS fsimpl.
 	return nil
 }
 
-func (rel *config) ExportValues(srcFS fs.StatFS, plandirFS fsimpl.WriteableFS, templater string) error {
+func (rel *config) ExportValues(srcFS fs.FS, plandirFS fsimpl.WriteableFS, templater string) error {
 	vals := rel.Values()
 	for i := len(vals) - 1; i >= 0; i-- {
 		v := vals[i]
 		err := v.SetViaRelease(rel, srcFS, plandirFS, templater)
 		switch {
-		case !v.Strict && errors.Is(ErrValuesNotExist, err):
+		case !v.Strict && errors.Is(err, ErrValuesNotExist):
 			rel.Logger().WithError(err).WithField("values", v).Warn("skipping values...")
 			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
 		case err != nil:

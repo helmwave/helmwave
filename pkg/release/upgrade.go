@@ -3,9 +3,9 @@ package release
 import (
 	"context"
 	"fmt"
-	"io/fs"
 	"strings"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli/values"
@@ -17,7 +17,9 @@ import (
 // So we have to find this substring in error string.
 const errMissingCRD = "unable to build kubernetes objects from release manifest:"
 
-func (rel *config) upgrade(ctx context.Context, baseFS fs.FS) (*release.Release, error) {
+func (rel *config) upgrade(ctx context.Context, baseFS fsimpl.CurrentPathFS) (*release.Release, error) {
+	plandirPath := baseFS.CurrentPath()
+
 	ch, err := rel.GetChart(baseFS)
 	if err != nil {
 		return nil, err
@@ -26,7 +28,7 @@ func (rel *config) upgrade(ctx context.Context, baseFS fs.FS) (*release.Release,
 	// Values
 	valuesFiles := make([]string, 0, len(rel.Values()))
 	for i := range rel.Values() {
-		valuesFiles = append(valuesFiles, rel.Values()[i].Src)
+		valuesFiles = append(valuesFiles, helper.FilepathJoin(plandirPath, rel.Values()[i].Src))
 	}
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}

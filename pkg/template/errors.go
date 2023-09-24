@@ -5,9 +5,7 @@ import (
 	"fmt"
 )
 
-var (
-	ErrInvalidFilesystem = errors.New("filesystem not supported")
-)
+var ErrInvalidFilesystem = errors.New("filesystem not supported")
 
 type SOPSDecodeError struct {
 	Err error

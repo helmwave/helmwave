@@ -36,6 +36,8 @@ func getTemplater(name string) (Templater, error) {
 }
 
 // Tpl2yml renders 'tpl' file to 'yml' file as go template.
+//
+//nolint:funlen
 func Tpl2yml(
 	tplFS fs.FS,
 	ymlFSUntyped fs.FS,

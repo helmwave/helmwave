@@ -2,6 +2,7 @@ package helper
 
 import (
 	"io/fs"
+	"path/filepath"
 
 	"github.com/helmwave/go-fsimpl"
 )
@@ -15,6 +16,7 @@ func MoveFile(srcFS, dstFS fsimpl.WriteableFS, src, dst string) error {
 		}
 	}
 
+	//nolint:forcetypeassert
 	err := switchBoard(srcFS.(interface {
 		fs.StatFS
 		fs.ReadDirFS
@@ -23,22 +25,19 @@ func MoveFile(srcFS, dstFS fsimpl.WriteableFS, src, dst string) error {
 		return err
 	}
 
-	return srcFS.RemoveAll(src)
+	return srcFS.RemoveAll(src) //nolint:wrapcheck
 }
 
-func Path(f fs.FS) (string, error) {
-	file, err := f.Open(".")
-	if err != nil {
-		return "", err //nolint:wrapcheck
-	}
-	defer func() {
-		_ = file.Close()
-	}()
+func FilepathJoin(paths ...string) string {
+	p := ""
 
-	stat, err := file.Stat()
-	if err != nil {
-		return "", err //nolint:wrapcheck
+	for _, pp := range paths {
+		if filepath.IsAbs(pp) {
+			p = ""
+		}
+
+		p = filepath.Join(p, pp)
 	}
 
-	return stat.Name(), nil
+	return p
 }

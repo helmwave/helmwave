@@ -11,7 +11,7 @@ var _ Action = (*Validate)(nil)
 
 // Validate is a struct for running 'validate' command.
 type Validate struct {
-	planFS plan.PlanImportFS
+	planFS plan.ImportFS
 }
 
 // Run is the main function for 'validate' command.

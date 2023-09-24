@@ -35,7 +35,7 @@ func (s *NewTestSuite) TestNew() {
 
 func (s *NewTestSuite) TestNewAndImportError() {
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: "/proc/1/blabla"})
-	_, err := plan.NewAndImport(context.Background(), baseFS.(plan.PlanImportFS))
+	_, err := plan.NewAndImport(context.Background(), baseFS.(plan.ImportFS))
 
 	s.Require().Error(err)
 	s.Require().ErrorContains(err, "failed to read plan file")

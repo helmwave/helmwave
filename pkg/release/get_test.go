@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -59,7 +60,7 @@ func (s *GetTestSuite) TestGet() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	r1, err := rel.Sync(context.Background(), baseFS)
+	r1, err := rel.Sync(context.Background(), baseFS.(fsimpl.CurrentPathFS))
 	s.Require().NoError(err)
 	s.Require().NotNil(r1)
 

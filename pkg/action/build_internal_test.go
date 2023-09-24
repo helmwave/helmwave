@@ -2,10 +2,12 @@ package action
 
 import (
 	"context"
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/release"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -50,27 +52,6 @@ func (ts *BuildTestSuite) TestYmlError() {
 	}
 	createGenericFS(&s.yml.srcFS)
 	createGenericFS(&s.yml.destFS, tests.Root, "helmwave.yml")
-	createGenericFS(&s.planFS, tmpDir)
-
-	ts.Require().Error(s.Run(context.Background()))
-}
-
-func (ts *BuildTestSuite) TestInvalidCacheDir() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		templater: template.TemplaterSprig,
-	}
-
-	s := &Build{
-		yml:  y,
-		tags: cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		chartsCacheDir: "/proc/1/bla",
-	}
-	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
-	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
 
 	ts.Require().Error(s.Run(context.Background()))
@@ -177,10 +158,11 @@ func (ts *BuildTestSuite) TestRepositories() {
 	ts.Require().NoError(s.Run(context.Background()))
 
 	const rep = "bitnami"
-	b, _ := plan.NewBody(context.Background(), s.planFS, true)
+	planfileFS, _ := s.planFS.(fs.SubFS).Sub(plan.File)
+	b, _ := plan.NewBody(context.Background(), planfileFS, true)
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
-		ts.Failf("%q not found", rep)
+		ts.Failf("", "%q not found", rep)
 	}
 }
 
@@ -218,7 +200,8 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		ts.Require().NoError(s.Run(context.Background()))
 
-		b, _ := plan.NewBody(context.Background(), s.planFS, true)
+		planfileFS, _ := s.planFS.(fs.SubFS).Sub(plan.File)
+		b, _ := plan.NewBody(context.Background(), planfileFS, true)
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {
@@ -361,4 +344,26 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	ts.Require().Contains(logMessages, "run global pre_build script")
 	ts.Require().Contains(logMessages, "running post_build script for nginx")
 	ts.Require().Contains(logMessages, "run global post_build script")
+}
+
+func (ts *NonParallelBuildTestSuite) TestInvalidCacheDir() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		yml:  y,
+		tags: cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		chartsCacheDir: "/proc/1/bla",
+	}
+	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
+	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
+	createGenericFS(&s.planFS, tmpDir)
+
+	defer cache.ChartsCache.Init(nil, "") //nolint:errcheck
+	ts.Require().Error(s.Run(context.Background()))
 }

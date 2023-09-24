@@ -13,8 +13,8 @@ var _ Action = (*DiffLocal)(nil)
 // DiffLocal is a struct for running 'diff plan' command.
 type DiffLocal struct {
 	diff    *Diff
-	plan1FS plan.PlanImportFS
-	plan2FS plan.PlanImportFS
+	plan1FS plan.ImportFS
+	plan2FS plan.ImportFS
 }
 
 // Run is the main function for 'diff plan' command.

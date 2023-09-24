@@ -74,11 +74,17 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
-func (u *Chart) IsRemote(baseFS fs.StatFS) bool {
+func (u *Chart) IsRemote(baseFS fs.FS) bool {
 	return !helper.IsExists(baseFS, filepath.Clean(u.Name))
 }
 
-func (rel *config) LocateChartWithCache(baseFS fs.FS) (string, error) {
+func (u *Chart) IsLocalArchive(baseFS fs.FS) bool {
+	return !helper.IsDir(baseFS, u.Name)
+}
+
+func (rel *config) LocateChartWithCache(baseFS fsimpl.CurrentPathFS) (string, error) {
+	plandirPath := baseFS.CurrentPath()
+
 	c := rel.Chart()
 	ch, err := cache.ChartsCache.FindInCache(c.Name, c.Version)
 	if err == nil {
@@ -90,15 +96,14 @@ func (rel *config) LocateChartWithCache(baseFS fs.FS) (string, error) {
 	// nice action bro
 	client := rel.newInstall()
 
-	// get absolute path so that helm can find the chart
-	absBasePath, err := helper.Path(baseFS)
-	if err != nil {
-		rel.Logger().WithError(err).Warn("failed to determine absolute location")
+	chartName := c.Name
+	if !c.IsRemote(baseFS) {
+		chartName = helper.FilepathJoin(plandirPath, c.Name)
 	}
 
-	ch, err = client.ChartPathOptions.LocateChart(filepath.Join(absBasePath, c.Name), rel.Helm())
+	ch, err = client.ChartPathOptions.LocateChart(chartName, rel.Helm())
 	if err != nil {
-		return "", fmt.Errorf("failed to locate chart %s: %w", c.Name, err)
+		return "", fmt.Errorf("failed to locate chart %s: %w", chartName, err)
 	}
 
 	cache.ChartsCache.AddToCache(baseFS, ch)
@@ -106,7 +111,7 @@ func (rel *config) LocateChartWithCache(baseFS fs.FS) (string, error) {
 	return ch, nil
 }
 
-func (rel *config) GetChart(baseFS fs.FS) (*chart.Chart, error) {
+func (rel *config) GetChart(baseFS fsimpl.CurrentPathFS) (*chart.Chart, error) {
 	ch, err := rel.LocateChartWithCache(baseFS)
 	if err != nil {
 		return nil, err
@@ -142,9 +147,17 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 	return nil
 }
 
-func (rel *config) ChartDepsUpd(baseFS fs.StatFS) error {
+func (rel *config) ChartDepsUpd(baseFS fsimpl.CurrentPathFS) error {
+	plandirPath := baseFS.CurrentPath()
+
 	if rel.Chart().IsRemote(baseFS) {
 		rel.Logger().Info("❎ skipping updating dependencies for remote chart")
+
+		return nil
+	}
+
+	if rel.Chart().IsLocalArchive(baseFS) {
+		rel.Logger().Debug("❎ skipping updating dependencies for downloaded chart")
 
 		return nil
 	}
@@ -160,7 +173,7 @@ func (rel *config) ChartDepsUpd(baseFS fs.StatFS) error {
 	client := action.NewDependency()
 	man := &downloader.Manager{
 		Out:              log.StandardLogger().Writer(),
-		ChartPath:        filepath.Clean(rel.Chart().Name),
+		ChartPath:        filepath.Clean(helper.FilepathJoin(plandirPath, rel.Chart().Name)),
 		Keyring:          client.Keyring,
 		SkipUpdate:       rel.Chart().SkipRefresh,
 		Getters:          getter.All(settings),
@@ -179,7 +192,7 @@ func (rel *config) ChartDepsUpd(baseFS fs.StatFS) error {
 	return nil
 }
 
-func (rel *config) DownloadChart(baseFS fs.StatFS, tmpFS fsimpl.WriteableFS, destDir string) error {
+func (rel *config) DownloadChart(baseFS fsimpl.CurrentPathFS, tmpFS fsimpl.WriteableFS, destDir string) error {
 	if !rel.Chart().IsRemote(baseFS) {
 		rel.Logger().Info("❎ chart is local, skipping exporting")
 

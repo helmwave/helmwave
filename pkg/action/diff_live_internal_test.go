@@ -7,7 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
@@ -48,8 +47,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
 
-	d := DiffLive{diff: s.diff, planFS: s.planFS.(plan.PlanImportFS)}
-	createGenericFS(&d.planFS)
+	d := DiffLive{diff: s.diff, planFS: s.planFS}
 
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s.Run(context.Background()))

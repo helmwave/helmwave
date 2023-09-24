@@ -69,9 +69,7 @@ func (ts *DiffLocalTestSuite) TestRun() {
 	createGenericFS(&s2.yml.destFS, tests.Root, "03_helmwave.yml")
 	createGenericFS(&s2.planFS, ts.T().TempDir())
 
-	d := DiffLocal{diff: s1.diff, plan1FS: s1.planFS.(plan.PlanImportFS), plan2FS: s2.planFS.(plan.PlanImportFS)}
-	createGenericFS(&d.plan1FS)
-	createGenericFS(&d.plan2FS)
+	d := DiffLocal{diff: s1.diff, plan1FS: s1.planFS.(plan.ImportFS), plan2FS: s2.planFS.(plan.ImportFS)}
 
 	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
 	ts.Require().NoError(s1.Run(context.Background()))

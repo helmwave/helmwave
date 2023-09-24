@@ -111,7 +111,6 @@ func (s *ValuesTestSuite) TestJSONSchema() {
 
 	keys := schema.Properties.Keys()
 	s.Require().Contains(keys, "src")
-	s.Require().Contains(keys, "dst")
 	s.Require().Contains(keys, "delimiter_left")
 	s.Require().Contains(keys, "delimiter_right")
 	s.Require().Contains(keys, "strict")

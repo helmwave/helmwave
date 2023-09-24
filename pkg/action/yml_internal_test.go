@@ -4,10 +4,8 @@ package action
 
 import (
 	"context"
-	"net/url"
 	"testing"
 
-	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
@@ -46,8 +44,7 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 
 	ts.Require().NoError(y.Run(context.Background()))
 
-	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
-	b, err := plan.NewBody(context.Background(), baseFS, true)
+	b, err := plan.NewBody(context.Background(), y.destFS, true)
 	ts.Require().NoError(err)
 
 	ts.Require().Equal(value, b.Project)
