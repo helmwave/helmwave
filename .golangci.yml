@@ -113,6 +113,9 @@ linters-settings:
     forbid:
       - ^print.*$
       - 'fmt\.Print.*'
+      - '^os\.(Chdir|Chmod|Chown|Chtimes|Lchown|Link|Mkdir|MkdirAll)$' # use fs
+      - '^os\.(ReadFile|Readlink|Remove|RemoveAll|Rename|Symlink|Truncate|WriteFile|ReadDir)$' # use fs
+      - '^os\.(Create|NewFile|Open|OpenFile|Lstat|Stat)$' # use fs
 
   funlen:
     lines: 69
@@ -794,6 +797,7 @@ issues:
       linters:
         - dupl
         - dupword
+        - forbidigo
         - forcetypeassert
         - funlen
         - gochecknoglobals

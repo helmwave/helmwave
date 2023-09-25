@@ -1,8 +1,11 @@
 package plan
 
 import (
+	"net/url"
+	"os"
 	"testing"
 
+	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/stretchr/testify/suite"
 )
@@ -21,7 +24,7 @@ func (ts *BuildRepositoriesTestSuite) TestReposEmpty() {
 
 	p.NewBody()
 
-	repos, err := p.buildRepositories()
+	repos, err := p.buildRepositories(nil)
 	ts.Require().NoError(err)
 	ts.Require().Empty(repos)
 }
@@ -43,7 +46,7 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	repos, err := p.buildRepositories()
+	repos, err := p.buildRepositories(nil)
 	ts.Require().NoError(err)
 	ts.Require().Empty(repos, 0)
 
@@ -58,7 +61,7 @@ func (ts *BuildRepositoriesTestSuite) TestUnusedRepo() {
 
 	p.SetRepositories(mockedRepo)
 
-	repos, err := p.buildRepositories()
+	repos, err := p.buildRepositories(nil)
 	ts.Require().NoError(err)
 	ts.Require().Empty(repos)
 
@@ -83,7 +86,9 @@ func (ts *BuildRepositoriesTestSuite) TestSuccess() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	repos, err := p.buildRepositories()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	repos, err := p.buildRepositories(baseFS)
 	ts.Require().NoError(err)
 	ts.Require().Len(repos, 1)
 	ts.Require().Contains(repos, mockedRepo)
@@ -106,7 +111,9 @@ func (ts *BuildRepositoriesTestSuite) TestMissingRepo() {
 
 	p.SetReleases(mockedRelease)
 
-	repos, err := p.buildRepositories()
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	repos, err := p.buildRepositories(baseFS)
 	ts.Require().Error(err)
 	ts.Require().Empty(repos)
 
@@ -114,5 +121,7 @@ func (ts *BuildRepositoriesTestSuite) TestMissingRepo() {
 }
 
 func (ts *BuildRepositoriesTestSuite) TestRepoIsLocal() {
-	ts.Require().True(repoIsLocal(ts.T().TempDir()))
+	wd, _ := os.Getwd()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
+	ts.Require().True(repoIsLocal(baseFS, ts.T().TempDir()))
 }

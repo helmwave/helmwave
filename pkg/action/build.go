@@ -51,7 +51,7 @@ func (i *Build) Run(ctx context.Context) error {
 	i.options.Yml = i.yml.destFS
 	i.options.Templater = i.yml.templater
 
-	err = newPlan.Build(ctx, i.options)
+	err = newPlan.Build(ctx, i.contextFS, i.options)
 	if err != nil {
 		return err
 	}

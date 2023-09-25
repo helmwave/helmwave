@@ -196,7 +196,7 @@ func Required(warn string, val any) (any, error) {
 // ReadFile reads file and returns its contents as string.
 // Used as custom template function.
 func ReadFile(file string) (string, error) {
-	b, err := os.ReadFile(file)
+	b, err := os.ReadFile(file) //nolint:forbidigo // TODO: pass contextFS here somehow
 	if err != nil {
 		return "", fmt.Errorf("failed to read file %q: %w", file, err)
 	}

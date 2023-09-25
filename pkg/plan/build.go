@@ -16,7 +16,7 @@ type BuildOptions struct { //nolint:govet
 }
 
 // Build plan with yml and tags/matchALL options.
-func (p *Plan) Build(ctx context.Context, o BuildOptions) error {
+func (p *Plan) Build(ctx context.Context, contextFS fs.FS, o BuildOptions) error {
 	p.templater = o.Templater
 
 	// Create Body
@@ -48,7 +48,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error {
 
 	// Build Repositories
 	log.Info("🔨 Building repositories...")
-	p.body.Repositories, err = p.buildRepositories()
+	p.body.Repositories, err = p.buildRepositories(contextFS)
 	if err != nil {
 		return err
 	}
