@@ -2,12 +2,10 @@ package action
 
 import (
 	"context"
-	"net/url"
 	"sort"
 	"strings"
 
 	"github.com/helmwave/go-fsimpl"
-	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
@@ -21,6 +19,7 @@ type Build struct {
 	yml            *Yml
 	diff           *Diff
 	options        plan.BuildOptions
+	contextFS      fsimpl.CurrentPathFS
 	planFS         fsimpl.CurrentPathFS
 	diffMode       string
 	chartsCacheDir string
@@ -51,11 +50,6 @@ func (i *Build) Run(ctx context.Context) error {
 	i.options.Yml = i.yml.destFS
 	i.options.Templater = i.yml.templater
 
-	workdirFS, err := filefs.New(&url.URL{Scheme: "file", Path: "."})
-	if err != nil {
-		return err //nolint:wrapcheck
-	}
-
 	err = newPlan.Build(ctx, i.options)
 	if err != nil {
 		return err
@@ -73,20 +67,20 @@ func (i *Build) Run(ctx context.Context) error {
 				return err
 			}
 
-			err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+			err = newPlan.Export(ctx, i.contextFS, i.planFS, i.skipUnchanged)
 			if err != nil {
 				return err
 			}
 
 			newPlan.DiffPlan(oldPlan, i.diff.ShowSecret, i.diff.Wide)
 		} else {
-			err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+			err = newPlan.Export(ctx, i.contextFS, i.planFS, i.skipUnchanged)
 			if err != nil {
 				return err
 			}
 		}
 	case DiffModeLive:
-		err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+		err = newPlan.Export(ctx, i.contextFS, i.planFS, i.skipUnchanged)
 		if err != nil {
 			return err
 		}
@@ -94,14 +88,14 @@ func (i *Build) Run(ctx context.Context) error {
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
 		newPlan.DiffLive(ctx, i.planFS, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
 	case DiffModeNone:
-		err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+		err = newPlan.Export(ctx, i.contextFS, i.planFS, i.skipUnchanged)
 		if err != nil {
 			return err
 		}
 
 		log.Info("🆚 Skip diffing")
 	default:
-		err = newPlan.Export(ctx, workdirFS, i.planFS, i.skipUnchanged)
+		err = newPlan.Export(ctx, i.contextFS, i.planFS, i.skipUnchanged)
 		if err != nil {
 			return err
 		}
@@ -137,7 +131,7 @@ func (i *Build) flags() []cli.Flag {
 		flagSkipUnchanged(&i.skipUnchanged),
 		flagDiffMode(&i.diffMode),
 		flagChartsCacheDir(&i.chartsCacheDir),
-		flagPlandirLocation(&i.planFS),
+		flagPlandir(&i.planFS),
 
 		&cli.BoolFlag{
 			Name:        "yml",
@@ -145,6 +139,14 @@ func (i *Build) flags() []cli.Flag {
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
 			Destination: &i.autoYml,
+		},
+
+		&cli.GenericFlag{
+			Name:        "context-dir",
+			Usage:       "directory for resolving relative paths in helmwave.yml",
+			Destination: createGenericFS(&i.contextFS, "."),
+			DefaultText: getDefaultFSValue("."),
+			EnvVars:     []string{"HELMWAVE_CONTEXT_DIR"},
 		},
 	}
 

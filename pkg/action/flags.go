@@ -209,7 +209,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 	}
 }
 
-func flagPlandirLocation[T fs.FS](v *T) *cli.GenericFlag {
+func flagPlandir[T fs.FS](v *T) *cli.GenericFlag {
 	return &cli.GenericFlag{
 		Name:        "plandir",
 		Aliases:     []string{"p"},

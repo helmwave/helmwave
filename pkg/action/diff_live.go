@@ -46,6 +46,6 @@ func (d *DiffLive) Cmd() *cli.Command {
 // flags return flag set of CLI urfave.
 func (d *DiffLive) flags() []cli.Flag {
 	return []cli.Flag{
-		flagPlandirLocation(&d.planFS),
+		flagPlandir(&d.planFS),
 	}
 }

@@ -12,12 +12,7 @@ import (
 )
 
 // Export allows save plan to file.
-func (p *Plan) Export(ctx context.Context, srcFSUntyped, plandirFSUntyped fs.FS, skipUnchanged bool) error {
-	srcFS, ok := srcFSUntyped.(fsimpl.CurrentPathFS)
-	if !ok {
-		return fmt.Errorf("invalid source dir for export: %w", ErrInvalidPlandir)
-	}
-
+func (p *Plan) Export(ctx context.Context, srcFS fsimpl.CurrentPathFS, plandirFSUntyped fs.FS, skipUnchanged bool) error {
 	plandirFS, ok := plandirFSUntyped.(ExportFS)
 	if !ok {
 		return fmt.Errorf("invalid plandir for export: %w", ErrInvalidPlandir)

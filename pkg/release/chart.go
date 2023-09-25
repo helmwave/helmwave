@@ -22,17 +22,17 @@ import (
 //nolint:lll
 type Chart struct {
 	Name                  string `yaml:"name" json:"name" jsonschema:"required,description=Name of the chart,example=bitnami/nginx,example=oci://ghcr.io/helmwave/unit-test-oci"`
-	CaFile                string `yaml:"ca_file" json:"ca_file" jsonschema:"description=Verify certificates of HTTPS-enabled servers using this CA bundle"`
-	CertFile              string `yaml:"cert_file" json:"cert_file" jsonschema:"description=Identify HTTPS client using this SSL certificate file"`
-	KeyFile               string `yaml:"key_file" json:"key_file" jsonschema:"description=Identify HTTPS client using this SSL key file"`
-	Keyring               string `yaml:"keyring" json:"keyring" jsonschema:"description=Location of public keys used for verification"`
-	RepoURL               string `yaml:"repo_url" json:"repo_url" jsonschema:"description=Chart repository url"`
-	Username              string `yaml:"username" json:"username" jsonschema:"description=Chart repository username"`
-	Password              string `yaml:"password" json:"password" jsonschema:"description=Chart repository password"`
-	Version               string `yaml:"version" json:"version" jsonschema:"description=Chart version"`
-	InsecureSkipTLSverify bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"`
-	Verify                bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`
-	PassCredentialsAll    bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`
+	CaFile                string `yaml:"ca_file,omitempty" json:"ca_file,omitempty" jsonschema:"description=Verify certificates of HTTPS-enabled servers using this CA bundle"`
+	CertFile              string `yaml:"cert_file,omitempty" json:"cert_file,omitempty" jsonschema:"description=Identify HTTPS client using this SSL certificate file"`
+	KeyFile               string `yaml:"key_file,omitempty" json:"key_file,omitempty" jsonschema:"description=Identify HTTPS client using this SSL key file"`
+	Keyring               string `yaml:"keyring,omitempty" json:"keyring,omitempty" jsonschema:"description=Location of public keys used for verification"`
+	RepoURL               string `yaml:"repo_url,omitempty" json:"repo_url,omitempty" jsonschema:"description=Chart repository url"`
+	Username              string `yaml:"username,omitempty" json:"username,omitempty" jsonschema:"description=Chart repository username"`
+	Password              string `yaml:"password,omitempty" json:"password,omitempty" jsonschema:"description=Chart repository password"`
+	Version               string `yaml:"version,omitempty" json:"version,omitempty" jsonschema:"description=Chart version"`
+	InsecureSkipTLSverify bool   `yaml:"insecure,omitempty" json:"insecure,omitempty" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"`
+	Verify                bool   `yaml:"verify,omitempty" json:"verify,omitempty" jsonschema:"description=Verify the provenance of the chart before using it"`
+	PassCredentialsAll    bool   `yaml:"pass_credentials,omitempty" json:"pass_credentials,omitempty" jsonschema:"description=Pass credentials to all domains"`
 	SkipDependencyUpdate  bool   `yaml:"skip_dependency_update" json:"skip_dependency_update" jsonschema:"description=Skip updating and downloading dependencies,default=false"`
 	SkipRefresh           bool   `yaml:"skip_refresh,omitempty" json:"skip_refresh,omitempty" jsonschema:"description=Skip refreshing repositories,default=false"`
 }
