@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/action"
+	"github.com/helmwave/helmwave/pkg/cache"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	helmwave "github.com/helmwave/helmwave/pkg/version"
 	"github.com/joho/godotenv"
@@ -70,8 +71,20 @@ func CreateApp() *cli.App {
 		"1. $ helmwave build\n" +
 		"2. $ helmwave up\n"
 
-	c.Before = logSetup.Default.Run
-	c.Flags = logSetup.Default.Flags()
+	c.Before = func(ctx *cli.Context) error {
+		err := logSetup.Default.Run(ctx)
+		if err != nil {
+			return err
+		}
+
+		err = cache.DefaultConfig.Run(ctx)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+	c.Flags = append(logSetup.Default.Flags(), cache.DefaultConfig.Flags()...)
 
 	c.Commands = commands
 	c.CommandNotFound = command404

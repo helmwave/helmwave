@@ -1,12 +1,16 @@
 package release
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
-	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -15,6 +19,9 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/helmpath"
+	"helm.sh/helm/v3/pkg/registry"
+	"helm.sh/helm/v3/pkg/repo"
 )
 
 // Chart is a structure for chart download options.
@@ -81,25 +88,114 @@ func (c *Chart) IsRemote() bool {
 }
 
 func (rel *config) LocateChartWithCache() (string, error) {
-	c := rel.Chart()
-	ch, err := cache.ChartsCache.FindInCache(c.Name, c.Version)
+	if !rel.Chart().IsRemote() {
+		return rel.Chart().Name, nil
+	}
+
+	ch, err := rel.findChartInHelmCache()
 	if err == nil {
-		rel.Logger().Infof("❎ use cache for chart %s: %s", c.Name, ch)
+		rel.Logger().WithField("path", ch).Info("❎ found chart in helm cache, using it")
 
 		return ch, nil
 	}
 
+	rel.Logger().WithError(err).Debug("haven't found chart in helm cache, need to download it")
+
 	// nice action bro
 	client := rel.newInstall()
 
-	ch, err = client.ChartPathOptions.LocateChart(c.Name, rel.Helm())
+	ch, err = client.ChartPathOptions.LocateChart(rel.Chart().Name, rel.Helm())
 	if err != nil {
-		return "", fmt.Errorf("failed to locate chart %s: %w", c.Name, err)
+		return "", fmt.Errorf("failed to locate chart %s: %w", rel.Chart().Name, err)
 	}
 
-	cache.ChartsCache.AddToCache(ch)
-
 	return ch, nil
+}
+
+// Helm doesn't use its own charts cache, it only stores charts there. So we copypaste some code from
+// *downloader.ChartDownloader to find already downloaded charts in our cache.
+// We also check chart file digest in case of any collision.
+func (rel *config) findChartInHelmCache() (string, error) {
+	settings := rel.Helm()
+	client := rel.newInstall()
+
+	dl := downloader.ChartDownloader{
+		Getters: getter.All(settings),
+		Options: []getter.Option{
+			getter.WithPassCredentialsAll(client.ChartPathOptions.PassCredentialsAll),
+			getter.WithTLSClientConfig(
+				client.ChartPathOptions.CertFile,
+				client.ChartPathOptions.KeyFile,
+				client.ChartPathOptions.CaFile,
+			),
+			getter.WithInsecureSkipVerifyTLS(client.ChartPathOptions.InsecureSkipTLSverify),
+		},
+		RepositoryConfig: settings.RepositoryConfig,
+		RepositoryCache:  settings.RepositoryCache,
+		RegistryClient:   client.GetRegistryClient(),
+	}
+
+	u, err := dl.ResolveChartVersion(rel.Chart().Name, rel.Chart().Version)
+	if err != nil {
+		return "", NewChartCacheError(err)
+	}
+
+	name := filepath.Base(u.Path)
+	if u.Scheme == registry.OCIScheme {
+		idx := strings.LastIndexByte(name, ':')
+		name = fmt.Sprintf("%s-%s.tgz", name[:idx], name[idx+1:])
+	}
+	chartFile := filepath.Join(settings.RepositoryCache, name)
+
+	ch, err := rel.getChartRepoEntryFromIndex(u.String(), settings.RepositoryCache)
+	if err != nil {
+		return "", NewChartCacheError(err)
+	}
+
+	digest := ch.Digest
+	hasher := sha256.New()
+
+	f, err := os.Open(chartFile)
+	if err != nil {
+		return "", NewChartCacheError(err)
+	}
+	defer func() {
+		_ = f.Close()
+	}()
+
+	_, err = io.Copy(hasher, f)
+	if err != nil {
+		return "", NewChartCacheError(err)
+	}
+
+	hashSum := hex.EncodeToString(hasher.Sum(nil))
+
+	if hashSum != digest {
+		return "", NewChartCacheError(ErrDigestNotMatch)
+	}
+
+	return chartFile, nil
+}
+
+func (rel *config) getChartRepoEntryFromIndex(u, repositoryCache string) (*repo.ChartVersion, error) {
+	repoName := strings.SplitN(rel.Chart().Name, "/", 2)[0]
+	idxFile := filepath.Join(repositoryCache, helmpath.CacheIndexFile(repoName))
+	i, err := repo.LoadIndexFile(idxFile)
+	if err != nil {
+		return nil, fmt.Errorf("no cached repo found: %w", err)
+	}
+
+	for _, entry := range i.Entries {
+		for _, ver := range entry {
+			for _, dl := range ver.URLs {
+				if u == dl {
+					return ver, nil
+				}
+			}
+		}
+	}
+
+	return nil, errors.New("repo not found")
 }
 
 func (rel *config) GetChart() (*chart.Chart, error) {
