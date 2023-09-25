@@ -1,0 +1,6 @@
+kind: New feature
+body: Add `--context-dir` argument for build command for resolving relative paths
+time: 2023-09-25T11:51:14.823372+04:00
+custom:
+  Author: r3nic1e
+  Issue: "737"

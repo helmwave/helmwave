@@ -1,0 +1,7 @@
+kind: New feature
+body: Add support for all path arguments to provide URL with different filesystems
+  (only file:// is supported yet)
+time: 2023-09-25T11:52:36.053778+04:00
+custom:
+  Author: r3nic1e
+  Issue: "737"
