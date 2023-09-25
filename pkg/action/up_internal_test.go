@@ -50,6 +50,7 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	createGenericFS(&u.build.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
 	createGenericFS(&u.build.yml.destFS, tmpDir, "02_helmwave.yml")
 	createGenericFS(&u.build.planFS, tmpDir)
+	createGenericFS(&u.build.contextFS, tmpDir)
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)

@@ -56,6 +56,7 @@ func (ts *DiffLocalTestSuite) TestRun() {
 	createGenericFS(&s1.yml.srcFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s1.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s1.planFS, ts.T().TempDir())
+	createGenericFS(&s1.contextFS, ts.T().TempDir())
 
 	s2 := &Build{
 		tags: cli.StringSlice{},
@@ -68,6 +69,7 @@ func (ts *DiffLocalTestSuite) TestRun() {
 	createGenericFS(&s2.yml.srcFS, tests.Root, "03_helmwave.yml")
 	createGenericFS(&s2.yml.destFS, tests.Root, "03_helmwave.yml")
 	createGenericFS(&s2.planFS, ts.T().TempDir())
+	createGenericFS(&s2.contextFS, ts.T().TempDir())
 
 	d := DiffLocal{diff: s1.diff, plan1FS: s1.planFS.(plan.ImportFS), plan2FS: s2.planFS.(plan.ImportFS)}
 

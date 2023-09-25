@@ -53,6 +53,7 @@ func (ts *BuildTestSuite) TestYmlError() {
 	createGenericFS(&s.yml.srcFS)
 	createGenericFS(&s.yml.destFS, tests.Root, "helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	ts.Require().Error(s.Run(context.Background()))
 }
@@ -73,6 +74,7 @@ func (ts *BuildTestSuite) TestManifest() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
 	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(tmpDir, plan.Manifest))
@@ -95,6 +97,7 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 		autoYml: true,
 	}
 	createGenericFS(&sfail.planFS, tmpDir)
+	createGenericFS(&sfail.contextFS, tmpDir)
 
 	sfailByTag := &Build{
 		yml:  y,
@@ -105,6 +108,7 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 		autoYml: true,
 	}
 	createGenericFS(&sfailByTag.planFS, tmpDir)
+	createGenericFS(&sfailByTag.contextFS, tmpDir)
 	err := sfailByTag.tags.Set("nginx")
 	ts.Require().NoError(err)
 
@@ -117,6 +121,7 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 		autoYml: true,
 	}
 	createGenericFS(&sa.planFS, tmpDir)
+	createGenericFS(&sa.contextFS, tmpDir)
 	err = sa.tags.Set("nginx-a")
 	ts.Require().NoError(err)
 
@@ -129,6 +134,7 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 		autoYml: true,
 	}
 	createGenericFS(&sb.planFS, tmpDir)
+	createGenericFS(&sb.contextFS, tmpDir)
 	err = sb.tags.Set("nginx-b")
 	ts.Require().NoError(err)
 
@@ -154,6 +160,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
 	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
 
@@ -197,6 +204,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 			},
 		}
 		createGenericFS(&s.planFS, tmpDir)
+		createGenericFS(&s.contextFS, tmpDir)
 
 		ts.Require().NoError(s.Run(context.Background()))
 
@@ -231,6 +239,7 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "07_helmwave.yml")
 	createGenericFS(&s.yml.destFS, tests.Root, "07_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()), "build should not fail without diffing")
 	ts.Require().NoError(s.Run(context.Background()), "build should not fail with diffing with previous plan")
@@ -288,6 +297,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
 	createGenericFS(&s.yml.destFS, tmpDir, "01_auto_yaml_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
@@ -313,6 +323,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "08_helmwave.yml")
 	createGenericFS(&s.yml.destFS, tmpDir, "08_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(tmpDir, plan.Manifest))
@@ -335,6 +346,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "13_helmwave.yml")
 	createGenericFS(&s.yml.destFS, tmpDir, "13_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	ts.Require().NoError(s.Run(context.Background()))
 	ts.Require().DirExists(filepath.Join(tmpDir, plan.Manifest))
@@ -363,6 +375,7 @@ func (ts *NonParallelBuildTestSuite) TestInvalidCacheDir() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
 	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	defer cache.ChartsCache.Init(nil, "") //nolint:errcheck
 	ts.Require().Error(s.Run(context.Background()))

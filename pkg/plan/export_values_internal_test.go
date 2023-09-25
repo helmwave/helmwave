@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"errors"
 	"io/fs"
 	"net/url"
 	"os"
@@ -16,11 +17,71 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type ExportTestSuite struct {
+type ExportValuesTestSuite struct {
 	suite.Suite
 }
 
-func (s *ExportTestSuite) TestValuesEmpty() {
+func TestExportValuesTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(ExportValuesTestSuite))
+}
+
+func (s *ExportValuesTestSuite) createPlan() *Plan {
+	s.T().Helper()
+
+	p := New()
+	p.templater = template.TemplaterSprig
+
+	return p
+}
+
+func (s *ExportValuesTestSuite) TestValuesBuildError() {
+	tmpDir := s.T().TempDir()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
+	p := s.createPlan()
+
+	mockedRelease := &MockReleaseConfig{}
+	mockedRelease.On("Name").Return("redis")
+	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("Uniq").Return()
+
+	errBuildValues := errors.New("values build error")
+	mockedRelease.On("ExportValues").Return(errBuildValues)
+
+	p.body = &planBody{
+		Releases: release.Configs{mockedRelease},
+	}
+
+	s.Require().ErrorIs(p.exportValues(baseFS, baseFS.(fsimpl.WriteableFS)), errBuildValues)
+	mockedRelease.AssertExpectations(s.T())
+}
+
+func (s *ExportValuesTestSuite) TestSuccess() {
+	tmpDir := s.T().TempDir()
+	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: tmpDir})
+	p := s.createPlan()
+
+	valuesName := "blablavalues.yaml"
+	valuesContents := []byte("a: b")
+	tmpValues := filepath.Join(tmpDir, valuesName)
+	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
+
+	mockedRelease := &MockReleaseConfig{}
+	mockedRelease.On("Values").Return([]release.ValuesReference{
+		{Src: tmpValues},
+	})
+	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("ExportValues").Return(nil)
+
+	p.body = &planBody{
+		Releases: release.Configs{mockedRelease},
+	}
+
+	s.Require().NoError(p.exportValues(baseFS, baseFS.(fsimpl.WriteableFS)))
+	mockedRelease.AssertExpectations(s.T())
+}
+
+func (s *ExportValuesTestSuite) TestValuesEmpty() {
 	p := New()
 	p.templater = template.TemplaterSprig
 
@@ -32,7 +93,7 @@ func (s *ExportTestSuite) TestValuesEmpty() {
 	s.Require().NoError(err)
 }
 
-func (s *ExportTestSuite) TestValuesOneRelease() {
+func (s *ExportValuesTestSuite) TestValuesOneRelease() {
 	tmpDir := s.T().TempDir()
 	p := New()
 	p.templater = template.TemplaterSprig
@@ -67,9 +128,4 @@ func (s *ExportTestSuite) TestValuesOneRelease() {
 	contents, err := os.ReadFile(filepath.Join(baseFS2.(fsimpl.CurrentPathFS).CurrentPath(), Values, valuesName))
 	s.Require().NoError(err)
 	s.Require().Equal(valuesContents, contents)
-}
-
-func TestExportTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(ExportTestSuite))
 }

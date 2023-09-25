@@ -40,6 +40,7 @@ func (ts *StatusTestSuite) TestRun() {
 	createGenericFS(&r.yml.srcFS, tests.Root, "01_helmwave.yml.tpl")
 	createGenericFS(&r.yml.destFS, ts.T().TempDir(), "02_helmwave.yml")
 	createGenericFS(&r.planFS, ts.T().TempDir())
+	createGenericFS(&r.contextFS, ts.T().TempDir())
 
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)

@@ -46,6 +46,7 @@ func (ts *DownTestSuite) TestRun() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	d := Down{
 		build: s,

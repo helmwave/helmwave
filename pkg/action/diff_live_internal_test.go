@@ -46,6 +46,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	createGenericFS(&s.yml.srcFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.yml.destFS, tests.Root, "02_helmwave.yml")
 	createGenericFS(&s.planFS, tmpDir)
+	createGenericFS(&s.contextFS, tmpDir)
 
 	d := DiffLive{diff: s.diff, planFS: s.planFS}
 
