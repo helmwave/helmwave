@@ -23,12 +23,12 @@ type Config interface {
 	helper.EqualChecker[Config]
 	log.LoggerGetter
 	Uniq() uniqname.UniqName
-	Sync(context.Context, fsimpl.CurrentPathFS) (*release.Release, error)
-	SyncDryRun(context.Context, fsimpl.CurrentPathFS) (*release.Release, error)
+	Sync(context.Context, fs.StatFS) (*release.Release, error)
+	SyncDryRun(context.Context, fs.StatFS) (*release.Release, error)
 	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd(fsimpl.CurrentPathFS) error
-	DownloadChart(fsimpl.CurrentPathFS, fsimpl.WriteableFS, string) error
+	DownloadChart(fs.FS, fsimpl.WriteableFS, string) error
 	ExportValues(fs.FS, fsimpl.WriteableFS, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get(int) (*release.Release, error)

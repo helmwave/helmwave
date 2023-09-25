@@ -4,14 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
+	"io/fs"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/gofrs/flock"
-	"github.com/helmwave/go-fsimpl"
-	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -31,7 +29,7 @@ import (
 )
 
 // Up syncs repositories and releases.
-func (p *Plan) Up(ctx context.Context, baseFS fsimpl.CurrentPathFS, dog *kubedog.Config) error {
+func (p *Plan) Up(ctx context.Context, baseFS fs.StatFS, dog *kubedog.Config) error {
 	// Run hooks
 	err := p.body.Lifecycle.RunPreUp(ctx)
 	if err != nil {
@@ -100,21 +98,12 @@ func (p *Plan) syncRegistries(ctx context.Context) (err error) {
 }
 
 // SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
-//
-//nolint:gocognit
 func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
-	// TODO: refactor it as global helmFS
-	helmROFS, err := filefs.New(&url.URL{Scheme: "file", Path: "/"})
-	if err != nil {
-		return err //nolint:wrapcheck
-	}
-	helmFS := helmROFS.(fsimpl.WriteableFS) //nolint:forcetypeassert
-
 	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
 
 	// Create if not exists
-	if !helper.IsExists(helmFS, helper.Helm.RepositoryConfig) {
-		f, err := helper.CreateFile(helmFS, helper.Helm.RepositoryConfig)
+	if !helper.IsExists(helper.HelmFS, helper.Helm.RepositoryConfig) {
+		f, err := helper.CreateFile(helper.HelmFS, helper.Helm.RepositoryConfig)
 		if err != nil {
 			return err
 		}
@@ -222,7 +211,7 @@ func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 	return res
 }
 
-func (p *Plan) syncReleases(ctx context.Context, baseFS fsimpl.CurrentPathFS) (err error) {
+func (p *Plan) syncReleases(ctx context.Context, baseFS fs.StatFS) (err error) {
 	dependenciesGraph, err := p.body.generateDependencyGraph()
 	if err != nil {
 		return err
@@ -292,7 +281,7 @@ func (p *Plan) syncReleasesWorker(
 	mu *sync.Mutex,
 	fails map[release.Config]error,
 	monitorsLockMap map[string]*parallel.WaitGroup,
-	baseFS fsimpl.CurrentPathFS,
+	baseFS fs.StatFS,
 ) {
 	for n := range nodesChan {
 		p.syncRelease(ctx, wg, n, mu, fails, monitorsLockMap, baseFS)
@@ -307,7 +296,7 @@ func (p *Plan) syncRelease(
 	mu *sync.Mutex,
 	fails map[release.Config]error,
 	monitorsLockMap map[string]*parallel.WaitGroup,
-	baseFS fsimpl.CurrentPathFS,
+	baseFS fs.StatFS,
 ) {
 	rel := node.Data
 
@@ -447,7 +436,7 @@ func (p *Plan) ApplyReport(
 	return nil
 }
 
-func (p *Plan) syncReleasesKubedog(ctx context.Context, baseFS fsimpl.CurrentPathFS, kubedogConfig *kubedog.Config) error {
+func (p *Plan) syncReleasesKubedog(ctx context.Context, baseFS fs.StatFS, kubedogConfig *kubedog.Config) error {
 	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Don't forget!
 

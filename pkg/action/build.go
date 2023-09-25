@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"io/fs"
 	"sort"
 	"strings"
 
@@ -20,7 +21,7 @@ type Build struct {
 	diff           *Diff
 	options        plan.BuildOptions
 	contextFS      fsimpl.CurrentPathFS
-	planFS         fsimpl.CurrentPathFS
+	planFS         fs.StatFS
 	diffMode       string
 	chartsCacheDir string
 	tags           cli.StringSlice

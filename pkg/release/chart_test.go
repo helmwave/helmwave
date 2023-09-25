@@ -47,7 +47,7 @@ func (ts *ChartTestSuite) TestLocateChartLocal() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	c, err := rel.GetChart(baseFS.(fsimpl.CurrentPathFS))
+	c, err := rel.GetChart(baseFS.(fs.StatFS))
 	ts.Require().Error(err)
 	ts.Require().Contains(err.Error(), "failed to locate chart")
 	ts.Require().Nil(c)
@@ -61,7 +61,7 @@ func (ts *ChartTestSuite) TestLoadChartLocal() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	c, err := rel.GetChart(baseFS.(fsimpl.CurrentPathFS))
+	c, err := rel.GetChart(baseFS.(fs.StatFS))
 	ts.Require().Error(err)
 	ts.Require().Contains(err.Error(), "failed to load chart")
 	ts.Require().Contains(err.Error(), "Chart.yaml file is missing")

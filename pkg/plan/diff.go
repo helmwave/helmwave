@@ -2,13 +2,13 @@ package plan
 
 import (
 	"context"
+	"io/fs"
 	"reflect"
 	"strings"
 	"sync"
 
 	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/databus23/helm-diff/v3/manifest"
-	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -67,7 +67,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
-func (p *Plan) DiffLive(ctx context.Context, baseFS fsimpl.CurrentPathFS, showSecret bool, diffWide int, threeWayMerge bool) {
+func (p *Plan) DiffLive(ctx context.Context, baseFS fs.StatFS, showSecret bool, diffWide int, threeWayMerge bool) {
 	alive, _, err := p.GetLive(ctx)
 	if err != nil {
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
@@ -191,7 +191,7 @@ func diffChartsFilter(path []string, _ reflect.Type, _ reflect.StructField) bool
 
 func diffCharts(
 	ctx context.Context,
-	baseFS fsimpl.CurrentPathFS,
+	baseFS fs.StatFS,
 	oldChart *chart.Chart,
 	rel release.Config,
 	l log.FieldLogger,

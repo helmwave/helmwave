@@ -49,13 +49,13 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	return u
 }
 
-func (r *MockReleaseConfig) Sync(_ context.Context, _ fsimpl.CurrentPathFS) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) Sync(_ context.Context, _ fs.StatFS) (*helmRelease.Release, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) SyncDryRun(ctx context.Context, baseFS fsimpl.CurrentPathFS) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) SyncDryRun(ctx context.Context, baseFS fs.StatFS) (*helmRelease.Release, error) {
 	r.DryRun(true)
 	defer r.DryRun(false)
 
@@ -166,7 +166,7 @@ func (r *MockReleaseConfig) HelmWait() bool {
 	return true
 }
 
-func (r *MockReleaseConfig) DownloadChart(_ fsimpl.CurrentPathFS, _ fsimpl.WriteableFS, _ string) error {
+func (r *MockReleaseConfig) DownloadChart(_ fs.FS, _ fsimpl.WriteableFS, _ string) error {
 	return r.Called().Error(0)
 }
 

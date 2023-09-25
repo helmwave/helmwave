@@ -2,9 +2,9 @@ package action
 
 import (
 	"context"
+	"io/fs"
 	"os"
 
-	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
 )
@@ -14,7 +14,7 @@ var _ Action = (*DiffLive)(nil)
 // DiffLive is a struct for running 'diff live' command.
 type DiffLive struct {
 	diff   *Diff
-	planFS fsimpl.CurrentPathFS
+	planFS fs.StatFS
 }
 
 // Run is the main function for 'diff live' command.

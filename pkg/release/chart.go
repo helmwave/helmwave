@@ -12,7 +12,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
 )
@@ -82,9 +81,7 @@ func (u *Chart) IsLocalArchive(baseFS fs.FS) bool {
 	return !helper.IsDir(baseFS, u.Name)
 }
 
-func (rel *config) LocateChartWithCache(baseFS fsimpl.CurrentPathFS) (string, error) {
-	plandirPath := baseFS.CurrentPath()
-
+func (rel *config) LocateChartWithCache(baseFS fs.FS) (string, error) {
 	c := rel.Chart()
 	ch, err := cache.ChartsCache.FindInCache(c.Name, c.Version)
 	if err == nil {
@@ -96,14 +93,9 @@ func (rel *config) LocateChartWithCache(baseFS fsimpl.CurrentPathFS) (string, er
 	// nice action bro
 	client := rel.newInstall()
 
-	chartName := c.Name
-	if !c.IsRemote(baseFS) {
-		chartName = helper.FilepathJoin(plandirPath, c.Name)
-	}
-
-	ch, err = client.ChartPathOptions.LocateChart(chartName, rel.Helm())
+	ch, err = helper.LocateChart(&client.ChartPathOptions, baseFS, c.Name, rel.Helm())
 	if err != nil {
-		return "", fmt.Errorf("failed to locate chart %s: %w", chartName, err)
+		return "", fmt.Errorf("failed to locate chart %s: %w", c.Name, err)
 	}
 
 	cache.ChartsCache.AddToCache(baseFS, ch)
@@ -111,13 +103,14 @@ func (rel *config) LocateChartWithCache(baseFS fsimpl.CurrentPathFS) (string, er
 	return ch, nil
 }
 
-func (rel *config) GetChart(baseFS fsimpl.CurrentPathFS) (*chart.Chart, error) {
+func (rel *config) GetChart(baseFS fs.StatFS) (*chart.Chart, error) {
 	ch, err := rel.LocateChartWithCache(baseFS)
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := loader.Load(ch)
+	// c, err := loader.Load(ch)
+	c, err := helper.ChartFSLoad(baseFS, ch)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load chart %s: %w", rel.Chart().Name, err)
 	}
@@ -192,7 +185,7 @@ func (rel *config) ChartDepsUpd(baseFS fsimpl.CurrentPathFS) error {
 	return nil
 }
 
-func (rel *config) DownloadChart(baseFS fsimpl.CurrentPathFS, tmpFS fsimpl.WriteableFS, destDir string) error {
+func (rel *config) DownloadChart(baseFS fs.FS, tmpFS fsimpl.WriteableFS, destDir string) error {
 	if !rel.Chart().IsRemote(baseFS) {
 		rel.Logger().Info("❎ chart is local, skipping exporting")
 

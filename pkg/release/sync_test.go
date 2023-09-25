@@ -4,13 +4,13 @@ package release_test
 
 import (
 	"context"
+	"io/fs"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/go-fsimpl/filefs"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -51,11 +51,11 @@ func (s *SyncTestSuite) TestInstallUpgrade() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	r, err := rel.Sync(context.Background(), baseFS.(fsimpl.CurrentPathFS))
+	r, err := rel.Sync(context.Background(), baseFS.(fs.StatFS))
 	s.Require().NoError(err)
 	s.Require().NotNil(r)
 
-	r, err = rel.Sync(context.Background(), baseFS.(fsimpl.CurrentPathFS))
+	r, err = rel.Sync(context.Background(), baseFS.(fs.StatFS))
 	s.Require().NoError(err)
 	s.Require().NotNil(r)
 }
@@ -70,7 +70,7 @@ func (s *SyncTestSuite) TestInvalidValues() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	r, err := rel.Sync(context.Background(), baseFS.(fsimpl.CurrentPathFS))
+	r, err := rel.Sync(context.Background(), baseFS.(fs.StatFS))
 	s.Require().Error(err)
 	s.Require().Nil(r)
 }
@@ -86,7 +86,7 @@ func (s *SyncTestSuite) TestSyncWithoutCRD() {
 
 	wd, _ := os.Getwd()
 	baseFS, _ := filefs.New(&url.URL{Scheme: "file", Path: wd})
-	r, err := rel.Sync(context.Background(), baseFS.(fsimpl.CurrentPathFS))
+	r, err := rel.Sync(context.Background(), baseFS.(fs.StatFS))
 	s.Require().NoError(err)
 	s.Require().NotNil(r)
 }

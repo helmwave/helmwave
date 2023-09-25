@@ -2,15 +2,15 @@ package release
 
 import (
 	"context"
+	"io/fs"
 
-	"github.com/helmwave/go-fsimpl"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Sync(ctx context.Context, baseFS fsimpl.CurrentPathFS) (*release.Release, error) {
+func (rel *config) Sync(ctx context.Context, baseFS fs.StatFS) (*release.Release, error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
@@ -49,7 +49,7 @@ func (rel *config) Sync(ctx context.Context, baseFS fsimpl.CurrentPathFS) (*rele
 	return r, err
 }
 
-func (rel *config) SyncDryRun(ctx context.Context, baseFS fsimpl.CurrentPathFS) (*release.Release, error) {
+func (rel *config) SyncDryRun(ctx context.Context, baseFS fs.StatFS) (*release.Release, error) {
 	old := rel.dryRun
 	defer rel.DryRun(old)
 	rel.DryRun(true)
