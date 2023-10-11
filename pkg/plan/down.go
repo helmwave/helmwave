@@ -15,6 +15,12 @@ func (p *Plan) Down(ctx context.Context) (err error) {
 	if err != nil {
 		return err
 	}
+
+	dependenciesGraph, err = dependenciesGraph.Reverse()
+	if err != nil {
+		return err
+	}
+
 	// Run hooks
 	err = p.body.Lifecycle.RunPreDown(ctx)
 	if err != nil {
@@ -54,5 +60,5 @@ func (p *Plan) Down(ctx context.Context) (err error) {
 
 	err = wg.Wait()
 
-	return
+	return err
 }
