@@ -305,7 +305,7 @@ func (p *Plan) syncRelease(
 		l.WithError(err).Error("❌ failed to deploy")
 
 		if rel.AllowFailure() {
-			l.Errorf("release is allowed to fail, markind as succeeded to dependencies")
+			l.Errorf("release is allowed to fail, marked as succeeded to dependencies")
 			node.SetSucceeded()
 		} else {
 			node.SetFailed()
