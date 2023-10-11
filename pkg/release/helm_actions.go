@@ -90,13 +90,13 @@ func (rel *config) newUpgrade() *action.Upgrade {
 func (rel *config) newUninstall() *action.Uninstall {
 	client := action.NewUninstall(rel.Cfg())
 
-	client.KeepHistory = false                // TODO: pass it via flags
-	client.DeletionPropagation = "background" // TODO: pass it via flags
+	client.KeepHistory = false // TODO: pass it via flags
 
 	client.DryRun = rel.dryRun
 	client.DisableHooks = rel.DisableHooks
 	client.Timeout = rel.Timeout
 	client.Wait = rel.Wait
+	client.DeletionPropagation = rel.DeletePropagation
 	client.Description = rel.Description()
 
 	return client
