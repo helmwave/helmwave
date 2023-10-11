@@ -16,6 +16,11 @@ func (p *Plan) Down(ctx context.Context) error {
 		return err
 	}
 
+	dependenciesGraph, err = dependenciesGraph.Reverse()
+	if err != nil {
+		return err
+	}
+
 	// Run hooks
 	err = p.body.Lifecycle.RunPreDown(ctx)
 	if err != nil {
