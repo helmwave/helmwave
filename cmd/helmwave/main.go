@@ -9,6 +9,7 @@ import (
 	helmwave "github.com/helmwave/helmwave/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+	"github.com/joho/godotenv"
 )
 
 //nolint:gochecknoglobals // we need a global list of commands
@@ -29,6 +30,11 @@ var commands = []*cli.Command{
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	c := CreateApp()
 
 	defer recoverPanic()
