@@ -139,7 +139,7 @@ func (s *GraphTestSuite) TestReverse() {
 
 	s.Require().NoError(graph.Build())
 	graph, err := graph.Reverse()
-	s.Require().Nil(err)
+	s.Require().NoError(err)
 
 	ch := graph.Run()
 
@@ -180,7 +180,7 @@ func (s *GraphTestSuite) TestReverseFailedDependencies() {
 
 	s.Require().NoError(graph.Build())
 	graph, err := graph.Reverse()
-	s.Require().Nil(err)
+	s.Require().NoError(err)
 
 	ch := graph.Run()
 
