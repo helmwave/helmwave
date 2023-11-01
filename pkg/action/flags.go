@@ -180,7 +180,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-status-interval",
-			Usage:       "interval of kubedog status messages",
+			Usage:       "interval of kubedog status messages: set -1s to stop showing status progress",
 			Value:       5 * time.Second,
 			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
 			Destination: &dog.StatusInterval,

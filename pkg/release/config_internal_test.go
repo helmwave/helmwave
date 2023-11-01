@@ -30,6 +30,7 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 		"Install",
 		"Namespace",
 		"DryRun",
+		"DryRunOption",
 		"Description",
 		"PostRenderer",
 		"DependencyUpdate",

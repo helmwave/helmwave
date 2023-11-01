@@ -33,6 +33,7 @@ type Chart struct {
 	InsecureSkipTLSverify bool   `yaml:"insecure" json:"insecure" jsonschema:"description=Connect to server with an insecure way by skipping certificate verification"`
 	Verify                bool   `yaml:"verify" json:"verify" jsonschema:"description=Verify the provenance of the chart before using it"`
 	PassCredentialsAll    bool   `yaml:"pass_credentials" json:"pass_credentials" jsonschema:"description=Pass credentials to all domains"`
+	PlainHTTP             bool   `yaml:"plain_http" json:"plain_http" jsonschema:"description=Connect to server with plain http and not https,default=false"`
 	SkipDependencyUpdate  bool   `yaml:"skip_dependency_update" json:"skip_dependency_update" jsonschema:"description=Skip updating and downloading dependencies,default=false"`
 	SkipRefresh           bool   `yaml:"skip_refresh,omitempty" json:"skip_refresh,omitempty" jsonschema:"description=Skip refreshing repositories,default=false"`
 }
@@ -44,6 +45,7 @@ func (c *Chart) CopyOptions(cpo *action.ChartPathOptions) {
 	cpo.CertFile = c.CertFile
 	cpo.KeyFile = c.KeyFile
 	cpo.InsecureSkipTLSverify = c.InsecureSkipTLSverify
+	cpo.PlainHTTP = c.PlainHTTP
 	cpo.Keyring = c.Keyring
 	cpo.Password = c.Password
 	cpo.PassCredentialsAll = c.PassCredentialsAll
