@@ -42,6 +42,7 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 	mockedRelease.On("Chart").Return(&release.Chart{})
 
 	mockedRepo := &MockRepositoryConfig{}
+	mockedRepo.On("Name").Return(repoName)
 
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
