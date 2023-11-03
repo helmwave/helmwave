@@ -1,8 +1,6 @@
 name: gitleaks
 on:
-  push:
-    branches: [ "main", "release/*" ]
-  pull_request:
+  pull_request_target:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
 jobs:
