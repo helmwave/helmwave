@@ -7,6 +7,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/action"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	helmwave "github.com/helmwave/helmwave/pkg/version"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -29,6 +30,13 @@ var commands = []*cli.Command{
 }
 
 func main() {
+	if _, err := os.Stat(".env"); err == nil {
+		err = godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
+
 	c := CreateApp()
 
 	defer recoverPanic()
