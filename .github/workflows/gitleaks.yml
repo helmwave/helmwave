@@ -1,5 +1,7 @@
 name: gitleaks
 on:
+  push:
+    branches: [ "main", "release/*" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
@@ -16,4 +18,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Only required for Organizations, not personal accounts.
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}}
+          
  
