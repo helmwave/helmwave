@@ -34,6 +34,30 @@ func (graph *Graph[K, N]) AddDependency(dependant, dependency K) {
 	graph.dependencies = append(graph.dependencies, [2]K{dependant, dependency})
 }
 
+func (graph *Graph[K, N]) Reverse() (*Graph[K, N], error) {
+	newDependenciesGraph := NewGraph[K, N]()
+
+	for key, node := range graph.Nodes {
+		err := newDependenciesGraph.NewNode(key, node.Data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for _, dep := range graph.dependencies {
+		dependantKey := dep[1]
+		dependencyKey := dep[0]
+		newDependenciesGraph.AddDependency(dependantKey, dependencyKey)
+	}
+
+	err := newDependenciesGraph.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	return newDependenciesGraph, nil
+}
+
 func (graph *Graph[K, N]) Build() error {
 	for _, dep := range graph.dependencies {
 		dependantKey := dep[0]
