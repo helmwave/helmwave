@@ -1,0 +1,6 @@
+kind: CI
+body: Add Qodana code quality checker
+time: 2023-11-16T21:16:00.994286+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""
