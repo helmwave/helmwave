@@ -9,43 +9,49 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Sync(ctx context.Context) (*release.Release, error) {
+func (rel *config) Sync(ctx context.Context) (r *release.Release, err error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
 	if rel.dryRun {
-		err := rel.Lifecycle.RunPreBuild(ctx)
+		err = rel.Lifecycle.RunPreBuild(ctx)
 		if err != nil {
-			return nil, err
+			return
 		}
 
 		defer func() {
-			err := rel.Lifecycle.RunPostBuild(ctx)
-			if err != nil {
-				rel.Logger().Errorf("got an error from postbuild hooks: %v", err)
+			lifecycleErr := rel.Lifecycle.RunPostBuild(ctx)
+			if lifecycleErr != nil {
+				rel.Logger().Errorf("got an error from postbuild hooks: %v", lifecycleErr)
+				if err == nil {
+					err = lifecycleErr
+				}
 			}
 		}()
 	} else {
-		err := rel.Lifecycle.RunPreUp(ctx)
+		err = rel.Lifecycle.RunPreUp(ctx)
 		if err != nil {
-			return nil, err
+			return
 		}
 
 		defer func() {
-			err := rel.Lifecycle.RunPostUp(ctx)
-			if err != nil {
-				rel.Logger().Errorf("got an error from postup hooks: %v", err)
+			lifecycleErr := rel.Lifecycle.RunPostUp(ctx)
+			if lifecycleErr != nil {
+				rel.Logger().Errorf("got an error from postup hooks: %v", lifecycleErr)
+				if err == nil {
+					err = lifecycleErr
+				}
 			}
 		}()
 	}
 
-	r, err := rel.upgrade(ctx)
+	r, err = rel.upgrade(ctx)
 
 	if err == nil && !rel.dryRun && rel.ShowNotes {
 		rel.Logger().Infof("🗒️ release notes:\n%s", r.Info.Notes)
 	}
 
-	return r, err
+	return
 }
 
 func (rel *config) SyncDryRun(ctx context.Context) (*release.Release, error) {

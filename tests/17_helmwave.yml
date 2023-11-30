@@ -1,0 +1,17 @@
+project: Test17
+
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: nginx
+    lifecycle:
+      post_build:
+        - cmd: /bin/bash
+          args:
+            - -c
+            - exit 1
+    chart:
+      name: bitnami/nginx
+    namespace: test

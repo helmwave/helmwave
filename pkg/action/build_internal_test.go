@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release"
 
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -376,4 +377,26 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	ts.Require().Contains(logMessages, "run global pre_build script")
 	ts.Require().Contains(logMessages, "running post_build script for nginx")
 	ts.Require().Contains(logMessages, "run global post_build script")
+}
+
+func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "17_helmwave.yml"),
+		file:      filepath.Join(tmpDir, "17_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+		yml:     y,
+	}
+
+	err := s.Run(context.Background())
+	ts.Require().ErrorIs(err, hooks.CommandRunError{})
 }

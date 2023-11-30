@@ -9,17 +9,20 @@ import (
 )
 
 // Down destroys all releases that exist in a plan.
-func (p *Plan) Down(ctx context.Context) error {
+func (p *Plan) Down(ctx context.Context) (err error) {
 	// Run hooks
-	err := p.body.Lifecycle.RunPreDown(ctx)
+	err = p.body.Lifecycle.RunPreDown(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	defer func() {
-		err := p.body.Lifecycle.RunPostDown(ctx)
-		if err != nil {
-			log.Errorf("got an error from postdown hooks: %v", err)
+		lifecycleErr := p.body.Lifecycle.RunPostDown(ctx)
+		if lifecycleErr != nil {
+			log.Errorf("got an error from postdown hooks: %v", lifecycleErr)
+			if err == nil {
+				err = lifecycleErr
+			}
 		}
 	}()
 
@@ -40,9 +43,5 @@ func (p *Plan) Down(ctx context.Context) error {
 	}
 
 	err = wg.Wait()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return
 }

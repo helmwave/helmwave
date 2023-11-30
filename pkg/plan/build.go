@@ -17,26 +17,30 @@ type BuildOptions struct { //nolint:govet
 // Build plan with yml and tags/matchALL options.
 //
 //nolint:cyclop // TODO: reduce cyclomatic complexity
-func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funlen
+func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) { //nolint:funlen
 	p.templater = o.Templater
 
 	// Create Body
-	body, err := NewBody(ctx, o.Yml, false)
+	var body *planBody
+	body, err = NewBody(ctx, o.Yml, false)
 	if err != nil {
-		return err
+		return
 	}
 	p.body = body
 
 	// Run hooks
 	err = p.body.Lifecycle.RunPreBuild(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	defer func() {
-		err := p.body.Lifecycle.RunPostBuild(ctx)
-		if err != nil {
-			log.Errorf("got an error from postbuild hooks: %v", err)
+		lifecycleErr := p.body.Lifecycle.RunPostBuild(ctx)
+		if lifecycleErr != nil {
+			log.Errorf("got an error from postbuild hooks: %v", lifecycleErr)
+			if err == nil {
+				err = lifecycleErr
+			}
 		}
 	}()
 
@@ -44,59 +48,59 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 	log.Info("🔨 Building releases...")
 	p.body.Releases, err = p.buildReleases(o.Tags, o.MatchAll)
 	if err != nil {
-		return err
+		return
 	}
 
 	// Build Values
 	log.Info("🔨 Building values...")
 	err = p.buildValues()
 	if err != nil {
-		return err
+		return
 	}
 
 	// Build Repositories
 	log.Info("🔨 Building repositories...")
 	p.body.Repositories, err = p.buildRepositories()
 	if err != nil {
-		return err
+		return
 	}
 
 	// Sync Repositories
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
-		return err
+		return
 	}
 
 	// Build Registries
 	log.Info("🔨 Building registries...")
 	p.body.Registries, err = p.buildRegistries()
 	if err != nil {
-		return err
+		return
 	}
 	// Sync Registries
 	err = p.syncRegistries(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	// to build charts, we need repositories and registries first
 	log.Info("🔨 Building charts...")
 	err = p.buildCharts()
 	if err != nil {
-		return err
+		return
 	}
 
 	// Validating plan after it was changed
 	err = p.body.Validate()
 	if err != nil {
-		return err
+		return
 	}
 
 	// Build Manifest
 	log.Info("🔨 Building manifests...")
 	err = p.buildManifest(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	// Build graphs
@@ -106,5 +110,5 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) error { //nolint:funle
 		log.Infof("show graph:\n%s", p.BuildGraphASCII(o.GraphWidth))
 	}
 
-	return nil
+	return
 }
