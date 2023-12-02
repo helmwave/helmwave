@@ -25,14 +25,14 @@ func (s *YAMLTestSuite) TestEmptyStructure() {
 
 	s.Require().NoError(err)
 
-	s.Require().Len(lifecycle.PreBuild, 0)
-	s.Require().Len(lifecycle.PostBuild, 0)
-	s.Require().Len(lifecycle.PreUp, 0)
-	s.Require().Len(lifecycle.PostUp, 0)
-	s.Require().Len(lifecycle.PreRollback, 0)
-	s.Require().Len(lifecycle.PostRollback, 0)
-	s.Require().Len(lifecycle.PreDown, 0)
-	s.Require().Len(lifecycle.PostDown, 0)
+	s.Require().Empty(lifecycle.PreBuild)
+	s.Require().Empty(lifecycle.PostBuild)
+	s.Require().Empty(lifecycle.PreUp)
+	s.Require().Empty(lifecycle.PostUp)
+	s.Require().Empty(lifecycle.PreRollback)
+	s.Require().Empty(lifecycle.PostRollback)
+	s.Require().Empty(lifecycle.PreDown)
+	s.Require().Empty(lifecycle.PostDown)
 }
 
 func (s *YAMLTestSuite) TestHooksUnmarshal() {
@@ -47,13 +47,13 @@ pre_build:
 	s.Require().NoError(err)
 
 	s.Require().Len(lifecycle.PreBuild, 1)
-	s.Require().Len(lifecycle.PostBuild, 0)
-	s.Require().Len(lifecycle.PreUp, 0)
-	s.Require().Len(lifecycle.PostUp, 0)
-	s.Require().Len(lifecycle.PreRollback, 0)
-	s.Require().Len(lifecycle.PostRollback, 0)
-	s.Require().Len(lifecycle.PreDown, 0)
-	s.Require().Len(lifecycle.PostDown, 0)
+	s.Require().Empty(lifecycle.PostBuild)
+	s.Require().Empty(lifecycle.PreUp)
+	s.Require().Empty(lifecycle.PostUp)
+	s.Require().Empty(lifecycle.PreRollback)
+	s.Require().Empty(lifecycle.PostRollback)
+	s.Require().Empty(lifecycle.PreDown)
+	s.Require().Empty(lifecycle.PostDown)
 
 	hook := lifecycle.PreBuild[0]
 	s.Require().NotNil(hook)

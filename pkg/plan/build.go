@@ -16,7 +16,7 @@ type BuildOptions struct { //nolint:govet
 
 // Build plan with yml and tags/matchALL options.
 //
-//nolint:cyclop // TODO: reduce cyclomatic complexity
+//nolint:cyclop,gocognit // TODO: reduce cyclomatic complexity
 func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) { //nolint:funlen
 	p.templater = o.Templater
 

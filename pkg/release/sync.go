@@ -9,6 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
+//nolint:gocognit,nestif
 func (rel *config) Sync(ctx context.Context) (r *release.Release, err error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 

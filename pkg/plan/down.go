@@ -43,5 +43,6 @@ func (p *Plan) Down(ctx context.Context) (err error) {
 	}
 
 	err = wg.Wait()
+
 	return
 }

@@ -29,10 +29,12 @@ linters:
     - golint # deprecated
     - gomnd # we want to keep magic numbers
     - ifshort # deprecated
+    - inamedparam
     - interfacebloat # we want huge interfaces
     - interfacer # deprecated
     - ireturn # sometimes we need to return interfaces
     - maligned # deprecated
+    - nakedret # sometimes we have to use naked returns
     - nonamedreturns # we do want some named returns
     - nosnakecase # deprecated
     - scopelint # deprecated

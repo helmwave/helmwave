@@ -37,7 +37,7 @@ func (s *ValidateTestSuite) TestInvalidRelease() {
 	p.SetReleases(mockedRelease)
 
 	s.Require().ErrorIs(err, body.ValidateReleases())
-	s.Require().Error(err, body.Validate())
+	s.Require().ErrorIs(err, body.Validate())
 
 	mockedRelease.AssertExpectations(s.T())
 }
@@ -55,7 +55,7 @@ func (s *ValidateTestSuite) TestInvalidRepository() {
 	p.SetRepositories(mockedRepo)
 
 	s.Require().ErrorIs(err, body.ValidateRepositories())
-	s.Require().Error(err, body.Validate())
+	s.Require().ErrorIs(err, body.Validate())
 
 	mockedRepo.AssertExpectations(s.T())
 }

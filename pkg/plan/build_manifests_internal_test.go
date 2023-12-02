@@ -59,8 +59,8 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	ts.Require().Len(p.manifests, 2)
 	ts.Require().Contains(p.manifests, u1)
 	ts.Require().Contains(p.manifests, u2)
-	ts.Require().Equal(p.manifests[u1], "")
-	ts.Require().Equal(p.manifests[u2], "")
+	ts.Require().Equal("", p.manifests[u1])
+	ts.Require().Equal("", p.manifests[u2])
 
 	rel1.AssertExpectations(ts.T())
 	rel2.AssertExpectations(ts.T())
@@ -86,7 +86,7 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 1)
 	ts.Require().Contains(p.manifests, uniq)
-	ts.Require().Equal(p.manifests[uniq], "")
+	ts.Require().Equal("", p.manifests[uniq])
 
 	rel.AssertExpectations(ts.T())
 }
