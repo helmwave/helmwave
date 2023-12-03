@@ -16,17 +16,20 @@ import (
 )
 
 // Rollback rollbacks helm release.
-func (p *Plan) Rollback(ctx context.Context, version int, dog *kubedog.Config) error {
+func (p *Plan) Rollback(ctx context.Context, version int, dog *kubedog.Config) (err error) {
 	// Run hooks
-	err := p.body.Lifecycle.RunPreRollback(ctx)
+	err = p.body.Lifecycle.RunPreRollback(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	defer func() {
-		err := p.body.Lifecycle.RunPostRollback(ctx)
-		if err != nil {
-			log.Errorf("got an error from postrollback hooks: %v", err)
+		lifecycleErr := p.body.Lifecycle.RunPostRollback(ctx)
+		if lifecycleErr != nil {
+			log.Errorf("got an error from postrollback hooks: %v", lifecycleErr)
+			if err == nil {
+				err = lifecycleErr
+			}
 		}
 	}()
 
@@ -38,11 +41,7 @@ func (p *Plan) Rollback(ctx context.Context, version int, dog *kubedog.Config) e
 		err = p.rollbackReleases(ctx, version)
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return
 }
 
 func (p *Plan) rollbackReleases(ctx context.Context, version int) error {

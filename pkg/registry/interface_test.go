@@ -42,7 +42,7 @@ func (ts *InterfaceTestSuite) TestUnmarshalYAML() {
 
 	ts.Require().NoError(err)
 	ts.Require().Len(cfgs, 1)
-	ts.Require().Equal(cfgs[0].Host(), "blabla")
+	ts.Require().Equal("blabla", cfgs[0].Host())
 }
 
 func (ts *InterfaceTestSuite) TestUnmarshalYAMLInvalid() {

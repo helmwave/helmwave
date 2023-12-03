@@ -77,8 +77,8 @@ version: 1.2.3
 	err := yaml.Unmarshal([]byte(str), &rs)
 
 	ts.Require().NoError(err)
-	ts.Require().Equal(rs.Name, "blabla")
-	ts.Require().Equal(rs.Version, "1.2.3")
+	ts.Require().Equal("blabla", rs.Name)
+	ts.Require().Equal("1.2.3", rs.Version)
 }
 
 func (ts *ChartTestSuite) TestUnmarshalYAMLInvalid() {

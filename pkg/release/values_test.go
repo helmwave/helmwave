@@ -99,7 +99,7 @@ func (s *ValuesTestSuite) TestBuildNonExistingNonStrict() {
 	err := r.BuildValues(".", template.TemplaterSprig)
 
 	s.Require().NoError(err)
-	s.Require().Len(r.Values(), 0)
+	s.Require().Empty(r.Values())
 }
 
 func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
