@@ -8,28 +8,31 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-func (rel *config) Uninstall(ctx context.Context) (*release.UninstallReleaseResponse, error) {
+func (rel *config) Uninstall(ctx context.Context) (resp *release.UninstallReleaseResponse, err error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
-	err := rel.Lifecycle.RunPreDown(ctx)
+	err = rel.Lifecycle.RunPreDown(ctx)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	defer func() {
-		err := rel.Lifecycle.RunPostDown(ctx)
-		if err != nil {
-			rel.Logger().Errorf("got an error from postdown hooks: %v", err)
+		lifecycleErr := rel.Lifecycle.RunPostDown(ctx)
+		if lifecycleErr != nil {
+			rel.Logger().Errorf("got an error from postdown hooks: %v", lifecycleErr)
+			if err == nil {
+				err = lifecycleErr
+			}
 		}
 	}()
 
 	client := rel.newUninstall()
 
-	resp, err := client.Run(rel.Name())
+	resp, err = client.Run(rel.Name())
 	if err != nil {
-		return nil, fmt.Errorf("failed to uninstall release %s: %w", rel.Uniq(), err)
+		err = fmt.Errorf("failed to uninstall release %s: %w", rel.Uniq(), err)
 	}
 
-	return resp, nil
+	return
 }

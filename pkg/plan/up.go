@@ -28,34 +28,37 @@ import (
 )
 
 // Up syncs repositories and releases.
-func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
+func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 	// Run hooks
-	err := p.body.Lifecycle.RunPreUp(ctx)
+	err = p.body.Lifecycle.RunPreUp(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	defer func() {
-		err := p.body.Lifecycle.RunPostUp(ctx)
-		if err != nil {
-			log.Errorf("got an error from postup hooks: %v", err)
+		lifecycleErr := p.body.Lifecycle.RunPostUp(ctx)
+		if lifecycleErr != nil {
+			log.Errorf("got an error from postup hooks: %v", lifecycleErr)
+			if err == nil {
+				err = lifecycleErr
+			}
 		}
 	}()
 
 	log.Info("🗄 sync repositories...")
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
-		return err
+		return
 	}
 
 	log.Info("🗄 sync registries...")
 	err = p.syncRegistries(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	if len(p.body.Releases) == 0 {
-		return nil
+		return
 	}
 
 	log.Info("🛥 sync releases...")
@@ -68,11 +71,7 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) error {
 		err = p.syncReleases(ctx)
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return
 }
 
 func (p *Plan) syncRegistries(ctx context.Context) (err error) {

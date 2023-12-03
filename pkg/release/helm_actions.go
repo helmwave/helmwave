@@ -93,6 +93,8 @@ func (rel *config) newUninstall() *action.Uninstall {
 	client.KeepHistory = false                // TODO: pass it via flags
 	client.DeletionPropagation = "background" // TODO: pass it via flags
 
+	client.IgnoreNotFound = true // make it idempotent
+
 	client.DryRun = rel.dryRun
 	client.DisableHooks = rel.DisableHooks
 	client.Timeout = rel.Timeout
