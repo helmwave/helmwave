@@ -62,3 +62,35 @@ func (ts *DownTestSuite) TestRun() {
 	ts.Require().NoError(u.Run(context.Background()))
 	ts.Require().NoError(d.Run(context.Background()))
 }
+
+func (ts *DownTestSuite) TestIdempotency() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		autoYml: true,
+		yml:     y,
+	}
+
+	u := &Up{
+		build: s,
+		dog:   &kubedog.Config{},
+	}
+	d := Down{
+		build: s,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ts.T().Cleanup(cancel)
+
+	ts.Require().NoError(s.Run(ctx))
+	ts.Require().NoError(u.Run(ctx))
+	ts.Require().NoError(d.Run(ctx))
+	ts.Require().NoError(d.Run(ctx))
+}
