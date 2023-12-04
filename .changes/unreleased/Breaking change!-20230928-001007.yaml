@@ -1,6 +1,0 @@
-kind: Breaking change!
-body: Drop support for own charts cache in favor of using helm repository cache
-time: 2023-09-28T00:10:07.425597+04:00
-custom:
-  Author: r3nic1e
-  Issue: "741"

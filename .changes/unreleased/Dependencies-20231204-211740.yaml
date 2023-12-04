@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Bump helm to v3.13.2
-time: 2023-12-04T21:17:40.586747+01:00
-custom:
-  Author: r3nic1e
-  Issue: ""
