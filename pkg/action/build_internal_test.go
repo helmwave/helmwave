@@ -56,27 +56,6 @@ func (ts *BuildTestSuite) TestYmlError() {
 	ts.Require().Error(s.Run(context.Background()))
 }
 
-func (ts *BuildTestSuite) TestInvalidCacheDir() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
-	}
-
-	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		chartsCacheDir: "/proc/1/bla",
-	}
-
-	ts.Require().Error(s.Run(context.Background()))
-}
-
 func (ts *BuildTestSuite) TestManifest() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{

@@ -11,7 +11,7 @@ import (
 )
 
 // flagPlandir pass val to urfave flag.
-func flagPlandir(v *string) *cli.StringFlag {
+func flagPlandir(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "plandir",
 		Aliases:     []string{"p"},
@@ -23,7 +23,7 @@ func flagPlandir(v *string) *cli.StringFlag {
 }
 
 // flagTags pass val to urfave flag.
-func flagTags(v *cli.StringSlice) *cli.StringSliceFlag {
+func flagTags(v *cli.StringSlice) cli.Flag {
 	return &cli.StringSliceFlag{
 		Name:        "tags",
 		Aliases:     []string{"t"},
@@ -34,7 +34,7 @@ func flagTags(v *cli.StringSlice) *cli.StringSliceFlag {
 }
 
 // flagTemplateEngine pass val to urfave flag.
-func flagMatchAllTags(v *bool) *cli.BoolFlag {
+func flagMatchAllTags(v *bool) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "match-all-tags",
 		Usage:       "match all provided tags",
@@ -45,7 +45,7 @@ func flagMatchAllTags(v *bool) *cli.BoolFlag {
 }
 
 // flagYmlFile pass val to urfave flag.
-func flagYmlFile(v *string) *cli.StringFlag {
+func flagYmlFile(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "file",
 		Aliases:     []string{"f"},
@@ -57,7 +57,7 @@ func flagYmlFile(v *string) *cli.StringFlag {
 }
 
 // flagTplFile pass val to urfave flag.
-func flagTplFile(v *string) *cli.StringFlag {
+func flagTplFile(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "tpl",
 		Value:       "helmwave.yml.tpl",
@@ -68,7 +68,7 @@ func flagTplFile(v *string) *cli.StringFlag {
 }
 
 // flagDiffMode pass val to urfave flag.
-func flagDiffMode(v *string) *cli.StringFlag {
+func flagDiffMode(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "diff-mode",
 		Value:       "live",
@@ -79,7 +79,7 @@ func flagDiffMode(v *string) *cli.StringFlag {
 }
 
 // flagDiffWide pass val to urfave flag.
-func flagDiffWide(v *int) *cli.IntFlag {
+func flagDiffWide(v *int) cli.Flag {
 	return &cli.IntFlag{
 		Name:        "wide",
 		Value:       5,
@@ -90,7 +90,7 @@ func flagDiffWide(v *int) *cli.IntFlag {
 }
 
 // flagDiffShowSecret pass val to urfave flag.
-func flagDiffShowSecret(v *bool) *cli.BoolFlag {
+func flagDiffShowSecret(v *bool) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "show-secret",
 		Value:       true,
@@ -101,7 +101,7 @@ func flagDiffShowSecret(v *bool) *cli.BoolFlag {
 }
 
 // flagTemplateEngine pass val to urfave flag.
-func flagTemplateEngine(v *string) *cli.StringFlag {
+func flagTemplateEngine(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "templater",
 		Value:       template.TemplaterSprig,
@@ -112,7 +112,7 @@ func flagTemplateEngine(v *string) *cli.StringFlag {
 }
 
 // flagAutoBuild pass val to urfave flag.
-func flagAutoBuild(v *bool) *cli.BoolFlag {
+func flagAutoBuild(v *bool) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "build",
 		Usage:       "auto build",
@@ -122,7 +122,7 @@ func flagAutoBuild(v *bool) *cli.BoolFlag {
 	}
 }
 
-func flagDiffThreeWayMerge(v *bool) *cli.BoolFlag {
+func flagDiffThreeWayMerge(v *bool) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "3-way-merge",
 		Usage:       "show 3-way merge diff",
@@ -132,19 +132,8 @@ func flagDiffThreeWayMerge(v *bool) *cli.BoolFlag {
 	}
 }
 
-// flagDiffMode pass val to urfave flag.
-func flagChartsCacheDir(v *string) *cli.StringFlag {
-	return &cli.StringFlag{
-		Name:        "charts-cache-dir",
-		Value:       "",
-		Usage:       "enable caching of helm charts in specified directory",
-		EnvVars:     []string{"HELMWAVE_CHARTS_CACHE"},
-		Destination: v,
-	}
-}
-
 // flagSkipUnchanged skip unchanged releases.
-func flagSkipUnchanged(v *bool) *cli.BoolFlag {
+func flagSkipUnchanged(v *bool) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "skip-unchanged",
 		Usage:       "skip unchanged releases",
@@ -155,7 +144,7 @@ func flagSkipUnchanged(v *bool) *cli.BoolFlag {
 }
 
 // flagGraphWidth pass val to an urfave flag.
-func flagGraphWidth(v *int) *cli.IntFlag {
+func flagGraphWidth(v *int) cli.Flag {
 	return &cli.IntFlag{
 		Name: "graph-width",
 		Usage: "set ceil width: " +

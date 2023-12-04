@@ -27,6 +27,8 @@ var (
 	ErrDepFailed = errors.New("dependency failed")
 
 	ErrUnknownFormat = errors.New("unknown format")
+
+	ErrDigestNotMatch = errors.New("chart digest doesn't match")
 )
 
 type DuplicateError struct {
@@ -67,5 +69,21 @@ func (err YAMLDecodeDependsOnError) Error() string {
 }
 
 func (err YAMLDecodeDependsOnError) Unwrap() error {
+	return err.Err
+}
+
+type ChartCacheError struct {
+	Err error
+}
+
+func NewChartCacheError(err error) error {
+	return &ChartCacheError{Err: err}
+}
+
+func (err ChartCacheError) Error() string {
+	return fmt.Sprintf("failed to find chart in helm cache: %s", err.Err)
+}
+
+func (err ChartCacheError) Unwrap() error {
 	return err.Err
 }
