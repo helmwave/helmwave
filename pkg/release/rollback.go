@@ -8,19 +8,22 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 )
 
-func (rel *config) Rollback(ctx context.Context, version int) error {
+func (rel *config) Rollback(ctx context.Context, version int) (err error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
-	err := rel.Lifecycle.RunPreRollback(ctx)
+	err = rel.Lifecycle.RunPreRollback(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
 	defer func() {
-		err := rel.Lifecycle.RunPostRollback(ctx)
-		if err != nil {
-			rel.Logger().Errorf("got an error from postrollback hooks: %v", err)
+		lifecycleErr := rel.Lifecycle.RunPostRollback(ctx)
+		if lifecycleErr != nil {
+			rel.Logger().Errorf("got an error from postrollback hooks: %v", lifecycleErr)
+			if err == nil {
+				err = lifecycleErr
+			}
 		}
 	}()
 
@@ -42,9 +45,10 @@ func (rel *config) Rollback(ctx context.Context, version int) error {
 		rel.Logger().Infof("Be careful! Rollback to %d revision", version)
 	}
 
-	if err := client.Run(rel.Name()); err != nil {
-		return fmt.Errorf("failed to rollback release %s: %w", rel.Uniq(), err)
+	err = client.Run(rel.Name())
+	if err != nil {
+		err = fmt.Errorf("failed to rollback release %s: %w", rel.Uniq(), err)
 	}
 
-	return nil
+	return
 }

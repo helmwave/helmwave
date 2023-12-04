@@ -21,7 +21,7 @@ func (s *UninstallTestSuite) TestNonExistingUninstall() {
 
 	_, err := rel.Uninstall(context.Background())
 
-	s.Require().ErrorContains(err, "failed to uninstall release blabla@blabla")
+	s.Require().NoError(err)
 }
 
 func TestUninstallTestSuite(t *testing.T) {

@@ -42,5 +42,5 @@ func (ts *InterfaceTestSuite) TestUnmarshalYAML() {
 
 	ts.Require().NoError(err)
 	ts.Require().Len(cfgs, 1)
-	ts.Require().Equal(cfgs[0].Name(), "blabla")
+	ts.Require().Equal("blabla", cfgs[0].Name())
 }

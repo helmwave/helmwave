@@ -32,7 +32,7 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	repoName := ""
+	repoName := ts.T().Name()
 
 	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -42,13 +42,15 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 	mockedRelease.On("Chart").Return(&release.Chart{})
 
 	mockedRepo := &MockRepositoryConfig{}
+	mockedRepo.On("Name").Return(repoName)
 
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
 	repos, err := p.buildRepositories()
 	ts.Require().NoError(err)
-	ts.Require().Empty(repos, 0)
+	ts.Len(repos, 1)
+	ts.Contains(repos, mockedRepo)
 
 	mockedRepo.AssertExpectations(ts.T())
 	mockedRelease.AssertExpectations(ts.T())
@@ -64,7 +66,7 @@ func (ts *BuildRepositoriesTestSuite) TestUnusedRepo() {
 
 	repos, err := p.buildRepositories()
 	ts.Require().NoError(err)
-	ts.Require().Empty(repos)
+	ts.Empty(repos)
 
 	mockedRepo.AssertExpectations(ts.T())
 }
