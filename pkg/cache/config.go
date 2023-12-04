@@ -1,7 +1,13 @@
 package cache
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"net/url"
+	"path/filepath"
+
 	"github.com/adrg/xdg"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -36,4 +42,21 @@ func (c *Config) Run(_ *cli.Context) error {
 // Init initializes cache.
 func (c *Config) Init() error {
 	return nil
+}
+
+func (s *Config) GetRemoteSourcePath(remoteSource *url.URL) string {
+	u := *remoteSource
+	u.RawQuery = ""
+
+	hasher := sha256.New()
+	hasher.Write([]byte(u.String()))
+	hash := hex.EncodeToString(hasher.Sum(nil))
+
+	p := filepath.Join(s.Home, "remote-source", hash)
+
+	log.WithField("remote source", remoteSource.String()).
+		WithField("cache path", p).
+		Info("using cache for remote source")
+
+	return p
 }

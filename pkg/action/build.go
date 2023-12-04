@@ -2,9 +2,16 @@ package action
 
 import (
 	"context"
+	"fmt"
+	"net/url"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/hashicorp/go-getter"
+	"github.com/helmwave/helmwave/pkg/cache"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -17,6 +24,7 @@ type Build struct {
 	yml           *Yml
 	diff          *Diff
 	options       plan.BuildOptions
+	remoteSource  string
 	plandir       string
 	diffMode      string
 	tags          cli.StringSlice
@@ -25,7 +33,53 @@ type Build struct {
 }
 
 // Run is the main function for 'build' CLI command.
+//
+//nolint:funlen,gocognit,cyclop
 func (i *Build) Run(ctx context.Context) (err error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+
+	if i.remoteSource != "" {
+		remoteSource, err := url.Parse(i.remoteSource)
+		if err != nil {
+			return fmt.Errorf("failed to parse remote source: %w", err)
+		}
+
+		downloadPath := cache.DefaultConfig.GetRemoteSourcePath(remoteSource)
+		err = getter.Get(
+			downloadPath,
+			i.remoteSource,
+			getter.WithContext(ctx),
+			getter.WithDetectors(getter.Detectors),
+			getter.WithGetters(getter.Getters),
+			getter.WithDecompressors(getter.Decompressors),
+		)
+		if err != nil {
+			return fmt.Errorf("failed to download remote source: %w", err)
+		}
+
+		// we need to move plandir back to where it should be
+		defer func() {
+			srcPlandir := filepath.Join(downloadPath, i.plandir)
+			destPlandir := filepath.Join(wd, i.plandir)
+			err := os.RemoveAll(destPlandir)
+			if err != nil {
+				log.WithError(err).Error("failed to clean plandir")
+			}
+			err = helper.MoveFile(srcPlandir, destPlandir)
+			if err != nil {
+				log.WithError(err).Error("failed to move plandir")
+			}
+		}()
+
+		err = os.Chdir(downloadPath)
+		if err != nil {
+			return fmt.Errorf("failed to chdir to downloaded remote source: %w", err)
+		}
+	}
+
 	if i.autoYml {
 		err = i.yml.Run(ctx)
 		if err != nil {
@@ -108,6 +162,13 @@ func (i *Build) flags() []cli.Flag {
 			Value:       false,
 			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
 			Destination: &i.autoYml,
+		},
+		&cli.StringFlag{
+			Name:        "remote-source",
+			Usage:       "go-getter URL to download build sources",
+			Value:       "",
+			EnvVars:     []string{"HELMWAVE_REMOTE_SOURCE"},
+			Destination: &i.remoteSource,
 		},
 	}
 
