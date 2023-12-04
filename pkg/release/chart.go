@@ -56,15 +56,15 @@ func (c *Chart) CopyOptions(cpo *action.ChartPathOptions) {
 }
 
 // UnmarshalYAML flexible config.
-func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
+func (c *Chart) UnmarshalYAML(node *yaml.Node) error {
 	type raw Chart
 	var err error
 
 	switch node.Kind {
 	case yaml.ScalarNode, yaml.AliasNode:
-		err = node.Decode(&(u.Name))
+		err = node.Decode(&(c.Name))
 	case yaml.MappingNode:
-		err = node.Decode((*raw)(u))
+		err = node.Decode((*raw)(c))
 	default:
 		err = ErrUnknownFormat
 	}
@@ -76,8 +76,8 @@ func (u *Chart) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
-func (u *Chart) IsRemote() bool {
-	return !helper.IsExists(filepath.Clean(u.Name))
+func (c *Chart) IsRemote() bool {
+	return !helper.IsExists(filepath.Clean(c.Name))
 }
 
 func (rel *config) LocateChartWithCache() (string, error) {

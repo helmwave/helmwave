@@ -51,5 +51,6 @@ func (ts *InterfaceTestSuite) TestUnmarshalYAMLInvalid() {
 
 	err := yaml.Unmarshal([]byte(str), &cfgs)
 
-	ts.Require().ErrorIs(err, registry.YAMLDecodeError{})
+	var e *registry.YAMLDecodeError
+	ts.Require().ErrorAs(err, &e)
 }

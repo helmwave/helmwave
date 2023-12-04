@@ -10,7 +10,7 @@ func (t noTemplater) Name() string {
 	return TemplaterNone
 }
 
-func (t noTemplater) Render(src string, data any) ([]byte, error) {
+func (t noTemplater) Render(src string, _ any) ([]byte, error) {
 	return []byte(src), nil
 }
 

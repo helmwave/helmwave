@@ -38,7 +38,7 @@ func SaveInterface(ctx context.Context, file string, in any) error {
 }
 
 // Byte marshals input to YAML and returns YAML byte slice.
-func Byte(ctx context.Context, in any) []byte {
+func Byte(_ context.Context, in any) []byte {
 	data, err := yaml.Marshal(in)
 	if err != nil {
 		log.Fatal(err)

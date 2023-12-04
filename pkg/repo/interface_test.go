@@ -17,11 +17,11 @@ func TestInterfaceTestSuite(t *testing.T) {
 	suite.Run(t, new(InterfaceTestSuite))
 }
 
-func (s *InterfaceTestSuite) TestConfigsJSONSchema() {
+func (ts *InterfaceTestSuite) TestConfigsJSONSchema() {
 	schema := repo.Configs{}.JSONSchema()
 
-	s.Require().NotNil(schema)
-	s.Require().Equal("array", schema.Type)
+	ts.Require().NotNil(schema)
+	ts.Require().Equal("array", schema.Type)
 }
 
 func (ts *InterfaceTestSuite) TestUnmarshalYAMLEmpty() {

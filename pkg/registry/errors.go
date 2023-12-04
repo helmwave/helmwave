@@ -19,15 +19,6 @@ func (err DuplicateError) Error() string {
 	return fmt.Sprintf("registry duplicate: %s", err.Host)
 }
 
-func (DuplicateError) Is(target error) bool {
-	switch target.(type) {
-	case DuplicateError, *DuplicateError:
-		return true
-	default:
-		return false
-	}
-}
-
 type NotFoundError struct {
 	Host string
 }
@@ -38,15 +29,6 @@ func NewNotFoundError(host string) error {
 
 func (err NotFoundError) Error() string {
 	return fmt.Sprintf("🗄 registry not found: %s", err.Host)
-}
-
-func (NotFoundError) Is(target error) bool {
-	switch target.(type) {
-	case NotFoundError, *NotFoundError:
-		return true
-	default:
-		return false
-	}
 }
 
 type LoginError struct {
@@ -65,15 +47,6 @@ func (err LoginError) Unwrap() error {
 	return err.Err
 }
 
-func (LoginError) Is(target error) bool {
-	switch target.(type) {
-	case LoginError, *LoginError:
-		return true
-	default:
-		return false
-	}
-}
-
 type YAMLDecodeError struct {
 	Err error
 }
@@ -88,13 +61,4 @@ func (err YAMLDecodeError) Error() string {
 
 func (err YAMLDecodeError) Unwrap() error {
 	return err.Err
-}
-
-func (YAMLDecodeError) Is(target error) bool {
-	switch target.(type) {
-	case YAMLDecodeError, *YAMLDecodeError:
-		return true
-	default:
-		return false
-	}
 }

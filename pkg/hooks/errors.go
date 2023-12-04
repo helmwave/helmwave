@@ -23,15 +23,6 @@ func (err CreatePipeError) Unwrap() error {
 	return err.Err
 }
 
-func (CreatePipeError) Is(target error) bool {
-	switch target.(type) {
-	case CreatePipeError, *CreatePipeError:
-		return true
-	default:
-		return false
-	}
-}
-
 type CommandRunError struct {
 	Err error
 }
@@ -46,15 +37,6 @@ func (err CommandRunError) Error() string {
 
 func (err CommandRunError) Unwrap() error {
 	return err.Err
-}
-
-func (CommandRunError) Is(target error) bool {
-	switch target.(type) {
-	case CommandRunError, *CommandRunError:
-		return true
-	default:
-		return false
-	}
 }
 
 type CommandReadOutputError struct {
@@ -73,15 +55,6 @@ func (err CommandReadOutputError) Unwrap() error {
 	return err.Err
 }
 
-func (CommandReadOutputError) Is(target error) bool {
-	switch target.(type) {
-	case CommandReadOutputError, *CommandReadOutputError:
-		return true
-	default:
-		return false
-	}
-}
-
 type YAMLDecodeError struct {
 	Err error
 }
@@ -96,13 +69,4 @@ func (err YAMLDecodeError) Error() string {
 
 func (err YAMLDecodeError) Unwrap() error {
 	return err.Err
-}
-
-func (YAMLDecodeError) Is(target error) bool {
-	switch target.(type) {
-	case YAMLDecodeError, *YAMLDecodeError:
-		return true
-	default:
-		return false
-	}
 }

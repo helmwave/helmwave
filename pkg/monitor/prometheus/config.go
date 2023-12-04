@@ -27,7 +27,7 @@ func NewConfig() *Config {
 	return &Config{}
 }
 
-func (c *Config) Init(ctx context.Context, logger *log.Entry) error {
+func (c *Config) Init(_ context.Context, logger *log.Entry) error {
 	client, err := api.NewClient(api.Config{Address: c.URL})
 	if err != nil {
 		return NewPrometheusClientError(err)

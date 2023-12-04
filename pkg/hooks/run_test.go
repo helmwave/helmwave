@@ -18,7 +18,7 @@ type MockHook struct {
 	mock.Mock
 }
 
-func (m *MockHook) Run(ctx context.Context) error {
+func (m *MockHook) Run(_ context.Context) error {
 	return m.Called().Error(0)
 }
 

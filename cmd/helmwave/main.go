@@ -88,7 +88,7 @@ func (e CommandNotFoundError) Error() string {
 	return fmt.Sprintf("👻 Command %q not found", e.Command)
 }
 
-func command404(c *cli.Context, s string) {
+func command404(_ *cli.Context, s string) {
 	err := CommandNotFoundError{
 		Command: s,
 	}

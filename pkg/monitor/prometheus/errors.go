@@ -15,27 +15,18 @@ var (
 	ErrResultEmpty = errors.New("result is empty")
 )
 
-type PrometheusClientError struct {
+type ClientError struct {
 	Err error
 }
 
 func NewPrometheusClientError(err error) error {
-	return &PrometheusClientError{Err: err}
+	return &ClientError{Err: err}
 }
 
-func (err PrometheusClientError) Error() string {
+func (err ClientError) Error() string {
 	return fmt.Sprintf("failed to create prometheus client: %s", err.Err)
 }
 
-func (err PrometheusClientError) Unwrap() error {
+func (err ClientError) Unwrap() error {
 	return err.Err
-}
-
-func (PrometheusClientError) Is(target error) bool {
-	switch target.(type) {
-	case PrometheusClientError, *PrometheusClientError:
-		return true
-	default:
-		return false
-	}
 }

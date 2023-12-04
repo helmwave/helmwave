@@ -124,8 +124,13 @@ func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 
 	p.SetRepositories(mockedRepo, mockedRepo)
 
-	s.Require().ErrorIs(repo.DuplicateError{}, body.ValidateRepositories())
-	s.Require().ErrorIs(repo.DuplicateError{}, body.Validate())
+	var e *repo.DuplicateError
+
+	s.Require().ErrorAs(body.ValidateRepositories(), &e)
+	s.Equal("blabla", e.Name)
+
+	s.Require().ErrorAs(body.Validate(), &e)
+	s.Equal("blabla", e.Name)
 
 	mockedRepo.AssertExpectations(s.T())
 }
@@ -143,8 +148,13 @@ func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
 
 	p.SetReleases(mockedRelease, mockedRelease)
 
-	s.Require().ErrorIs(release.DuplicateError{}, body.ValidateReleases())
-	s.Require().ErrorIs(release.DuplicateError{}, body.Validate())
+	var e *release.DuplicateError
+
+	s.Require().ErrorAs(body.ValidateReleases(), &e)
+	s.Equal(mockedRelease.Uniq(), e.Uniq)
+
+	s.Require().ErrorAs(body.Validate(), &e)
+	s.Equal(mockedRelease.Uniq(), e.Uniq)
 
 	mockedRelease.AssertExpectations(s.T())
 }

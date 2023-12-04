@@ -11,9 +11,6 @@ import (
 var (
 	ErrNameEmpty = errors.New("release name is empty")
 
-	// ErrMissingDependency is returned when values can't be used and are skipped.
-	ErrMissingDependency = errors.New("dependency is missing")
-
 	// ErrPendingRelease is an error for fail strategy that release is in pending status.
 	ErrPendingRelease = errors.New("release is in pending status")
 
@@ -44,15 +41,6 @@ func (err DuplicateError) Error() string {
 	return fmt.Sprintf("release duplicate: %s", err.Uniq.String())
 }
 
-func (DuplicateError) Is(target error) bool {
-	switch target.(type) {
-	case DuplicateError, *DuplicateError:
-		return true
-	default:
-		return false
-	}
-}
-
 type InvalidNamespaceError struct {
 	Namespace string
 }
@@ -65,22 +53,13 @@ func (err InvalidNamespaceError) Error() string {
 	return fmt.Sprintf("invalid namespace: %s", err.Namespace)
 }
 
-func (InvalidNamespaceError) Is(target error) bool {
-	switch target.(type) {
-	case InvalidNamespaceError, *InvalidNamespaceError:
-		return true
-	default:
-		return false
-	}
-}
-
 type YAMLDecodeDependsOnError struct {
 	Err       error
 	DependsOn string
 }
 
-func NewYAMLDecodeDependsOnError(depends_on string, err error) error {
-	return &YAMLDecodeDependsOnError{DependsOn: depends_on, Err: err}
+func NewYAMLDecodeDependsOnError(dependsOn string, err error) error {
+	return &YAMLDecodeDependsOnError{DependsOn: dependsOn, Err: err}
 }
 
 func (err YAMLDecodeDependsOnError) Error() string {
@@ -89,13 +68,4 @@ func (err YAMLDecodeDependsOnError) Error() string {
 
 func (err YAMLDecodeDependsOnError) Unwrap() error {
 	return err.Err
-}
-
-func (YAMLDecodeDependsOnError) Is(target error) bool {
-	switch target.(type) {
-	case YAMLDecodeDependsOnError, *YAMLDecodeDependsOnError:
-		return true
-	default:
-		return false
-	}
 }

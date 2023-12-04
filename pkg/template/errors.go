@@ -19,12 +19,3 @@ func (err SOPSDecodeError) Error() string {
 func (err SOPSDecodeError) Unwrap() error {
 	return err.Err
 }
-
-func (SOPSDecodeError) Is(target error) bool {
-	switch target.(type) {
-	case SOPSDecodeError, *SOPSDecodeError:
-		return true
-	default:
-		return false
-	}
-}

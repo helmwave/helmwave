@@ -8,6 +8,7 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -167,10 +168,15 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 	err = sb.tags.Set("nginx-b")
 	ts.Require().NoError(err)
 
-	ts.Require().ErrorIs(sfail.Run(context.Background()), release.DuplicateError{})
-	ts.Require().ErrorIs(sfailByTag.Run(context.Background()), release.DuplicateError{})
-	ts.Require().NoError(sa.Run(context.Background()))
-	ts.Require().NoError(sb.Run(context.Background()))
+	var e *release.DuplicateError
+	ts.Require().ErrorAs(sfail.Run(context.Background()), &e)
+	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
+
+	ts.Require().ErrorAs(sfailByTag.Run(context.Background()), &e)
+	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
+
+	ts.NoError(sa.Run(context.Background()))
+	ts.NoError(sb.Run(context.Background()))
 }
 
 func (ts *BuildTestSuite) TestRepositories() {
@@ -398,5 +404,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
 	}
 
 	err := s.Run(context.Background())
-	ts.Require().ErrorIs(err, hooks.CommandRunError{})
+
+	var e *hooks.CommandRunError
+	ts.Require().ErrorAs(err, &e)
 }

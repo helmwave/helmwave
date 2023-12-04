@@ -68,9 +68,8 @@ func (s *NewTestSuite) TestJSONSchema() {
 
 	s.Require().NotNil(schema)
 
-	keys := schema.Properties.Keys()
-	s.Require().Contains(keys, "repositories")
-	s.Require().Contains(keys, "registries")
-	s.Require().Contains(keys, "releases")
-	s.Require().Contains(keys, "lifecycle")
+	s.NotNil(schema.Properties.GetPair("repositories"))
+	s.NotNil(schema.Properties.GetPair("registries"))
+	s.NotNil(schema.Properties.GetPair("releases"))
+	s.NotNil(schema.Properties.GetPair("lifecycle"))
 }

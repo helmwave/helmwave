@@ -26,12 +26,3 @@ func (err NotCreatedError) Error() string {
 func (err NotCreatedError) Unwrap() error {
 	return err.Err
 }
-
-func (NotCreatedError) Is(target error) bool {
-	switch target.(type) {
-	case NotCreatedError, *NotCreatedError:
-		return true
-	default:
-		return false
-	}
-}

@@ -20,15 +20,6 @@ func (err ParseError) Unwrap() error {
 	return err.err
 }
 
-func (ParseError) Is(target error) bool {
-	switch target.(type) {
-	case ParseError, *ParseError:
-		return true
-	default:
-		return false
-	}
-}
-
 type InvalidValueError[T ~string] struct {
 	value      T
 	annotation string
@@ -48,15 +39,6 @@ func (err InvalidValueError[T]) Error() string {
 	)
 }
 
-func (InvalidValueError[T]) Is(target error) bool {
-	switch target.(type) {
-	case InvalidValueError[T], *InvalidValueError[T]:
-		return true
-	default:
-		return false
-	}
-}
-
 type EmptyContainerNameError struct {
 	annotation string
 	value      string
@@ -72,13 +54,4 @@ func (err EmptyContainerNameError) Error() string {
 		err.value,
 		err.annotation,
 	)
-}
-
-func (EmptyContainerNameError) Is(target error) bool {
-	switch target.(type) {
-	case EmptyContainerNameError, *EmptyContainerNameError:
-		return true
-	default:
-		return false
-	}
 }

@@ -17,21 +17,25 @@ func (s *ValidateTestSuite) TestEmptyName() {
 	rel := release.NewConfig()
 	rel.NameF = ""
 
-	s.Require().ErrorIs(release.ErrNameEmpty, rel.Validate())
+	s.Require().ErrorIs(rel.Validate(), release.ErrNameEmpty)
 }
 
 func (s *ValidateTestSuite) TestInvalidNamespace() {
 	rel := release.NewConfig()
 	rel.NamespaceF = "///"
 
-	s.Require().ErrorIs(release.InvalidNamespaceError{}, rel.Validate())
+	var e *release.InvalidNamespaceError
+	s.Require().ErrorAs(rel.Validate(), &e)
+	s.Equal(rel.NamespaceF, e.Namespace)
 }
 
 func (s *ValidateTestSuite) TestInvalidUniq() {
 	rel := release.NewConfig()
 	rel.NameF = "bla@bla"
 
-	s.Require().ErrorIs(uniqname.ValidationError{}, rel.Validate())
+	var e *uniqname.ValidationError
+	s.Require().ErrorAs(rel.Validate(), &e)
+	s.Equal(rel.Uniq().String(), e.Uniq)
 }
 
 func TestValidateTestSuite(t *testing.T) {
