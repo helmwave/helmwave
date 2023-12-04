@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -187,10 +188,8 @@ func (rel *config) getChartRepoEntryFromIndex(u, repositoryCache string) (*repo.
 
 	for _, entry := range i.Entries {
 		for _, ver := range entry {
-			for _, dl := range ver.URLs {
-				if u == dl {
-					return ver, nil
-				}
+			if slices.Contains(ver.URLs, u) {
+				return ver, nil
 			}
 		}
 	}
