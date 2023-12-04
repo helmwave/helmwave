@@ -1,6 +1,0 @@
-kind: New feature
-body: Add new flag `--cache-dir` to specify base cache dir for helmwave
-time: 2023-09-26T01:44:20.766181+04:00
-custom:
-  Author: r3nic1e
-  Issue: "741"
