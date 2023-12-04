@@ -2,10 +2,12 @@ package action
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -386,4 +388,39 @@ func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
 
 	var e *hooks.CommandRunError
 	ts.Require().ErrorAs(err, &e)
+}
+
+func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
+	tmpDir := ts.T().TempDir()
+	d, err := os.Getwd()
+	ts.Require().NoError(err)
+
+	ts.Require().NoError(os.Chdir(tmpDir))
+	ts.T().Cleanup(func() {
+		ts.Require().NoError(os.Chdir(d))
+	})
+
+	y := &Yml{
+		tpl:       filepath.Join("tests", "02_helmwave.yml"),
+		file:      filepath.Join("tests", "02_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: plan.Dir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		remoteSource: "github.com/helmwave/helmwave",
+		yml:          y,
+	}
+
+	cache.DefaultConfig.Home = ts.T().TempDir()
+
+	err = s.Run(context.Background())
+	ts.Require().NoError(err)
+
+	ts.DirExists(filepath.Join(tmpDir, s.plandir))
+	ts.FileExists(filepath.Join(tmpDir, s.plandir, plan.File))
 }
