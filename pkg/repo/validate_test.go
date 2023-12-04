@@ -36,7 +36,7 @@ func (s *ValidateTestSuite) TestInvalidURL() {
 	rep.Entry.URL = "\\asdasd://null"
 
 	var e *repo.InvalidURLError
-	s.ErrorAs(rep.Validate(), &e)
+	s.Require().ErrorAs(rep.Validate(), &e)
 	s.Equal(rep.Entry.URL, e.URL)
 }
 

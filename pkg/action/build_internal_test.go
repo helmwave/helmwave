@@ -175,8 +175,8 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 	ts.Require().ErrorAs(sfailByTag.Run(context.Background()), &e)
 	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
 
-	ts.NoError(sa.Run(context.Background()))
-	ts.NoError(sb.Run(context.Background()))
+	ts.Require().NoError(sa.Run(context.Background()))
+	ts.Require().NoError(sb.Run(context.Background()))
 }
 
 func (ts *BuildTestSuite) TestRepositories() {

@@ -22,6 +22,7 @@ func (s *ValidateTestSuite) TestGood() {
 	}
 }
 
+//nolint:testifylint
 func (s *ValidateTestSuite) TestBad() {
 	data := []string{
 		"my-release",
