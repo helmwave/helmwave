@@ -21,21 +21,23 @@ func (s *ValidateTestSuite) TestEmptyName() {
 	rep := repo.NewConfig()
 	rep.Entry.Name = ""
 
-	s.Require().ErrorIs(repo.ErrNameEmpty, rep.Validate())
+	s.Require().ErrorIs(rep.Validate(), repo.ErrNameEmpty)
 }
 
 func (s *ValidateTestSuite) TestEmptyURL() {
 	rep := repo.NewConfig()
 	rep.Entry.URL = ""
 
-	s.Require().ErrorIs(repo.ErrURLEmpty, rep.Validate())
+	s.Require().ErrorIs(rep.Validate(), repo.ErrURLEmpty)
 }
 
 func (s *ValidateTestSuite) TestInvalidURL() {
 	rep := repo.NewConfig()
 	rep.Entry.URL = "\\asdasd://null"
 
-	s.Require().ErrorIs(repo.InvalidURLError{}, rep.Validate())
+	var e *repo.InvalidURLError
+	s.Require().ErrorAs(rep.Validate(), &e)
+	s.Equal(rep.Entry.URL, e.URL)
 }
 
 func (s *ValidateTestSuite) TestValid() {

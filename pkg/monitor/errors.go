@@ -15,29 +15,20 @@ var (
 	ErrLowInterval = errors.New("interval cannot be zero")
 )
 
-type MonitorInitError struct {
+type InitError struct {
 	Err error
 }
 
 func NewMonitorInitError(err error) error {
-	return &MonitorInitError{Err: err}
+	return &InitError{Err: err}
 }
 
-func (err MonitorInitError) Error() string {
+func (err InitError) Error() string {
 	return fmt.Sprintf("monitor failed to initialize: %s", err.Err)
 }
 
-func (err MonitorInitError) Unwrap() error {
+func (err InitError) Unwrap() error {
 	return err.Err
-}
-
-func (MonitorInitError) Is(target error) bool {
-	switch target.(type) {
-	case MonitorInitError, *MonitorInitError:
-		return true
-	default:
-		return false
-	}
 }
 
 type YAMLDecodeError struct {
@@ -56,15 +47,6 @@ func (err YAMLDecodeError) Unwrap() error {
 	return err.Err
 }
 
-func (YAMLDecodeError) Is(target error) bool {
-	switch target.(type) {
-	case YAMLDecodeError, *YAMLDecodeError:
-		return true
-	default:
-		return false
-	}
-}
-
 type DuplicateError struct {
 	Name string
 }
@@ -77,15 +59,6 @@ func (err DuplicateError) Error() string {
 	return fmt.Sprintf("monitor duplicate: %s", err.Name)
 }
 
-func (DuplicateError) Is(target error) bool {
-	switch target.(type) {
-	case DuplicateError, *DuplicateError:
-		return true
-	default:
-		return false
-	}
-}
-
 type NotExistsError struct {
 	Name string
 }
@@ -96,15 +69,6 @@ func NewNotExistsError(name string) error {
 
 func (err NotExistsError) Error() string {
 	return fmt.Sprintf("monitor doesn't exist: %s", err.Name)
-}
-
-func (NotExistsError) Is(target error) bool {
-	switch target.(type) {
-	case NotExistsError, *NotExistsError:
-		return true
-	default:
-		return false
-	}
 }
 
 type SubMonitorError struct {
@@ -121,13 +85,4 @@ func (err SubMonitorError) Error() string {
 
 func (err SubMonitorError) Unwrap() error {
 	return err.Err
-}
-
-func (SubMonitorError) Is(target error) bool {
-	switch target.(type) {
-	case SubMonitorError, *SubMonitorError:
-		return true
-	default:
-		return false
-	}
 }

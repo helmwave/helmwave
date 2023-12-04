@@ -30,7 +30,9 @@ func (s *ConfigTestSuite) TestConfigInvalidUniq() {
 	r.NameF = "redis"
 	r.NamespaceF = ""
 
-	s.Require().ErrorIs(r.Uniq().Validate(), uniqname.ValidationError{})
+	var e *uniqname.ValidationError
+	s.Require().ErrorAs(r.Uniq().Validate(), &e)
+	s.Equal(r.Uniq().String(), e.Uniq)
 }
 
 func (s *ConfigTestSuite) TestDependsOn() {

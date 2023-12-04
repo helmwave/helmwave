@@ -54,7 +54,10 @@ func (ts *InstallTestSuite) TestInstallExistingNotSame() {
 
 	err := rep1.Install(context.Background(), settings, f)
 
-	ts.Require().ErrorIs(err, repo.DuplicateError{})
-	ts.Require().Contains(f.Repositories, &rep2.Entry)
-	ts.Require().NotContains(f.Repositories, &rep1.Entry)
+	var e *repo.DuplicateError
+	ts.Require().ErrorAs(err, &e)
+	ts.Equal(rep1.Name(), e.Name)
+
+	ts.Contains(f.Repositories, &rep2.Entry)
+	ts.NotContains(f.Repositories, &rep1.Entry)
 }

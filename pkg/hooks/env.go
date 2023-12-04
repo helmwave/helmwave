@@ -9,19 +9,19 @@ import (
 )
 
 const (
-	ENV_RELEASE_UNIQNAME = "HELMWAVE_LIFECYCLE_RELEASE_UNIQNAME"
-	ENV_LIFECYCLE_TYPE   = "HELMWAVE_LIFECYCLE_TYPE"
+	EnvReleaseUniqname = "HELMWAVE_LIFECYCLE_RELEASE_UNIQNAME"
+	EnvLifecycleType   = "HELMWAVE_LIFECYCLE_TYPE"
 )
 
 func (h *hook) getCommandEnviron(ctx context.Context) []string {
 	env := os.Environ()
 
 	if uniq, exists := helper.ContextGetReleaseUniq(ctx); exists {
-		env = addToEnviron(env, ENV_RELEASE_UNIQNAME, uniq.String())
+		env = addToEnviron(env, EnvReleaseUniqname, uniq.String())
 	}
 
 	if typ, exists := helper.ContextGetLifecycleType(ctx); exists {
-		env = addToEnviron(env, ENV_LIFECYCLE_TYPE, typ)
+		env = addToEnviron(env, EnvLifecycleType, typ)
 	}
 
 	return env

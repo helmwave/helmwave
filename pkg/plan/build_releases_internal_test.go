@@ -172,8 +172,12 @@ func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
 	p.SetReleases(rel1, rel2)
 
 	releases, err := p.buildReleases(tags, true)
-	ts.Require().ErrorIs(err, release.DuplicateError{})
-	ts.Require().Empty(releases)
+
+	var e *release.DuplicateError
+	ts.Require().ErrorAs(err, &e)
+	ts.Equal(u, e.Uniq)
+
+	ts.Empty(releases)
 
 	rel1.AssertExpectations(ts.T())
 	rel2.AssertExpectations(ts.T())

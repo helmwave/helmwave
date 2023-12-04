@@ -2,12 +2,15 @@ package action
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -50,27 +53,6 @@ func (ts *BuildTestSuite) TestYmlError() {
 		options: plan.BuildOptions{
 			MatchAll: true,
 		},
-	}
-
-	ts.Require().Error(s.Run(context.Background()))
-}
-
-func (ts *BuildTestSuite) TestInvalidCacheDir() {
-	tmpDir := ts.T().TempDir()
-	y := &Yml{
-		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
-		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
-	}
-
-	s := &Build{
-		plandir: tmpDir,
-		yml:     y,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		chartsCacheDir: "/proc/1/bla",
 	}
 
 	ts.Require().Error(s.Run(context.Background()))
@@ -167,8 +149,13 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 	err = sb.tags.Set("nginx-b")
 	ts.Require().NoError(err)
 
-	ts.Require().ErrorIs(sfail.Run(context.Background()), release.DuplicateError{})
-	ts.Require().ErrorIs(sfailByTag.Run(context.Background()), release.DuplicateError{})
+	var e *release.DuplicateError
+	ts.Require().ErrorAs(sfail.Run(context.Background()), &e)
+	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
+
+	ts.Require().ErrorAs(sfailByTag.Run(context.Background()), &e)
+	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
+
 	ts.Require().NoError(sa.Run(context.Background()))
 	ts.Require().NoError(sb.Run(context.Background()))
 }
@@ -398,5 +385,42 @@ func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
 	}
 
 	err := s.Run(context.Background())
-	ts.Require().ErrorIs(err, hooks.CommandRunError{})
+
+	var e *hooks.CommandRunError
+	ts.Require().ErrorAs(err, &e)
+}
+
+func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
+	tmpDir := ts.T().TempDir()
+	d, err := os.Getwd()
+	ts.Require().NoError(err)
+
+	ts.Require().NoError(os.Chdir(tmpDir))
+	ts.T().Cleanup(func() {
+		ts.Require().NoError(os.Chdir(d))
+	})
+
+	y := &Yml{
+		tpl:       filepath.Join("tests", "02_helmwave.yml"),
+		file:      filepath.Join("tests", "02_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: plan.Dir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		remoteSource: "github.com/helmwave/helmwave",
+		yml:          y,
+	}
+
+	cache.DefaultConfig.Home = ts.T().TempDir()
+
+	err = s.Run(context.Background())
+	ts.Require().NoError(err)
+
+	ts.DirExists(filepath.Join(tmpDir, s.plandir))
+	ts.FileExists(filepath.Join(tmpDir, s.plandir, plan.File))
 }

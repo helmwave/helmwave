@@ -20,8 +20,7 @@ func TestMultitrackTestSuite(t *testing.T) {
 }
 
 func (s *MultitrackTestSuite) TestNoResources() {
-	res := []kubedog.Resource{}
-	spec, err := kubedog.MakeSpecs(res, "", false)
+	spec, err := kubedog.MakeSpecs(nil, "", false)
 
 	s.Require().NoError(err)
 
@@ -247,7 +246,9 @@ func (s *MultitrackTestSuite) TestAnnotationSkipLogsInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.ParseError{})
+
+	var e *kubedog.ParseError
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationShowEventsInvalid() {
@@ -265,7 +266,9 @@ func (s *MultitrackTestSuite) TestAnnotationShowEventsInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.ParseError{})
+
+	var e *kubedog.ParseError
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationLogRegexInvalid() {
@@ -283,7 +286,9 @@ func (s *MultitrackTestSuite) TestAnnotationLogRegexInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.ParseError{})
+
+	var e *kubedog.ParseError
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationFailuresAllowedPerReplicaInvalid() {
@@ -301,7 +306,9 @@ func (s *MultitrackTestSuite) TestAnnotationFailuresAllowedPerReplicaInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.ParseError{})
+
+	var e *kubedog.ParseError
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationFailuresAllowedPerReplicaMultiply() {
@@ -347,7 +354,9 @@ func (s *MultitrackTestSuite) TestAnnotationTrackTerminationModeInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.InvalidValueError[multitrack.TrackTerminationMode]{})
+
+	var e *kubedog.InvalidValueError[multitrack.TrackTerminationMode]
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationFailModeInvalid() {
@@ -365,7 +374,9 @@ func (s *MultitrackTestSuite) TestAnnotationFailModeInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.InvalidValueError[multitrack.FailMode]{})
+
+	var e *kubedog.InvalidValueError[multitrack.FailMode]
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationSkipLogsForContainersInvalid() {
@@ -383,7 +394,9 @@ func (s *MultitrackTestSuite) TestAnnotationSkipLogsForContainersInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.EmptyContainerNameError{})
+
+	var e *kubedog.EmptyContainerNameError
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationShowLogsOnlyForContainersInvalid() {
@@ -401,7 +414,9 @@ func (s *MultitrackTestSuite) TestAnnotationShowLogsOnlyForContainersInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.EmptyContainerNameError{})
+
+	var e *kubedog.EmptyContainerNameError
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationLogRegexForInvalid() {
@@ -419,7 +434,9 @@ func (s *MultitrackTestSuite) TestAnnotationLogRegexForInvalid() {
 	}
 
 	_, err := kubedog.MakeSpecs([]kubedog.Resource{res}, "", false)
-	s.Require().ErrorIs(err, kubedog.ParseError{})
+
+	var e *kubedog.ParseError
+	s.Require().ErrorAs(err, &e)
 }
 
 func (s *MultitrackTestSuite) TestAnnotationLogRegexForEmptyContainer() {

@@ -3,8 +3,8 @@ package repo
 import "slices"
 
 // Equal checks repo configs to have equal names.
-func (rep *config) Equal(a Config) bool {
-	return rep.Name() == a.Name()
+func (c *config) Equal(a Config) bool {
+	return c.Name() == a.Name()
 }
 
 // IndexOfName searches repository in slice of repositories by name. Returns offset.

@@ -31,5 +31,6 @@ func (ts *InstallTestSuite) TestInstallPrivateError() {
 
 	err := reg.Install()
 
-	ts.Require().ErrorIs(err, registry.LoginError{})
+	var e *registry.LoginError
+	ts.Require().ErrorAs(err, &e)
 }

@@ -27,12 +27,6 @@ const (
 	// ShowLogsOnlyForContainersAnnoName allows to show logs only for specified containers.
 	ShowLogsOnlyForContainersAnnoName = helper.RootAnnoName + "show-logs-only-for-containers"
 
-	// ShowLogsUntilAnnoName is unused.
-	ShowLogsUntilAnnoName = helper.RootAnnoName + "show-logs-until"
-
 	// ShowEventsAnnoName enables streaming resource events.
 	ShowEventsAnnoName = helper.RootAnnoName + "show-service-messages"
-
-	// ReplicasOnCreationAnnoName is unused.
-	ReplicasOnCreationAnnoName = helper.RootAnnoName + "replicas-on-creation"
 )

@@ -121,11 +121,10 @@ func (s *ValuesTestSuite) TestJSONSchema() {
 
 	s.Require().NotNil(schema)
 
-	keys := schema.Properties.Keys()
-	s.Require().Contains(keys, "src")
-	s.Require().Contains(keys, "dst")
-	s.Require().Contains(keys, "delimiter_left")
-	s.Require().Contains(keys, "delimiter_right")
-	s.Require().Contains(keys, "strict")
-	s.Require().Contains(keys, "renderer")
+	s.NotNil(schema.Properties.GetPair("src"))
+	s.NotNil(schema.Properties.GetPair("dst"))
+	s.NotNil(schema.Properties.GetPair("delimiter_left"))
+	s.NotNil(schema.Properties.GetPair("delimiter_right"))
+	s.NotNil(schema.Properties.GetPair("strict"))
+	s.NotNil(schema.Properties.GetPair("renderer"))
 }

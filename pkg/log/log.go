@@ -54,7 +54,7 @@ func (l *Settings) Flags() []cli.Flag {
 }
 
 // Run initializes logger.
-func (l *Settings) Run(c *cli.Context) error {
+func (l *Settings) Run(_ *cli.Context) error {
 	return l.Init()
 }
 

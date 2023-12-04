@@ -33,7 +33,7 @@ func NewConfig() *Config {
 	}
 }
 
-func (c *Config) Init(ctx context.Context, logger *log.Entry) error {
+func (c *Config) Init(_ context.Context, logger *log.Entry) error {
 	c.client = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{

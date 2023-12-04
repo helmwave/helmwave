@@ -23,15 +23,6 @@ func (err RequestError) Unwrap() error {
 	return err.Err
 }
 
-func (RequestError) Is(target error) bool {
-	switch target.(type) {
-	case RequestError, *RequestError:
-		return true
-	default:
-		return false
-	}
-}
-
 type ResponseError struct {
 	Err error
 }
@@ -48,15 +39,6 @@ func (err ResponseError) Unwrap() error {
 	return err.Err
 }
 
-func (ResponseError) Is(target error) bool {
-	switch target.(type) {
-	case ResponseError, *ResponseError:
-		return true
-	default:
-		return false
-	}
-}
-
 type UnexpectedStatusError struct {
 	StatusCode int
 }
@@ -67,13 +49,4 @@ func NewUnexpectedStatusError(status int) error {
 
 func (err UnexpectedStatusError) Error() string {
 	return fmt.Sprintf("unexpected status code %d", err.StatusCode)
-}
-
-func (UnexpectedStatusError) Is(target error) bool {
-	switch target.(type) {
-	case UnexpectedStatusError, *UnexpectedStatusError:
-		return true
-	default:
-		return false
-	}
 }

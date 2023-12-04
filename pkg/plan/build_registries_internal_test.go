@@ -69,8 +69,11 @@ func (ts *BuildRegistriesTestSuite) TestMissingRegistry() {
 
 	repos, err := p.buildRegistries()
 
-	ts.Require().ErrorIs(err, registry.NotFoundError{})
-	ts.Require().Empty(repos)
+	var e *registry.NotFoundError
+	ts.Require().ErrorAs(err, &e)
+	ts.Equal(regiName, e.Host)
+
+	ts.Empty(repos)
 
 	mockedRelease.AssertExpectations(ts.T())
 }

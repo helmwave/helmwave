@@ -109,7 +109,7 @@ func GenSchema() *jsonschema.Schema {
 }
 
 // NewBody parses plan from file.
-func NewBody(ctx context.Context, file string, validate bool) (*planBody, error) {
+func NewBody(_ context.Context, file string, validate bool) (*planBody, error) {
 	b := &planBody{
 		Version: version.Version,
 	}

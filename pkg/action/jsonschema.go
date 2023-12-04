@@ -15,7 +15,7 @@ var _ Action = (*GenSchema)(nil)
 type GenSchema struct{}
 
 // Run is the main function for 'GenSchema' command.
-func (i *GenSchema) Run(ctx context.Context) error {
+func (i *GenSchema) Run(_ context.Context) error {
 	s, err := json.Marshal(plan.GenSchema())
 	if err != nil {
 		return err

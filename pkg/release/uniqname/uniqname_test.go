@@ -22,6 +22,7 @@ func (s *ValidateTestSuite) TestGood() {
 	}
 }
 
+//nolint:testifylint
 func (s *ValidateTestSuite) TestBad() {
 	data := []string{
 		"my-release",
@@ -36,7 +37,10 @@ func (s *ValidateTestSuite) TestBad() {
 	}
 
 	for _, d := range data {
-		s.Require().ErrorIs(uniqname.UniqName(d).Validate(), uniqname.ValidationError{})
+		u := uniqname.UniqName(d)
+		var e *uniqname.ValidationError
+		s.ErrorAs(u.Validate(), &e)
+		s.Equal(d, e.Uniq)
 	}
 }
 

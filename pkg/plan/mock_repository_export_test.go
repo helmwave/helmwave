@@ -14,7 +14,7 @@ type MockRepositoryConfig struct {
 	mock.Mock
 }
 
-func (r *MockRepositoryConfig) Equal(repo.Config) bool {
+func (r *MockRepositoryConfig) Equal(_ repo.Config) bool {
 	return r.Called().Bool(0)
 }
 

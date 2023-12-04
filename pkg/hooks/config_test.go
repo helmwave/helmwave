@@ -30,9 +30,8 @@ func (s *ConfigTestSuite) TestHookJSONSchema() {
 
 	s.Require().NotNil(schema)
 
-	keys := schema.Properties.Keys()
-	s.Require().Contains(keys, "cmd")
-	s.Require().Contains(keys, "args")
-	s.Require().Contains(keys, "show")
-	s.Require().Contains(keys, "allow_failure")
+	s.NotNil(schema.Properties.GetPair("cmd"))
+	s.NotNil(schema.Properties.GetPair("args"))
+	s.NotNil(schema.Properties.GetPair("show"))
+	s.NotNil(schema.Properties.GetPair("allow_failure"))
 }

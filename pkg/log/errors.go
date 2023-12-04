@@ -15,15 +15,6 @@ func (err InvalidLogLevelError) Error() string {
 	return fmt.Sprintf("failed to parse log level %q: %s", err.Level, err.Err)
 }
 
-func (InvalidLogLevelError) Is(target error) bool {
-	switch target.(type) {
-	case InvalidLogLevelError, *InvalidLogLevelError:
-		return true
-	default:
-		return false
-	}
-}
-
 func (err InvalidLogLevelError) Unwrap() error {
 	return err.Err
 }

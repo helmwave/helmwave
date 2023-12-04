@@ -19,7 +19,7 @@ type MockReleaseConfig struct {
 	mock.Mock
 }
 
-func (r *MockReleaseConfig) SetChartName(s string) {
+func (r *MockReleaseConfig) SetChartName(_ string) {
 	r.Called()
 }
 
@@ -68,7 +68,7 @@ func (r *MockReleaseConfig) ChartDepsUpd() error {
 	return r.Called().Error(0)
 }
 
-func (r *MockReleaseConfig) Equal(release.Config) bool {
+func (r *MockReleaseConfig) Equal(_ release.Config) bool {
 	return r.Called().Bool(0)
 }
 
@@ -166,7 +166,7 @@ func (r *MockReleaseConfig) DownloadChart(string) error {
 	return r.Called().Error(0)
 }
 
-func (r *MockReleaseConfig) SetChart(string) {}
+func (r *MockReleaseConfig) SetChart(_ string) {}
 
 func (r *MockReleaseConfig) KubeContext() string {
 	return r.Called().String(0)
