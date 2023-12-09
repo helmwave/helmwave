@@ -13,6 +13,12 @@ import (
 	"helm.sh/helm/v3/pkg/postrender"
 )
 
+type configTests struct {
+	Enabled       bool                `yaml:"enabled,omitempty" json:"enabled,omitempty" jsonschema:"description=Whether to run helm tests,default=false"`
+	Filters       map[string][]string `yaml:"filters,omitempty" json:"filters,omitempty" jsonschema:"description=Filter tests by attributes,default={}"`
+	ForceShowLogs bool                `yaml:"force_show_logs,omitempty" json:"force_show_logs,omitempty" jsonschema:"description=Always show tests logs, not only if they failed,default=false"'`
+}
+
 type config struct {
 	helm *helm.EnvSettings
 	log  *log.Entry
@@ -36,6 +42,7 @@ type config struct {
 	Labels        map[string]string     `yaml:"labels,omitempty" json:"labels,omitempty" jsonschema:"Labels that would be added to release metadata on sync"`
 	PostRendererF []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
 	ShowNotes     bool                  `yaml:"show_notes,omitempty" json:"show_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install"`
+	Tests         configTests           `yaml:"tests,omitempty" json:"tests,omitempty" jsonschema:"description=Configuration for helm tests"`
 
 	Timeout time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;int,default=5m"`
 
