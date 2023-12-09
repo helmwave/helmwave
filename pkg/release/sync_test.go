@@ -18,9 +18,18 @@ import (
 
 type SyncTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
-func (s *SyncTestSuite) SetupSuite() {
+func TestSyncTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(SyncTestSuite))
+}
+
+func (ts *SyncTestSuite) SetupSuite() {
+	ts.ctx = tests.GetContext(ts.T())
+
 	var rs repo.Configs
 	str := `
 - name: prometheus-community
@@ -30,14 +39,14 @@ func (s *SyncTestSuite) SetupSuite() {
 `
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().NoError(err)
+	ts.Require().NoError(err)
 
-	s.Require().NoError(plan.SyncRepositories(context.Background(), rs))
+	ts.Require().NoError(plan.SyncRepositories(ts.ctx, rs))
 }
 
-func (s *SyncTestSuite) TestInstallUpgrade() {
+func (ts *SyncTestSuite) TestInstallUpgrade() {
 	rel := release.NewConfig()
-	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
+	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
@@ -45,43 +54,38 @@ func (s *SyncTestSuite) TestInstallUpgrade() {
 		Dst: filepath.Join(tests.Root, "06_values.yaml"),
 	})
 
-	r, err := rel.Sync(context.Background())
-	s.Require().NoError(err)
-	s.Require().NotNil(r)
+	r, err := rel.Sync(ts.ctx)
+	ts.Require().NoError(err)
+	ts.Require().NotNil(r)
 
-	r, err = rel.Sync(context.Background())
-	s.Require().NoError(err)
-	s.Require().NotNil(r)
+	r, err = rel.Sync(ts.ctx)
+	ts.Require().NoError(err)
+	ts.Require().NotNil(r)
 }
 
-func (s *SyncTestSuite) TestInvalidValues() {
+func (ts *SyncTestSuite) TestInvalidValues() {
 	rel := release.NewConfig()
-	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
+	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{})
 
-	r, err := rel.Sync(context.Background())
-	s.Require().Error(err)
-	s.Require().Nil(r)
+	r, err := rel.Sync(ts.ctx)
+	ts.Require().Error(err)
+	ts.Require().Nil(r)
 }
 
-func (s *SyncTestSuite) TestSyncWithoutCRD() {
+func (ts *SyncTestSuite) TestSyncWithoutCRD() {
 	rel := release.NewConfig()
-	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
+	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
 	rel.Wait = false
 	rel.ChartF.Name = "prometheus-community/kube-prometheus-stack"
 
 	rel.DryRun(true)
 
-	r, err := rel.Sync(context.Background())
-	s.Require().NoError(err)
-	s.Require().NotNil(r)
-}
-
-func TestSyncTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(SyncTestSuite))
+	r, err := rel.Sync(ts.ctx)
+	ts.Require().NoError(err)
+	ts.Require().NotNil(r)
 }

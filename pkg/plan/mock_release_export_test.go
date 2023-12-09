@@ -47,7 +47,7 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	return u
 }
 
-func (r *MockReleaseConfig) Sync(context.Context) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) Sync(_ context.Context) (*helmRelease.Release, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
@@ -72,7 +72,7 @@ func (r *MockReleaseConfig) Equal(_ release.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockReleaseConfig) BuildValues(dir, templater string) error {
+func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater string) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn
@@ -81,7 +81,7 @@ func (r *MockReleaseConfig) BuildValues(dir, templater string) error {
 	for i := len(r.Values()) - 1; i >= 0; i-- {
 		v := r.Values()[i]
 		dst := filepath.Join(dir, Values, filepath.Base(v.Src))
-		err := template.Tpl2yml(v.Src, dst, nil, templater)
+		err := template.Tpl2yml(ctx, v.Src, dst, nil, templater)
 		if err != nil {
 			return err
 		}

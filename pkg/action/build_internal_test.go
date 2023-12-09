@@ -24,11 +24,17 @@ import (
 
 type BuildTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestBuildTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(BuildTestSuite))
+}
+
+func (ts *BuildTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
 }
 
 func (ts *BuildTestSuite) TestCmd() {
@@ -55,7 +61,7 @@ func (ts *BuildTestSuite) TestYmlError() {
 		},
 	}
 
-	ts.Require().Error(s.Run(context.Background()))
+	ts.Require().Error(s.Run(ts.ctx))
 }
 
 func (ts *BuildTestSuite) TestManifest() {
@@ -75,7 +81,7 @@ func (ts *BuildTestSuite) TestManifest() {
 		},
 	}
 
-	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().NoError(s.Run(ts.ctx))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
@@ -150,14 +156,14 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 	ts.Require().NoError(err)
 
 	var e *release.DuplicateError
-	ts.Require().ErrorAs(sfail.Run(context.Background()), &e)
+	ts.Require().ErrorAs(sfail.Run(ts.ctx), &e)
 	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
 
-	ts.Require().ErrorAs(sfailByTag.Run(context.Background()), &e)
+	ts.Require().ErrorAs(sfailByTag.Run(ts.ctx), &e)
 	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
 
-	ts.Require().NoError(sa.Run(context.Background()))
-	ts.Require().NoError(sb.Run(context.Background()))
+	ts.Require().NoError(sa.Run(ts.ctx))
+	ts.Require().NoError(sb.Run(ts.ctx))
 }
 
 func (ts *BuildTestSuite) TestRepositories() {
@@ -177,10 +183,10 @@ func (ts *BuildTestSuite) TestRepositories() {
 		},
 	}
 
-	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().NoError(s.Run(ts.ctx))
 
 	const rep = "bitnami"
-	b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File), true)
+	b, _ := plan.NewBody(ts.ctx, filepath.Join(s.plandir, plan.File), true)
 
 	if _, found := repo.IndexOfName(b.Repositories, rep); !found {
 		ts.Failf("%q not found", rep)
@@ -219,9 +225,9 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 			},
 		}
 
-		ts.Require().NoError(s.Run(context.Background()))
+		ts.Require().NoError(s.Run(ts.ctx))
 
-		b, _ := plan.NewBody(context.Background(), filepath.Join(s.plandir, plan.File), true)
+		b, _ := plan.NewBody(ts.ctx, filepath.Join(s.plandir, plan.File), true)
 
 		names := make([]string, 0, len(b.Releases))
 		for _, r := range b.Releases {
@@ -252,8 +258,8 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 		diffMode: DiffModeLocal,
 	}
 
-	ts.Require().NoError(s.Run(context.Background()), "build should not fail without diffing")
-	ts.Require().NoError(s.Run(context.Background()), "build should not fail with diffing with previous plan")
+	ts.Require().NoError(s.Run(ts.ctx), "build should not fail without diffing")
+	ts.Require().NoError(s.Run(ts.ctx), "build should not fail with diffing with previous plan")
 }
 
 type NonParallelBuildTestSuite struct {
@@ -261,12 +267,18 @@ type NonParallelBuildTestSuite struct {
 
 	defaultHooks log.LevelHooks
 	logHook      *logTest.Hook
+
+	ctx context.Context
 }
 
 //nolint:paralleltest // can't parallel because of setenv and uses helm repository.yaml flock
 func TestNonParallelNonParallelBuildTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(NonParallelBuildTestSuite))
+}
+
+func (ts *NonParallelBuildTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
 }
 
 func (ts *NonParallelBuildTestSuite) SetupSuite() {
@@ -312,7 +324,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
-	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().NoError(s.Run(ts.ctx))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
@@ -334,7 +346,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 		yml:     y,
 	}
 
-	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().NoError(s.Run(ts.ctx))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 }
 
@@ -356,7 +368,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 		yml:     y,
 	}
 
-	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().NoError(s.Run(ts.ctx))
 	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
 
 	logMessages := ts.getLoggerMessages()
@@ -384,7 +396,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
 		yml:     y,
 	}
 
-	err := s.Run(context.Background())
+	err := s.Run(ts.ctx)
 
 	var e *hooks.CommandRunError
 	ts.Require().ErrorAs(err, &e)
@@ -418,7 +430,7 @@ func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
 
 	cache.DefaultConfig.Home = ts.T().TempDir()
 
-	err = s.Run(context.Background())
+	err = s.Run(ts.ctx)
 	ts.Require().NoError(err)
 
 	ts.DirExists(filepath.Join(tmpDir, s.plandir))

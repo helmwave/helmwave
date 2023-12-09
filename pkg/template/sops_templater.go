@@ -1,6 +1,8 @@
 package template
 
 import (
+	"context"
+
 	"go.mozilla.org/sops/v3/decrypt"
 )
 
@@ -14,7 +16,7 @@ func (t sopsTemplater) Name() string {
 	return TemplaterSOPS
 }
 
-func (t sopsTemplater) Render(src string, _ any) ([]byte, error) {
+func (t sopsTemplater) Render(_ context.Context, src string, _ any) ([]byte, error) {
 	data, err := decrypt.Data([]byte(src), "yaml")
 	if err != nil {
 		return nil, NewSOPSDecodeError(err)

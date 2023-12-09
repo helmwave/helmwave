@@ -8,12 +8,15 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
 )
 
 type ChartTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestChartTestSuite(t *testing.T) {
@@ -21,6 +24,8 @@ func TestChartTestSuite(t *testing.T) {
 }
 
 func (ts *ChartTestSuite) SetupSuite() {
+	ts.ctx = tests.GetContext(ts.T())
+
 	var rs repo.Configs
 	str := `
 - name: bitnami
@@ -31,7 +36,7 @@ func (ts *ChartTestSuite) SetupSuite() {
 	ts.Require().NoError(err)
 	ts.Require().Len(rs, 1)
 
-	ts.Require().NoError(plan.SyncRepositories(context.Background(), rs))
+	ts.Require().NoError(plan.SyncRepositories(ts.ctx, rs))
 }
 
 func (ts *ChartTestSuite) TestLocateChartLocal() {

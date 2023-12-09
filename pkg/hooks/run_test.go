@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -28,6 +29,8 @@ func (m *MockHook) Log() *log.Entry {
 
 type LifecycleRunTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestLifecycleRunTestSuite(t *testing.T) {
@@ -35,50 +38,53 @@ func TestLifecycleRunTestSuite(t *testing.T) {
 	suite.Run(t, new(LifecycleRunTestSuite))
 }
 
-func (s *LifecycleRunTestSuite) TestRunNoError() {
+func (ts *LifecycleRunTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *LifecycleRunTestSuite) TestRunNoError() {
 	hook := &MockHook{}
 	hook.On("Run").Return(nil)
 
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
-	ctx := context.Background()
 
-	err := lifecycle.RunPreBuild(ctx)
+	err := lifecycle.RunPreBuild(ts.ctx)
 
-	s.Require().NoError(err)
-	hook.AssertExpectations(s.T())
+	ts.Require().NoError(err)
+	hook.AssertExpectations(ts.T())
 }
 
-func (s *LifecycleRunTestSuite) TestRunError() {
+func (ts *LifecycleRunTestSuite) TestRunError() {
 	hook := &MockHook{}
 	errExpected := errors.New("test 123")
 	hook.On("Run").Return(errExpected)
-	hook.On("Log").Return(log.WithField("test", s.T().Name()))
+	hook.On("Log").Return(log.WithField("test", ts.T().Name()))
 
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
-	ctx := context.Background()
 
-	err := lifecycle.RunPreBuild(ctx)
+	err := lifecycle.RunPreBuild(ts.ctx)
 
-	s.Require().ErrorIs(err, errExpected)
-	hook.AssertExpectations(s.T())
+	ts.Require().ErrorIs(err, errExpected)
+	hook.AssertExpectations(ts.T())
 }
 
-func (s *LifecycleRunTestSuite) TestEmpty() {
+func (ts *LifecycleRunTestSuite) TestEmpty() {
 	lifecycle := hooks.Lifecycle{}
-	ctx := context.Background()
 
-	s.Require().NoError(lifecycle.RunPreBuild(ctx))
-	s.Require().NoError(lifecycle.RunPostBuild(ctx))
-	s.Require().NoError(lifecycle.RunPreUp(ctx))
-	s.Require().NoError(lifecycle.RunPostUp(ctx))
-	s.Require().NoError(lifecycle.RunPreDown(ctx))
-	s.Require().NoError(lifecycle.RunPostDown(ctx))
-	s.Require().NoError(lifecycle.RunPreRollback(ctx))
-	s.Require().NoError(lifecycle.RunPostRollback(ctx))
+	ts.Require().NoError(lifecycle.RunPreBuild(ts.ctx))
+	ts.Require().NoError(lifecycle.RunPostBuild(ts.ctx))
+	ts.Require().NoError(lifecycle.RunPreUp(ts.ctx))
+	ts.Require().NoError(lifecycle.RunPostUp(ts.ctx))
+	ts.Require().NoError(lifecycle.RunPreDown(ts.ctx))
+	ts.Require().NoError(lifecycle.RunPostDown(ts.ctx))
+	ts.Require().NoError(lifecycle.RunPreRollback(ts.ctx))
+	ts.Require().NoError(lifecycle.RunPostRollback(ts.ctx))
 }
 
 type HookRunTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestHookRunTestSuite(t *testing.T) {
@@ -86,39 +92,41 @@ func TestHookRunTestSuite(t *testing.T) {
 	suite.Run(t, new(HookRunTestSuite))
 }
 
-func (s *HookRunTestSuite) TestRunCanceledContext() {
+func (ts *HookRunTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *HookRunTestSuite) TestRunCanceledContext() {
 	hook := hooks.NewHook()
 	hook.Cmd = "id"
 
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ts.ctx)
 	cancel()
 
 	err := lifecycle.RunPreBuild(ctx)
 
-	s.Require().ErrorIs(err, context.Canceled)
+	ts.Require().ErrorIs(err, context.Canceled)
 }
 
-func (s *HookRunTestSuite) TestRunNoError() {
+func (ts *HookRunTestSuite) TestRunNoError() {
 	hook := hooks.NewHook()
 	hook.Cmd = "id"
 
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
-	ctx := context.Background()
 
-	err := lifecycle.RunPreBuild(ctx)
+	err := lifecycle.RunPreBuild(ts.ctx)
 
-	s.Require().NoError(err)
+	ts.Require().NoError(err)
 }
 
-func (s *HookRunTestSuite) TestRunWrongCommand() {
+func (ts *HookRunTestSuite) TestRunWrongCommand() {
 	hook := hooks.NewHook()
 	hook.Cmd = "id 123"
 
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
-	ctx := context.Background()
 
-	err := lifecycle.RunPreBuild(ctx)
+	err := lifecycle.RunPreBuild(ts.ctx)
 
-	s.Require().ErrorIs(err, exec.ErrNotFound)
+	ts.Require().ErrorIs(err, exec.ErrNotFound)
 }

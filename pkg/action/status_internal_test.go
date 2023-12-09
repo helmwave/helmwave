@@ -14,12 +14,18 @@ import (
 
 type StatusTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 //nolint:paralleltest // can't parallel because of setenv
 func TestStatusTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(StatusTestSuite))
+}
+
+func (ts *StatusTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
 }
 
 func (ts *StatusTestSuite) TestCmd() {
@@ -45,11 +51,11 @@ func (ts *StatusTestSuite) TestRun() {
 	value := strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	ts.T().Setenv("NAMESPACE", value)
 
-	ts.Require().NoError(r.Run(context.Background()))
+	ts.Require().NoError(r.Run(ts.ctx))
 
 	s := &Status{
 		build: r,
 	}
 
-	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().NoError(s.Run(ts.ctx))
 }

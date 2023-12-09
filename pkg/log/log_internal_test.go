@@ -1,10 +1,12 @@
 package log
 
 import (
+	"context"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/helmwave/helmwave/tests"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
@@ -16,13 +18,24 @@ import (
 type LogTestSuite struct {
 	suite.Suite
 
+	ctx          context.Context
 	defaultHooks log.LevelHooks
 	logHook      *logTest.Hook
+}
+
+//nolint:paralleltest // helmwave uses single logger for the whole program
+func TestLogTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(LogTestSuite))
 }
 
 func (ts *LogTestSuite) SetupSuite() {
 	ts.defaultHooks = log.StandardLogger().Hooks
 	ts.logHook = logTest.NewLocal(log.StandardLogger())
+}
+
+func (ts *LogTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
 }
 
 func (ts *LogTestSuite) TearDownTestSuite() {
@@ -188,12 +201,6 @@ func (ts *LogTestSuite) TestDefaultFormatter() {
 func (ts *LogTestSuite) TestLogboekWidth() {
 	width := 1
 
-	kubedog.FixLog(width)
+	kubedog.FixLog(ts.ctx, width)
 	ts.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
-}
-
-//nolint:paralleltest // helmwave uses single logger for the whole program
-func TestLogTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(LogTestSuite))
 }

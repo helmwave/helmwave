@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -14,6 +15,8 @@ import (
 
 type BuildManifestsTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestBuildManifestsTestSuite(t *testing.T) {
@@ -21,11 +24,15 @@ func TestBuildManifestsTestSuite(t *testing.T) {
 	suite.Run(t, new(BuildManifestsTestSuite))
 }
 
+func (ts *BuildManifestsTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
 func (ts *BuildManifestsTestSuite) TestEmptyReleases() {
 	p := New(".")
 	p.NewBody()
 
-	err := p.buildManifest(context.Background())
+	err := p.buildManifest(ts.ctx)
 
 	ts.Require().NoError(err)
 }
@@ -53,7 +60,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 
 	p.SetReleases(rel1, rel2)
 
-	err := p.buildManifest(context.Background())
+	err := p.buildManifest(ts.ctx)
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 2)
@@ -81,7 +88,7 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	err := p.buildManifest(ts.ctx)
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 1)
@@ -103,7 +110,7 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	err := p.buildManifest(ts.ctx)
 
 	ts.Require().ErrorIs(err, errExpected)
 
@@ -127,7 +134,7 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	err := p.buildManifest(ts.ctx)
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 1)
@@ -159,7 +166,7 @@ func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 
 	p.SetReleases(rel)
 
-	err := p.buildManifest(context.Background())
+	err := p.buildManifest(ts.ctx)
 
 	ts.Require().NoError(err)
 	ts.Require().Len(p.manifests, 1)

@@ -7,16 +7,28 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 )
 
 type DestroyTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
-func (s *DestroyTestSuite) TestDestroy() {
-	tmpDir := s.T().TempDir()
+func TestDestroyTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(DestroyTestSuite))
+}
+
+func (ts *DestroyTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *DestroyTestSuite) TestDestroy() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -27,41 +39,36 @@ func (s *DestroyTestSuite) TestDestroy() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Down(context.Background())
-	s.Require().NoError(err)
+	err := p.Down(ts.ctx)
+	ts.Require().NoError(err)
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *DestroyTestSuite) TestDestroyFailedRelease() {
-	tmpDir := s.T().TempDir()
+func (ts *DestroyTestSuite) TestDestroyFailedRelease() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
-	e := errors.New(s.T().Name())
+	e := errors.New(ts.T().Name())
 	mockedRelease.On("Uninstall").Return(&helmRelease.UninstallReleaseResponse{}, e)
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Down(context.Background())
-	s.Require().ErrorIs(err, e)
+	err := p.Down(ts.ctx)
+	ts.Require().ErrorIs(err, e)
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *DestroyTestSuite) TestDestroyNoReleases() {
-	tmpDir := s.T().TempDir()
+func (ts *DestroyTestSuite) TestDestroyNoReleases() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Down(context.Background())
-	s.Require().NoError(err)
-}
-
-func TestDestroyTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(DestroyTestSuite))
+	err := p.Down(ts.ctx)
+	ts.Require().NoError(err)
 }

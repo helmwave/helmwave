@@ -25,7 +25,7 @@ func SilenceKlogV2(ctx context.Context) error {
 	klogV2.SetOutputBySeverity("INFO", io.Discard)
 	klogV2.SetOutputBySeverity("WARNING", io.Discard)
 	klogV2.SetOutputBySeverity("ERROR", io.Discard)
-	klogV2.SetOutputBySeverity("FATAL", logboek.Context(ctx).ErrStream())
+	klogV2.SetOutputBySeverity("FATAL", logboek.DefaultLogger().ErrStream())
 
 	return nil
 }
@@ -43,7 +43,7 @@ func SilenceKlog(ctx context.Context) error {
 	klog.SetOutputBySeverity("INFO", io.Discard)
 	klog.SetOutputBySeverity("WARNING", io.Discard)
 	klog.SetOutputBySeverity("ERROR", io.Discard)
-	klog.SetOutputBySeverity("FATAL", logboek.Context(ctx).ErrStream())
+	klog.SetOutputBySeverity("FATAL", logboek.DefaultLogger().ErrStream())
 
 	return nil
 }
@@ -63,12 +63,12 @@ func silenceKlogFlagSet(fs *flag.FlagSet) error {
 }
 
 // FixLog will disable kubernetes logger and fix width for logboek.
-func FixLog(width int) {
-	if err := SilenceKlog(context.Background()); err != nil {
+func FixLog(ctx context.Context, width int) {
+	if err := SilenceKlog(ctx); err != nil {
 		log.Fatal(err)
 	}
 
-	if err := SilenceKlogV2(context.Background()); err != nil {
+	if err := SilenceKlogV2(ctx); err != nil {
 		log.Fatal(err)
 	}
 

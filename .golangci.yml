@@ -794,6 +794,7 @@ issues:
         - lll
     - path: _test\.go
       linters:
+        - containedctx
         - dupl
         - dupword
         - forcetypeassert
