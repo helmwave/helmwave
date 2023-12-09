@@ -17,12 +17,18 @@ import (
 
 type DownTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 //nolint:paralleltest // uses helm repository.yaml flock
 func TestDownTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DownTestSuite))
+}
+
+func (ts *DownTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
 }
 
 func (ts *DownTestSuite) TestCmd() {
@@ -51,16 +57,16 @@ func (ts *DownTestSuite) TestRun() {
 	d := Down{
 		build: s,
 	}
-	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist, "down should fail before build")
-	ts.Require().NoError(s.Run(context.Background()))
+	ts.Require().ErrorIs(d.Run(ts.ctx), os.ErrNotExist, "down should fail before build")
+	ts.Require().NoError(s.Run(ts.ctx))
 
 	u := &Up{
 		build: s,
 		dog:   &kubedog.Config{},
 	}
 
-	ts.Require().NoError(u.Run(context.Background()))
-	ts.Require().NoError(d.Run(context.Background()))
+	ts.Require().NoError(u.Run(ts.ctx))
+	ts.Require().NoError(d.Run(ts.ctx))
 }
 
 func (ts *DownTestSuite) TestIdempotency() {
@@ -86,7 +92,7 @@ func (ts *DownTestSuite) TestIdempotency() {
 		build: s,
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ts.ctx)
 	ts.T().Cleanup(cancel)
 
 	ts.Require().NoError(s.Run(ctx))

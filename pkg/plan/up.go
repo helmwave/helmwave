@@ -65,7 +65,7 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 
 	if dog.Enabled {
 		log.Warn("🐶 kubedog is enabled")
-		kubedog.FixLog(dog.LogWidth)
+		kubedog.FixLog(ctx, dog.LogWidth)
 		err = p.syncReleasesKubedog(ctx, dog)
 	} else {
 		err = p.syncReleases(ctx)

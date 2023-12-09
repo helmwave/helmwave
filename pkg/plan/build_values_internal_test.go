@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -8,15 +9,27 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
 
 type BuildValuesTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
-func (s *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
-	s.T().Helper()
+func TestBuildValuesTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(BuildValuesTestSuite))
+}
+
+func (ts *BuildValuesTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
+	ts.T().Helper()
 
 	p := New(filepath.Join(tmpDir, Dir))
 	p.templater = template.TemplaterSprig
@@ -24,21 +37,21 @@ func (s *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
 	return p
 }
 
-func (s *BuildValuesTestSuite) TestValuesEmpty() {
-	tmpDir := s.T().TempDir()
-	p := s.createPlan(tmpDir)
+func (ts *BuildValuesTestSuite) TestValuesEmpty() {
+	tmpDir := ts.T().TempDir()
+	p := ts.createPlan(tmpDir)
 
 	p.body = &planBody{}
 
-	s.Require().NoError(p.buildValues())
+	ts.Require().NoError(p.buildValues(ts.ctx))
 }
 
-func (s *BuildValuesTestSuite) TestValuesBuildError() {
-	tmpDir := s.T().TempDir()
-	p := s.createPlan(tmpDir)
+func (ts *BuildValuesTestSuite) TestValuesBuildError() {
+	tmpDir := ts.T().TempDir()
+	p := ts.createPlan(tmpDir)
 
 	tmpValues := filepath.Join(tmpDir, "blablavalues.yaml")
-	s.Require().NoError(os.WriteFile(tmpValues, []byte("a: b"), 0o600))
+	ts.Require().NoError(os.WriteFile(tmpValues, []byte("a: b"), 0o600))
 
 	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -55,18 +68,18 @@ func (s *BuildValuesTestSuite) TestValuesBuildError() {
 		Releases: release.Configs{mockedRelease},
 	}
 
-	s.Require().ErrorIs(p.buildValues(), errBuildValues)
-	mockedRelease.AssertExpectations(s.T())
+	ts.Require().ErrorIs(p.buildValues(ts.ctx), errBuildValues)
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *BuildValuesTestSuite) TestSuccess() {
-	tmpDir := s.T().TempDir()
-	p := s.createPlan(tmpDir)
+func (ts *BuildValuesTestSuite) TestSuccess() {
+	tmpDir := ts.T().TempDir()
+	p := ts.createPlan(tmpDir)
 
 	valuesName := "blablavalues.yaml"
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, valuesName)
-	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
+	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
 	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -81,11 +94,6 @@ func (s *BuildValuesTestSuite) TestSuccess() {
 		Releases: release.Configs{mockedRelease},
 	}
 
-	s.Require().NoError(p.buildValues())
-	mockedRelease.AssertExpectations(s.T())
-}
-
-func TestBuildValuesTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(BuildValuesTestSuite))
+	ts.Require().NoError(p.buildValues(ts.ctx))
+	mockedRelease.AssertExpectations(ts.T())
 }

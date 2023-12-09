@@ -53,7 +53,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) { //nolint
 
 	// Build Values
 	log.Info("🔨 Building values...")
-	err = p.buildValues()
+	err = p.buildValues(ctx)
 	if err != nil {
 		return
 	}

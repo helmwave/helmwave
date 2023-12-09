@@ -35,7 +35,7 @@ func (p *Plan) Rollback(ctx context.Context, version int, dog *kubedog.Config) (
 
 	if dog.Enabled {
 		log.Warn("🐶 kubedog is enabled")
-		kubedog.FixLog(dog.LogWidth)
+		kubedog.FixLog(ctx, dog.LogWidth)
 		err = p.rollbackReleasesKubedog(ctx, version, dog)
 	} else {
 		err = p.rollbackReleases(ctx, version)

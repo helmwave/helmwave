@@ -26,7 +26,7 @@ type Config interface {
 	DryRun(bool)
 	ChartDepsUpd() error
 	DownloadChart(string) error
-	BuildValues(string, string) error
+	BuildValues(context.Context, string, string) error
 	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
 	Get(int) (*release.Release, error)
 	List() (*release.Release, error)

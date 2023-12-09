@@ -6,11 +6,14 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
 
 type NewTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestNewTestSuite(t *testing.T) {
@@ -18,23 +21,27 @@ func TestNewTestSuite(t *testing.T) {
 	suite.Run(t, new(NewTestSuite))
 }
 
-func (s *NewTestSuite) TestNew() {
+func (ts *NewTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *NewTestSuite) TestNew() {
 	dir := "/proc/1/bla"
 	p := plan.New(dir)
 
-	s.Require().NotNil(p)
-	s.Require().False(p.IsExist())
-	s.Require().False(p.IsManifestExist())
+	ts.Require().NotNil(p)
+	ts.Require().False(p.IsExist())
+	ts.Require().False(p.IsManifestExist())
 }
 
-func (s *NewTestSuite) TestNewAndImportError() {
-	_, err := plan.NewAndImport(context.Background(), "/proc/1/blabla")
+func (ts *NewTestSuite) TestNewAndImportError() {
+	_, err := plan.NewAndImport(ts.ctx, "/proc/1/blabla")
 
-	s.Require().Error(err)
-	s.Require().ErrorContains(err, "failed to read plan file")
+	ts.Require().Error(err)
+	ts.Require().ErrorContains(err, "failed to read plan file")
 }
 
-func (s *NewTestSuite) TestLogger() {
+func (ts *NewTestSuite) TestLogger() {
 	p := plan.New(".")
 	body := p.NewBody()
 
@@ -51,25 +58,25 @@ func (s *NewTestSuite) TestLogger() {
 
 	logger := p.Logger()
 
-	s.Require().NotNil(logger)
+	ts.Require().NotNil(logger)
 
-	s.Require().Contains(logger.Data, "releases")
-	s.Require().Equal([]string{uniq.String()}, logger.Data["releases"])
+	ts.Require().Contains(logger.Data, "releases")
+	ts.Require().Equal([]string{uniq.String()}, logger.Data["releases"])
 
-	s.Require().Contains(logger.Data, "repositories")
-	s.Require().Equal([]string{repoName}, logger.Data["repositories"])
+	ts.Require().Contains(logger.Data, "repositories")
+	ts.Require().Equal([]string{repoName}, logger.Data["repositories"])
 
-	rel.AssertExpectations(s.T())
-	repo.AssertExpectations(s.T())
+	rel.AssertExpectations(ts.T())
+	repo.AssertExpectations(ts.T())
 }
 
-func (s *NewTestSuite) TestJSONSchema() {
+func (ts *NewTestSuite) TestJSONSchema() {
 	schema := plan.GenSchema()
 
-	s.Require().NotNil(schema)
+	ts.Require().NotNil(schema)
 
-	s.NotNil(schema.Properties.GetPair("repositories"))
-	s.NotNil(schema.Properties.GetPair("registries"))
-	s.NotNil(schema.Properties.GetPair("releases"))
-	s.NotNil(schema.Properties.GetPair("lifecycle"))
+	ts.NotNil(schema.Properties.GetPair("repositories"))
+	ts.NotNil(schema.Properties.GetPair("registries"))
+	ts.NotNil(schema.Properties.GetPair("releases"))
+	ts.NotNil(schema.Properties.GetPair("lifecycle"))
 }

@@ -1,16 +1,20 @@
 package release_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
 )
 
 type ValuesTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestValuesTestSuite(t *testing.T) {
@@ -18,7 +22,11 @@ func TestValuesTestSuite(t *testing.T) {
 	suite.Run(t, new(ValuesTestSuite))
 }
 
-func (s *ValuesTestSuite) TestProhibitDst() {
+func (ts *ValuesTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *ValuesTestSuite) TestProhibitDst() {
 	type config struct {
 		Values []release.ValuesReference
 	}
@@ -33,13 +41,13 @@ values:
 	c := &config{}
 
 	err := yaml.Unmarshal([]byte(src), c)
-	s.Require().NoError(err)
+	ts.Require().NoError(err)
 
 	err = release.ProhibitDst(c.Values)
-	s.Require().Error(err)
+	ts.Require().Error(err)
 }
 
-func (s *ValuesTestSuite) TestList() {
+func (ts *ValuesTestSuite) TestList() {
 	type config struct {
 		Values []release.ValuesReference
 	}
@@ -52,9 +60,9 @@ values:
 	c := &config{}
 
 	err := yaml.Unmarshal([]byte(src), c)
-	s.Require().NoError(err)
+	ts.Require().NoError(err)
 
-	s.Require().Equal(&config{
+	ts.Require().Equal(&config{
 		Values: []release.ValuesReference{
 			{Src: "a"},
 			{Src: "b"},
@@ -62,7 +70,7 @@ values:
 	}, c)
 }
 
-func (s *ValuesTestSuite) TestMap() {
+func (ts *ValuesTestSuite) TestMap() {
 	type config struct {
 		Values []release.ValuesReference
 	}
@@ -77,9 +85,9 @@ values:
 	c := &config{}
 
 	err := yaml.Unmarshal([]byte(src), c)
-	s.Require().NoError(err)
+	ts.Require().NoError(err)
 
-	s.Require().Equal(&config{
+	ts.Require().Equal(&config{
 		Values: []release.ValuesReference{
 			{Src: "1", Strict: false},
 			{Src: "2", Strict: true},
@@ -87,7 +95,7 @@ values:
 	}, c)
 }
 
-func (s *ValuesTestSuite) TestBuildNonExistingNonStrict() {
+func (ts *ValuesTestSuite) TestBuildNonExistingNonStrict() {
 	r := release.NewConfig()
 	r.ValuesF = []release.ValuesReference{
 		{
@@ -96,13 +104,13 @@ func (s *ValuesTestSuite) TestBuildNonExistingNonStrict() {
 		},
 	}
 
-	err := r.BuildValues(".", template.TemplaterSprig)
+	err := r.BuildValues(ts.ctx, ".", template.TemplaterSprig)
 
-	s.Require().NoError(err)
-	s.Require().Empty(r.Values())
+	ts.Require().NoError(err)
+	ts.Require().Empty(r.Values())
 }
 
-func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
+func (ts *ValuesTestSuite) TestBuildNonExistingStrict() {
 	r := release.NewConfig()
 	r.ValuesF = []release.ValuesReference{
 		{
@@ -111,20 +119,20 @@ func (s *ValuesTestSuite) TestBuildNonExistingStrict() {
 		},
 	}
 
-	err := r.BuildValues(".", template.TemplaterSprig)
+	err := r.BuildValues(ts.ctx, ".", template.TemplaterSprig)
 
-	s.Require().Error(err)
+	ts.Require().Error(err)
 }
 
-func (s *ValuesTestSuite) TestJSONSchema() {
+func (ts *ValuesTestSuite) TestJSONSchema() {
 	schema := (&release.ValuesReference{}).JSONSchema()
 
-	s.Require().NotNil(schema)
+	ts.Require().NotNil(schema)
 
-	s.NotNil(schema.Properties.GetPair("src"))
-	s.NotNil(schema.Properties.GetPair("dst"))
-	s.NotNil(schema.Properties.GetPair("delimiter_left"))
-	s.NotNil(schema.Properties.GetPair("delimiter_right"))
-	s.NotNil(schema.Properties.GetPair("strict"))
-	s.NotNil(schema.Properties.GetPair("renderer"))
+	ts.NotNil(schema.Properties.GetPair("src"))
+	ts.NotNil(schema.Properties.GetPair("dst"))
+	ts.NotNil(schema.Properties.GetPair("delimiter_left"))
+	ts.NotNil(schema.Properties.GetPair("delimiter_right"))
+	ts.NotNil(schema.Properties.GetPair("strict"))
+	ts.NotNil(schema.Properties.GetPair("renderer"))
 }

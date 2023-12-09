@@ -6,11 +6,14 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
 
 type ContextTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestContextTestSuite(t *testing.T) {
@@ -18,38 +21,34 @@ func TestContextTestSuite(t *testing.T) {
 	suite.Run(t, new(ContextTestSuite))
 }
 
-func (s *ContextTestSuite) TestReleaseUniq() {
-	ctxBase := context.Background()
-	uniqBase := uniqname.UniqName("test")
+func (ts *ContextTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
 
-	ctx := helper.ContextWithReleaseUniq(ctxBase, uniqBase)
+func (ts *ContextTestSuite) TestReleaseUniq() {
+	uniqBase := uniqname.UniqName("test")
+	ctx := helper.ContextWithReleaseUniq(ts.ctx, uniqBase)
 
 	uniq, exists := helper.ContextGetReleaseUniq(ctx)
-	s.Require().True(exists)
-	s.Require().Equal(uniqBase, uniq)
+	ts.Require().True(exists)
+	ts.Require().Equal(uniqBase, uniq)
 }
 
-func (s *ContextTestSuite) TestNoReleaseUniq() {
-	ctx := context.Background()
-
-	_, exists := helper.ContextGetReleaseUniq(ctx)
-	s.Require().False(exists)
+func (ts *ContextTestSuite) TestNoReleaseUniq() {
+	_, exists := helper.ContextGetReleaseUniq(ts.ctx)
+	ts.Require().False(exists)
 }
 
-func (s *ContextTestSuite) TestLifecycleType() {
-	ctxBase := context.Background()
+func (ts *ContextTestSuite) TestLifecycleType() {
 	typBase := "test"
-
-	ctx := helper.ContextWithLifecycleType(ctxBase, typBase)
+	ctx := helper.ContextWithLifecycleType(ts.ctx, typBase)
 
 	typ, exists := helper.ContextGetLifecycleType(ctx)
-	s.Require().True(exists)
-	s.Require().Equal(typBase, typ)
+	ts.Require().True(exists)
+	ts.Require().Equal(typBase, typ)
 }
 
-func (s *ContextTestSuite) TestNoLifecycleType() {
-	ctx := context.Background()
-
-	_, exists := helper.ContextGetLifecycleType(ctx)
-	s.Require().False(exists)
+func (ts *ContextTestSuite) TestNoLifecycleType() {
+	_, exists := helper.ContextGetLifecycleType(ts.ctx)
+	ts.Require().False(exists)
 }

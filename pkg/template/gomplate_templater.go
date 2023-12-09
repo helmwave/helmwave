@@ -24,9 +24,9 @@ func (t gomplateTemplater) Name() string {
 	return TemplaterGomplate
 }
 
-func (t gomplateTemplater) Render(src string, data any) ([]byte, error) {
+func (t gomplateTemplater) Render(ctx context.Context, src string, data any) ([]byte, error) {
 	tpl := template.New("tpl")
-	funcs := t.funcMap(tpl, data)
+	funcs := t.funcMap(ctx, tpl, data)
 	tpl, err := tpl.Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template: %w", err)
@@ -41,11 +41,10 @@ func (t gomplateTemplater) Render(src string, data any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (t gomplateTemplater) funcMap(tpl *template.Template, data any) template.FuncMap {
+func (t gomplateTemplater) funcMap(ctx context.Context, tpl *template.Template, data any) template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading gomplate template functions")
-	ctx := context.Background()
 	gomplateFuncMap := gomplate.CreateFuncs(ctx, &gomplateData.Data{Ctx: ctx})
 
 	addToMap(funcMap, gomplateFuncMap)
