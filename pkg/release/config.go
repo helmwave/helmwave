@@ -14,9 +14,9 @@ import (
 )
 
 type configTests struct {
-	Enabled       bool                `yaml:"enabled,omitempty" json:"enabled,omitempty" jsonschema:"description=Whether to run helm tests,default=false"`
 	Filters       map[string][]string `yaml:"filters,omitempty" json:"filters,omitempty" jsonschema:"description=Filter tests by attributes,default={}"`
-	ForceShowLogs bool                `yaml:"force_show_logs,omitempty" json:"force_show_logs,omitempty" jsonschema:"description=Always show tests logs, not only if they failed,default=false"'`
+	Enabled       bool                `yaml:"enabled,omitempty" json:"enabled,omitempty" jsonschema:"description=Whether to run helm tests,default=false"`
+	ForceShowLogs bool                `yaml:"force_show_logs,omitempty" json:"force_show_logs,omitempty" jsonschema:"description=Always show tests logs, not only if they failed,default=false"`
 }
 
 type config struct {
@@ -26,23 +26,23 @@ type config struct {
 	Lifecycle              hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
 	Store                  map[string]any  `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
 	ChartF                 Chart           `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
+	Tests                  configTests     `yaml:"tests,omitempty" json:"tests,omitempty" jsonschema:"description=Configuration for helm tests"`
 	PendingReleaseStrategy PendingStrategy `yaml:"pending_release_strategy,omitempty" json:"pending_release_strategy,omitempty" jsonschema:"description=Strategy to handle releases in pending statuses (pending-install/pending-upgrade/pending-rollback)"`
-	uniqName               uniqname.UniqName
 
-	NameF               string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required,title=Release name"`
-	NamespaceF          string `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
-	DescriptionF        string `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
-	KubeContextF        string `yaml:"context,omitempty" json:"context,omitempty"`
-	OfflineKubeVersionF string `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
+	uniqName     uniqname.UniqName
+	NameF        string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required,title=Release name"`
+	NamespaceF   string `yaml:"namespace,omitempty" json:"namespace,omitempty" jsonschema:"required,title=Kubernetes namespace"`
+	DescriptionF string `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
+	KubeContextF string `yaml:"context,omitempty" json:"context,omitempty"`
 
-	DependsOnF    []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
-	MonitorsF     []MonitorReference    `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
-	ValuesF       []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release,oneof_type=string;object"`
-	TagsF         []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
-	Labels        map[string]string     `yaml:"labels,omitempty" json:"labels,omitempty" jsonschema:"Labels that would be added to release metadata on sync"`
-	PostRendererF []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
-	ShowNotes     bool                  `yaml:"show_notes,omitempty" json:"show_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install"`
-	Tests         configTests           `yaml:"tests,omitempty" json:"tests,omitempty" jsonschema:"description=Configuration for helm tests"`
+	OfflineKubeVersionF string                `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
+	DependsOnF          []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
+	MonitorsF           []MonitorReference    `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
+	ValuesF             []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release,oneof_type=string;object"`
+	TagsF               []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
+	Labels              map[string]string     `yaml:"labels,omitempty" json:"labels,omitempty" jsonschema:"Labels that would be added to release metadata on sync"`
+	PostRendererF       []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
+	ShowNotes           bool                  `yaml:"show_notes,omitempty" json:"show_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install"`
 
 	Timeout time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;int,default=5m"`
 

@@ -144,10 +144,12 @@ func (rel *config) test() error {
 
 		if err != nil {
 			rel.Logger().WithError(err).WithField("output", buf.String()).Error("helm tests failed")
+
+			return NewHelmTestsError(err)
 		} else {
 			rel.Logger().WithField("output", buf.String()).Info("helm tests output")
 		}
 	}
 
-	return err
+	return nil
 }
