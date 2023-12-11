@@ -9,7 +9,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-//nolint:gocognit,nestif
+//nolint:gocognit,nestif,cyclop
 func (rel *config) Sync(ctx context.Context) (r *release.Release, err error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
@@ -47,8 +47,20 @@ func (rel *config) Sync(ctx context.Context) (r *release.Release, err error) {
 	}
 
 	r, err = rel.upgrade(ctx)
+	if err != nil {
+		return
+	}
 
-	if err == nil && !rel.dryRun && rel.ShowNotes {
+	if rel.Tests.Enabled && !rel.dryRun {
+		err = rel.test()
+		if err != nil {
+			rel.Logger().Errorf("helm tests failed")
+
+			return
+		}
+	}
+
+	if !rel.dryRun && rel.ShowNotes {
 		rel.Logger().Infof("🗒️ release notes:\n%s", r.Info.Notes)
 	}
 

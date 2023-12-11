@@ -103,3 +103,13 @@ func (rel *config) newUninstall() *action.Uninstall {
 
 	return client
 }
+
+func (rel *config) newTest() *action.ReleaseTesting {
+	client := action.NewReleaseTesting(rel.Cfg())
+
+	client.Timeout = rel.Timeout
+	client.Namespace = rel.Namespace()
+	client.Filters = rel.Tests.Filters
+
+	return client
+}
