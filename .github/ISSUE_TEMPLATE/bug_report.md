@@ -9,7 +9,7 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-** General info (please complete the following information):**
+**General info (please complete the following information):**
 
 - OS: [e.g. linux, windows, macOS]
 - Helmwave Version [e.g. 0.18.0]
