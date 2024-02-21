@@ -1,6 +1,7 @@
 package template
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -15,7 +16,7 @@ type TemplaterOptions func(Templater)
 type Templater interface {
 	Name() string
 	Delims(string, string)
-	Render(string, any) ([]byte, error)
+	Render(context.Context, string, any) ([]byte, error)
 }
 
 func getTemplater(name string) (Templater, error) {
@@ -34,7 +35,7 @@ func getTemplater(name string) (Templater, error) {
 }
 
 // Tpl2yml renders 'tpl' file to 'yml' file as go template.
-func Tpl2yml(tpl, yml string, data any, templaterName string, opts ...TemplaterOptions) error {
+func Tpl2yml(ctx context.Context, tpl, yml string, data any, templaterName string, opts ...TemplaterOptions) error {
 	log.WithFields(log.Fields{
 		"from": tpl,
 		"to":   yml,
@@ -59,7 +60,7 @@ func Tpl2yml(tpl, yml string, data any, templaterName string, opts ...TemplaterO
 		opt(templater)
 	}
 
-	d, err := templater.Render(string(src), data)
+	d, err := templater.Render(ctx, string(src), data)
 	if err != nil {
 		return fmt.Errorf("failed to render template: %w", err)
 	}

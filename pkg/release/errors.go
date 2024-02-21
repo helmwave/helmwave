@@ -87,3 +87,19 @@ func (err ChartCacheError) Error() string {
 func (err ChartCacheError) Unwrap() error {
 	return err.Err
 }
+
+type HelmTestsError struct {
+	Err error
+}
+
+func NewHelmTestsError(err error) error {
+	return &HelmTestsError{Err: err}
+}
+
+func (err HelmTestsError) Error() string {
+	return fmt.Sprintf("helm tests failed: %s", err.Err)
+}
+
+func (err HelmTestsError) Unwrap() error {
+	return err.Err
+}

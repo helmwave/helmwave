@@ -2,6 +2,7 @@ package template
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"text/template"
 
@@ -40,7 +41,7 @@ func (t sprigTemplater) Name() string {
 	return TemplaterSprig
 }
 
-func (t sprigTemplater) Render(src string, data any) ([]byte, error) {
+func (t sprigTemplater) Render(_ context.Context, src string, data any) ([]byte, error) {
 	funcs := t.funcMap()
 	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
 	if err != nil {

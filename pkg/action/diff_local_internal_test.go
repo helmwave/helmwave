@@ -20,6 +20,8 @@ var buf bytes.Buffer
 
 type DiffLocalTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 //nolint:paralleltest // we capture output for global logger and uses helm repository.yaml flock
@@ -29,11 +31,12 @@ func TestDiffLocalTestSuite(t *testing.T) {
 }
 
 func (ts *DiffLocalTestSuite) SetupTest() {
-	log.StandardLogger().SetOutput(&buf)
-}
+	ts.ctx = tests.GetContext(ts.T())
 
-func (ts *DiffLocalTestSuite) TearDownTest() {
-	log.StandardLogger().SetOutput(os.Stderr)
+	log.StandardLogger().SetOutput(&buf)
+	ts.T().Cleanup(func() {
+		log.StandardLogger().SetOutput(os.Stderr)
+	})
 }
 
 func (ts *DiffLocalTestSuite) TestCmd() {
@@ -71,13 +74,13 @@ func (ts *DiffLocalTestSuite) TestRun() {
 
 	d := DiffLocal{diff: s1.diff, plandir1: s1.plandir, plandir2: s2.plandir}
 
-	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
-	ts.Require().NoError(s1.Run(context.Background()))
-	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
-	ts.Require().NoError(s2.Run(context.Background()))
+	ts.Require().ErrorIs(d.Run(ts.ctx), os.ErrNotExist)
+	ts.Require().NoError(s1.Run(ts.ctx))
+	ts.Require().ErrorIs(d.Run(ts.ctx), os.ErrNotExist)
+	ts.Require().NoError(s2.Run(ts.ctx))
 
 	buf.Reset()
-	ts.Require().NoError(d.Run(context.Background()))
+	ts.Require().NoError(d.Run(ts.ctx))
 
 	output := buf.String()
 	buf.Reset()

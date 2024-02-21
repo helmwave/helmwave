@@ -10,15 +10,25 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v3"
 )
 
 type GetTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
-func (s *GetTestSuite) SetupSuite() {
+func TestGetTestSuite(t *testing.T) { //nolint:paralleltest // uses helm repository.yaml flock
+	// t.Parallel()
+	suite.Run(t, new(GetTestSuite))
+}
+
+func (ts *GetTestSuite) SetupSuite() {
+	ts.ctx = tests.GetContext(ts.T())
+
 	var rs repo.Configs
 	str := `
 - name: bitnami
@@ -26,47 +36,42 @@ func (s *GetTestSuite) SetupSuite() {
 `
 	err := yaml.Unmarshal([]byte(str), &rs)
 
-	s.Require().NoError(err)
-	s.Require().Len(rs, 1)
+	ts.Require().NoError(err)
+	ts.Require().Len(rs, 1)
 
-	s.Require().NoError(plan.SyncRepositories(context.Background(), rs))
+	ts.Require().NoError(plan.SyncRepositories(ts.ctx, rs))
 }
 
-func (s *GetTestSuite) TestGetNotInstalled() {
+func (ts *GetTestSuite) TestGetNotInstalled() {
 	rel := release.NewConfig()
-	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
+	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 
 	r, err := rel.Get(0)
-	s.Require().Error(err)
-	s.Require().Nil(r)
+	ts.Require().Error(err)
+	ts.Require().Nil(r)
 
 	_, err = rel.GetValues()
-	s.Require().Error(err)
+	ts.Require().Error(err)
 }
 
-func (s *GetTestSuite) TestGet() {
+func (ts *GetTestSuite) TestGet() {
 	rel := release.NewConfig()
-	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(s.T().Name(), "/", ""))
+	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 
-	r1, err := rel.Sync(context.Background())
-	s.Require().NoError(err)
-	s.Require().NotNil(r1)
+	r1, err := rel.Sync(ts.ctx)
+	ts.Require().NoError(err)
+	ts.Require().NotNil(r1)
 
 	r2, err := rel.Get(0)
-	s.Require().NoError(err)
-	s.Require().NotNil(r2)
+	ts.Require().NoError(err)
+	ts.Require().NotNil(r2)
 
 	_, err = rel.GetValues()
-	s.Require().NoError(err)
-}
-
-func TestGetTestSuite(t *testing.T) { //nolint:paralleltest // uses helm repository.yaml flock
-	// t.Parallel()
-	suite.Run(t, new(GetTestSuite))
+	ts.Require().NoError(err)
 }

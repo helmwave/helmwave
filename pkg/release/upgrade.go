@@ -1,6 +1,7 @@
 package release
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strings"
@@ -127,6 +128,28 @@ func (rel *config) forceOfflineKubeVersion() error {
 
 	rel.OfflineKubeVersionF = v.GitVersion
 	rel.Logger().WithField("version", rel.OfflineKubeVersionF).Info("discovered kubernetes version")
+
+	return nil
+}
+
+func (rel *config) test() error {
+	rel.Logger().Info("running helm tests")
+
+	client := rel.newTest()
+	r, err := client.Run(rel.Name())
+
+	if (err != nil) || rel.Tests.ForceShowLogs {
+		var buf bytes.Buffer
+		_ = client.GetPodLogs(&buf, r)
+
+		if err != nil {
+			rel.Logger().WithError(err).WithField("output", buf.String()).Error("helm tests failed")
+
+			return NewHelmTestsError(err)
+		} else {
+			rel.Logger().WithField("output", buf.String()).Info("helm tests output")
+		}
+	}
 
 	return nil
 }

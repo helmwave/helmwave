@@ -17,8 +17,8 @@ type Yml struct {
 }
 
 // Run is the main function for 'yml' command.
-func (i *Yml) Run(_ context.Context) error {
-	err := template.Tpl2yml(i.tpl, i.file, nil, i.templater)
+func (i *Yml) Run(ctx context.Context) error {
+	err := template.Tpl2yml(ctx, i.tpl, i.file, nil, i.templater)
 	if err != nil {
 		return err
 	}
