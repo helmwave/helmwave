@@ -49,4 +49,4 @@ Documentation available at [docs.helmwave.app](https://docs.helmwave.app?utm_sou
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/helmwave/helmwave.svg)](https://starchart.cc/helmwave/helmwave)
+[![Stargazers over time](https://starchart.cc/helmwave/helmwave.svg?variant=adaptive)](https://starchart.cc/helmwave/helmwave)
