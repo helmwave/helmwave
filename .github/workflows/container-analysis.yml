@@ -14,7 +14,7 @@ jobs:
 
       - name: Trivy
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.14.0
+        uses: aquasecurity/trivy-action@0.17.0
         with:
           image-ref: "ghcr.io/${{ github.repository }}:latest"
           format: "sarif"
@@ -22,7 +22,7 @@ jobs:
           severity: "HIGH,CRITICAL"
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "trivy-results.sarif"
 
@@ -36,6 +36,6 @@ jobs:
           args: --file=Dockerfile --severity-threshold=high
 
       - name: Upload Snyk result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk.sarif
