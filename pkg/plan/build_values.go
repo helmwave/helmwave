@@ -1,12 +1,14 @@
 package plan
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *Plan) buildValues() error {
+func (p *Plan) buildValues(ctx context.Context) error {
 	if err := p.ValidateValuesBuild(); err != nil {
 		return err
 	}
@@ -17,7 +19,7 @@ func (p *Plan) buildValues() error {
 	for _, rel := range p.body.Releases {
 		go func(wg *parallel.WaitGroup, rel release.Config) {
 			defer wg.Done()
-			err := rel.BuildValues(p.tmpDir, p.templater)
+			err := rel.BuildValues(ctx, p.tmpDir, p.templater)
 			if err != nil {
 				log.Errorf("❌ %s values: %v", rel.Uniq(), err)
 				wg.ErrChan() <- err

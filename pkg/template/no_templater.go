@@ -1,5 +1,7 @@
 package template
 
+import "context"
+
 const (
 	TemplaterNone = "copy"
 )
@@ -10,7 +12,7 @@ func (t noTemplater) Name() string {
 	return TemplaterNone
 }
 
-func (t noTemplater) Render(src string, _ any) ([]byte, error) {
+func (t noTemplater) Render(_ context.Context, src string, _ any) ([]byte, error) {
 	return []byte(src), nil
 }
 

@@ -1,12 +1,14 @@
 package plan_test
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/tests"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -17,6 +19,8 @@ import (
 
 type ValidateTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestValidateTestSuite(t *testing.T) {
@@ -24,8 +28,12 @@ func TestValidateTestSuite(t *testing.T) {
 	suite.Run(t, new(ValidateTestSuite))
 }
 
-func (s *ValidateTestSuite) TestInvalidRelease() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *ValidateTestSuite) TestInvalidRelease() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
@@ -36,14 +44,14 @@ func (s *ValidateTestSuite) TestInvalidRelease() {
 
 	p.SetReleases(mockedRelease)
 
-	s.Require().ErrorIs(err, body.ValidateReleases())
-	s.Require().ErrorIs(err, body.Validate())
+	ts.Require().ErrorIs(err, body.ValidateReleases())
+	ts.Require().ErrorIs(err, body.Validate())
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *ValidateTestSuite) TestInvalidRepository() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) TestInvalidRepository() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
@@ -54,67 +62,67 @@ func (s *ValidateTestSuite) TestInvalidRepository() {
 
 	p.SetRepositories(mockedRepo)
 
-	s.Require().ErrorIs(err, body.ValidateRepositories())
-	s.Require().ErrorIs(err, body.Validate())
+	ts.Require().ErrorIs(err, body.ValidateRepositories())
+	ts.Require().ErrorIs(err, body.Validate())
 
-	mockedRepo.AssertExpectations(s.T())
+	mockedRepo.AssertExpectations(ts.T())
 }
 
-func (s *ValidateTestSuite) TestValidateValues() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) TestValidateValues() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, "valuesName")
-	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
+	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
 	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Name").Return(s.T().Name())
-	mockedRelease.On("Namespace").Return(s.T().Name())
+	mockedRelease.On("Name").Return(ts.T().Name())
+	mockedRelease.On("Namespace").Return(ts.T().Name())
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
-	s.Require().NoError(v.SetViaRelease(mockedRelease, tmpDir, template.TemplaterSprig))
+	ts.Require().NoError(v.SetViaRelease(ts.ctx, mockedRelease, tmpDir, template.TemplaterSprig))
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
 
-	s.Require().NoError(p.ValidateValuesImport())
+	ts.Require().NoError(p.ValidateValuesImport())
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *ValidateTestSuite) TestValidateValuesNotFound() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) TestValidateValuesNotFound() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, "valuesName")
-	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
+	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
 	mockedRelease := &plan.MockReleaseConfig{}
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
 
-	s.Require().Error(p.ValidateValuesImport())
+	ts.Require().Error(p.ValidateValuesImport())
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *ValidateTestSuite) TestValidateValuesNoReleases() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) TestValidateValuesNoReleases() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	p.NewBody()
 
-	s.Require().NoError(p.ValidateValuesImport())
+	ts.Require().NoError(p.ValidateValuesImport())
 }
 
-func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) TestValidateRepositoryDuplicate() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
@@ -126,17 +134,17 @@ func (s *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 
 	var e *repo.DuplicateError
 
-	s.Require().ErrorAs(body.ValidateRepositories(), &e)
-	s.Equal("blabla", e.Name)
+	ts.Require().ErrorAs(body.ValidateRepositories(), &e)
+	ts.Equal("blabla", e.Name)
 
-	s.Require().ErrorAs(body.Validate(), &e)
-	s.Equal("blabla", e.Name)
+	ts.Require().ErrorAs(body.Validate(), &e)
+	ts.Equal("blabla", e.Name)
 
-	mockedRepo.AssertExpectations(s.T())
+	mockedRepo.AssertExpectations(ts.T())
 }
 
-func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) TestValidateReleaseDuplicate() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
@@ -150,19 +158,19 @@ func (s *ValidateTestSuite) TestValidateReleaseDuplicate() {
 
 	var e *release.DuplicateError
 
-	s.Require().ErrorAs(body.ValidateReleases(), &e)
-	s.Equal(mockedRelease.Uniq(), e.Uniq)
+	ts.Require().ErrorAs(body.ValidateReleases(), &e)
+	ts.Equal(mockedRelease.Uniq(), e.Uniq)
 
-	s.Require().ErrorAs(body.Validate(), &e)
-	s.Equal(mockedRelease.Uniq(), e.Uniq)
+	ts.Require().ErrorAs(body.Validate(), &e)
+	ts.Equal(mockedRelease.Uniq(), e.Uniq)
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *ValidateTestSuite) TestValidateEmpty() {
-	tmpDir := s.T().TempDir()
+func (ts *ValidateTestSuite) TestValidateEmpty() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
-	s.Require().NoError(body.Validate())
+	ts.Require().NoError(body.Validate())
 }

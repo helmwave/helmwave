@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/repo"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	helm "helm.sh/helm/v3/pkg/cli"
 	helmRepo "helm.sh/helm/v3/pkg/repo"
@@ -12,6 +13,8 @@ import (
 
 type InstallTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 func TestInstallTestSuite(t *testing.T) {
@@ -19,12 +22,16 @@ func TestInstallTestSuite(t *testing.T) {
 	suite.Run(t, new(InstallTestSuite))
 }
 
+func (ts *InstallTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
 func (ts *InstallTestSuite) TestInstallNonExisting() {
 	rep := repo.NewConfig()
 	settings := &helm.EnvSettings{}
 	f := &helmRepo.File{}
 
-	err := rep.Install(context.Background(), settings, f)
+	err := rep.Install(ts.ctx, settings, f)
 
 	ts.Require().NoError(err)
 	ts.Require().Contains(f.Repositories, &rep.Entry)
@@ -37,7 +44,7 @@ func (ts *InstallTestSuite) TestInstallExistingSame() {
 		Repositories: []*helmRepo.Entry{&rep.Entry},
 	}
 
-	err := rep.Install(context.Background(), settings, f)
+	err := rep.Install(ts.ctx, settings, f)
 
 	ts.Require().NoError(err)
 	ts.Require().Contains(f.Repositories, &rep.Entry)
@@ -52,7 +59,7 @@ func (ts *InstallTestSuite) TestInstallExistingNotSame() {
 		Repositories: []*helmRepo.Entry{&rep2.Entry},
 	}
 
-	err := rep1.Install(context.Background(), settings, f)
+	err := rep1.Install(ts.ctx, settings, f)
 
 	var e *repo.DuplicateError
 	ts.Require().ErrorAs(err, &e)

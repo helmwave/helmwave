@@ -16,12 +16,18 @@ import (
 
 type DiffLiveTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 //nolint:paralleltest // uses helm repository.yaml flock
 func TestDiffLiveTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(DiffLiveTestSuite))
+}
+
+func (ts *DiffLiveTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
 }
 
 func (ts *DiffLiveTestSuite) TestCmd() {
@@ -50,7 +56,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 
 	d := DiffLive{diff: s.diff, plandir: s.plandir}
 
-	ts.Require().ErrorIs(d.Run(context.Background()), os.ErrNotExist)
-	ts.Require().NoError(s.Run(context.Background()))
-	ts.Require().NoError(d.Run(context.Background()))
+	ts.Require().ErrorIs(d.Run(ts.ctx), os.ErrNotExist)
+	ts.Require().NoError(s.Run(ts.ctx))
+	ts.Require().NoError(d.Run(ts.ctx))
 }

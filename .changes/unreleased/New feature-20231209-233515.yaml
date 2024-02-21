@@ -1,0 +1,6 @@
+kind: New feature
+body: Add support for running helm tests
+time: 2023-12-09T23:35:15.171612+04:00
+custom:
+  Author: r3nic1e
+  Issue: "784"

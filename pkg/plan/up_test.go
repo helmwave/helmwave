@@ -9,6 +9,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -16,29 +17,41 @@ import (
 
 type ApplyTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
-func (s *ApplyTestSuite) TestApplyBadRepoInstallation() {
-	tmpDir := s.T().TempDir()
+//nolint:paralleltest // can't parallel because of flock timeout
+func TestApplyTestSuite(t *testing.T) {
+	// t.Parallel()
+	suite.Run(t, new(ApplyTestSuite))
+}
+
+func (ts *ApplyTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *ApplyTestSuite) TestApplyBadRepoInstallation() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	repoName := "blablanami"
 
 	mockedRepo := &plan.MockRepositoryConfig{}
 	mockedRepo.On("Name").Return(repoName)
-	e := errors.New(s.T().Name())
+	e := errors.New(ts.T().Name())
 	mockedRepo.On("Install").Return(e)
 
 	p.SetRepositories(mockedRepo)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
-	s.Require().ErrorIs(err, e)
+	err := p.Up(ts.ctx, &kubedog.Config{})
+	ts.Require().ErrorIs(err, e)
 
-	mockedRepo.AssertExpectations(s.T())
+	mockedRepo.AssertExpectations(ts.T())
 }
 
-func (s *ApplyTestSuite) TestApplyNoReleases() {
-	tmpDir := s.T().TempDir()
+func (ts *ApplyTestSuite) TestApplyNoReleases() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRepo := &plan.MockRepositoryConfig{}
@@ -47,14 +60,14 @@ func (s *ApplyTestSuite) TestApplyNoReleases() {
 	p.SetRepositories(mockedRepo)
 	dog := &kubedog.Config{}
 
-	err := p.Up(context.Background(), dog)
-	s.Require().NoError(err)
+	err := p.Up(ts.ctx, dog)
+	ts.Require().NoError(err)
 
-	mockedRepo.AssertExpectations(s.T())
+	mockedRepo.AssertExpectations(ts.T())
 }
 
-func (s *ApplyTestSuite) TestApplyFailedRelease() {
-	tmpDir := s.T().TempDir()
+func (ts *ApplyTestSuite) TestApplyFailedRelease() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -62,22 +75,22 @@ func (s *ApplyTestSuite) TestApplyFailedRelease() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
-	e := errors.New(s.T().Name())
+	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
+	e := errors.New(ts.T().Name())
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, e)
 	mockedRelease.On("AllowFailure").Return(false)
 	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
-	s.Require().ErrorIs(err, e)
+	err := p.Up(ts.ctx, &kubedog.Config{})
+	ts.Require().ErrorIs(err, e)
 
-	mockedRelease.AssertExpectations(s.T())
+	mockedRelease.AssertExpectations(ts.T())
 }
 
-func (s *ApplyTestSuite) TestApply() {
-	tmpDir := s.T().TempDir()
+func (ts *ApplyTestSuite) TestApply() {
+	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
 	mockedRelease := &plan.MockReleaseConfig{}
@@ -86,7 +99,7 @@ func (s *ApplyTestSuite) TestApply() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, nil)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 
 	mockedRepo := &plan.MockRepositoryConfig{}
@@ -95,15 +108,9 @@ func (s *ApplyTestSuite) TestApply() {
 	p.SetRepositories(mockedRepo)
 	p.SetReleases(mockedRelease)
 
-	err := p.Up(context.Background(), &kubedog.Config{})
-	s.Require().NoError(err)
+	err := p.Up(ts.ctx, &kubedog.Config{})
+	ts.Require().NoError(err)
 
-	mockedRepo.AssertExpectations(s.T())
-	mockedRelease.AssertExpectations(s.T())
-}
-
-//nolint:paralleltest // can't parallel because of flock timeout
-func TestApplyTestSuite(t *testing.T) {
-	// t.Parallel()
-	suite.Run(t, new(ApplyTestSuite))
+	mockedRepo.AssertExpectations(ts.T())
+	mockedRelease.AssertExpectations(ts.T())
 }

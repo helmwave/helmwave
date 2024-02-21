@@ -18,7 +18,7 @@ const (
 )
 
 // Download downloads uri to file.
-func Download(file, uri string) error {
+func Download(ctx context.Context, file, uri string) error {
 	f, err := CreateFile(file)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func Download(file, uri string) error {
 		}
 	}(f)
 
-	ctx, cancel := context.WithTimeout(context.Background(), HTTPTimeout)
+	ctx, cancel := context.WithTimeout(ctx, HTTPTimeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, http.NoBody)

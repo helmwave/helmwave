@@ -15,12 +15,18 @@ import (
 
 type YmlTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
 //nolint:paralleltest // can't parallel because of setenv
 func TestYmlTestSuite(t *testing.T) {
 	// t.Parallel()
 	suite.Run(t, new(YmlTestSuite))
+}
+
+func (ts *YmlTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
 }
 
 func (ts *YmlTestSuite) TestCmd() {
@@ -43,9 +49,9 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 	ts.T().Setenv("NAMESPACE", value)
 	ts.T().Setenv("PROJECT_NAME", value)
 
-	ts.Require().NoError(y.Run(context.Background()))
+	ts.Require().NoError(y.Run(ts.ctx))
 
-	b, err := plan.NewBody(context.Background(), y.file, true)
+	b, err := plan.NewBody(ts.ctx, y.file, true)
 	ts.Require().NoError(err)
 
 	ts.Require().Equal(value, b.Project)

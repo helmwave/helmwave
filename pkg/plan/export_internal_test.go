@@ -1,39 +1,52 @@
 package plan
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
 
 type ExportTestSuite struct {
 	suite.Suite
+
+	ctx context.Context
 }
 
-func (s *ExportTestSuite) TestValuesEmpty() {
-	tmpDir := s.T().TempDir()
+func TestExportTestSuite(t *testing.T) {
+	t.Parallel()
+	suite.Run(t, new(ExportTestSuite))
+}
+
+func (ts *ExportTestSuite) SetupTest() {
+	ts.ctx = tests.GetContext(ts.T())
+}
+
+func (ts *ExportTestSuite) TestValuesEmpty() {
+	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 	p.templater = template.TemplaterSprig
 
 	p.body = &planBody{}
 
 	err := p.exportValues()
-	s.Require().NoError(err)
+	ts.Require().NoError(err)
 }
 
-func (s *ExportTestSuite) TestValuesOneRelease() {
-	tmpDir := s.T().TempDir()
+func (ts *ExportTestSuite) TestValuesOneRelease() {
+	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 	p.templater = template.TemplaterSprig
 
 	valuesName := "blablavalues.yaml"
 	valuesContents := []byte("a: b")
 	tmpValues := filepath.Join(tmpDir, valuesName)
-	s.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
+	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
 	mockedRelease := &MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
@@ -48,18 +61,13 @@ func (s *ExportTestSuite) TestValuesOneRelease() {
 		Releases: release.Configs{mockedRelease},
 	}
 
-	s.Require().NoError(p.buildValues())
-	s.Require().NoError(p.exportValues())
-	mockedRelease.AssertExpectations(s.T())
-	s.Require().DirExists(filepath.Join(tmpDir, Dir, Values))
-	s.Require().FileExists(filepath.Join(tmpDir, Dir, Values, valuesName))
+	ts.Require().NoError(p.buildValues(ts.ctx))
+	ts.Require().NoError(p.exportValues())
+	mockedRelease.AssertExpectations(ts.T())
+	ts.Require().DirExists(filepath.Join(tmpDir, Dir, Values))
+	ts.Require().FileExists(filepath.Join(tmpDir, Dir, Values, valuesName))
 
 	contents, err := os.ReadFile(filepath.Join(tmpDir, Dir, Values, valuesName))
-	s.Require().NoError(err)
-	s.Require().Equal(valuesContents, contents)
-}
-
-func TestExportTestSuite(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, new(ExportTestSuite))
+	ts.Require().NoError(err)
+	ts.Require().Equal(valuesContents, contents)
 }
