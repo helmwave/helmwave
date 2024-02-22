@@ -56,7 +56,7 @@ func NewDuplicateError(name string) error {
 }
 
 func (err DuplicateError) Error() string {
-	return fmt.Sprintf("monitor duplicate: %s", err.Name)
+	return fmt.Sprint("monitor duplicate: ", err.Name)
 }
 
 type NotExistsError struct {

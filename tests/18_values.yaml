@@ -1,0 +1,9 @@
+envs:
+  HELLO: WORLD
+  FOO: BAR
+
+secrets:
+  my:
+    data:
+      GREETING: true
+      TREES: lol
