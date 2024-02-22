@@ -19,7 +19,7 @@ func NewInvalidURLError(url string) error {
 }
 
 func (err InvalidURLError) Error() string {
-	return fmt.Sprintf("invalid URL: %s", err.URL)
+	return fmt.Sprint("invalid URL: ", err.URL)
 }
 
 type DuplicateError struct {
@@ -31,7 +31,7 @@ func NewDuplicateError(name string) error {
 }
 
 func (err DuplicateError) Error() string {
-	return fmt.Sprintf("repository duplicate: %s", err.Name)
+	return fmt.Sprint("repository duplicate: ", err.Name)
 }
 
 type NotFoundError struct {
@@ -43,5 +43,5 @@ func NewNotFoundError(name string) error {
 }
 
 func (err NotFoundError) Error() string {
-	return fmt.Sprintf("🗄 repository not found: %s", err.Name)
+	return fmt.Sprint("🗄 repository not found: ", err.Name)
 }

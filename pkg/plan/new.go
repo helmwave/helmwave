@@ -127,7 +127,6 @@ func NewBody(_ context.Context, file string, validate bool) (*planBody, error) {
 
 	if validate {
 		err = b.Validate()
-
 		if err != nil {
 			return nil, err
 		}

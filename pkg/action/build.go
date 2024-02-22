@@ -140,6 +140,7 @@ func (i *Build) Cmd() *cli.Command {
 		Flags: i.flags(),
 		Before: func(q *cli.Context) error {
 			i.diff.FixFields()
+
 			return nil
 		},
 		Action: toCtx(i.Run),

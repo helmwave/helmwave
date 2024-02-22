@@ -172,7 +172,7 @@ func SetValueAtPath(path string, value any, values Values) (Values, error) {
 // RequiredEnv returns environment variable by name and errors if it is not defined.
 // Used as custom template function.
 func RequiredEnv(name string) (string, error) {
-	if val, exists := os.LookupEnv(name); exists && len(val) > 0 {
+	if val, exists := os.LookupEnv(name); exists && val != "" {
 		return val, nil
 	}
 

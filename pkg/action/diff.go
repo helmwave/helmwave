@@ -19,10 +19,10 @@ const (
 
 // Diff is a struct for running 'diff' commands.
 type Diff struct {
+	*diff.Options
+	kindSuppressHelper cli.StringSlice
 	ThreeWayMerge      bool // maybe it should move to DiffLive?
 	findRenamesHelper  float64
-	kindSuppressHelper cli.StringSlice
-	*diff.Options
 }
 
 func (d *Diff) FixFields() {
@@ -43,6 +43,7 @@ func (d *Diff) Cmd() *cli.Command {
 		Flags:   d.flags(),
 		Before: func(q *cli.Context) error {
 			d.FixFields()
+
 			return nil
 		},
 		Subcommands: []*cli.Command{
