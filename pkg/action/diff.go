@@ -21,6 +21,7 @@ const (
 type Diff struct {
 	*diff.Options
 	kindSuppressHelper cli.StringSlice
+	ThreeWayMerge      bool // maybe it should move to DiffLive?
 	findRenamesHelper  float64
 }
 
@@ -59,6 +60,7 @@ func (d *Diff) flags() []cli.Flag {
 	self := []cli.Flag{
 		flagDiffWide(&d.OutputContext),
 		flagDiffShowSecret(&d.ShowSecrets),
+		flagDiffThreeWayMerge(&d.ThreeWayMerge),
 		&cli.BoolFlag{
 			Name:        "strip-trailing-cr",
 			Usage:       "strip trailing carriage return on input",
