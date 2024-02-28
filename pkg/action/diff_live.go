@@ -12,9 +12,8 @@ var _ Action = (*DiffLive)(nil)
 
 // DiffLive is a struct for running 'diff live' command.
 type DiffLive struct {
-	diff          *Diff
-	plandir       string
-	ThreeWayMerge bool
+	diff    *Diff
+	plandir string
 }
 
 // Run is the main function for 'diff live' command.
@@ -28,7 +27,7 @@ func (d *DiffLive) Run(ctx context.Context) error {
 		return os.ErrNotExist
 	}
 
-	p.DiffLive(ctx, d.diff.Options, d.ThreeWayMerge)
+	p.DiffLive(ctx, d.diff.Options, d.diff.ThreeWayMerge)
 
 	return nil
 }
@@ -47,6 +46,6 @@ func (d *DiffLive) Cmd() *cli.Command {
 func (d *DiffLive) flags() []cli.Flag {
 	return []cli.Flag{
 		flagPlandir(&d.plandir),
-		flagDiffThreeWayMerge(&d.ThreeWayMerge),
+		flagDiffThreeWayMerge(&d.diff.ThreeWayMerge),
 	}
 }
