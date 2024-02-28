@@ -5,11 +5,11 @@ package action
 import (
 	"bytes"
 	"context"
-	"github.com/databus23/helm-diff/v3/diff"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
