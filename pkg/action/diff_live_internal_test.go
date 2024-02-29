@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
@@ -31,7 +32,7 @@ func (ts *DiffLiveTestSuite) SetupTest() {
 }
 
 func (ts *DiffLiveTestSuite) TestCmd() {
-	s := &DiffLive{}
+	s := &DiffLive{diff: &Diff{Options: &diff.Options{}}}
 	cmd := s.Cmd()
 
 	ts.Require().NotNil(cmd)
@@ -50,7 +51,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 		plandir:  tmpDir,
 		tags:     cli.StringSlice{},
 		yml:      y,
-		diff:     &Diff{},
+		diff:     &Diff{Options: &diff.Options{}},
 		diffMode: DiffModeLive,
 	}
 

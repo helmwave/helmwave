@@ -11,6 +11,7 @@ output:
 linters:
   enable-all: true
   disable:
+    - perfsprint
     - paralleltest
     - gochecknoglobals # we use globals
     - musttag # we don't need tags always

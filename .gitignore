@@ -9,6 +9,8 @@ dist/
 helmwave.yml
 .helmwave
 
+tests.cov
+
 ### Linux template
 *~
 

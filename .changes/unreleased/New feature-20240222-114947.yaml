@@ -1,0 +1,6 @@
+kind: New feature
+body: Provide options to helm-diff via flags
+time: 2024-02-22T11:49:47.108824+02:00
+custom:
+  Author: zhilyaev
+  Issue: "814"

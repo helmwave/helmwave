@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
@@ -56,7 +57,7 @@ func (ts *DiffLocalTestSuite) TestRun() {
 			file:      filepath.Join(tests.Root, "02_helmwave.yml"),
 			templater: template.TemplaterSprig,
 		},
-		diff:     &Diff{},
+		diff:     &Diff{Options: &diff.Options{}},
 		diffMode: DiffModeLive,
 	}
 
@@ -68,7 +69,7 @@ func (ts *DiffLocalTestSuite) TestRun() {
 			file:      filepath.Join(tests.Root, "03_helmwave.yml"),
 			templater: template.TemplaterSprig,
 		},
-		diff:     &Diff{},
+		diff:     &Diff{Options: &diff.Options{}},
 		diffMode: DiffModeLive,
 	}
 

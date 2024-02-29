@@ -1,0 +1,25 @@
+project: Test18
+
+registries:
+  - host: ghcr.io
+
+.options: &options
+  wait: true
+  wait_for_jobs: true
+  force: false
+  timeout: 10m
+  chart:
+    name: oci://ghcr.io/zhilyaev/uni
+    version: 1.1.2
+  atomic: false
+  max_history: 3
+  namespace: test18
+  create_namespace: true
+  offline_kube_version: 1.25.2
+  pending_release_strategy: rollback
+
+releases:
+  - name: test18
+    <<: *options
+    values:
+      - tests/18_values.yaml

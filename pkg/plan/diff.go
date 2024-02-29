@@ -9,7 +9,6 @@ import (
 	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/databus23/helm-diff/v3/manifest"
 	"github.com/helmwave/helmwave/pkg/helper"
-	logSetup "github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -31,14 +30,11 @@ var SkippedAnnotations = map[string][]string{
 }
 
 // DiffPlan show diff between 2 plans.
-func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
+func (p *Plan) DiffPlan(b *Plan, opts *diff.Options) {
 	visited := make(map[uniqname.UniqName]bool)
 	k := 0
-	opts := &diff.Options{
-		ShowSecrets:   showSecret,
-		OutputContext: diffWide,
-		OutputFormat:  logSetup.Default.Format(),
-	}
+
+	log.WithField("suppress", opts.SuppressedKinds).Debug("suppress kinds for diffing")
 
 	for _, rel := range append(p.body.Releases, b.body.Releases...) {
 		if visited[rel.Uniq()] {
@@ -66,7 +62,7 @@ func (p *Plan) DiffPlan(b *Plan, showSecret bool, diffWide int) {
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
-func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, threeWayMerge bool) {
+func (p *Plan) DiffLive(ctx context.Context, opts *diff.Options, threeWayMerge bool) {
 	alive, _, err := p.GetLive(ctx)
 	if err != nil {
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
@@ -74,10 +70,6 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, thre
 
 	visited := make([]uniqname.UniqName, 0, len(p.body.Releases))
 	k := 0
-	opts := &diff.Options{
-		ShowSecrets:   showSecret,
-		OutputContext: diffWide,
-	}
 
 	for _, rel := range p.body.Releases {
 		visited = append(visited, rel.Uniq())
@@ -87,7 +79,7 @@ func (p *Plan) DiffLive(ctx context.Context, showSecret bool, diffWide int, thre
 			if threeWayMerge {
 				oldManifest = get3WayMergeManifests(rel, active.Manifest)
 			}
-			// I dont use manifest.ParseRelease
+			// I don't use manifest.ParseRelease
 			// Because Structs are different.
 			oldSpecs := parseManifests(oldManifest, rel.Namespace())
 			newSpecs := parseManifests(newManifest, rel.Namespace())

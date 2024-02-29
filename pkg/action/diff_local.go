@@ -42,7 +42,7 @@ func (d *DiffLocal) Run(ctx context.Context) error {
 		return os.ErrNotExist
 	}
 
-	plan1.DiffPlan(plan2, d.diff.ShowSecret, d.diff.Wide)
+	plan1.DiffPlan(plan2, d.diff.Options)
 
 	return nil
 }
