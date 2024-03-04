@@ -16,6 +16,7 @@ func flagPlandir(v *string) cli.Flag {
 		Name:        "plandir",
 		Aliases:     []string{"p"},
 		Value:       plan.Dir,
+		Category:    "BUILD",
 		Usage:       "path to plandir",
 		EnvVars:     []string{"HELMWAVE_PLANDIR", "HELMWAVE_PLAN"},
 		Destination: v,
@@ -50,6 +51,7 @@ func flagMatchAllTags(v *bool) cli.Flag {
 func flagYmlFile(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "file",
+		Category:    "YML",
 		Aliases:     []string{"f"},
 		Value:       plan.Body,
 		Usage:       "main yml file",
@@ -62,6 +64,7 @@ func flagYmlFile(v *string) cli.Flag {
 func flagTplFile(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "tpl",
+		Category:    "YML",
 		Value:       "helmwave.yml.tpl",
 		Usage:       "main tpl file",
 		EnvVars:     []string{"HELMWAVE_TPL"},
@@ -109,6 +112,7 @@ func flagDiffShowSecret(v *bool) cli.Flag {
 func flagTemplateEngine(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "templater",
+		Category:    "YML",
 		Value:       template.TemplaterSprig,
 		Usage:       fmt.Sprintf("select template engine: [ %s | %s ]", template.TemplaterSprig, template.TemplaterGomplate),
 		EnvVars:     []string{"HELMWAVE_TEMPLATER", "HELMWAVE_TEMPLATE_ENGINE"},
@@ -122,6 +126,7 @@ func flagAutoBuild(v *bool) cli.Flag {
 		Name:        "build",
 		Usage:       "auto build",
 		Value:       false,
+		Category:    "BUILD",
 		EnvVars:     []string{"HELMWAVE_AUTO_BUILD"},
 		Destination: v,
 	}
@@ -144,6 +149,7 @@ func flagSkipUnchanged(v *bool) cli.Flag {
 		Name:        "skip-unchanged",
 		Usage:       "skip unchanged releases",
 		Value:       false,
+		Category:    "BUILD",
 		EnvVars:     []string{"HELMWAVE_SKIP_UNCHANGED"},
 		Destination: v,
 	}
@@ -159,6 +165,7 @@ func flagGraphWidth(v *int) cli.Flag {
 			"N>1 – show only N symbols; " +
 			"N<0 – drop N symbols from end.",
 		Value:       0,
+		Category:    "BUILD",
 		EnvVars:     []string{"HELMWAVE_GRAPH_WIDTH"},
 		Destination: v,
 	}
