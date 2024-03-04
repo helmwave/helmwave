@@ -80,7 +80,7 @@ jobs:
           TAG: ${{ needs.tagger.outputs.tag }}
 
       - name: Upload changelog artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: changelog
           path: .changes/${{ needs.tagger.outputs.tag }}.md
