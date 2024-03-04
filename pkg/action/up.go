@@ -74,6 +74,7 @@ func (i *Up) flags() []cli.Flag {
 			Name:        "progress",
 			Usage:       "enable progress logs of helm (INFO log level)",
 			Value:       false,
+			Category:    "KUBEDOG",
 			EnvVars:     []string{"HELMWAVE_PROGRESS"},
 			Destination: &helper.Helm.Debug,
 		},

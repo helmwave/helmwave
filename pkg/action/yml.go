@@ -34,11 +34,11 @@ func (i *Yml) Run(ctx context.Context) error {
 // Cmd returns 'yml' *cli.Command.
 func (i *Yml) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:     "yml",
-		Category: Step0,
-		Usage:    "📄 render helmwave.yml.tpl -> helmwave.yml",
-		Flags:    i.flags(),
-		Action:   toCtx(i.Run),
+		Name: "yml",
+		// Category: Step0,
+		Usage:  "📄 render helmwave.yml.tpl -> helmwave.yml",
+		Flags:  i.flags(),
+		Action: toCtx(i.Run),
 	}
 }
 
