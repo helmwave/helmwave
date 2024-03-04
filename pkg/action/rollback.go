@@ -36,10 +36,11 @@ func (i *Rollback) Run(ctx context.Context) error {
 // Cmd returns 'rollback' *cli.Command.
 func (i *Rollback) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "rollback",
-		Usage:  "⏮  rollback your plan",
-		Flags:  i.flags(),
-		Action: toCtx(i.Run),
+		Name:     "rollback",
+		Category: Step2,
+		Usage:    "⏮  rollback your plan",
+		Flags:    i.flags(),
+		Action:   toCtx(i.Run),
 	}
 }
 

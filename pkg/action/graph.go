@@ -47,10 +47,11 @@ func (l *Graph) Run(ctx context.Context) error {
 // Cmd returns 'status' *cli.Command.
 func (l *Graph) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "graph",
-		Usage:  "show graph",
-		Flags:  l.flags(),
-		Action: toCtx(l.Run),
+		Name:     "graph",
+		Category: Step1,
+		Usage:    "show graph",
+		Flags:    l.flags(),
+		Action:   toCtx(l.Run),
 	}
 }
 

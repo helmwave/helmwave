@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/action"
 
 	"github.com/urfave/cli/v2"
 )
@@ -72,8 +73,9 @@ var (
 
 func completion() *cli.Command {
 	return &cli.Command{
-		Name:  "completion",
-		Usage: "generate completion script",
+		Name:     "completion",
+		Category: action.Step_,
+		Usage:    "generate completion script",
 		Description: `
 			 echo "source <(helmwave completion bash)" >> ~/.bashrc
 			 echo "source <(helmwave completion zsh)" >> ~/.zshrc"

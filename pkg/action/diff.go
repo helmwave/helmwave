@@ -37,10 +37,11 @@ func (d *Diff) Cmd() *cli.Command {
 	live := DiffLive{diff: d}
 
 	return &cli.Command{
-		Name:    "diff",
-		Usage:   "🆚 show differences",
-		Aliases: []string{"vs"},
-		Flags:   d.flags(),
+		Name:     "diff",
+		Category: Step1,
+		Usage:    "🆚 show differences",
+		Aliases:  []string{"vs"},
+		Flags:    d.flags(),
 		Before: func(q *cli.Context) error {
 			d.FixFields()
 

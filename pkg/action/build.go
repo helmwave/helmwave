@@ -135,9 +135,10 @@ func (i *Build) Run(ctx context.Context) (err error) {
 // Cmd returns 'build' *cli.Command.
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "build",
-		Usage: "🏗 build a plan",
-		Flags: i.flags(),
+		Name:     "build",
+		Category: Step1,
+		Usage:    "🏗 build a plan",
+		Flags:    i.flags(),
 		Before: func(q *cli.Context) error {
 			i.diff.FixFields()
 
