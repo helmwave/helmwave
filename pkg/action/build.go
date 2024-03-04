@@ -110,12 +110,12 @@ func (i *Build) Run(ctx context.Context) (err error) {
 				return err
 			}
 
-			newPlan.DiffPlan(oldPlan, i.diff.ShowSecret, i.diff.Wide)
+			newPlan.DiffPlan(oldPlan, i.diff.Options)
 		}
 
 	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
-		newPlan.DiffLive(ctx, i.diff.ShowSecret, i.diff.Wide, i.diff.ThreeWayMerge)
+		newPlan.DiffLive(ctx, i.diff.Options, i.diff.ThreeWayMerge)
 	case DiffModeNone:
 		log.Info("🆚 Skip diffing")
 	default:
@@ -135,9 +135,14 @@ func (i *Build) Run(ctx context.Context) (err error) {
 // Cmd returns 'build' *cli.Command.
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "build",
-		Usage:  "🏗 build a plan",
-		Flags:  i.flags(),
+		Name:  "build",
+		Usage: "🏗 build a plan",
+		Flags: i.flags(),
+		Before: func(q *cli.Context) error {
+			i.diff.FixFields()
+
+			return nil
+		},
 		Action: toCtx(i.Run),
 	}
 }

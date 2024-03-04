@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-
-	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
@@ -254,7 +254,7 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 		},
 		autoYml:  true,
 		yml:      y,
-		diff:     &Diff{},
+		diff:     &Diff{Options: &diff.Options{}},
 		diffMode: DiffModeLocal,
 	}
 

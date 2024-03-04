@@ -5,6 +5,7 @@ package action
 import (
 	"testing"
 
+	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -18,7 +19,7 @@ func TestDiffTestSuite(t *testing.T) {
 }
 
 func (ts *DiffTestSuite) TestCmd() {
-	s := &Diff{}
+	s := &Diff{Options: &diff.Options{}}
 	cmd := s.Cmd()
 
 	ts.Require().NotNil(cmd)
