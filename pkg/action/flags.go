@@ -28,6 +28,7 @@ func flagTags(v *cli.StringSlice) cli.Flag {
 		Name:        "tags",
 		Aliases:     []string{"t"},
 		Usage:       "build releases by tags: -t tag1 -t tag3,tag4",
+		Category:    "SELECTION",
 		EnvVars:     []string{"HELMWAVE_TAGS"},
 		Destination: v,
 	}
@@ -39,6 +40,7 @@ func flagMatchAllTags(v *bool) cli.Flag {
 		Name:        "match-all-tags",
 		Usage:       "match all provided tags",
 		Value:       false,
+		Category:    "SELECTION",
 		EnvVars:     []string{"HELMWAVE_MATCH_ALL_TAGS"},
 		Destination: v,
 	}
