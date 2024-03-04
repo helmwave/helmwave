@@ -89,7 +89,7 @@ jobs:
         run: changie merge
 
       - name: Create Pull Request for changelog
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           add-paths: |
             CHANGELOG.md
