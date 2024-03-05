@@ -108,11 +108,15 @@ func GenSchema() *jsonschema.Schema {
 	return schema
 }
 
-// NewBody parses plan from file.
-func NewBody(_ context.Context, file string, validate bool) (*planBody, error) {
-	b := &planBody{
+func NewBodyPillow() *planBody {
+	return &planBody{
 		Version: version.Version,
 	}
+}
+
+// NewBody parses plan from file.
+func NewBody(_ context.Context, file string, validate bool) (*planBody, error) {
+	b := NewBodyPillow()
 
 	src, err := os.ReadFile(file)
 	if err != nil {

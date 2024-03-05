@@ -33,7 +33,9 @@ type Config interface {
 	Rollback(context.Context, int) error
 	Status() (*release.Release, error)
 	Name() string
+	SetName(string)
 	Namespace() string
+	SetNamespace(string)
 	Chart() *Chart
 	SetChartName(string)
 	DependsOn() []*DependsOnReference
@@ -41,6 +43,7 @@ type Config interface {
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
+	SetValues([]ValuesReference)
 	HelmWait() bool
 	KubeContext() string
 	Cfg() *action.Configuration

@@ -13,6 +13,8 @@ import (
 	"helm.sh/helm/v3/pkg/postrender"
 )
 
+var Default = &config{}
+
 type configTests struct {
 	Filters       map[string][]string `yaml:"filters,omitempty" json:"filters,omitempty" jsonschema:"description=Filter tests by attributes,default={}"`
 	Enabled       bool                `yaml:"enabled,omitempty" json:"enabled,omitempty" jsonschema:"description=Whether to run helm tests,default=false"`
@@ -99,6 +101,14 @@ func (rel *config) Name() string {
 	return rel.NameF
 }
 
+func (rel *config) SetName(n string) {
+	rel.NameF = n
+}
+
+func (rel *config) SetNamespace(n string) {
+	rel.NamespaceF = n
+}
+
 func (rel *config) Namespace() string {
 	return rel.NamespaceF
 }
@@ -134,6 +144,10 @@ func (rel *config) Tags() []string {
 
 func (rel *config) Values() []ValuesReference {
 	return rel.ValuesF
+}
+
+func (rel *config) SetValues(v []ValuesReference) {
+	rel.ValuesF = v
 }
 
 func (rel *config) Logger() *log.Entry {

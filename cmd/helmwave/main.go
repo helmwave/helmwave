@@ -16,6 +16,7 @@ import (
 //nolint:gochecknoglobals // we need a global list of commands
 var commands = []*cli.Command{
 	new(action.Build).Cmd(),
+	new(action.One).Cmd(),
 	new(action.Diff).Cmd(),
 	new(action.Up).Cmd(),
 	new(action.List).Cmd(),

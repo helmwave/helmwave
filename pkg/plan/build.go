@@ -14,20 +14,36 @@ type BuildOptions struct { //nolint:govet
 	GraphWidth int
 }
 
+func (o *BuildOptions) Body(ctx context.Context) (body *planBody, err error) {
+	// Create Body
+	body, err = NewBody(ctx, o.Yml, false)
+	if err != nil {
+		return
+	}
+	return body, nil
+}
+
 // Build plan with yml and tags/matchALL options.
 //
 //nolint:cyclop,gocognit // TODO: reduce cyclomatic complexity
 func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) { //nolint:funlen
 	p.templater = o.Templater
-
-	// Create Body
-	var body *planBody
-	body, err = NewBody(ctx, o.Yml, false)
+	p.body, err = o.Body(ctx)
 	if err != nil {
 		return
 	}
-	p.body = body
+	return p.build(ctx, o)
 
+}
+
+//nolint:cyclop,gocognit
+func (p *Plan) BuildWithBody(ctx context.Context, o BuildOptions, body *planBody) (err error) { //nolint:funlen
+	p.body = body
+	return p.build(ctx, o)
+
+}
+
+func (p *Plan) build(ctx context.Context, o BuildOptions) (err error) {
 	// Run hooks
 	err = p.body.Lifecycle.RunPreBuild(ctx)
 	if err != nil {

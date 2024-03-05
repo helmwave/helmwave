@@ -19,6 +19,26 @@ type MockReleaseConfig struct {
 	mock.Mock
 }
 
+func (r *MockReleaseConfig) Equal(t T) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *MockReleaseConfig) SetName(s string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *MockReleaseConfig) SetNamespace(s string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *MockReleaseConfig) SetValues(references []release.ValuesReference) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (r *MockReleaseConfig) SetChartName(_ string) {
 	r.Called()
 }
