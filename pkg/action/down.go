@@ -34,10 +34,11 @@ func (i *Down) Run(ctx context.Context) error {
 // Cmd returns 'down' *cli.Command.
 func (i *Down) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "down",
-		Usage:  "🔪 delete all",
-		Flags:  i.flags(),
-		Action: toCtx(i.Run),
+		Name:     "down",
+		Category: Step2,
+		Usage:    "🔪 delete all",
+		Flags:    i.flags(),
+		Action:   toCtx(i.Run),
 	}
 }
 

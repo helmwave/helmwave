@@ -54,10 +54,11 @@ func (i *Up) warnOnBuildFlags(ctx context.Context) {
 // Cmd returns 'up' *cli.Command.
 func (i *Up) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "up",
-		Usage:  "🚢 apply your plan",
-		Flags:  i.flags(),
-		Action: toCtx(i.Run),
+		Name:     "up",
+		Category: Step2,
+		Usage:    "🚢 apply your plan",
+		Flags:    i.flags(),
+		Action:   toCtx(i.Run),
 	}
 }
 
@@ -73,6 +74,7 @@ func (i *Up) flags() []cli.Flag {
 			Name:        "progress",
 			Usage:       "enable progress logs of helm (INFO log level)",
 			Value:       false,
+			Category:    "KUBEDOG",
 			EnvVars:     []string{"HELMWAVE_PROGRESS"},
 			Destination: &helper.Helm.Debug,
 		},

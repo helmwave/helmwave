@@ -37,10 +37,11 @@ func (d *Diff) Cmd() *cli.Command {
 	live := DiffLive{diff: d}
 
 	return &cli.Command{
-		Name:    "diff",
-		Usage:   "🆚 show differences",
-		Aliases: []string{"vs"},
-		Flags:   d.flags(),
+		Name:     "diff",
+		Category: Step1,
+		Usage:    "🆚 show differences",
+		Aliases:  []string{"vs"},
+		Flags:    d.flags(),
 		Before: func(q *cli.Context) error {
 			d.FixFields()
 
@@ -65,6 +66,7 @@ func (d *Diff) flags() []cli.Flag {
 			Name:        "strip-trailing-cr",
 			Usage:       "strip trailing carriage return on input",
 			Value:       false,
+			Category:    "DIFF",
 			EnvVars:     []string{"HELMWAVE_DIFF_STRIP_TRAILING_CR"},
 			Destination: &d.StripTrailingCR,
 		},
@@ -72,6 +74,7 @@ func (d *Diff) flags() []cli.Flag {
 			Name:        "find-renames",
 			Usage:       "enable rename detection if set to any value greater than 0.",
 			Value:       0,
+			Category:    "DIFF",
 			EnvVars:     []string{"HELMWAVE_DIFF_FIND_RENAMES"},
 			Destination: &d.findRenamesHelper,
 		},
@@ -79,6 +82,7 @@ func (d *Diff) flags() []cli.Flag {
 			Name:  "suppress",
 			Usage: "allows suppression of the values listed in the diff output (\"Secret\" for example)",
 			// Value: cli.NewStringSlice("Secret"),
+			Category:    "DIFF",
 			EnvVars:     []string{"HELMWAVE_DIFF_SUPPRESS"},
 			Destination: &d.kindSuppressHelper,
 		},
