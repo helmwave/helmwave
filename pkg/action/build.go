@@ -135,9 +135,10 @@ func (i *Build) Run(ctx context.Context) (err error) {
 // Cmd returns 'build' *cli.Command.
 func (i *Build) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:  "build",
-		Usage: "🏗 build a plan",
-		Flags: i.flags(),
+		Name:     "build",
+		Category: Step1,
+		Usage:    "🏗 build a plan",
+		Flags:    i.flags(),
 		Before: func(q *cli.Context) error {
 			i.diff.FixFields()
 
@@ -165,6 +166,7 @@ func (i *Build) flags() []cli.Flag {
 			Name:        "yml",
 			Usage:       "auto helmwave.yml.tpl --> helmwave.yml",
 			Value:       false,
+			Category:    "YML",
 			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
 			Destination: &i.autoYml,
 		},
@@ -172,6 +174,7 @@ func (i *Build) flags() []cli.Flag {
 			Name:        "remote-source",
 			Usage:       "go-getter URL to download build sources",
 			Value:       "",
+			Category:    "BUILD",
 			EnvVars:     []string{"HELMWAVE_REMOTE_SOURCE"},
 			Destination: &i.remoteSource,
 		},

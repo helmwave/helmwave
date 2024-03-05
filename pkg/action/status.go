@@ -34,10 +34,11 @@ func (l *Status) Run(ctx context.Context) error {
 // Cmd returns 'status' *cli.Command.
 func (l *Status) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "status",
-		Usage:  "👁️status of deployed releases",
-		Flags:  l.flags(),
-		Action: toCtx(l.Run),
+		Name:     "status",
+		Category: Step2,
+		Usage:    "👁️status of deployed releases",
+		Flags:    l.flags(),
+		Action:   toCtx(l.Run),
 	}
 }
 

@@ -33,11 +33,12 @@ func (l *List) Run(ctx context.Context) error {
 // Cmd returns 'list' *cli.Command.
 func (l *List) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:    "list",
-		Aliases: []string{"ls"},
-		Usage:   "👀 list of deployed releases",
-		Flags:   l.flags(),
-		Action:  toCtx(l.Run),
+		Name:     "list",
+		Category: Step2,
+		Aliases:  []string{"ls"},
+		Usage:    "👀 list of deployed releases",
+		Flags:    l.flags(),
+		Action:   toCtx(l.Run),
 	}
 }
 

@@ -29,10 +29,11 @@ func (i *GenSchema) Run(_ context.Context) error {
 // Cmd returns 'GenSchema' *cli.Command.
 func (i *GenSchema) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:   "schema",
-		Usage:  "generate json schema",
-		Flags:  i.flags(),
-		Action: toCtx(i.Run),
+		Name:     "schema",
+		Category: Step_,
+		Usage:    "generate json schema",
+		Flags:    i.flags(),
+		Action:   toCtx(i.Run),
 	}
 }
 

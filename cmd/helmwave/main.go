@@ -110,9 +110,10 @@ func command404(_ *cli.Context, s string) {
 
 func version() *cli.Command {
 	return &cli.Command{
-		Name:    "version",
-		Aliases: []string{"ver"},
-		Usage:   "show shorts version",
+		Name:     "version",
+		Aliases:  []string{"ver"},
+		Category: action.Step_,
+		Usage:    "show shorts version",
 		Action: func(c *cli.Context) error {
 			fmt.Println(helmwave.Version) //nolint:forbidigo // we need to use fmt.Println here
 
