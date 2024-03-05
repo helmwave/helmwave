@@ -1,8 +1,10 @@
 name: Git mirror
 
-on: 
-  - push
-  - delete
+on:
+  push:
+    branches: [ main ]
+  delete:
+    branches: [ main]
 
 jobs:
   sync:

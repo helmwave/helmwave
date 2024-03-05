@@ -2,8 +2,11 @@ name: Check changelog
 
 on:
   pull_request:
+    branches-ignore:
+      - dependabot/*
     branches:
       - main
+
 
 jobs:
   check-changelog:
