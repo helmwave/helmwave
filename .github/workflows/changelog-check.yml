@@ -3,9 +3,9 @@ name: Check changelog
 on:
   pull_request:
     branches-ignore:
-      - dependabot/*
+      - "dependabot/*"
     branches:
-      - main
+      - "main"
 
 
 jobs:
