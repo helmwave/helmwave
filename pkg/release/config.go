@@ -44,7 +44,7 @@ type config struct {
 	PostRendererF       []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
 	ShowNotes           bool                  `yaml:"show_notes,omitempty" json:"show_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install"`
 
-	Timeout time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;int,default=5m"`
+	Timeout time.Duration `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;integer,default=5m"`
 
 	// Lock for parallel testing
 	lock sync.RWMutex
