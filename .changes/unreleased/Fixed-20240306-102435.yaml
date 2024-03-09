@@ -1,6 +1,0 @@
-kind: Fixed
-body: Fixed jsonschema to use correct type (`integer` instead of `int`)
-time: 2024-03-06T10:24:35.397386+01:00
-custom:
-  Author: r3nic1e
-  Issue: "834"
