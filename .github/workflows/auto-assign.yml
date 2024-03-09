@@ -4,7 +4,7 @@ on:
     types: [opened]
   pull_request:
     branches-ignore:
-      - dependabot/*
+      - "dependabot/*"
     types: [opened]
 jobs:
   run:

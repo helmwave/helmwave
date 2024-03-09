@@ -27,9 +27,9 @@ type config struct {
 	log              *log.Entry         `yaml:"-" json:"-"`
 	NameF            string             `yaml:"name" json:"name" jsonschema:"required"`
 	Type             string             `yaml:"type" json:"type" jsonschema:"enum=prometheus,enum=http,required"`
-	TotalTimeout     time.Duration      `yaml:"total_timeout" json:"total_timeout" jsonschema:"title=Timeout for the whole monitor,description=After this timeout hits monitor will fail regardless of current streak,default=5m,oneof_type=string;int"`
-	IterationTimeout time.Duration      `yaml:"iteration_timeout" json:"iteration_timeout" jsonschema:"title=Timeout for each timeout execution,description=After this timeout hits monitor iteration will be considered as failed,default=10s,oneof_type=string;int"`
-	Interval         time.Duration      `yaml:"interval" json:"interval" jsonschema:"default=1m,oneof_type=string;int"`
+	TotalTimeout     time.Duration      `yaml:"total_timeout" json:"total_timeout" jsonschema:"title=Timeout for the whole monitor,description=After this timeout hits monitor will fail regardless of current streak,default=5m,oneof_type=string;integer"`
+	IterationTimeout time.Duration      `yaml:"iteration_timeout" json:"iteration_timeout" jsonschema:"title=Timeout for each timeout execution,description=After this timeout hits monitor iteration will be considered as failed,default=10s,oneof_type=string;integer"`
+	Interval         time.Duration      `yaml:"interval" json:"interval" jsonschema:"default=1m,oneof_type=string;integer"`
 	SuccessThreshold uint8              `yaml:"success_threshold" json:"success_threshold" jsonschema:"default=3"`
 	FailureThreshold uint8              `yaml:"failure_threshold" json:"failure_threshold" jsonschema:"default=3"`
 }
