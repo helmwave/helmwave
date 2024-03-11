@@ -9,6 +9,7 @@
   <a href="https://codecov.io/gh/helmwave/helmwave"><img alt="codecov" src="https://codecov.io/gh/helmwave/helmwave/branch/main/graph/badge.svg?token=0WXxYhIG4S" /></a>
   <a href="https://www.codacy.com/gh/helmwave/helmwave/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=helmwave/helmwave&amp;utm_campaign=Badge_Grade"><img alt="codacy" src="https://app.codacy.com/project/badge/Grade/200ca37690b7463b976f1ece36b53a4e"/></a>
   <a href="https://www.codefactor.io/repository/github/helmwave/helmwave"><img src="https://www.codefactor.io/repository/github/helmwave/helmwave/badge" alt="CodeFactor" /></a>
+  <a href="https://goreportcard.com/report/github.com/helmwave/helmwave"><img src="https://goreportcard.com/badge/github.com/helmwave/helmwave" alt="CodeFactor" /></a>
   <img alt="GitHub tag (latest SemVer)" src="https://img.shields.io/github/v/tag/zhilyaev/helmwave?label=latest">
 </p>
 
