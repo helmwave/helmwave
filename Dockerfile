@@ -19,6 +19,7 @@ RUN go build -a -o /${PROJECT} ./cmd/${PROJECT}
 ### Base image with shell
 FROM alpine:${ALPINE_VERSION} as base-release
 RUN apk --update --no-cache add ca-certificates && update-ca-certificates
+COPY --from=bitnami/kubectl:latest /opt/bitnami/kubectl/bin/kubectl /bin/kubectl
 ENTRYPOINT ["/bin/helmwave"]
 
 ### Build with goreleaser
