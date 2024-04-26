@@ -19,11 +19,21 @@ RUN go build -a -o /${PROJECT} ./cmd/${PROJECT}
 ### Base image with shell
 FROM alpine:${ALPINE_VERSION} as base-release
 RUN apk --update --no-cache add ca-certificates && update-ca-certificates
+ENTRYPOINT ["/bin/helmwave"]
+
+### Base image with shell and debugging tools
+FROM alpine:${ALPINE_VERSION} as base-debug-release
+RUN apk --update --no-cache add ca-certificates jq bash &&\
+	update-ca-certificates
 COPY --chown=root:root --chmod=0775 --from=bitnami/kubectl:latest /opt/bitnami/kubectl/bin/kubectl /bin/kubectl
 ENTRYPOINT ["/bin/helmwave"]
 
 ### Build with goreleaser
 FROM base-release as goreleaser
+COPY helmwave /bin/
+
+### Debug tag
+FROM base-debug-release as debug-goreleaser
 COPY helmwave /bin/
 
 ### Build in docker
