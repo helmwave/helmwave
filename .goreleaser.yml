@@ -21,7 +21,7 @@ builds:
       # - v4
     goos:
       - linux
-      - windows
+      # - windows
       - darwin
     main: ./cmd/helmwave
     ldflags:
