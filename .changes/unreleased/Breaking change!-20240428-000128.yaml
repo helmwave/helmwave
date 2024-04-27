@@ -1,0 +1,6 @@
+kind: Breaking change!
+body: Values render now have a constant timeout - 1 minute per release
+time: 2024-04-28T00:01:28.842044+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""
