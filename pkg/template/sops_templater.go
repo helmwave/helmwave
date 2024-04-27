@@ -2,6 +2,7 @@ package template
 
 import (
 	"context"
+	"io"
 
 	"go.mozilla.org/sops/v3/decrypt"
 )
@@ -10,7 +11,9 @@ const (
 	TemplaterSOPS = "sops"
 )
 
-type sopsTemplater struct{}
+type sopsTemplater struct {
+	additionalOutputs []io.Writer
+}
 
 func (t sopsTemplater) Name() string {
 	return TemplaterSOPS
@@ -22,7 +25,27 @@ func (t sopsTemplater) Render(_ context.Context, src string, _ any) ([]byte, err
 		return nil, NewSOPSDecodeError(err)
 	}
 
+	writers := []io.Writer{}
+	if t.additionalOutputs != nil {
+		writers = append(writers, t.additionalOutputs...)
+	}
+	w := io.MultiWriter(writers...)
+
+	_, err = w.Write(data)
+	if err != nil {
+		return nil, err
+	}
+
 	return data, nil
 }
 
 func (t sopsTemplater) Delims(string, string) {}
+
+func (t *sopsTemplater) AddOutput(w io.Writer) {
+	if t.additionalOutputs == nil {
+		t.additionalOutputs = []io.Writer{}
+	}
+	t.additionalOutputs = append(t.additionalOutputs, w)
+}
+
+func (t sopsTemplater) AddFunc(string, any) {}

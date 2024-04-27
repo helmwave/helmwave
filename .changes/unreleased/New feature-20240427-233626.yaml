@@ -1,0 +1,6 @@
+kind: New feature
+body: Add new template function `getValues` to reference other values
+time: 2024-04-27T23:36:26.462279+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""

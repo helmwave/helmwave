@@ -262,6 +262,27 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	ts.Require().NoError(s.Run(ts.ctx), "build should not fail with diffing with previous plan")
 }
 
+func (ts *BuildTestSuite) TestValuesDependency() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "19_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "19_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+		yml:     y,
+	}
+
+	ts.Require().NoError(s.Run(ts.ctx), "build should not fail")
+}
+
 type NonParallelBuildTestSuite struct {
 	suite.Suite
 
