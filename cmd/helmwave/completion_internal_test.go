@@ -25,7 +25,9 @@ func (ts *CliTestSuite) TestCompletion() {
 
 	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
 
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
+
 		err := app.Run(tt.args)
 		if tt.fails {
 			ts.Error(err)

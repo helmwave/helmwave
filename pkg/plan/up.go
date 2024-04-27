@@ -241,7 +241,7 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 
 	releasesMutex := &sync.Mutex{}
 
-	for i := 0; i < parallelLimit; i++ {
+	for range parallelLimit {
 		go p.syncReleasesWorker(ctx, releasesWG, releasesNodesChan, releasesMutex, releasesFails, monitorsLockMap)
 	}
 

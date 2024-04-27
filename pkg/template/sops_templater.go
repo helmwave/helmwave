@@ -33,6 +33,7 @@ func (t sopsTemplater) Render(_ context.Context, src string, _ any) ([]byte, err
 
 	_, err = w.Write(data)
 	if err != nil {
+		//nolint:wrapcheck
 		return nil, err
 	}
 

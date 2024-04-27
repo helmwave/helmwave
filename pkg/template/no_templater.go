@@ -27,6 +27,7 @@ func (t noTemplater) Render(_ context.Context, src string, _ any) ([]byte, error
 	b := []byte(src)
 	_, err := w.Write(b)
 	if err != nil {
+		//nolint:wrapcheck
 		return nil, err
 	}
 

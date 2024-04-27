@@ -20,9 +20,9 @@ const (
 )
 
 type gomplateTemplater struct {
+	additionalFuncs               map[string]any
 	delimiterLeft, delimiterRight string
 	additionalOutputs             []io.Writer
-	additionalFuncs               map[string]any
 }
 
 func (t gomplateTemplater) Name() string {

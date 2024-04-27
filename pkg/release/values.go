@@ -165,18 +165,28 @@ func (v *ValuesReference) SetViaRelease(
 		return err
 	}
 
-	renderedMap[v.Src] = &strings.Builder{}
+	if renderedMap != nil {
+		renderedMap[v.Src] = &strings.Builder{}
+	}
+
 	opts := []template.TemplaterOptions{
 		template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight),
 		template.CopyOutput(renderedMap[v.Src]),
-		template.AddFunc("getValues", func(filename string) (any, error) {
-			for renderedMap[filename] == nil {
-			}
+	}
+	if renderedMap != nil {
+		opts = append(opts,
+			template.AddFunc("getValues", func(filename string) (any, error) {
+				//nolint:staticcheck
+				for renderedMap[filename] == nil {
+				}
 
-			var res any
-			err := yaml.Unmarshal([]byte(renderedMap[filename].String()), &res)
-			return res, err
-		}),
+				var res any
+				err := yaml.Unmarshal([]byte(renderedMap[filename].String()), &res)
+
+				//nolint:wrapcheck
+				return res, err
+			},
+			))
 	}
 	if v.isURL() {
 		err = template.Tpl2yml(ctx, v.Dst, v.Dst, data, v.Renderer, opts...)
