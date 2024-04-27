@@ -20,8 +20,8 @@ type Config interface {
 	helper.EqualChecker[Config]
 	log.LoggerGetter
 	Uniq() uniqname.UniqName
-	Sync(context.Context) (*release.Release, error)
-	SyncDryRun(context.Context) (*release.Release, error)
+	Sync(context.Context, bool) (*release.Release, error)
+	SyncDryRun(context.Context, bool) (*release.Release, error)
 	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error

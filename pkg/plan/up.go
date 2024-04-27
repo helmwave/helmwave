@@ -300,7 +300,7 @@ func (p *Plan) syncRelease(
 
 	l.Info("🛥 deploying... ")
 
-	if _, err := rel.Sync(ctx); err != nil {
+	if _, err := rel.Sync(ctx, true); err != nil {
 		l.WithError(err).Error("❌ failed to deploy")
 
 		if rel.AllowFailure() {

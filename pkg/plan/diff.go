@@ -183,7 +183,7 @@ func diffChartsFilter(path []string, _ reflect.Type, _ reflect.StructField) bool
 func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, l log.FieldLogger) bool {
 	l.Info("getting charts diff")
 
-	dryRunRelease, err := rel.SyncDryRun(ctx)
+	dryRunRelease, err := rel.SyncDryRun(ctx, false)
 	if err != nil {
 		l.WithError(err).Error("failed to get dry-run release")
 

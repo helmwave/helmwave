@@ -64,7 +64,7 @@ func (ts *GetTestSuite) TestGet() {
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
 
-	r1, err := rel.Sync(ts.ctx)
+	r1, err := rel.Sync(ts.ctx, false)
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r1)
 
