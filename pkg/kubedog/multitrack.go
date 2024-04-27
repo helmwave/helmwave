@@ -45,7 +45,7 @@ var ignoredGenericGK = []string{
 func MakeSpecs(m []Resource, ns string, trackGeneric bool) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
-	for i := 0; i < len(m); i++ {
+	for i := range m {
 		r := &m[i]
 
 		spec, err := r.MakeMultiTrackSpec(ns)

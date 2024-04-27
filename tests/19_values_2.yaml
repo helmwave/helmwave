@@ -1,0 +1,3 @@
+{{ $v := getValues "tests/19_values_1.yaml" }}
+envs:
+  FOO: {{ get "envs.HELLO" $v }}
