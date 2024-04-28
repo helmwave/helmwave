@@ -33,7 +33,7 @@ jobs:
         run: go mod download
 
       - name: Run tests
-        run: go test -p=1 -race -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
+        run: go test -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
 
       - uses: codecov/codecov-action@v4
         with:
