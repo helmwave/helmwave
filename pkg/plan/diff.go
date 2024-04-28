@@ -23,8 +23,6 @@ import (
 )
 
 // SkippedAnnotations is a map with all annotations to be skipped by differ.
-//
-//nolint:gochecknoglobals // can't make this const
 var SkippedAnnotations = map[string][]string{
 	live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
 	helper.RootAnnoName + "skip-diff": {"true"},

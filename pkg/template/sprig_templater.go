@@ -18,12 +18,12 @@ const (
 )
 
 var (
-	sprigAliases = map[string]string{ //nolint:gochecknoglobals // can't make these const
+	sprigAliases = map[string]string{
 		"get":    "sprigGet",
 		"hasKey": "sprigHasKey",
 	}
 
-	customFuncs = map[string]any{ //nolint:gochecknoglobals // can't make these const
+	customFuncs = map[string]any{
 		"toYaml":         ToYaml,
 		"fromYaml":       FromYaml,
 		"exec":           Exec,

@@ -15,7 +15,6 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-//nolint:gochecknoglobals // TODO: get rid of globals
 var (
 	// Helm is an instance of helm CLI.
 	Helm = helm.New()
