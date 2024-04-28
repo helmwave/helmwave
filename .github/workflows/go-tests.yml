@@ -39,3 +39,4 @@ jobs:
         with:
           files: ./tests.cov
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
