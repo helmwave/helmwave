@@ -7,3 +7,6 @@ linter: jetbrains/qodana-go:latest
 
 include:
   - name: CheckDependencyLicenses
+
+exclude:
+  - name: GoMixedReceiverTypes

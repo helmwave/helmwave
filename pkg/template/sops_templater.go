@@ -25,11 +25,7 @@ func (t sopsTemplater) Render(_ context.Context, src string, _ any) ([]byte, err
 		return nil, NewSOPSDecodeError(err)
 	}
 
-	writers := []io.Writer{}
-	if t.additionalOutputs != nil {
-		writers = append(writers, t.additionalOutputs...)
-	}
-	w := io.MultiWriter(writers...)
+	w := io.MultiWriter(t.additionalOutputs...)
 
 	_, err = w.Write(data)
 	if err != nil {

@@ -18,11 +18,7 @@ func (t noTemplater) Name() string {
 }
 
 func (t noTemplater) Render(_ context.Context, src string, _ any) ([]byte, error) {
-	writers := []io.Writer{}
-	if t.additionalOutputs != nil {
-		writers = append(writers, t.additionalOutputs...)
-	}
-	w := io.MultiWriter(writers...)
+	w := io.MultiWriter(t.additionalOutputs...)
 
 	b := []byte(src)
 	_, err := w.Write(b)
