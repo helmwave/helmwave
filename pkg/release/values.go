@@ -165,14 +165,15 @@ func (v *ValuesReference) SetViaRelease(
 		return err
 	}
 
-	if renderedMap != nil {
-		renderedMap[v.Src] = &strings.Builder{}
-	}
-
 	opts := []template.TemplaterOptions{
 		template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight),
-		template.CopyOutput(renderedMap[v.Src]),
 	}
+
+	if renderedMap != nil {
+		renderedMap[v.Src] = &strings.Builder{}
+		opts = append(opts, template.CopyOutput(renderedMap[v.Src]))
+	}
+
 	if renderedMap != nil {
 		opts = append(opts,
 			template.AddFunc("getValues", func(filename string) (any, error) {
