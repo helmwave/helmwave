@@ -15,7 +15,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	structDiff "github.com/r3labs/diff/v3"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/exp/maps"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	live "helm.sh/helm/v3/pkg/release"
@@ -55,9 +54,7 @@ func (p *Plan) DiffPlan(b *Plan, opts *diff.Options) {
 		}
 	}
 
-	visitedNames := maps.Keys(visited)
-
-	showChangesReport(p.body.Releases, visitedNames, k)
+	showChangesReport(p.body.Releases, visited, k)
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
@@ -67,11 +64,12 @@ func (p *Plan) DiffLive(ctx context.Context, opts *diff.Options, threeWayMerge b
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
 	}
 
-	visited := make([]uniqname.UniqName, 0, len(p.body.Releases))
+	visited := make(map[uniqname.UniqName]bool, len(p.body.Releases))
 	k := 0
 
 	for _, rel := range p.body.Releases {
-		visited = append(visited, rel.Uniq())
+		visited[rel.Uniq()] = true
+
 		if active, ok := alive[rel.Uniq()]; ok {
 			newManifest := p.manifests[rel.Uniq()]
 			oldManifest := active.Manifest
@@ -245,13 +243,15 @@ func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 }
 
 // showChangesReport help function for reporting helm-diff.
-func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k int) {
+func showChangesReport(releases []release.Config, visited map[uniqname.UniqName]bool, k int) {
 	previous := false
 	for _, rel := range releases {
-		if !helper.In(rel.Uniq(), visited) {
-			previous = true
-			rel.Logger().Warn("🆚 release was found in previous plan but not affected in new")
+		if visited[rel.Uniq()] {
+			continue
 		}
+
+		previous = true
+		rel.Logger().Warn("🆚 release was found in previous plan but not affected in new")
 	}
 
 	if k == len(releases) && !previous {

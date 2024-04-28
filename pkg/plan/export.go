@@ -69,7 +69,9 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 
 func (p *Plan) removeUnchanged() {
 	p.body.Releases = slices.DeleteFunc(p.body.Releases, func(rel release.Config) bool {
-		return helper.In(rel, p.unchanged)
+		return slices.ContainsFunc(p.unchanged, func(r release.Config) bool {
+			return r.Uniq().Equal(rel.Uniq())
+		})
 	})
 }
 

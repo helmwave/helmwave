@@ -3,6 +3,7 @@ package plan
 import (
 	"slices"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
 )
@@ -77,12 +78,10 @@ func addToPlan(
 	return newPlan, nil
 }
 
-func releaseNames(a []release.Config) (n []string) {
-	for _, r := range a {
-		n = append(n, r.Uniq().String())
-	}
-
-	return n
+func releaseNames(a []release.Config) []string {
+	return helper.SlicesMap(a, func(r release.Config) string {
+		return r.Uniq().String()
+	})
 }
 
 // checkTagInclusion checks where any of release tags are included in target tags.

@@ -18,7 +18,6 @@ import (
 
 // Config is an interface to manage particular helm release.
 type Config interface {
-	helper.EqualChecker[Config]
 	log.LoggerGetter
 	Uniq() uniqname.UniqName
 	Sync(context.Context, bool) (*release.Release, error)
@@ -62,11 +61,11 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 		return fmt.Errorf("failed to decode release config from YAML: %w", err)
 	}
 
-	*r = make([]Config, len(rr))
-	for i := range rr {
-		rr[i].buildAfterUnmarshal(rr)
-		(*r)[i] = rr[i]
-	}
+	*r = helper.SlicesMap(rr, func(r *config) Config {
+		r.buildAfterUnmarshal(rr)
+
+		return r
+	})
 
 	return nil
 }

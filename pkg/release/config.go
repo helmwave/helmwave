@@ -175,13 +175,15 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 			}
 		case DependencyTag:
 			for _, r := range allReleases {
-				if slices.Contains(r.Tags(), dep.Tag) {
-					newDep := &DependsOnReference{
-						Name:     r.Uniq().String(),
-						Optional: dep.Optional,
-					}
-					newDeps = append(newDeps, newDep)
+				if !slices.Contains(r.Tags(), dep.Tag) {
+					continue
 				}
+
+				newDep := &DependsOnReference{
+					Name:     r.Uniq().String(),
+					Optional: dep.Optional,
+				}
+				newDeps = append(newDeps, newDep)
 			}
 		case DependencyInvalid:
 			l.Warn("invalid dependency, skipping")

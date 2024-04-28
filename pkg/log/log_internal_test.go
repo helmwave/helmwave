@@ -47,12 +47,9 @@ func (ts *LogTestSuite) TearDownSuite() {
 }
 
 func (ts *LogTestSuite) getLoggerMessages() []string {
-	res := make([]string, len(ts.logHook.Entries))
-	for i, entry := range ts.logHook.AllEntries() {
-		res[i] = entry.Message
-	}
-
-	return res
+	return helper.SlicesMap(ts.logHook.AllEntries(), func(entry *log.Entry) string {
+		return entry.Message
+	})
 }
 
 func (ts *LogTestSuite) TestKLogHandler() {

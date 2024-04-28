@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -34,10 +35,9 @@ func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config) error
 
 		return err
 	} else {
-		var vals []string
-		for i := range rel.Values() {
-			vals = append(vals, rel.Values()[i].Dst)
-		}
+		vals := helper.SlicesMap(rel.Values(), func(v release.ValuesReference) string {
+			return v.Dst
+		})
 
 		if len(vals) == 0 {
 			rel.Logger().Info("🔨 no values provided")

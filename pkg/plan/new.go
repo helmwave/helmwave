@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/registry"
@@ -63,20 +64,17 @@ func NewAndImport(ctx context.Context, src string) (p *Plan, err error) {
 
 // Logger will pretty build log.Entry.
 func (p *Plan) Logger() *log.Entry {
-	a := make([]string, 0, len(p.body.Releases))
-	for _, r := range p.body.Releases {
-		a = append(a, r.Uniq().String())
-	}
+	a := helper.SlicesMap(p.body.Releases, func(r release.Config) string {
+		return r.Uniq().String()
+	})
 
-	b := make([]string, 0, len(p.body.Repositories))
-	for _, r := range p.body.Repositories {
-		b = append(b, r.Name())
-	}
+	b := helper.SlicesMap(p.body.Repositories, func(r repo.Config) string {
+		return r.Name()
+	})
 
-	c := make([]string, 0, len(p.body.Registries))
-	for _, r := range p.body.Registries {
-		c = append(c, r.Host())
-	}
+	c := helper.SlicesMap(p.body.Registries, func(r registry.Config) string {
+		return r.Host()
+	})
 
 	return log.WithFields(log.Fields{
 		"releases":     a,

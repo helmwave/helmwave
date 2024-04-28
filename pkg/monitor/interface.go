@@ -3,6 +3,7 @@ package monitor
 import (
 	"context"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/invopop/jsonschema"
 	"github.com/sirupsen/logrus"
@@ -35,10 +36,7 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 		return NewYAMLDecodeError(err)
 	}
 
-	*r = make([]Config, len(rr))
-	for i := range rr {
-		(*r)[i] = rr[i]
-	}
+	*r = helper.SlicesMap(rr, func(h *config) Config { return h })
 
 	return nil
 }

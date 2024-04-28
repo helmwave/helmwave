@@ -24,10 +24,9 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 	}
 
 	// Values
-	valuesFiles := make([]string, 0, len(rel.Values()))
-	for i := range rel.Values() {
-		valuesFiles = append(valuesFiles, rel.Values()[i].Dst)
-	}
+	valuesFiles := helper.SlicesMap(rel.Values(), func(v ValuesReference) string {
+		return v.Dst
+	})
 
 	valOpts := &values.Options{ValueFiles: valuesFiles}
 	vals, err := valOpts.MergeValues(getter.All(rel.Helm()))

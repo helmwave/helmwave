@@ -103,18 +103,13 @@ func (graph *Graph[K, N]) runChan(ch chan<- *Node[N]) {
 
 	for len(nodes) > 0 {
 		for key, node := range nodes {
+			switch {
 			// In case some release failed because it's dependency failed
-			if node.IsDone() {
+			case node.IsDone():
 				delete(nodes, key)
-
-				continue
-			}
-
-			if node.IsReady() {
+			case node.IsReady():
 				ch <- node
 				delete(nodes, key)
-
-				continue
 			}
 		}
 	}

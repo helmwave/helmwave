@@ -9,6 +9,7 @@ import (
 
 	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/helmwave/helmwave/pkg/cache"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -229,12 +230,11 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		b, _ := plan.NewBody(ts.ctx, filepath.Join(s.plandir, plan.File), true)
 
-		names := make([]string, 0, len(b.Releases))
-		for _, r := range b.Releases {
-			names = append(names, r.Name())
-		}
+		names := helper.SlicesMap(b.Releases, func(rel release.Config) string {
+			return rel.Name()
+		})
 
-		ts.Require().ElementsMatch(cases[i].names, names)
+		ts.ElementsMatch(cases[i].names, names)
 	}
 }
 
@@ -316,12 +316,9 @@ func (ts *NonParallelBuildTestSuite) TearDownSuite() {
 }
 
 func (ts *NonParallelBuildTestSuite) getLoggerMessages() []string {
-	res := make([]string, len(ts.logHook.Entries))
-	for i, entry := range ts.logHook.AllEntries() {
-		res[i] = entry.Message
-	}
-
-	return res
+	return helper.SlicesMap(ts.logHook.AllEntries(), func(entry *log.Entry) string {
+		return entry.Message
+	})
 }
 
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
