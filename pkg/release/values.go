@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -131,18 +132,13 @@ func ProhibitDst(values []ValuesReference) error {
 	return nil
 }
 
-// func (v *ValuesReference) Set(Dst string) *ValuesReference {
-//	v.Dst = Dst
-//	return v
-// }
-
 // SetViaRelease downloads and templates values file.
 // Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
 func (v *ValuesReference) SetViaRelease(
 	ctx context.Context,
 	rel Config,
 	dir, templater string,
-	renderedMap map[string]*strings.Builder,
+	renderedFiles *renderedValuesFiles,
 ) error {
 	if v.Renderer == "" {
 		v.Renderer = templater
@@ -169,20 +165,19 @@ func (v *ValuesReference) SetViaRelease(
 		template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight),
 	}
 
-	if renderedMap != nil {
-		renderedMap[v.Src] = &strings.Builder{}
-		opts = append(opts, template.CopyOutput(renderedMap[v.Src]))
-	}
+	if renderedFiles != nil {
+		buf := &strings.Builder{}
+		defer func() {
+			renderedFiles.Add(v.Src, buf)
+		}()
 
-	if renderedMap != nil {
 		opts = append(opts,
+			template.CopyOutput(buf),
 			template.AddFunc("getValues", func(filename string) (any, error) {
-				//nolint:staticcheck
-				for renderedMap[filename] == nil {
-				}
+				s := renderedFiles.Get(filename).String()
 
 				var res any
-				err := yaml.Unmarshal([]byte(renderedMap[filename].String()), &res)
+				err := yaml.Unmarshal([]byte(s), &res)
 
 				//nolint:wrapcheck
 				return res, err
@@ -226,7 +221,7 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 	wg.Add(len(vals))
 
 	renderedValuesChan := make(chan ValuesReference, len(vals))
-	renderedValuesMap := make(map[string]*strings.Builder, len(vals))
+	renderedValuesMap := newRenderedValuesFiles()
 
 	// just in case of dependency cycle or long http requests
 	ctx, cancel := context.WithTimeout(ctx, time.Minute)
@@ -269,4 +264,35 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 	rel.ValuesF = renderedValues
 
 	return nil
+}
+
+type renderedValuesFiles struct {
+	bufs map[string]fmt.Stringer
+	cond *sync.Cond
+}
+
+func newRenderedValuesFiles() *renderedValuesFiles {
+	r := &renderedValuesFiles{
+		bufs: make(map[string]fmt.Stringer),
+	}
+	r.cond = sync.NewCond(&sync.Mutex{})
+
+	return r
+}
+
+func (r *renderedValuesFiles) Add(name string, buf fmt.Stringer) {
+	r.cond.L.Lock()
+	r.bufs[name] = buf
+	r.cond.Broadcast()
+	r.cond.L.Unlock()
+}
+
+func (r *renderedValuesFiles) Get(name string) fmt.Stringer {
+	r.cond.L.Lock()
+	for r.bufs[name] == nil {
+		r.cond.Wait()
+	}
+	r.cond.L.Unlock()
+
+	return r.bufs[name]
 }
