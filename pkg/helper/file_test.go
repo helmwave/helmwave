@@ -12,30 +12,6 @@ type FileTestSuite struct {
 	suite.Suite
 }
 
-func (s *FileTestSuite) TestContainsGood() {
-	b := helper.Contains("c", []string{
-		"a",
-		"b",
-		"c",
-		"d",
-		"c",
-	})
-
-	s.Require().True(b)
-}
-
-func (s *FileTestSuite) TestContainsBad() {
-	b := helper.Contains("12", []string{
-		"a",
-		"b",
-		"c",
-		"d",
-		"c",
-	})
-
-	s.Require().False(b)
-}
-
 func (s *FileTestSuite) TestCreateFile() {
 	tmpDir := s.T().TempDir()
 	filePath := filepath.Join(tmpDir, "testdir", "test")

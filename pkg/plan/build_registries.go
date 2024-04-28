@@ -10,10 +10,12 @@ import (
 func buildRegistriesMapTop(releases []release.Config) map[string][]release.Config {
 	m := make(map[string][]release.Config)
 	for _, rel := range releases {
-		if registry.IsOCI(rel.Chart().Name) {
-			m[rel.Repo()] = append(m[rel.Repo()], rel)
-			rel.Logger().Debugln("🗄 This chart will download via OCI")
+		if !registry.IsOCI(rel.Chart().Name) {
+			continue
 		}
+
+		m[rel.Repo()] = append(m[rel.Repo()], rel)
+		rel.Logger().Debug("🗄 This chart will download via OCI")
 	}
 
 	return m

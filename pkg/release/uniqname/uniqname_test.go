@@ -18,11 +18,10 @@ func (s *ValidateTestSuite) TestGood() {
 	}
 
 	for _, d := range data {
-		s.Require().NoError(uniqname.UniqName(d).Validate())
+		s.NoError(uniqname.UniqName(d).Validate())
 	}
 }
 
-//nolint:testifylint
 func (s *ValidateTestSuite) TestBad() {
 	data := []string{
 		"my-release",

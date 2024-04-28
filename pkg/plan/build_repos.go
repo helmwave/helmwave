@@ -42,9 +42,11 @@ func buildRepoMapTop(releases []release.Config) map[string][]release.Config {
 	m := make(map[string][]release.Config)
 	for _, rel := range releases {
 		// Added to map if is not OCI
-		if !registry.IsOCI(rel.Chart().Name) {
-			m[rel.Repo()] = append(m[rel.Repo()], rel)
+		if registry.IsOCI(rel.Chart().Name) {
+			continue
 		}
+
+		m[rel.Repo()] = append(m[rel.Repo()], rel)
 	}
 
 	return m

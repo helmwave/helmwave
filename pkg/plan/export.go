@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -67,15 +68,9 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 }
 
 func (p *Plan) removeUnchanged() {
-	filtered := p.body.Releases[:0]
-
-	for _, rel := range p.body.Releases {
-		if !helper.In[release.Config](rel, p.unchanged) {
-			filtered = append(filtered, rel)
-		}
-	}
-
-	p.body.Releases = filtered
+	p.body.Releases = slices.DeleteFunc(p.body.Releases, func(rel release.Config) bool {
+		return helper.In(rel, p.unchanged)
+	})
 }
 
 func (p *Plan) exportCharts() error {
@@ -144,15 +139,9 @@ func (p *Plan) exportManifest() error {
 }
 
 func (p *Plan) exportGraphMD() error {
-	found := false
-	for _, rel := range p.body.Releases {
-		if len(rel.DependsOn()) > 0 {
-			found = true
-
-			break
-		}
-	}
-
+	found := slices.ContainsFunc(p.body.Releases, func(rel release.Config) bool {
+		return len(rel.DependsOn()) > 0
+	})
 	if !found {
 		return nil
 	}

@@ -3,9 +3,9 @@ package plan
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"sort"
 
-	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,13 +20,10 @@ func status(all []release.Config, names []string) error {
 
 	if len(names) > 0 {
 		sort.Strings(names)
-		r = make([]release.Config, 0, len(all))
 
-		for _, rel := range all {
-			if helper.Contains(rel.Uniq().String(), names) {
-				r = append(r, rel)
-			}
-		}
+		r = slices.DeleteFunc(r, func(rel release.Config) bool {
+			return !slices.Contains(names, rel.Uniq().String())
+		})
 	}
 
 	for _, rel := range r {

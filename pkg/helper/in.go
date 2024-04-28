@@ -9,9 +9,7 @@ type EqualChecker[T any] interface {
 
 // In returns whether `search` appears in `target` slice.
 func In[T any, C EqualChecker[T]](search C, target []T) bool {
-	i := slices.IndexFunc(target, func(t T) bool {
+	return slices.ContainsFunc(target, func(t T) bool {
 		return search.Equal(t)
 	})
-
-	return i != -1
 }

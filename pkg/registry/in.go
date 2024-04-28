@@ -1,12 +1,12 @@
 package registry
 
-// IndexOfHost searches registry in slice of registries by host. Returns offset.
-func IndexOfHost(a []Config, host string) (i int, found bool) {
-	for i, r := range a {
-		if host == r.Host() {
-			return i, true
-		}
-	}
+import "golang.org/x/exp/slices"
 
-	return i, false
+// IndexOfHost searches registry in slice of registries by host. Returns offset.
+func IndexOfHost(a []Config, host string) (int, bool) {
+	i := slices.IndexFunc(a, func(r Config) bool {
+		return host == r.Host()
+	})
+
+	return i, i != -1
 }

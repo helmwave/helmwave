@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"reflect"
+	"slices"
 	"strings"
 	"sync"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	structDiff "github.com/r3labs/diff/v3"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/maps"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/chart"
 	live "helm.sh/helm/v3/pkg/release"
@@ -36,7 +38,7 @@ func (p *Plan) DiffPlan(b *Plan, opts *diff.Options) {
 
 	log.WithField("suppress", opts.SuppressedKinds).Debug("suppress kinds for diffing")
 
-	for _, rel := range append(p.body.Releases, b.body.Releases...) {
+	for _, rel := range slices.Concat(p.body.Releases, b.body.Releases) {
 		if visited[rel.Uniq()] {
 			continue
 		}
@@ -53,10 +55,7 @@ func (p *Plan) DiffPlan(b *Plan, opts *diff.Options) {
 		}
 	}
 
-	visitedNames := make([]uniqname.UniqName, 0, len(visited))
-	for n := range visited {
-		visitedNames = append(visitedNames, n)
-	}
+	visitedNames := maps.Keys(visited)
 
 	showChangesReport(p.body.Releases, visitedNames, k)
 }
@@ -230,15 +229,15 @@ func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 		}
 
 		for anno := range parsed.Metadata.Annotations {
-			if helper.Contains(parsed.Metadata.Annotations[anno], SkippedAnnotations[anno]) {
-				log.WithFields(log.Fields{
-					"resource":   manifests[k].Name,
-					"annotation": anno,
-				}).Debug("resource diff is skipped due to annotation")
-				delete(manifests, k)
-
+			if !slices.Contains(SkippedAnnotations[anno], parsed.Metadata.Annotations[anno]) {
 				continue
 			}
+
+			log.WithFields(log.Fields{
+				"resource":   manifests[k].Name,
+				"annotation": anno,
+			}).Debug("resource diff is skipped due to annotation")
+			delete(manifests, k)
 		}
 	}
 

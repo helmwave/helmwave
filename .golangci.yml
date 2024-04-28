@@ -713,6 +713,11 @@ linters-settings:
         json: snake
         yaml: snake
 
+  testifylint:
+    enable-all: true
+    disable:
+      - require-error
+
   testpackage:
     # regexp pattern to skip files
     skip-regexp: (export|internal)_test\.go

@@ -1,10 +1,10 @@
 package release
 
 import (
+	"slices"
 	"sync"
 	"time"
 
-	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
@@ -175,7 +175,7 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 			}
 		case DependencyTag:
 			for _, r := range allReleases {
-				if helper.Contains(dep.Tag, r.Tags()) {
+				if slices.Contains(r.Tags(), dep.Tag) {
 					newDep := &DependsOnReference{
 						Name:     r.Uniq().String(),
 						Optional: dep.Optional,

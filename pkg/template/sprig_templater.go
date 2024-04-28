@@ -96,9 +96,7 @@ func (t sprigTemplater) funcMap() template.FuncMap {
 }
 
 func addToMap(dst, src template.FuncMap) {
-	for k, v := range src {
-		dst[k] = v
-	}
+	maps.Copy(dst, src)
 }
 
 func (t *sprigTemplater) Delims(left, right string) {

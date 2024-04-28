@@ -3,6 +3,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
@@ -85,11 +86,13 @@ func (r Configs) Contains(rel Config) (Config, bool) {
 }
 
 func (r Configs) ContainsUniq(uniq uniqname.UniqName) (Config, bool) {
-	for _, rel := range r {
-		if rel.Uniq().Equal(uniq) {
-			return rel, true
-		}
+	i := slices.IndexFunc(r, func(rel Config) bool {
+		return rel.Uniq().Equal(uniq)
+	})
+
+	if i == -1 {
+		return nil, false
 	}
 
-	return nil, false
+	return r[i], true
 }

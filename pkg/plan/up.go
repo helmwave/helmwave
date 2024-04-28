@@ -159,8 +159,7 @@ func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
 func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
 	dependenciesGraph := dependency.NewGraph[uniqname.UniqName, release.Config]()
 
-	for i := range p.Releases {
-		rel := p.Releases[i]
+	for _, rel := range p.Releases {
 		err := dependenciesGraph.NewNode(rel.Uniq(), rel)
 		if err != nil {
 			return nil, err
