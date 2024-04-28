@@ -47,17 +47,17 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 	return u
 }
 
-func (r *MockReleaseConfig) Sync(_ context.Context) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) Sync(_ context.Context, _ bool) (*helmRelease.Release, error) {
 	args := r.Called()
 
 	return args.Get(0).(*helmRelease.Release), args.Error(1)
 }
 
-func (r *MockReleaseConfig) SyncDryRun(ctx context.Context) (*helmRelease.Release, error) {
+func (r *MockReleaseConfig) SyncDryRun(ctx context.Context, runHooks bool) (*helmRelease.Release, error) {
 	r.DryRun(true)
 	defer r.DryRun(false)
 
-	return r.Sync(ctx)
+	return r.Sync(ctx, runHooks)
 }
 
 func (r *MockReleaseConfig) DryRun(bool) {
