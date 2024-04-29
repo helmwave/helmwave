@@ -229,7 +229,7 @@ docker_manifests:
     image_templates:
       - ghcr.io/helmwave/helmwave:{{ .Version }}-debug-amd64
       - ghcr.io/helmwave/helmwave:{{ .Version }}-debug-arm64v8
-  - name_template: ghcr.io/helmwave/helmwave:latest
+  - name_template: ghcr.io/helmwave/helmwave:debug
     image_templates:
       - ghcr.io/helmwave/helmwave:debug-amd64
       - ghcr.io/helmwave/helmwave:debug-arm64v8
