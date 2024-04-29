@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Bump go 1.22 && update deps
-time: 2024-04-26T12:01:18.632862+03:00
-custom:
-  Author: zhilyaev
-  Issue: ""

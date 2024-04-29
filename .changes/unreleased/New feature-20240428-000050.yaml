@@ -1,7 +1,0 @@
-kind: New feature
-body: Now all values are rendered in parallel - probably a few ns faster. Now you
-  don't have time to take a sip of coffee
-time: 2024-04-28T00:00:50.990842+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
