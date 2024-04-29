@@ -60,6 +60,6 @@ func (ts *HTTPTestSuite) TestIsURL() {
 
 	for _, url := range urls {
 		b := helper.IsURL(url)
-		ts.True(b)
+		ts.Truef(b, "%s is not URL", url)
 	}
 }

@@ -57,6 +57,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.Recreate = rel.Recreate
 	client.ReuseValues = rel.ReuseValues
 	client.ResetValues = rel.ResetValues
+	client.ResetThenReuseValues = rel.ResetThenReuseValues
 
 	// Common Part
 	client.DryRun = rel.dryRun

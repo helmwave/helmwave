@@ -159,8 +159,7 @@ func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
 func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
 	dependenciesGraph := dependency.NewGraph[uniqname.UniqName, release.Config]()
 
-	for i := range p.Releases {
-		rel := p.Releases[i]
+	for _, rel := range p.Releases {
 		err := dependenciesGraph.NewNode(rel.Uniq(), rel)
 		if err != nil {
 			return nil, err
@@ -241,7 +240,7 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 
 	releasesMutex := &sync.Mutex{}
 
-	for i := 0; i < parallelLimit; i++ {
+	for range parallelLimit {
 		go p.syncReleasesWorker(ctx, releasesWG, releasesNodesChan, releasesMutex, releasesFails, monitorsLockMap)
 	}
 
@@ -300,7 +299,7 @@ func (p *Plan) syncRelease(
 
 	l.Info("🛥 deploying... ")
 
-	if _, err := rel.Sync(ctx); err != nil {
+	if _, err := rel.Sync(ctx, true); err != nil {
 		l.WithError(err).Error("❌ failed to deploy")
 
 		if rel.AllowFailure() {

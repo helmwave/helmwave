@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"reflect"
+	"slices"
 	"strings"
 	"sync"
 
@@ -22,8 +23,6 @@ import (
 )
 
 // SkippedAnnotations is a map with all annotations to be skipped by differ.
-//
-//nolint:gochecknoglobals // can't make this const
 var SkippedAnnotations = map[string][]string{
 	live.HookAnnotation:               {string(live.HookTest), "test-success", "test-failure"},
 	helper.RootAnnoName + "skip-diff": {"true"},
@@ -36,7 +35,7 @@ func (p *Plan) DiffPlan(b *Plan, opts *diff.Options) {
 
 	log.WithField("suppress", opts.SuppressedKinds).Debug("suppress kinds for diffing")
 
-	for _, rel := range append(p.body.Releases, b.body.Releases...) {
+	for _, rel := range slices.Concat(p.body.Releases, b.body.Releases) {
 		if visited[rel.Uniq()] {
 			continue
 		}
@@ -53,12 +52,7 @@ func (p *Plan) DiffPlan(b *Plan, opts *diff.Options) {
 		}
 	}
 
-	visitedNames := make([]uniqname.UniqName, 0, len(visited))
-	for n := range visited {
-		visitedNames = append(visitedNames, n)
-	}
-
-	showChangesReport(p.body.Releases, visitedNames, k)
+	showChangesReport(p.body.Releases, visited, k)
 }
 
 // DiffLive show diff with production releases in k8s-cluster.
@@ -68,11 +62,12 @@ func (p *Plan) DiffLive(ctx context.Context, opts *diff.Options, threeWayMerge b
 		log.Fatalf("Something went wrong with getting releases in the kubernetes cluster: %v", err)
 	}
 
-	visited := make([]uniqname.UniqName, 0, len(p.body.Releases))
+	visited := make(map[uniqname.UniqName]bool, len(p.body.Releases))
 	k := 0
 
 	for _, rel := range p.body.Releases {
-		visited = append(visited, rel.Uniq())
+		visited[rel.Uniq()] = true
+
 		if active, ok := alive[rel.Uniq()]; ok {
 			newManifest := p.manifests[rel.Uniq()]
 			oldManifest := active.Manifest
@@ -183,7 +178,7 @@ func diffChartsFilter(path []string, _ reflect.Type, _ reflect.StructField) bool
 func diffCharts(ctx context.Context, oldChart *chart.Chart, rel release.Config, l log.FieldLogger) bool {
 	l.Info("getting charts diff")
 
-	dryRunRelease, err := rel.SyncDryRun(ctx)
+	dryRunRelease, err := rel.SyncDryRun(ctx, false)
 	if err != nil {
 		l.WithError(err).Error("failed to get dry-run release")
 
@@ -230,15 +225,15 @@ func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 		}
 
 		for anno := range parsed.Metadata.Annotations {
-			if helper.Contains(parsed.Metadata.Annotations[anno], SkippedAnnotations[anno]) {
-				log.WithFields(log.Fields{
-					"resource":   manifests[k].Name,
-					"annotation": anno,
-				}).Debug("resource diff is skipped due to annotation")
-				delete(manifests, k)
-
+			if !slices.Contains(SkippedAnnotations[anno], parsed.Metadata.Annotations[anno]) {
 				continue
 			}
+
+			log.WithFields(log.Fields{
+				"resource":   manifests[k].Name,
+				"annotation": anno,
+			}).Debug("resource diff is skipped due to annotation")
+			delete(manifests, k)
 		}
 	}
 
@@ -246,13 +241,15 @@ func parseManifests(m, ns string) map[string]*manifest.MappingResult {
 }
 
 // showChangesReport help function for reporting helm-diff.
-func showChangesReport(releases []release.Config, visited []uniqname.UniqName, k int) {
+func showChangesReport(releases []release.Config, visited map[uniqname.UniqName]bool, k int) {
 	previous := false
 	for _, rel := range releases {
-		if !helper.In(rel.Uniq(), visited) {
-			previous = true
-			rel.Logger().Warn("🆚 release was found in previous plan but not affected in new")
+		if visited[rel.Uniq()] {
+			continue
 		}
+
+		previous = true
+		rel.Logger().Warn("🆚 release was found in previous plan but not affected in new")
 	}
 
 	if k == len(releases) && !previous {

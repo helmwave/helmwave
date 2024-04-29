@@ -3,6 +3,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
@@ -17,11 +18,10 @@ import (
 
 // Config is an interface to manage particular helm release.
 type Config interface {
-	helper.EqualChecker[Config]
 	log.LoggerGetter
 	Uniq() uniqname.UniqName
-	Sync(context.Context) (*release.Release, error)
-	SyncDryRun(context.Context) (*release.Release, error)
+	Sync(context.Context, bool) (*release.Release, error)
+	SyncDryRun(context.Context, bool) (*release.Release, error)
 	AllowFailure() bool
 	DryRun(bool)
 	ChartDepsUpd() error
@@ -61,11 +61,11 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 		return fmt.Errorf("failed to decode release config from YAML: %w", err)
 	}
 
-	*r = make([]Config, len(rr))
-	for i := range rr {
-		rr[i].buildAfterUnmarshal(rr)
-		(*r)[i] = rr[i]
-	}
+	*r = helper.SlicesMap(rr, func(r *config) Config {
+		r.buildAfterUnmarshal(rr)
+
+		return r
+	})
 
 	return nil
 }
@@ -85,11 +85,13 @@ func (r Configs) Contains(rel Config) (Config, bool) {
 }
 
 func (r Configs) ContainsUniq(uniq uniqname.UniqName) (Config, bool) {
-	for _, rel := range r {
-		if rel.Uniq().Equal(uniq) {
-			return rel, true
-		}
+	i := slices.IndexFunc(r, func(rel Config) bool {
+		return rel.Uniq().Equal(uniq)
+	})
+
+	if i == -1 {
+		return nil, false
 	}
 
-	return nil, false
+	return r[i], true
 }

@@ -62,11 +62,11 @@ func (s *ExtraTestSuite) TestFromYaml() {
 	for i := range tests {
 		v, err := template.FromYaml(tests[i].yaml)
 		if tests[i].fails {
-			s.Require().Error(err)
-			s.Require().Empty(v)
+			s.Error(err)
+			s.Empty(v)
 		} else {
-			s.Require().NoError(err)
-			s.Require().Equal(tests[i].result, v)
+			s.NoError(err)
+			s.Equal(tests[i].result, v)
 		}
 	}
 }
@@ -180,11 +180,11 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	for i := range tests {
 		res, err := template.SetValueAtPath(tests[i].path, tests[i].value, data)
 		if tests[i].fails {
-			s.Require().Error(err)
-			s.Require().Nil(res)
+			s.Error(err)
+			s.Nil(res)
 		} else {
-			s.Require().NoError(err)
-			s.Require().Equal(tests[i].result, res)
+			s.NoError(err)
+			s.Equal(tests[i].result, res)
 		}
 	}
 }
@@ -215,11 +215,11 @@ func (s *ExtraTestSuite) TestRequired() {
 	for _, t := range tests {
 		res, err := template.Required("blabla", t.data)
 		if t.fails {
-			s.Require().Error(err)
-			s.Require().Nil(res)
+			s.Error(err)
+			s.Nil(res)
 		} else {
-			s.Require().NoError(err)
-			s.Require().Equal(t.data, res)
+			s.NoError(err)
+			s.Equal(t.data, res)
 		}
 	}
 }
@@ -290,11 +290,11 @@ func (s *ExtraTestSuite) TestGet() {
 	for i := range tests {
 		res, err := template.Get(tests[i].path, data)
 		if tests[i].fails {
-			s.Require().Error(err)
-			s.Require().Nil(res)
+			s.Error(err)
+			s.Nil(res)
 		} else {
-			s.Require().NoError(err)
-			s.Require().Equal(tests[i].result, res)
+			s.NoError(err)
+			s.Equal(tests[i].result, res)
 		}
 	}
 }
@@ -344,12 +344,12 @@ func (s *ExtraTestSuite) TestHasKey() {
 
 	for _, test := range tests {
 		res, err := template.HasKey(test.path, data)
-		s.Require().Equal(test.result, res)
+		s.Equal(test.result, res)
 
 		if test.fails {
-			s.Require().Error(err)
+			s.Error(err)
 		} else {
-			s.Require().NoError(err)
+			s.NoError(err)
 		}
 	}
 }

@@ -2,6 +2,8 @@ package dependency
 
 import (
 	"fmt"
+
+	"golang.org/x/exp/maps"
 )
 
 // Graph is dependencies graph. K stands for map keys type (e.g. string names), N for data type.
@@ -97,25 +99,17 @@ func (graph *Graph[K, N]) dfs(node *Node[N], visited map[*Node[N]]int) error {
 }
 
 func (graph *Graph[K, N]) runChan(ch chan<- *Node[N]) {
-	nodes := make(map[K]*Node[N])
-	for key, node := range graph.Nodes {
-		nodes[key] = node
-	}
+	nodes := maps.Clone(graph.Nodes)
 
 	for len(nodes) > 0 {
 		for key, node := range nodes {
+			switch {
 			// In case some release failed because it's dependency failed
-			if node.IsDone() {
+			case node.IsDone():
 				delete(nodes, key)
-
-				continue
-			}
-
-			if node.IsReady() {
+			case node.IsReady():
 				ch <- node
 				delete(nodes, key)
-
-				continue
 			}
 		}
 	}

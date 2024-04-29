@@ -77,34 +77,36 @@ func (p *planBody) Validate() error {
 
 // ValidateRepositories validates all repositories.
 func (p *planBody) ValidateRepositories() error {
-	a := make(map[string]int8)
+	a := make(map[string]bool)
 	for _, r := range p.Repositories {
 		err := r.Validate()
 		if err != nil {
 			return err
 		}
 
-		a[r.Name()]++
-		if a[r.Name()] > 1 {
+		if a[r.Name()] {
 			return repo.NewDuplicateError(r.Name())
 		}
+
+		a[r.Name()] = true
 	}
 
 	return nil
 }
 
 func (p *planBody) ValidateRegistries() error {
-	a := make(map[string]int8)
+	a := make(map[string]bool)
 	for _, r := range p.Registries {
 		err := r.Validate()
 		if err != nil {
 			return err
 		}
 
-		a[r.Host()]++
-		if a[r.Host()] > 1 {
+		if a[r.Host()] {
 			return registry.NewDuplicateError(r.Host())
 		}
+
+		a[r.Host()] = true
 	}
 
 	return nil
@@ -112,17 +114,18 @@ func (p *planBody) ValidateRegistries() error {
 
 // ValidateReleases validates all releases.
 func (p *planBody) ValidateReleases() error {
-	a := make(map[uniqname.UniqName]int8)
+	a := make(map[uniqname.UniqName]bool)
 	for _, r := range p.Releases {
 		err := r.Validate()
 		if err != nil {
 			return err
 		}
 
-		a[r.Uniq()]++
-		if a[r.Uniq()] > 1 {
+		if a[r.Uniq()] {
 			return release.NewDuplicateError(r.Uniq())
 		}
+
+		a[r.Uniq()] = true
 	}
 
 	_, err := p.generateDependencyGraph()
@@ -134,24 +137,25 @@ func (p *planBody) ValidateReleases() error {
 }
 
 func (p *planBody) ValidateMonitors() error {
-	a := make(map[string]int8)
+	a := make(map[string]bool)
 	for _, r := range p.Monitors {
 		err := r.Validate()
 		if err != nil {
 			return err
 		}
 
-		a[r.Name()]++
-		if a[r.Name()] > 1 {
+		if a[r.Name()] {
 			return monitor.NewDuplicateError(r.Name())
 		}
+
+		a[r.Name()] = true
 	}
 
 	for _, r := range p.Releases {
 		mons := r.Monitors()
 		for i := range mons {
 			mon := mons[i]
-			if a[mon.Name] != 1 {
+			if !a[mon.Name] {
 				return monitor.NewNotExistsError(mon.Name)
 			}
 		}

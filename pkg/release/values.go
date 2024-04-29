@@ -8,8 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
+	"sync"
+	"time"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/invopop/jsonschema"
@@ -128,14 +132,14 @@ func ProhibitDst(values []ValuesReference) error {
 	return nil
 }
 
-// func (v *ValuesReference) Set(Dst string) *ValuesReference {
-//	v.Dst = Dst
-//	return v
-// }
-
 // SetViaRelease downloads and templates values file.
 // Returns ErrValuesNotExist if values can't be downloaded or doesn't exist in local FS.
-func (v *ValuesReference) SetViaRelease(ctx context.Context, rel Config, dir, templater string) error {
+func (v *ValuesReference) SetViaRelease(
+	ctx context.Context,
+	rel Config,
+	dir, templater string,
+	renderedFiles *renderedValuesFiles,
+) error {
 	if v.Renderer == "" {
 		v.Renderer = templater
 	}
@@ -157,11 +161,33 @@ func (v *ValuesReference) SetViaRelease(ctx context.Context, rel Config, dir, te
 		return err
 	}
 
-	delimOption := template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)
+	opts := []template.TemplaterOptions{
+		template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight),
+	}
+
+	if renderedFiles != nil {
+		buf := &strings.Builder{}
+		defer func() {
+			renderedFiles.Add(v.Src, buf)
+		}()
+
+		opts = append(opts,
+			template.CopyOutput(buf),
+			template.AddFunc("getValues", func(filename string) (any, error) {
+				s := renderedFiles.Get(filename).String()
+
+				var res any
+				err := yaml.Unmarshal([]byte(s), &res)
+
+				//nolint:wrapcheck
+				return res, err
+			},
+			))
+	}
 	if v.isURL() {
-		err = template.Tpl2yml(ctx, v.Dst, v.Dst, data, v.Renderer, delimOption)
+		err = template.Tpl2yml(ctx, v.Dst, v.Dst, data, v.Renderer, opts...)
 	} else {
-		err = template.Tpl2yml(ctx, v.Src, v.Dst, data, v.Renderer, delimOption)
+		err = template.Tpl2yml(ctx, v.Src, v.Dst, data, v.Renderer, opts...)
 	}
 
 	if err != nil {
@@ -190,21 +216,83 @@ func (v *ValuesReference) fetch(ctx context.Context, l *log.Entry) error {
 
 func (rel *config) BuildValues(ctx context.Context, dir, templater string) error {
 	vals := rel.Values()
-	for i := len(vals) - 1; i >= 0; i-- {
-		v := vals[i]
-		err := v.SetViaRelease(ctx, rel, dir, templater)
-		switch {
-		case !v.Strict && errors.Is(ErrValuesNotExist, err):
-			rel.Logger().WithError(err).WithField("values", v).Warn("skipping values...")
-			rel.ValuesF = append(rel.ValuesF[:i], rel.ValuesF[i+1:]...)
-		case err != nil:
-			rel.Logger().WithError(err).WithField("values", v).Error("failed to build values")
 
-			return err
-		default:
-			rel.Values()[i] = v
-		}
+	wg := parallel.NewWaitGroup()
+	wg.Add(len(vals))
+
+	renderedValuesChan := make(chan ValuesReference, len(vals))
+	renderedValuesMap := newRenderedValuesFiles()
+
+	// just in case of dependency cycle or long http requests
+	ctx, cancel := context.WithTimeout(ctx, time.Minute)
+	defer cancel()
+
+	l := rel.Logger()
+
+	// we explicitly use slice length here instead of ranging over slice because we modify slice inside the loop
+	// we keep the iterator independent of the slice just in case
+	for i := len(vals) - 1; i >= 0; i-- {
+		go func(v ValuesReference) {
+			defer wg.Done()
+
+			l := l.WithField("values", v)
+
+			err := v.SetViaRelease(ctx, rel, dir, templater, renderedValuesMap)
+			switch {
+			case !v.Strict && errors.Is(ErrValuesNotExist, err):
+				l.WithError(err).Warn("skipping values...")
+			case err != nil:
+				l.WithError(err).Error("failed to build values")
+
+				wg.ErrChan() <- err
+			default:
+				renderedValuesChan <- v
+			}
+		}(vals[i])
 	}
 
+	err := wg.WaitWithContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	close(renderedValuesChan)
+	renderedValues := make([]ValuesReference, 0, len(renderedValuesChan))
+	for v := range renderedValuesChan {
+		renderedValues = append(renderedValues, v)
+	}
+	rel.ValuesF = renderedValues
+
 	return nil
+}
+
+type renderedValuesFiles struct {
+	bufs map[string]fmt.Stringer
+	cond *sync.Cond
+}
+
+func newRenderedValuesFiles() *renderedValuesFiles {
+	r := &renderedValuesFiles{
+		bufs: make(map[string]fmt.Stringer),
+	}
+	r.cond = sync.NewCond(&sync.Mutex{})
+
+	return r
+}
+
+func (r *renderedValuesFiles) Add(name string, buf fmt.Stringer) {
+	r.cond.L.Lock()
+	r.bufs[name] = buf
+	r.cond.Broadcast()
+	r.cond.L.Unlock()
+}
+
+func (r *renderedValuesFiles) Get(name string) fmt.Stringer {
+	r.cond.L.Lock()
+	for r.bufs[name] == nil {
+		r.cond.Wait()
+	}
+	r.cond.L.Unlock()
+
+	return r.bufs[name]
 }

@@ -2,6 +2,7 @@ package release
 
 import (
 	"reflect"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -16,18 +17,6 @@ type ChartInternalTestSuite struct {
 func TestChartInternalTestSuite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(ChartInternalTestSuite))
-}
-
-func (ts *ChartInternalTestSuite) contains(a []string, b string) bool {
-	ts.T().Helper()
-
-	for i := range a {
-		if a[i] == b {
-			return true
-		}
-	}
-
-	return false
 }
 
 // TestChartTypeFields checks that all fields of helm upgrade action exist in config structure.
@@ -48,12 +37,12 @@ func (ts *ChartInternalTestSuite) TestChartTypeFields() {
 		fieldsR[i] = f.Name
 	}
 
-	for i := bb.NumField() - 1; i >= 0; i-- {
+	for i := range bb.NumField() {
 		f := bb.Field(i)
 		if !f.IsExported() {
 			continue
 		}
-		if !ts.contains(skipFields, f.Name) {
+		if !slices.Contains(skipFields, f.Name) {
 			ts.Require().Contains(fieldsR, f.Name)
 		}
 	}

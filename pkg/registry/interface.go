@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
@@ -27,10 +28,9 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 		return NewYAMLDecodeError(err)
 	}
 
-	*r = make([]Config, len(rr))
-	for i := range rr {
-		(*r)[i] = rr[i]
-	}
+	*r = helper.SlicesMap(rr, func(r *config) Config {
+		return r
+	})
 
 	return nil
 }

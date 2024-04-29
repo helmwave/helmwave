@@ -82,7 +82,7 @@ func (ts *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
-	ts.Require().NoError(v.SetViaRelease(ts.ctx, mockedRelease, tmpDir, template.TemplaterSprig))
+	ts.Require().NoError(v.SetViaRelease(ts.ctx, mockedRelease, tmpDir, template.TemplaterSprig, nil))
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)

@@ -2,6 +2,8 @@ package release
 
 import (
 	"reflect"
+	"slices"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -9,18 +11,6 @@ import (
 
 type ConfigInternalTestSuite struct {
 	suite.Suite
-}
-
-func (s *ConfigInternalTestSuite) contains(a []string, b string) bool {
-	s.T().Helper()
-
-	for i := range a {
-		if a[i] == b {
-			return true
-		}
-	}
-
-	return false
 }
 
 // TestConfigHelmTypeFields checks that all fields of helm upgrade action exist in config structure.
@@ -40,24 +30,33 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 
 	r := NewConfig()
 	rr := reflect.ValueOf(r).Elem().Type()
-	fieldsR := make([]string, rr.NumField())
+	fieldsR := make([]string, 0, rr.NumField())
 
 	c := r.newUpgrade()
 	rc := reflect.ValueOf(c).Elem().Type()
 
-	for i := range fieldsR {
+	for i := range rr.NumField() {
 		f := rr.Field(i)
-		fieldsR[i] = f.Name
+		if !f.IsExported() {
+			continue
+		}
+		if strings.HasSuffix(f.Name, "F") {
+			continue
+		}
+
+		fieldsR = append(fieldsR, f.Name)
 	}
 
-	for i := rc.NumField() - 1; i >= 0; i-- {
+	for i := range rc.NumField() {
 		f := rc.Field(i)
 		if !f.IsExported() {
 			continue
 		}
-		if !s.contains(skipFields, f.Name) {
-			s.Require().Contains(fieldsR, f.Name)
+		if slices.Contains(skipFields, f.Name) {
+			continue
 		}
+
+		s.Containsf(fieldsR, f.Name, "helm upgrade field %q is not supported by helmwave config", f.Name)
 	}
 }
 

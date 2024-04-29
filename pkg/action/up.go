@@ -41,12 +41,14 @@ func (i *Up) Run(ctx context.Context) error {
 
 func (i *Up) warnOnBuildFlags(ctx context.Context) {
 	cliCtx, ok := ctx.Value("cli").(*cli.Context)
-	if ok && cliCtx != nil {
-		for _, buildFlag := range i.build.flags() {
-			name := buildFlag.Names()[0]
-			if cliCtx.IsSet(name) {
-				log.WithField("flag", name).Warn("this flag is used by autobuild (--build) but autobuild is disabled")
-			}
+	if !ok || cliCtx == nil {
+		return
+	}
+
+	for _, buildFlag := range i.build.flags() {
+		name := buildFlag.Names()[0]
+		if cliCtx.IsSet(name) {
+			log.WithField("flag", name).Warn("this flag is used by autobuild (--build) but autobuild is disabled")
 		}
 	}
 }

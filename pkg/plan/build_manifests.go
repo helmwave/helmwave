@@ -31,7 +31,7 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup,
 		l.WithError(err).Warn("❌ can't get dependencies")
 	}
 
-	r, err := rel.SyncDryRun(ctx)
+	r, err := rel.SyncDryRun(ctx, true)
 	if err != nil || r == nil {
 		l.Errorf("❌ can't get manifests: %v", err)
 		wg.ErrChan() <- err

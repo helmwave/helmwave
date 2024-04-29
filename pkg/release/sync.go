@@ -10,40 +10,42 @@ import (
 )
 
 //nolint:gocognit,nestif,cyclop
-func (rel *config) Sync(ctx context.Context) (r *release.Release, err error) {
+func (rel *config) Sync(ctx context.Context, runHooks bool) (r *release.Release, err error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
-	if rel.dryRun {
-		err = rel.Lifecycle.RunPreBuild(ctx)
-		if err != nil {
-			return
-		}
-
-		defer func() {
-			lifecycleErr := rel.Lifecycle.RunPostBuild(ctx)
-			if lifecycleErr != nil {
-				rel.Logger().Errorf("got an error from postbuild hooks: %v", lifecycleErr)
-				if err == nil {
-					err = lifecycleErr
-				}
+	if runHooks {
+		if rel.dryRun {
+			err = rel.Lifecycle.RunPreBuild(ctx)
+			if err != nil {
+				return
 			}
-		}()
-	} else {
-		err = rel.Lifecycle.RunPreUp(ctx)
-		if err != nil {
-			return
-		}
 
-		defer func() {
-			lifecycleErr := rel.Lifecycle.RunPostUp(ctx)
-			if lifecycleErr != nil {
-				rel.Logger().Errorf("got an error from postup hooks: %v", lifecycleErr)
-				if err == nil {
-					err = lifecycleErr
+			defer func() {
+				lifecycleErr := rel.Lifecycle.RunPostBuild(ctx)
+				if lifecycleErr != nil {
+					rel.Logger().Errorf("got an error from postbuild hooks: %v", lifecycleErr)
+					if err == nil {
+						err = lifecycleErr
+					}
 				}
+			}()
+		} else {
+			err = rel.Lifecycle.RunPreUp(ctx)
+			if err != nil {
+				return
 			}
-		}()
+
+			defer func() {
+				lifecycleErr := rel.Lifecycle.RunPostUp(ctx)
+				if lifecycleErr != nil {
+					rel.Logger().Errorf("got an error from postup hooks: %v", lifecycleErr)
+					if err == nil {
+						err = lifecycleErr
+					}
+				}
+			}()
+		}
 	}
 
 	r, err = rel.upgrade(ctx)
@@ -67,12 +69,12 @@ func (rel *config) Sync(ctx context.Context) (r *release.Release, err error) {
 	return
 }
 
-func (rel *config) SyncDryRun(ctx context.Context) (*release.Release, error) {
+func (rel *config) SyncDryRun(ctx context.Context, runHooks bool) (*release.Release, error) {
 	old := rel.dryRun
 	defer rel.DryRun(old)
 	rel.DryRun(true)
 
-	return rel.Sync(ctx)
+	return rel.Sync(ctx, runHooks)
 }
 
 func (rel *config) Cfg() *action.Configuration {

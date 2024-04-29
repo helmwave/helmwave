@@ -3,6 +3,7 @@ package hooks
 import (
 	"strings"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"gopkg.in/yaml.v3"
 )
 
@@ -14,10 +15,7 @@ func (h *Hooks) UnmarshalYAML(node *yaml.Node) error {
 		return NewYAMLDecodeError(err)
 	}
 
-	*h = make([]Hook, len(rr))
-	for i := range rr {
-		(*h)[i] = rr[i]
-	}
+	*h = helper.SlicesMap(rr, func(h *hook) Hook { return h })
 
 	return nil
 }

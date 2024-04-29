@@ -194,10 +194,7 @@ func (i *Build) normalizeTags() []string {
 // normalizeTags normalizes and splits comma-separated tag list.
 // ["c", " b ", "a "] -> ["a", "b", "c"].
 func normalizeTagList(tags []string) []string {
-	m := make([]string, len(tags))
-	for i, t := range tags {
-		m[i] = strings.TrimSpace(t)
-	}
+	m := helper.SlicesMap(tags, strings.TrimSpace)
 	sort.Strings(m)
 
 	return m

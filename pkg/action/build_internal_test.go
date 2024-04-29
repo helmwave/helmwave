@@ -9,6 +9,7 @@ import (
 
 	"github.com/databus23/helm-diff/v3/diff"
 	"github.com/helmwave/helmwave/pkg/cache"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -229,12 +230,11 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 
 		b, _ := plan.NewBody(ts.ctx, filepath.Join(s.plandir, plan.File), true)
 
-		names := make([]string, 0, len(b.Releases))
-		for _, r := range b.Releases {
-			names = append(names, r.Name())
-		}
+		names := helper.SlicesMap(b.Releases, func(rel release.Config) string {
+			return rel.Name()
+		})
 
-		ts.Require().ElementsMatch(cases[i].names, names)
+		ts.ElementsMatch(cases[i].names, names)
 	}
 }
 
@@ -260,6 +260,27 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 
 	ts.Require().NoError(s.Run(ts.ctx), "build should not fail without diffing")
 	ts.Require().NoError(s.Run(ts.ctx), "build should not fail with diffing with previous plan")
+}
+
+func (ts *BuildTestSuite) TestValuesDependency() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "19_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "19_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Build{
+		plandir: tmpDir,
+		tags:    cli.StringSlice{},
+		options: plan.BuildOptions{
+			MatchAll: true,
+		},
+		autoYml: true,
+		yml:     y,
+	}
+
+	ts.Require().NoError(s.Run(ts.ctx), "build should not fail")
 }
 
 type NonParallelBuildTestSuite struct {
@@ -295,12 +316,9 @@ func (ts *NonParallelBuildTestSuite) TearDownSuite() {
 }
 
 func (ts *NonParallelBuildTestSuite) getLoggerMessages() []string {
-	res := make([]string, len(ts.logHook.Entries))
-	for i, entry := range ts.logHook.AllEntries() {
-		res[i] = entry.Message
-	}
-
-	return res
+	return helper.SlicesMap(ts.logHook.AllEntries(), func(entry *log.Entry) string {
+		return entry.Message
+	})
 }
 
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {

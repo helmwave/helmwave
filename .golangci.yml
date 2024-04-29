@@ -230,8 +230,6 @@ linters-settings:
         truncate: "32"
 
   gosimple:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
     # https://staticcheck.io/docs/options#checks
     checks:
       - all
@@ -633,15 +631,11 @@ linters-settings:
         disabled: false
 
   staticcheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
     # https://staticcheck.io/docs/options#checks
     checks:
       - all
 
   stylecheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
     # https://staticcheck.io/docs/options#checks
     checks:
       - all
@@ -713,6 +707,11 @@ linters-settings:
         json: snake
         yaml: snake
 
+  testifylint:
+    enable-all: true
+    disable:
+      - require-error
+
   testpackage:
     # regexp pattern to skip files
     skip-regexp: (export|internal)_test\.go
@@ -739,9 +738,6 @@ linters-settings:
     # if it's called for subdir of a project it can't find external interfaces. All text editor integrations
     # with golangci-lint call it on a directory with the changed file.
     check-exported: false
-
-  unused:
-    go: "1.17"
 
   whitespace:
     multi-if: false # Enforces newlines (or comments) after every multi-line if statement
@@ -787,7 +783,6 @@ issues:
   exclude-rules:
     - path: pkg/version/
       linters:
-        - gochecknoglobals
         - lll
         - wrapcheck
     - path: config\.go
@@ -800,7 +795,6 @@ issues:
         - dupword
         - forcetypeassert
         - funlen
-        - gochecknoglobals
         - goconst
         - godot
         - lll
@@ -851,7 +845,6 @@ severity:
     - severity: warning
       linters:
         - forcetypeassert
-        - gochecknoglobals
         - funlen
         - paralleltest
     - severity: notice

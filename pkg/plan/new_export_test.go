@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
 	regi "github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -16,31 +17,28 @@ func (p *Plan) SetReleases(r ...*MockReleaseConfig) {
 	if p.body == nil {
 		p.NewBody()
 	}
-	c := make(release.Configs, len(r))
-	for i := range r {
-		c[i] = r[i]
-	}
-	p.body.Releases = c
+
+	p.body.Releases = helper.SlicesMap(r, func(r *MockReleaseConfig) release.Config {
+		return r
+	})
 }
 
 func (p *Plan) SetRepositories(r ...*MockRepositoryConfig) {
 	if p.body == nil {
 		p.NewBody()
 	}
-	c := make(repo.Configs, len(r))
-	for i := range r {
-		c[i] = r[i]
-	}
-	p.body.Repositories = c
+
+	p.body.Repositories = helper.SlicesMap(r, func(r *MockRepositoryConfig) repo.Config {
+		return r
+	})
 }
 
 func (p *Plan) SetRegistries(r ...*MockRegistryConfig) {
 	if p.body == nil {
 		p.NewBody()
 	}
-	c := make(regi.Configs, len(r))
-	for i := range r {
-		c[i] = r[i]
-	}
-	p.body.Registries = c
+
+	p.body.Registries = helper.SlicesMap(r, func(r *MockRegistryConfig) regi.Config {
+		return r
+	})
 }

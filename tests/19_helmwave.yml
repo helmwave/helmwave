@@ -1,0 +1,24 @@
+project: Test19
+
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+.options: &options
+  wait: true
+  wait_for_jobs: true
+  force: false
+  timeout: 10m
+  atomic: false
+  max_history: 3
+  namespace: test19
+  create_namespace: true
+
+releases:
+  - name: nginx
+    <<: *options
+    chart:
+      name: bitnami/nginx
+    values:
+      - tests/19_values_1.yaml
+      - tests/19_values_2.yaml

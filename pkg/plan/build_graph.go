@@ -7,6 +7,7 @@ import (
 	"github.com/helmwave/asciigraph"
 	"github.com/helmwave/asciigraph/ascii"
 	"github.com/helmwave/asciigraph/core"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
 )
@@ -87,10 +88,9 @@ func getGraphNodesForReleases(releases release.Configs) ([]core.NodeInput, int, 
 	minLength := 9999
 
 	for _, rel := range releases {
-		deps := make([]string, len(rel.DependsOn()))
-		for i, d := range rel.DependsOn() {
-			deps[i] = d.Uniq().String()
-		}
+		deps := helper.SlicesMap(rel.DependsOn(), func(d *release.DependsOnReference) string {
+			return d.Uniq().String()
+		})
 
 		uniq := rel.Uniq().String()
 		if len(uniq) > maxLength {

@@ -1,0 +1,6 @@
+kind: New feature
+body: Add support for helm `reset-then-reuse-values` option
+time: 2024-04-28T13:58:56.322792+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""

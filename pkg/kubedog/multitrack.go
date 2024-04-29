@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/helmwave/helmwave/pkg/helper"
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/tracker/resid"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
@@ -45,7 +44,7 @@ var ignoredGenericGK = []string{
 func MakeSpecs(m []Resource, ns string, trackGeneric bool) (*multitrack.MultitrackSpecs, error) {
 	specs := &multitrack.MultitrackSpecs{}
 
-	for i := 0; i < len(m); i++ {
+	for i := range m {
 		r := &m[i]
 
 		spec, err := r.MakeMultiTrackSpec(ns)
@@ -107,6 +106,8 @@ func MakeSpecs(m []Resource, ns string, trackGeneric bool) (*multitrack.Multitra
 }
 
 // MakeMultiTrackSpec creates *multitrack.MultitrackSpec for current resource.
+//
+//nolint:cyclop
 func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, error) {
 	// Default spec
 	spec := &multitrack.MultitrackSpec{
@@ -149,10 +150,10 @@ func (r *Resource) MakeMultiTrackSpec(ns string) (*multitrack.MultitrackSpec, er
 			err = r.handleAnnotationShowLogsOnlyForContainers(name, value, spec)
 
 		default:
-			//nolint:gocritic // leaving switch case just in case (LUL)
 			switch {
 			case strings.HasPrefix(name, LogRegexForAnnoPrefix):
 				err = r.handleAnnotationLogRegexFor(name, value, spec)
+			default:
 			}
 		}
 
@@ -298,5 +299,5 @@ func splitContainers(name, value string) (containers []string, err error) {
 func isIgnoredGenericGK(gk schema.GroupKind) bool {
 	l := strings.ToLower(gk.String())
 
-	return helper.Contains(l, ignoredGenericGK)
+	return slices.Contains(ignoredGenericGK, l)
 }

@@ -54,11 +54,11 @@ func (ts *SyncTestSuite) TestInstallUpgrade() {
 		Dst: filepath.Join(tests.Root, "06_values.yaml"),
 	})
 
-	r, err := rel.Sync(ts.ctx)
+	r, err := rel.Sync(ts.ctx, false)
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r)
 
-	r, err = rel.Sync(ts.ctx)
+	r, err = rel.Sync(ts.ctx, false)
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r)
 }
@@ -71,7 +71,7 @@ func (ts *SyncTestSuite) TestInvalidValues() {
 	rel.ChartF.Name = "bitnami/nginx"
 	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{})
 
-	r, err := rel.Sync(ts.ctx)
+	r, err := rel.Sync(ts.ctx, false)
 	ts.Require().Error(err)
 	ts.Require().Nil(r)
 }
@@ -85,7 +85,7 @@ func (ts *SyncTestSuite) TestSyncWithoutCRD() {
 
 	rel.DryRun(true)
 
-	r, err := rel.Sync(ts.ctx)
+	r, err := rel.Sync(ts.ctx, false)
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r)
 }

@@ -14,7 +14,6 @@ import (
 
 // Config is an interface to manage particular helm repository.
 type Config interface {
-	helper.EqualChecker[Config]
 	log.LoggerGetter
 	Install(context.Context, *helm.EnvSettings, *repo.File) error
 	Name() string
@@ -32,10 +31,9 @@ func (r *Configs) UnmarshalYAML(node *yaml.Node) error {
 		return fmt.Errorf("failed to decode repository config from YAML: %w", err)
 	}
 
-	*r = make([]Config, len(rr))
-	for i := range rr {
-		(*r)[i] = rr[i]
-	}
+	*r = helper.SlicesMap(rr, func(r *config) Config {
+		return r
+	})
 
 	return nil
 }

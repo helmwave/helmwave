@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"maps"
 	"text/template"
 
 	"github.com/hairyhenderson/gomplate/v3"
 	gomplateData "github.com/hairyhenderson/gomplate/v3/data"
 	"github.com/hairyhenderson/gomplate/v3/tmpl"
+	"github.com/helmwave/helmwave/pkg/parallel"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,7 +20,9 @@ const (
 )
 
 type gomplateTemplater struct {
+	additionalFuncs               map[string]any
 	delimiterLeft, delimiterRight string
+	additionalOutputs             []io.Writer
 }
 
 func (t gomplateTemplater) Name() string {
@@ -27,15 +32,33 @@ func (t gomplateTemplater) Name() string {
 func (t gomplateTemplater) Render(ctx context.Context, src string, data any) ([]byte, error) {
 	tpl := template.New("tpl")
 	funcs := t.funcMap(ctx, tpl, data)
+	if t.additionalFuncs != nil {
+		maps.Copy(funcs, t.additionalFuncs)
+	}
+
 	tpl, err := tpl.Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	var buf bytes.Buffer
-	err = tpl.Execute(&buf, data)
+	writers := []io.Writer{&buf}
+	if t.additionalOutputs != nil {
+		writers = append(writers, t.additionalOutputs...)
+	}
+	w := io.MultiWriter(writers...)
+
+	wg := parallel.NewWaitGroup()
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		wg.ErrChan() <- tpl.Execute(w, data)
+	}()
+
+	err = wg.WaitWithContext(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to render template: %w", err)
+		return nil, err
 	}
 
 	return buf.Bytes(), nil
@@ -60,4 +83,19 @@ func (t gomplateTemplater) funcMap(ctx context.Context, tpl *template.Template, 
 func (t *gomplateTemplater) Delims(left, right string) {
 	t.delimiterLeft = left
 	t.delimiterRight = right
+}
+
+func (t *gomplateTemplater) AddOutput(w io.Writer) {
+	if t.additionalOutputs == nil {
+		t.additionalOutputs = []io.Writer{}
+	}
+	t.additionalOutputs = append(t.additionalOutputs, w)
+}
+
+func (t *gomplateTemplater) AddFunc(name string, f any) {
+	if t.additionalFuncs == nil {
+		t.additionalFuncs = map[string]any{}
+	}
+
+	t.additionalFuncs[name] = f
 }

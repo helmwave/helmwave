@@ -47,12 +47,9 @@ func (ts *LogTestSuite) TearDownSuite() {
 }
 
 func (ts *LogTestSuite) getLoggerMessages() []string {
-	res := make([]string, len(ts.logHook.Entries))
-	for i, entry := range ts.logHook.AllEntries() {
-		res[i] = entry.Message
-	}
-
-	return res
+	return helper.SlicesMap(ts.logHook.AllEntries(), func(entry *log.Entry) string {
+		return entry.Message
+	})
 }
 
 func (ts *LogTestSuite) TestKLogHandler() {
@@ -110,7 +107,7 @@ func (ts *LogTestSuite) TestInvalidLogLevel() {
 	}
 
 	for _, item := range settings {
-		ts.Require().Error(item.s.Init(), item.msg)
+		ts.Error(item.s.Init(), item.msg)
 	}
 }
 
@@ -164,8 +161,8 @@ func (ts *LogTestSuite) TestFormatter() {
 	}
 
 	for i := range settings {
-		ts.Require().NoError(settings[i].s.Init())
-		ts.Require().Equal(settings[i].formatter, log.StandardLogger().Formatter, settings[i].msg)
+		ts.NoError(settings[i].s.Init())
+		ts.Equal(settings[i].formatter, log.StandardLogger().Formatter, settings[i].msg)
 	}
 }
 
@@ -193,8 +190,8 @@ func (ts *LogTestSuite) TestDefaultFormatter() {
 	}
 
 	for _, item := range settings {
-		ts.Require().NoError(item.s.Init())
-		ts.Require().Same(defaultFormatter, log.StandardLogger().Formatter, item.msg)
+		ts.NoError(item.s.Init())
+		ts.Same(defaultFormatter, log.StandardLogger().Formatter, item.msg)
 	}
 }
 

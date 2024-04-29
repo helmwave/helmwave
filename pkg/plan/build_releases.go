@@ -1,6 +1,8 @@
 package plan
 
 import (
+	"slices"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -10,14 +12,16 @@ func (p *Plan) buildReleases(tags []string, matchAll bool) ([]release.Config, er
 	plan := make([]release.Config, 0)
 
 	for _, r := range p.body.Releases {
-		if checkTagInclusion(tags, r.Tags(), matchAll) {
-			var err error
-			plan, err = addToPlan(plan, r, p.body.Releases)
-			if err != nil {
-				log.WithError(err).Error("failed to build releases plan")
+		if !checkTagInclusion(tags, r.Tags(), matchAll) {
+			continue
+		}
 
-				return nil, err
-			}
+		var err error
+		plan, err = addToPlan(plan, r, p.body.Releases)
+		if err != nil {
+			log.WithError(err).Error("failed to build releases plan")
+
+			return nil, err
 		}
 	}
 
@@ -74,12 +78,10 @@ func addToPlan(
 	return newPlan, nil
 }
 
-func releaseNames(a []release.Config) (n []string) {
-	for _, r := range a {
-		n = append(n, r.Uniq().String())
-	}
-
-	return n
+func releaseNames(a []release.Config) []string {
+	return helper.SlicesMap(a, func(r release.Config) string {
+		return r.Uniq().String()
+	})
 }
 
 // checkTagInclusion checks where any of release tags are included in target tags.
@@ -97,7 +99,7 @@ func checkTagInclusion(targetTags, releaseTags []string, matchAll bool) bool {
 
 func checkAllTagsInclusion(targetTags, releaseTags []string) bool {
 	for _, t := range targetTags {
-		contains := helper.Contains(t, releaseTags)
+		contains := slices.Contains(releaseTags, t)
 		if !contains {
 			return false
 		}
@@ -108,7 +110,7 @@ func checkAllTagsInclusion(targetTags, releaseTags []string) bool {
 
 func checkAnyTagInclusion(targetTags, releaseTags []string) bool {
 	for _, t := range targetTags {
-		contains := helper.Contains(t, releaseTags)
+		contains := slices.Contains(releaseTags, t)
 		if contains {
 			return true
 		}

@@ -145,7 +145,12 @@ func (rel *config) findChartInHelmCache() (string, error) {
 	if u.Scheme == registry.OCIScheme {
 		idx := strings.LastIndexByte(name, ':')
 		name = fmt.Sprintf("%s-%s.tgz", name[:idx], name[idx+1:])
+
+		rel.Logger().Debug("digest validation is not supported for OCI charts, skipping it")
+
+		return filepath.Join(settings.RepositoryCache, name), nil
 	}
+
 	chartFile := filepath.Join(settings.RepositoryCache, name)
 
 	ch, err := rel.getChartRepoEntryFromIndex(u.String(), settings.RepositoryCache)

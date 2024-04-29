@@ -3,6 +3,7 @@ package template
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -17,6 +18,8 @@ type Templater interface {
 	Name() string
 	Delims(string, string)
 	Render(context.Context, string, any) ([]byte, error)
+	AddOutput(io.Writer)
+	AddFunc(string, any)
 }
 
 func getTemplater(name string) (Templater, error) {
@@ -26,9 +29,9 @@ func getTemplater(name string) (Templater, error) {
 	case TemplaterSprig:
 		return &sprigTemplater{}, nil
 	case TemplaterNone:
-		return noTemplater{}, nil
+		return &noTemplater{}, nil
 	case TemplaterSOPS:
-		return sopsTemplater{}, nil
+		return &sopsTemplater{}, nil
 	default:
 		return nil, fmt.Errorf("templater %s is not registered", name)
 	}
@@ -88,5 +91,17 @@ func Tpl2yml(ctx context.Context, tpl, yml string, data any, templaterName strin
 func SetDelimiters(left, right string) TemplaterOptions {
 	return func(s Templater) {
 		s.Delims(left, right)
+	}
+}
+
+func CopyOutput(output io.Writer) TemplaterOptions {
+	return func(s Templater) {
+		s.AddOutput(output)
+	}
+}
+
+func AddFunc(name string, f any) TemplaterOptions {
+	return func(s Templater) {
+		s.AddFunc(name, f)
 	}
 }
