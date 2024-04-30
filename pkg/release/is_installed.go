@@ -3,12 +3,11 @@ package release
 import (
 	"errors"
 
-	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
 func (rel *config) isInstalled() bool {
-	client := action.NewHistory(rel.Cfg())
+	client := rel.newHistory()
 	client.Max = 1
 	_, err := client.Run(rel.Name())
 	switch {

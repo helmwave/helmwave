@@ -3,13 +3,11 @@ package release
 import (
 	"fmt"
 
-	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 )
 
 func (rel *config) Status() (*release.Release, error) {
-	client := action.NewStatus(rel.Cfg())
-	client.ShowDescription = true
+	client := rel.newStatus()
 
 	r, err := client.Run(rel.Name())
 	if err != nil {
