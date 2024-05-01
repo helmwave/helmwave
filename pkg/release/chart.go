@@ -258,6 +258,7 @@ func (rel *config) ChartDepsUpd() error {
 		Out:              log.StandardLogger().Writer(),
 		ChartPath:        filepath.Clean(rel.Chart().Name),
 		Keyring:          client.Keyring,
+		RegistryClient:   helper.HelmRegistryClient,
 		SkipUpdate:       rel.Chart().SkipRefresh,
 		Getters:          getter.All(settings),
 		RepositoryConfig: settings.RepositoryConfig,
