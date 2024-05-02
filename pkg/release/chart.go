@@ -113,14 +113,11 @@ func (rel *config) LocateChartWithCache() (string, error) {
 	return ch, nil
 }
 
-// Helm doesn't use its own charts cache, it only stores charts there. So we copypaste some code from
-// *downloader.ChartDownloader to find already downloaded charts in our cache.
-// We also check chart file digest in case of any collision.
-func (rel *config) findChartInHelmCache() (string, error) {
+func (rel *config) getDownloader() downloader.ChartDownloader {
 	settings := rel.Helm()
 	client := rel.newInstall()
 
-	dl := downloader.ChartDownloader{
+	return downloader.ChartDownloader{
 		Getters: getter.All(settings),
 		Options: []getter.Option{
 			getter.WithPassCredentialsAll(client.ChartPathOptions.PassCredentialsAll),
@@ -135,6 +132,15 @@ func (rel *config) findChartInHelmCache() (string, error) {
 		RepositoryCache:  settings.RepositoryCache,
 		RegistryClient:   client.GetRegistryClient(),
 	}
+}
+
+// Helm doesn't use its own charts cache, it only stores charts there. So we copypaste some code from
+// *downloader.ChartDownloader to find already downloaded charts in our cache.
+// We also check chart file digest in case of any collision.
+func (rel *config) findChartInHelmCache() (string, error) {
+	settings := rel.Helm()
+
+	dl := rel.getDownloader()
 
 	u, err := dl.ResolveChartVersion(rel.Chart().Name, rel.Chart().Version)
 	if err != nil {
@@ -148,7 +154,14 @@ func (rel *config) findChartInHelmCache() (string, error) {
 
 		rel.Logger().Debug("digest validation is not supported for OCI charts, skipping it")
 
-		return filepath.Join(settings.RepositoryCache, name), nil
+		chartFile := filepath.Join(settings.RepositoryCache, name)
+
+		_, err := os.Stat(chartFile)
+		if err != nil {
+			return "", NewChartCacheError(err)
+		}
+
+		return chartFile, nil
 	}
 
 	chartFile := filepath.Join(settings.RepositoryCache, name)
