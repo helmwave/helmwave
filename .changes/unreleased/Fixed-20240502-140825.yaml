@@ -1,6 +1,0 @@
-kind: Fixed
-body: Do not fail if OCI chart is not found in helm cache
-time: 2024-05-02T14:08:25.867515+04:00
-custom:
-  Author: r3nic1e
-  Issue: ""
