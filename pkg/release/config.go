@@ -35,6 +35,7 @@ type config struct {
 	DescriptionF        string `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
 	OfflineKubeVersionF string `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
 	KubeContextF        string `yaml:"context,omitempty" json:"context,omitempty"`
+	DeletePropagation   string `yaml:"delete_propagation,omitempty" json:"delete_propagation,omitempty" jsonschema:"description=Selects the deletion cascading strategy for the dependents,enum=background,enum=orphan,enum=foreground,default=background"`
 
 	DependsOnF    []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
 	MonitorsF     []MonitorReference    `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
@@ -47,25 +48,24 @@ type config struct {
 	// Lock for parallel testing
 	lock sync.RWMutex
 
-	MaxHistory               int    `yaml:"max_history,omitempty" json:"max_history,omitempty" jsonschema:"default=0"`
-	AllowFailureF            bool   `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
-	Atomic                   bool   `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
-	CleanupOnFail            bool   `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
-	CreateNamespace          bool   `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exits,default=false"`
-	DisableHooks             bool   `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
-	DisableOpenAPIValidation bool   `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
-	EnableDNS                bool   `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
-	Force                    bool   `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
-	Recreate                 bool   `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
-	ResetValues              bool   `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`
-	ReuseValues              bool   `yaml:"reuse_values,omitempty" json:"reuse_values,omitempty" jsonschema:"default=false"`
+	MaxHistory               int  `yaml:"max_history,omitempty" json:"max_history,omitempty" jsonschema:"default=0"`
+	AllowFailureF            bool `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
+	Atomic                   bool `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
+	CleanupOnFail            bool `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
+	CreateNamespace          bool `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exits,default=false"`
+	DisableHooks             bool `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
+	DisableOpenAPIValidation bool `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
+	EnableDNS                bool `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
+	Force                    bool `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
+	Recreate                 bool `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
+	ResetValues              bool `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`
+	ReuseValues              bool `yaml:"reuse_values,omitempty" json:"reuse_values,omitempty" jsonschema:"default=false"`
 	ResetThenReuseValues     bool `yaml:"reset_then_reuse_values,omitempty" json:"reset_then_reuse_values,omitempty" jsonschema:"default=false"`
-	SkipCRDs                 bool   `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty" jsonschema:"default=false"`
+	SkipCRDs                 bool `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty" jsonschema:"default=false"`
 	ShowNotes                bool `yaml:"show_notes,omitempty" json:"show_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install"`
-	SubNotes                 bool   `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"default=false"`
-	DeletePropagation        string `yaml:"delete_propagation,omitempty" json:"delete_propagation,omitempty" jsonschema:"description=Selects the deletion cascading strategy for the dependents,enum=background,enum=orphan,enum=foreground,default=background"`
-	Wait                     bool   `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
-	WaitForJobs              bool   `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
+	SubNotes                 bool `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"default=false"`
+	Wait                     bool `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
+	WaitForJobs              bool `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
 
 	// special field for templating and building
 	dryRun bool `jsonschema:"default=false,-"`

@@ -124,7 +124,8 @@ func (s *GraphTestSuite) TestCycles() {
 // 2 /
 // Reversed
 // 4 -> 3 -> 1
-// --------> 2
+//
+//	\-> 2
 func (s *GraphTestSuite) TestReverse() {
 	graph := dependency.NewGraph[string, string]()
 

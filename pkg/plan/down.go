@@ -47,12 +47,13 @@ func (p *Plan) Down(ctx context.Context) (err error) {
 			defer wg.Done()
 			rel := node.Data
 			_, err := rel.Uninstall(ctx)
-			node.SetSucceeded()
 			if err != nil {
 				log.Errorf("❌ %s: %v", rel.Uniq(), err)
 				wg.ErrChan() <- err
+				node.SetFailed()
 			} else {
 				log.Infof("✅ %s uninstalled!", rel.Uniq())
+				node.SetSucceeded()
 			}
 		}(ctx, wg, node)
 	}
