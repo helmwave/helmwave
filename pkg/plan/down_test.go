@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -36,6 +37,7 @@ func (ts *DestroyTestSuite) TestDestroy() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Uninstall").Return(&helmRelease.UninstallReleaseResponse{}, nil)
+	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 
 	p.SetReleases(mockedRelease)
 
@@ -55,6 +57,7 @@ func (ts *DestroyTestSuite) TestDestroyFailedRelease() {
 	mockedRelease.On("Uniq").Return()
 	e := errors.New(ts.T().Name())
 	mockedRelease.On("Uninstall").Return(&helmRelease.UninstallReleaseResponse{}, e)
+	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 
 	p.SetReleases(mockedRelease)
 

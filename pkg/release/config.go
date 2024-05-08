@@ -35,6 +35,7 @@ type config struct {
 	DescriptionF        string `yaml:"description,omitempty" json:"description,omitempty" jsonschema:"default="`
 	OfflineKubeVersionF string `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
 	KubeContextF        string `yaml:"context,omitempty" json:"context,omitempty"`
+	DeletePropagation   string `yaml:"delete_propagation,omitempty" json:"delete_propagation,omitempty" jsonschema:"description=Selects the deletion cascading strategy for the dependents,enum=background,enum=orphan,enum=foreground,default=background"`
 
 	DependsOnF    []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
 	MonitorsF     []MonitorReference    `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
