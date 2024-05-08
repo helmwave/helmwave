@@ -1,0 +1,6 @@
+kind: Fixed
+body: Values are now applied in the same way as defined, not in random
+time: 2024-05-08T10:20:22.347791+04:00
+custom:
+  Author: r3nic1e
+  Issue: ""

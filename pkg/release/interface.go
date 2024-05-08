@@ -19,25 +19,20 @@ import (
 // Config is an interface to manage particular helm release.
 type Config interface {
 	log.LoggerGetter
+	HelmActionRunner
+
 	Uniq() uniqname.UniqName
-	Sync(context.Context, bool) (*release.Release, error)
-	SyncDryRun(context.Context, bool) (*release.Release, error)
 	AllowFailure() bool
-	DryRun(bool)
+	DryRun(dryRun bool)
 	ChartDepsUpd() error
-	DownloadChart(string) error
-	BuildValues(context.Context, string, string) error
-	Uninstall(context.Context) (*release.UninstallReleaseResponse, error)
-	Get(int) (*release.Release, error)
-	List() (*release.Release, error)
-	Rollback(context.Context, int) error
-	Status() (*release.Release, error)
+	DownloadChart(tmpDir string) error
+	BuildValues(ctx context.Context, dir, templater string) error
 	Name() string
 	Namespace() string
 	Chart() *Chart
 	SetChartName(string)
 	DependsOn() []*DependsOnReference
-	SetDependsOn([]*DependsOnReference)
+	SetDependsOn(deps []*DependsOnReference)
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
@@ -48,7 +43,17 @@ type Config interface {
 	OfflineKubeVersion() *chartutil.KubeVersion
 	Validate() error
 	Monitors() []MonitorReference
-	NotifyMonitorsFailed(context.Context, ...monitor.Config)
+	NotifyMonitorsFailed(ctx context.Context, monitors ...monitor.Config)
+}
+
+type HelmActionRunner interface {
+	SyncDryRun(ctx context.Context, runHooks bool) (*release.Release, error)
+	Sync(ctx context.Context, runHooks bool) (*release.Release, error)
+	Uninstall(ctx context.Context) (*release.UninstallReleaseResponse, error)
+	Get(version int) (*release.Release, error)
+	List() (*release.Release, error)
+	Rollback(ctx context.Context, version int) error
+	Status() (*release.Release, error)
 }
 
 // Configs type of array Config.

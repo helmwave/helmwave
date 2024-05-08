@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -220,8 +221,10 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(vals))
 
-	renderedValuesChan := make(chan ValuesReference, len(vals))
+	// we need to keep rendered values in memory to use them in other values
 	renderedValuesMap := newRenderedValuesFiles()
+	// we need to keep track of values that we need to delete (e.g. non-existent files)
+	toDeleteMap := make(map[*ValuesReference]bool)
 
 	// just in case of dependency cycle or long http requests
 	ctx, cancel := context.WithTimeout(ctx, time.Minute)
@@ -229,10 +232,8 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 
 	l := rel.Logger()
 
-	// we explicitly use slice length here instead of ranging over slice because we modify slice inside the loop
-	// we keep the iterator independent of the slice just in case
-	for i := len(vals) - 1; i >= 0; i-- {
-		go func(v ValuesReference) {
+	for i := range vals {
+		go func(v *ValuesReference) {
 			defer wg.Done()
 
 			l := l.WithField("values", v)
@@ -241,14 +242,13 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 			switch {
 			case !v.Strict && errors.Is(ErrValuesNotExist, err):
 				l.WithError(err).Warn("skipping values...")
+				toDeleteMap[v] = true
 			case err != nil:
 				l.WithError(err).Error("failed to build values")
 
 				wg.ErrChan() <- err
-			default:
-				renderedValuesChan <- v
 			}
-		}(vals[i])
+		}(&vals[i])
 	}
 
 	err := wg.WaitWithContext(ctx)
@@ -256,12 +256,12 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 		return err
 	}
 
-	close(renderedValuesChan)
-	renderedValues := make([]ValuesReference, 0, len(renderedValuesChan))
-	for v := range renderedValuesChan {
-		renderedValues = append(renderedValues, v)
+	for i := len(vals) - 1; i >= 0; i-- {
+		if toDeleteMap[&vals[i]] {
+			vals = slices.Delete(vals, i, i+1)
+		}
 	}
-	rel.ValuesF = renderedValues
+	rel.ValuesF = vals
 
 	return nil
 }

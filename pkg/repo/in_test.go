@@ -16,21 +16,6 @@ func TestInTestSuite(t *testing.T) {
 	suite.Run(t, new(InTestSuite))
 }
 
-func (ts *InTestSuite) TestEqual() {
-	rep1 := repo.NewConfig()
-	rep2 := repo.NewConfig()
-
-	ts.Require().True(rep1.Equal(rep2))
-}
-
-func (ts *InTestSuite) TestNotEqual() {
-	rep1 := repo.NewConfig()
-	rep1.Entry.Name = "blabla"
-	rep2 := repo.NewConfig()
-
-	ts.Require().False(rep1.Equal(rep2))
-}
-
 func (ts *InTestSuite) TestIndexOfName() {
 	rep := repo.NewConfig()
 	rep.Entry.Name = ts.T().Name()

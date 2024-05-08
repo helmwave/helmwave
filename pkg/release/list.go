@@ -2,15 +2,12 @@ package release
 
 import (
 	"fmt"
-	"regexp"
 
-	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 )
 
 func (rel *config) List() (*release.Release, error) {
-	client := action.NewList(rel.Cfg())
-	client.Filter = fmt.Sprintf("^%s$", regexp.QuoteMeta(rel.Name()))
+	client := rel.newList()
 
 	result, err := client.Run()
 	if err != nil {
