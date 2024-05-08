@@ -36,8 +36,8 @@ type MonitorReference struct {
 func (rel *config) NotifyMonitorsFailed(ctx context.Context, mons ...monitor.Config) {
 	action := MonitorActionNone
 
+	allMons := rel.Monitors()
 	for _, mon := range mons {
-		allMons := rel.Monitors()
 		for i := range allMons {
 			monRef := allMons[i]
 			if mon.Name() != monRef.Name {

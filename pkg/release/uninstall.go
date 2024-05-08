@@ -20,7 +20,6 @@ func (rel *config) Uninstall(ctx context.Context) (resp *release.UninstallReleas
 	defer func() {
 		lifecycleErr := rel.Lifecycle.RunPostDown(ctx)
 		if lifecycleErr != nil {
-			rel.Logger().Errorf("got an error from postdown hooks: %v", lifecycleErr)
 			if err == nil {
 				err = lifecycleErr
 			}
