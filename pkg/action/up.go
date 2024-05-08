@@ -3,6 +3,7 @@ package action
 import (
 	"context"
 
+	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -40,8 +41,8 @@ func (i *Up) Run(ctx context.Context) error {
 }
 
 func (i *Up) warnOnBuildFlags(ctx context.Context) {
-	cliCtx, ok := ctx.Value("cli").(*cli.Context)
-	if !ok || cliCtx == nil {
+	cliCtx := clictx.GetCLIFromContext(ctx)
+	if cliCtx == nil {
 		return
 	}
 
