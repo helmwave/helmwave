@@ -19,16 +19,19 @@ linters:
     - contextcheck # we don't need contexts everywhere
     - deadcode # deprecated
     - revive # piece of shit
+    - execinquery # deprecated
     - exhaustivestruct # deprecated
     - exhaustruct # it requires to initialize billions of fields, I ain't monkey to fix these
     - gci # we use gofumpt
     - gochecknoinits # we want to use `init()` functions
     - gocyclo # we use cyclop
     - godox # get rid of TODOs
-    - goerr113 # need to create wrapped static errors
+    - goerr113 # renamed to err113
+    - err113 # need to create wrapped static errors
     - goimports # we use gofumpt
     - golint # deprecated
-    - gomnd # we want to keep magic numbers
+    - gomnd # renamed to mnd
+    - mnd # we want to keep magic numbers
     - ifshort # deprecated
     - inamedparam
     - interfacebloat # we want huge interfaces
