@@ -7,7 +7,7 @@ toolchain go1.22.2
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/adrg/xdg v0.4.0
-	github.com/databus23/helm-diff/v3 v3.9.5
+	github.com/databus23/helm-diff/v3 v3.9.6
 	github.com/gofrs/flock v0.8.1
 	github.com/hairyhenderson/gomplate/v3 v3.11.7
 	github.com/hashicorp/go-getter v1.7.4
@@ -280,8 +280,8 @@ require (
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/oauth2 v0.19.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/term v0.19.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
