@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofrs/flock"
+	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -179,7 +180,7 @@ func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqNam
 }
 
 func getParallelLimit(ctx context.Context, releases release.Configs) int {
-	parallelLimit, ok := ctx.Value("parallel-limit").(int)
+	parallelLimit, ok := clictx.GetFlagFromContext(ctx, "parallel-limit").(int)
 	if !ok {
 		parallelLimit = 0
 	}
@@ -303,7 +304,7 @@ func (p *Plan) syncRelease(
 		l.WithError(err).Error("❌ failed to deploy")
 
 		if rel.AllowFailure() {
-			l.Errorf("release is allowed to fail, markind as succeeded to dependencies")
+			l.Errorf("release is allowed to fail, marked as succeeded to dependencies")
 			node.SetSucceeded()
 		} else {
 			node.SetFailed()

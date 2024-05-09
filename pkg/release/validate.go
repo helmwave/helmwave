@@ -2,6 +2,8 @@ package release
 
 import "regexp"
 
+var nsRegexp = regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
+
 func (rel *config) Validate() error {
 	if rel.Name() == "" {
 		return ErrNameEmpty
@@ -23,7 +25,5 @@ func (rel *config) Validate() error {
 }
 
 func validateNS(ns string) bool {
-	r := regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
-
-	return r.MatchString(ns)
+	return nsRegexp.MatchString(ns)
 }

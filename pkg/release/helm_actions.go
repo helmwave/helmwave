@@ -1,6 +1,40 @@
 package release
 
-import "helm.sh/helm/v3/pkg/action"
+import (
+	"fmt"
+	"regexp"
+
+	"github.com/helmwave/helmwave/pkg/helper"
+	"helm.sh/helm/v3/pkg/action"
+	helm "helm.sh/helm/v3/pkg/cli"
+)
+
+func (rel *config) Cfg() *action.Configuration {
+	cfg, err := helper.NewCfg(rel.Namespace(), rel.KubeContext())
+	if err != nil {
+		rel.Logger().Fatal(err)
+
+		return nil
+	}
+
+	return cfg
+}
+
+func (rel *config) Helm() *helm.EnvSettings {
+	if rel.helm == nil {
+		var err error
+		rel.helm, err = helper.NewHelm(rel.Namespace())
+		if err != nil {
+			rel.Logger().Fatal(err)
+
+			return nil
+		}
+
+		rel.helm.Debug = helper.Helm.Debug
+	}
+
+	return rel.helm
+}
 
 func (rel *config) newInstall() *action.Install {
 	client := action.NewInstall(rel.Cfg())
@@ -91,8 +125,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 func (rel *config) newUninstall() *action.Uninstall {
 	client := action.NewUninstall(rel.Cfg())
 
-	client.KeepHistory = false                // TODO: pass it via flags
-	client.DeletionPropagation = "background" // TODO: pass it via flags
+	client.KeepHistory = false // TODO: pass it via flags
 
 	client.IgnoreNotFound = true // make it idempotent
 
@@ -100,6 +133,7 @@ func (rel *config) newUninstall() *action.Uninstall {
 	client.DisableHooks = rel.DisableHooks
 	client.Timeout = rel.Timeout
 	client.Wait = rel.Wait
+	client.DeletionPropagation = rel.DeletePropagation
 	client.Description = rel.Description()
 
 	return client
@@ -111,6 +145,57 @@ func (rel *config) newTest() *action.ReleaseTesting {
 	client.Timeout = rel.Timeout
 	client.Namespace = rel.Namespace()
 	client.Filters = rel.Tests.Filters
+
+	return client
+}
+
+func (rel *config) newRollback() *action.Rollback {
+	client := action.NewRollback(rel.Cfg())
+
+	client.CleanupOnFail = rel.CleanupOnFail
+	client.MaxHistory = rel.MaxHistory
+	client.Recreate = rel.Recreate
+	client.Timeout = rel.Timeout
+
+	client.DisableHooks = rel.DisableHooks
+	client.Timeout = rel.Timeout
+	client.Wait = rel.Wait
+	client.WaitForJobs = rel.WaitForJobs
+	client.Force = rel.Force
+
+	return client
+}
+
+func (rel *config) newStatus() *action.Status {
+	client := action.NewStatus(rel.Cfg())
+
+	client.ShowDescription = true
+
+	return client
+}
+
+func (rel *config) newGet() *action.Get {
+	client := action.NewGet(rel.Cfg())
+
+	return client
+}
+
+func (rel *config) newGetValues() *action.GetValues {
+	client := action.NewGetValues(rel.Cfg())
+
+	return client
+}
+
+func (rel *config) newList() *action.List {
+	client := action.NewList(rel.Cfg())
+
+	client.Filter = fmt.Sprintf("^%s$", regexp.QuoteMeta(rel.Name()))
+
+	return client
+}
+
+func (rel *config) newHistory() *action.History {
+	client := action.NewHistory(rel.Cfg())
 
 	return client
 }

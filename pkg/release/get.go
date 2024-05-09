@@ -3,12 +3,11 @@ package release
 import (
 	"fmt"
 
-	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 )
 
 func (rel *config) Get(version int) (*release.Release, error) {
-	client := action.NewGet(rel.Cfg())
+	client := rel.newGet()
 	client.Version = version
 
 	r, err := client.Run(rel.Name())
@@ -20,7 +19,7 @@ func (rel *config) Get(version int) (*release.Release, error) {
 }
 
 func (rel *config) GetValues() (map[string]any, error) {
-	client := action.NewGetValues(rel.Cfg())
+	client := rel.newGetValues()
 
 	r, err := client.Run(rel.Name())
 	if err != nil {

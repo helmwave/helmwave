@@ -9,14 +9,14 @@ import (
 // Graph is dependencies graph. K stands for map keys type (e.g. string names), N for data type.
 type Graph[K comparable, N any] struct {
 	Nodes        map[K]*Node[N]
-	dependencies [][2]K
+	dependencies []GraphDependency[K]
 }
 
 // NewGraph returns empty graph.
 func NewGraph[K comparable, N any]() *Graph[K, N] {
 	return &Graph[K, N]{
 		Nodes:        make(map[K]*Node[N]),
-		dependencies: make([][2]K, 0),
+		dependencies: make([]GraphDependency[K], 0),
 	}
 }
 
@@ -33,21 +33,40 @@ func (graph *Graph[K, N]) NewNode(key K, data N) error {
 
 // AddDependency adds lazy dependency. It will be evaluated only in `Build` method.
 func (graph *Graph[K, N]) AddDependency(dependant, dependency K) {
-	graph.dependencies = append(graph.dependencies, [2]K{dependant, dependency})
+	graph.dependencies = append(graph.dependencies, newDependency(dependant, dependency))
+}
+
+func (graph *Graph[K, N]) Reverse() (*Graph[K, N], error) {
+	newDependenciesGraph := NewGraph[K, N]()
+
+	for key, node := range graph.Nodes {
+		err := newDependenciesGraph.NewNode(key, node.Data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for _, dep := range graph.dependencies {
+		newDependenciesGraph.AddDependency(dep.Dependency(), dep.Dependant())
+	}
+
+	err := newDependenciesGraph.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	return newDependenciesGraph, nil
 }
 
 func (graph *Graph[K, N]) Build() error {
 	for _, dep := range graph.dependencies {
-		dependantKey := dep[0]
-		dependencyKey := dep[1]
-
-		dependant, ok := graph.Nodes[dependantKey]
+		dependant, ok := graph.Nodes[dep.Dependant()]
 		if !ok {
-			return fmt.Errorf("dependant key %v does not exist", dependantKey)
+			return fmt.Errorf("dependant key %v does not exist", dep.Dependant())
 		}
-		dependency, ok := graph.Nodes[dependencyKey]
+		dependency, ok := graph.Nodes[dep.Dependency()]
 		if !ok {
-			return fmt.Errorf("dependency key %v does not exist", dependencyKey)
+			return fmt.Errorf("dependency key %v does not exist", dep.Dependency())
 		}
 
 		dependant.addDependency(dependency)
@@ -124,4 +143,18 @@ func (graph *Graph[K, N]) Run() <-chan *Node[N] {
 	go graph.runChan(ch)
 
 	return ch
+}
+
+type GraphDependency[K comparable] [2]K
+
+func newDependency[K comparable](dependant, dependency K) GraphDependency[K] {
+	return GraphDependency[K]{dependant, dependency}
+}
+
+func (dep GraphDependency[K]) Dependant() K {
+	return dep[0]
+}
+
+func (dep GraphDependency[K]) Dependency() K {
+	return dep[1]
 }
