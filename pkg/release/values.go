@@ -35,14 +35,15 @@ type ValuesReference struct {
 	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
 }
 
-func (v *ValuesReference) JSONSchema() *jsonschema.Schema {
+//nolint:gocritic
+func (v ValuesReference) JSONSchema() *jsonschema.Schema {
 	r := &jsonschema.Reflector{
 		DoNotReference:             true,
 		RequiredFromJSONSchemaTags: true,
 		KeyNamer:                   strcase.SnakeCase, // for action.ChartPathOptions
 	}
 
-	type values *ValuesReference
+	type values ValuesReference
 	schema := r.Reflect(values(v))
 	schema.OneOf = []*jsonschema.Schema{
 		{
