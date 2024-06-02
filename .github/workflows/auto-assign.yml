@@ -1,11 +1,11 @@
 name: Auto Assign
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]
   pull_request:
     branches-ignore:
       - "dependabot/*"
-    types: [opened]
+    types: [opened, reopened]
 jobs:
   run:
     runs-on: ubuntu-latest
