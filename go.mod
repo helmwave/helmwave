@@ -7,7 +7,7 @@ toolchain go1.22.2
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/adrg/xdg v0.4.0
-	github.com/databus23/helm-diff/v3 v3.9.5
+	github.com/databus23/helm-diff/v3 v3.9.7
 	github.com/gofrs/flock v0.8.1
 	github.com/hairyhenderson/gomplate/v3 v3.11.7
 	github.com/hashicorp/go-getter v1.7.4
@@ -33,10 +33,10 @@ require (
 	go.mozilla.org/sops/v3 v3.7.3
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
 	gopkg.in/yaml.v3 v3.0.1
-	helm.sh/helm/v3 v3.14.4
-	k8s.io/apimachinery v0.30.0
-	k8s.io/cli-runtime v0.30.0
-	k8s.io/client-go v0.30.0
+	helm.sh/helm/v3 v3.15.0
+	k8s.io/apimachinery v0.30.1
+	k8s.io/cli-runtime v0.30.1
+	k8s.io/client-go v0.30.1
 	k8s.io/klog v1.0.0
 	k8s.io/klog/v2 v2.120.1
 )
@@ -280,8 +280,8 @@ require (
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/oauth2 v0.19.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/term v0.19.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
@@ -298,10 +298,10 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	inet.af/netaddr v0.0.0-20230525184311-b8eac61e914a // indirect
-	k8s.io/api v0.30.0 // indirect
-	k8s.io/apiextensions-apiserver v0.30.0 // indirect
-	k8s.io/apiserver v0.30.0 // indirect
-	k8s.io/component-base v0.30.0 // indirect
+	k8s.io/api v0.30.1 // indirect
+	k8s.io/apiextensions-apiserver v0.30.1 // indirect
+	k8s.io/apiserver v0.30.1 // indirect
+	k8s.io/component-base v0.30.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240423202451-8948a665c108 // indirect
 	k8s.io/kubectl v0.30.0 // indirect
 	k8s.io/utils v0.0.0-20240423183400-0849a56e8f22 // indirect
