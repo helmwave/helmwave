@@ -2,8 +2,6 @@ name: Test GoReleaser config
 
 on:
   pull_request:
-    branches-ignore:
-      - "dependabot/*"
     branches:
       - main
     paths:

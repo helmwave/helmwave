@@ -1,18 +1,24 @@
 name: Auto Assign
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]
   pull_request:
     branches-ignore:
       - "dependabot/*"
-    types: [opened]
+    types: [opened, reopened]
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - uses: wow-actions/use-app-token@v2
+        id: generate_token
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - uses: bubkoo/auto-assign@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.CR_PAT }}
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.BOT_TOKEN }}
 
           addAssignees: true
           addReviewers: true
