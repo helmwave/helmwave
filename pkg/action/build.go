@@ -13,6 +13,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/cache"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -21,15 +22,25 @@ var _ Action = (*Build)(nil)
 
 // Build is a struct for running 'build' CLI command.
 type Build struct {
-	yml           *Yml
-	diff          *Diff
-	options       plan.BuildOptions
-	remoteSource  string
-	plandir       string
-	diffMode      string
-	tags          cli.StringSlice
-	autoYml       bool
-	skipUnchanged bool
+	yml             *Yml
+	diff            *Diff
+	options         plan.BuildOptions
+	remoteSource    string
+	plandir         string
+	diffMode        string
+	tags            cli.StringSlice
+	autoYml         bool
+	skipUnchanged   bool
+	outputManifests bool
+}
+
+func (i *Build) ArgoCDMode() {
+	i.yml = &Yml{file: plan.Body, templater: template.TemplaterSprig}
+	i.diff = &Diff{}
+	i.diffMode = "none"
+	i.options.Yml = plan.Body
+	i.plandir = plan.Dir
+	i.outputManifests = true
 }
 
 // Run is the main function for 'build' CLI command.
@@ -98,6 +109,14 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		return err
 	}
 
+	if i.outputManifests {
+		for _, manifest := range newPlan.GetManifests() {
+			fmt.Println("---\n", manifest) //nolint:forbidigo
+		}
+
+		return nil
+	}
+
 	// Show current plan
 	newPlan.Logger().Info("🏗 Plan")
 
@@ -151,8 +170,13 @@ func (i *Build) Cmd() *cli.Command {
 // flags return flag set of CLI urfave.
 func (i *Build) flags() []cli.Flag {
 	// Init sub-structures
-	i.yml = &Yml{}
-	i.diff = &Diff{}
+	if i.yml == nil {
+		i.yml = &Yml{}
+	}
+
+	if i.diff == nil {
+		i.diff = &Diff{}
+	}
 
 	self := []cli.Flag{
 		flagPlandir(&i.plandir),

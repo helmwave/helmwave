@@ -11,6 +11,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 )
 
 // Export allows save plan to file.
@@ -200,4 +201,8 @@ func (p *Plan) IsExist() bool {
 // IsManifestExist returns true if planfile exists.
 func (p *Plan) IsManifestExist() bool {
 	return helper.IsExists(filepath.Join(p.dir, Manifest))
+}
+
+func (p *Plan) GetManifests() map[uniqname.UniqName]string {
+	return p.manifests
 }

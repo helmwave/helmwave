@@ -1,6 +1,8 @@
 package log
 
 import (
+	"os"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	"github.com/mgutz/ansi"
@@ -73,6 +75,14 @@ func (l *Settings) Init() error {
 	l.setFormat()
 
 	return l.setLevel()
+}
+
+func (l *Settings) ArgoCDMode() {
+	l.format = "text"
+	l.color = false
+	l.level = "info"
+
+	log.SetOutput(os.Stderr)
 }
 
 func (l *Settings) setLevel() error {
