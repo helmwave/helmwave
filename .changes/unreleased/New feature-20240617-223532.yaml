@@ -1,0 +1,6 @@
+kind: New feature
+body: HELMWAVE_AUTO_YML will skip `helmwave.yml.tpl` if it doesn't exist.
+time: 2024-06-17T22:35:32.272818+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""
