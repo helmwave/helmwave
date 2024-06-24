@@ -73,17 +73,17 @@ func (d *Diff) flags() []cli.Flag {
 		&cli.Float64Flag{
 			Name:        "find-renames",
 			Usage:       "enable rename detection if set to any value greater than 0.",
-			Value:       0,
+			Value:       0, // TODO: maybe set 1 to default?
 			Category:    "DIFF",
 			EnvVars:     []string{"HELMWAVE_DIFF_FIND_RENAMES"},
 			Destination: &d.findRenamesHelper,
 		},
 		&cli.StringSliceFlag{
 			Name:  "suppress",
-			Usage: "allows suppression of the values listed in the diff output (\"Secret\" for example)",
+			Usage: "allows suppression kinds of the values listed in the diff output (\"Secret\" for example)",
 			// Value: cli.NewStringSlice("Secret"),
 			Category:    "DIFF",
-			EnvVars:     []string{"HELMWAVE_DIFF_SUPPRESS"},
+			EnvVars:     []string{"HELMWAVE_DIFF_SUPPRESS", "HELMWAVE_DIFF_SUPPRESS_KINDS"},
 			Destination: &d.kindSuppressHelper,
 		},
 	}

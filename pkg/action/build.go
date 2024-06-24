@@ -81,9 +81,13 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	}
 
 	if i.autoYml {
-		err = i.yml.Run(ctx)
-		if err != nil {
-			return err
+		if helper.IsExists(i.yml.tpl) {
+			err = i.yml.Run(ctx)
+			if err != nil {
+				return err
+			}
+		} else {
+			log.Warnf("You've enabled auto yml, but I can't find %q. I'm skipping yml phase.", i.yml.tpl)
 		}
 	}
 
