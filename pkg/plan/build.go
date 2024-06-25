@@ -6,19 +6,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type BuildOptions struct { //nolint:govet
-	Tags               []string
+type BuildOptions struct {
 	Yml                string
 	Templater          string
-	MatchAll           bool
+	Tags               []string
 	GraphWidth         int
+	MatchAll           bool
 	EnableDependencies bool
 }
 
 // Build plan with yml and tags/matchALL options.
-//
-//nolint:cyclop,gocognit // TODO: reduce cyclomatic complexity
-func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) { //nolint:funlen
+func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 	p.templater = o.Templater
 
 	// Create Body
@@ -45,71 +43,69 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) { //nolint
 		}
 	}()
 
-	// Build Releases
+	return p.build(ctx, o)
+}
+
+func (p *Plan) build(ctx context.Context, o BuildOptions) error {
+	var err error
+
 	log.Info("🔨 Building releases...")
 	p.body.Releases, err = p.buildReleases(o)
 	if err != nil {
-		return
+		return err
 	}
 
-	// Build Values
 	log.Info("🔨 Building values...")
 	err = p.buildValues(ctx)
 	if err != nil {
-		return
+		return err
 	}
 
-	// Build Repositories
 	log.Info("🔨 Building repositories...")
 	p.body.Repositories, err = p.buildRepositories()
 	if err != nil {
-		return
+		return err
 	}
 
-	// Sync Repositories
 	err = SyncRepositories(ctx, p.body.Repositories)
 	if err != nil {
-		return
+		return err
 	}
 
-	// Build Registries
 	log.Info("🔨 Building registries...")
 	p.body.Registries, err = p.buildRegistries()
 	if err != nil {
-		return
-	}
-	// Sync Registries
-	err = p.syncRegistries(ctx)
-	if err != nil {
-		return
+		return err
 	}
 
-	// to build charts, we need repositories and registries first
+	err = p.syncRegistries(ctx)
+	if err != nil {
+		return err
+	}
+
 	log.Info("🔨 Building charts...")
 	err = p.buildCharts()
 	if err != nil {
-		return
+		return err
 	}
 
 	// Validating plan after it was changed
 	err = p.body.Validate()
 	if err != nil {
-		return
+		return err
 	}
 
-	// Build Manifest
 	log.Info("🔨 Building manifests...")
 	err = p.buildManifest(ctx)
 	if err != nil {
-		return
+		return err
 	}
 
-	// Build graphs
 	if o.GraphWidth != 1 {
 		log.Info("🔨 Building graphs...")
 		p.graphMD = buildGraphMD(p.body.Releases)
 		log.Infof("show graph:\n%s", p.BuildGraphASCII(o.GraphWidth))
 	}
 
-	return
+	return nil
 }

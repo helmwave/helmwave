@@ -23,11 +23,11 @@ var _ Action = (*Build)(nil)
 type Build struct {
 	yml           *Yml
 	diff          *Diff
-	options       plan.BuildOptions
 	remoteSource  string
 	plandir       string
 	diffMode      string
 	tags          cli.StringSlice
+	options       plan.BuildOptions
 	autoYml       bool
 	skipUnchanged bool
 }
