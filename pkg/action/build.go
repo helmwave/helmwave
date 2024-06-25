@@ -178,6 +178,14 @@ func (i *Build) flags() []cli.Flag {
 			EnvVars:     []string{"HELMWAVE_REMOTE_SOURCE"},
 			Destination: &i.remoteSource,
 		},
+		&cli.BoolFlag{
+			Name:        "enable-dependencies",
+			Usage:       "evaluate releases dependencies and add them to the plan even if they don't match provided tags",
+			Value:       true,
+			Category:    Step1,
+			EnvVars:     []string{"HELMWAVE_ENABLE_DEPENDENCIES"},
+			Destination: &i.options.EnableDependencies,
+		},
 	}
 
 	self = append(self, i.diff.flags()...)

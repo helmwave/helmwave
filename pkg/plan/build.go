@@ -7,11 +7,12 @@ import (
 )
 
 type BuildOptions struct { //nolint:govet
-	Tags       []string
-	Yml        string
-	Templater  string
-	MatchAll   bool
-	GraphWidth int
+	Tags               []string
+	Yml                string
+	Templater          string
+	MatchAll           bool
+	GraphWidth         int
+	EnableDependencies bool
 }
 
 // Build plan with yml and tags/matchALL options.
@@ -46,7 +47,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) { //nolint
 
 	// Build Releases
 	log.Info("🔨 Building releases...")
-	p.body.Releases, err = p.buildReleases(o.Tags, o.MatchAll)
+	p.body.Releases, err = p.buildReleases(o)
 	if err != nil {
 		return
 	}

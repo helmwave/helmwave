@@ -8,16 +8,21 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *Plan) buildReleases(tags []string, matchAll bool) ([]release.Config, error) {
+func (p *Plan) buildReleases(o BuildOptions) ([]release.Config, error) {
 	plan := make([]release.Config, 0)
 
+	planAdderFunction := addToPlanWithDependencies
+	if !o.EnableDependencies {
+		planAdderFunction = addToPlanWithoutDependencies
+	}
+
 	for _, r := range p.body.Releases {
-		if !checkTagInclusion(tags, r.Tags(), matchAll) {
+		if !checkTagInclusion(o.Tags, r.Tags(), o.MatchAll) {
 			continue
 		}
 
 		var err error
-		plan, err = addToPlan(plan, r, p.body.Releases)
+		plan, err = planAdderFunction(plan, r, p.body.Releases)
 		if err != nil {
 			log.WithError(err).Error("failed to build releases plan")
 
@@ -31,7 +36,6 @@ func (p *Plan) buildReleases(tags []string, matchAll bool) ([]release.Config, er
 func addToPlan(
 	plan release.Configs,
 	rel release.Config,
-	releases release.Configs,
 ) (release.Configs, error) {
 	if r, contains := plan.Contains(rel); contains {
 		if r != rel {
@@ -41,8 +45,33 @@ func addToPlan(
 		}
 	}
 
-	newPlan := plan
-	newPlan = append(newPlan, rel)
+	return append(plan, rel), nil
+}
+
+func addToPlanWithoutDependencies(
+	plan release.Configs,
+	rel release.Config,
+	_ release.Configs,
+) (release.Configs, error) {
+	plan, err := addToPlan(plan, rel)
+	if err != nil {
+		return nil, err
+	}
+
+	rel.SetDependsOn([]*release.DependsOnReference{})
+
+	return plan, nil
+}
+
+func addToPlanWithDependencies(
+	plan release.Configs,
+	rel release.Config,
+	releases release.Configs,
+) (release.Configs, error) {
+	newPlan, err := addToPlan(plan, rel)
+	if err != nil {
+		return nil, err
+	}
 
 	deps := rel.DependsOn()
 	newDeps := make([]*release.DependsOnReference, 0, len(deps))
@@ -54,7 +83,7 @@ func addToPlan(
 		r, found := releases.ContainsUniq(dep.Uniq())
 		if found {
 			var err error
-			newPlan, err = addToPlan(newPlan, r, releases)
+			newPlan, err = addToPlanWithDependencies(newPlan, r, releases)
 			if err != nil {
 				return nil, err
 			}
