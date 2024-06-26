@@ -211,10 +211,8 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 
 // buildAfterUnmarshalDependency generates full uniqname for dependency if it was short using release as default.
 func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error {
-	u, err := uniqname.NewFromString(dep.Name)
-	if err != nil {
-		return err
-	}
+	// skipping error as it may fail due to missing namespace
+	u, _ := uniqname.NewFromString(dep.Name)
 
 	if u.Namespace == "" {
 		u.Namespace = rel.Namespace()

@@ -9,7 +9,7 @@ import (
 // Separator is a separator between release Name and Namespace.
 const Separator = "@"
 
-var validateRegexp = regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
+var validateRegexp = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
 
 // UniqName is a unique identificator for release.
 type UniqName struct {

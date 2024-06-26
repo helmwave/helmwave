@@ -35,6 +35,7 @@ func (ts *DestroyTestSuite) TestDestroy() {
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Uninstall").Return(&helmRelease.UninstallReleaseResponse{}, nil)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
@@ -54,6 +55,7 @@ func (ts *DestroyTestSuite) TestDestroyFailedRelease() {
 	mockedRelease := &plan.MockReleaseConfig{}
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
 	e := errors.New(ts.T().Name())
 	mockedRelease.On("Uninstall").Return(&helmRelease.UninstallReleaseResponse{}, e)

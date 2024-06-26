@@ -31,7 +31,7 @@ func (s *ValidateTestSuite) TestInvalidNamespace() {
 
 func (s *ValidateTestSuite) TestInvalidUniq() {
 	rel := release.NewConfig()
-	rel.NameF = "bla@bla"
+	rel.NameF = "bla@1@2@3"
 
 	var e *uniqname.ValidationError
 	s.Require().ErrorAs(rel.Validate(), &e)
