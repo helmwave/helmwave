@@ -1,0 +1,6 @@
+kind: Fixed
+body: Multiple kubecontext for the same releases
+time: 2024-06-26T17:38:27.525673+03:00
+custom:
+  Author: zhilyaev
+  Issue: "910"
