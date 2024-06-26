@@ -13,7 +13,7 @@ import (
 
 const ROOT_PREFIX = "HELMWAVE_"
 
-// EnvVars helper function for HELMWAVE environment variables
+// EnvVars helper function for HELMWAVE environment variables.
 func EnvVars(names ...string) []string {
 	a := make([]string, 0, len(names))
 	for _, name := range names {

@@ -183,11 +183,11 @@ func (i *Build) flags() []cli.Flag {
 			Destination: &i.remoteSource,
 		},
 		&cli.BoolFlag{
-			Name:        "enable-dependencies",
+			Name:        "dependencies",
 			Usage:       "evaluate releases dependencies and add them to the plan even if they don't match provided tags",
 			Value:       true,
 			Category:    Step1,
-			EnvVars:     EnvVars("ENABLE_DEPENDENCIES"),
+			EnvVars:     EnvVars("DEPENDENCIES_ENABLED", "DEPENDENCIES"),
 			Destination: &i.options.EnableDependencies,
 		},
 	}
