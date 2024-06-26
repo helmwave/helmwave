@@ -1,0 +1,6 @@
+kind: New feature
+body: Add flag to disable evaluating dependencies
+time: 2024-06-25T23:19:39.966348+01:00
+custom:
+    Author: r3nic1e
+    Issue: "734"

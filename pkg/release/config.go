@@ -224,14 +224,16 @@ func (rel *config) KubeContext() string {
 
 // MarshalYAML is a marshaller for gopkg.in/yaml.v3.
 // It is required to avoid data race with getting read lock.
+//
+//nolint:govet // we don't care about mutex copying during marshaling
 func (rel *config) MarshalYAML() (any, error) {
 	rel.lock.RLock()
 	defer rel.lock.RUnlock()
 
 	type raw config
-	r := raw(*rel) //nolint:govet
+	r := raw(*rel)
 
-	return r, nil //nolint:govet
+	return r, nil
 }
 
 func (rel *config) HooksDisabled() bool {

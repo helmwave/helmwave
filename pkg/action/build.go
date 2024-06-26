@@ -23,11 +23,11 @@ var _ Action = (*Build)(nil)
 type Build struct {
 	yml           *Yml
 	diff          *Diff
-	options       plan.BuildOptions
 	remoteSource  string
 	plandir       string
 	diffMode      string
 	tags          cli.StringSlice
+	options       plan.BuildOptions
 	autoYml       bool
 	skipUnchanged bool
 }
@@ -181,6 +181,14 @@ func (i *Build) flags() []cli.Flag {
 			Category:    "BUILD",
 			EnvVars:     []string{"HELMWAVE_REMOTE_SOURCE"},
 			Destination: &i.remoteSource,
+		},
+		&cli.BoolFlag{
+			Name:        "enable-dependencies",
+			Usage:       "evaluate releases dependencies and add them to the plan even if they don't match provided tags",
+			Value:       true,
+			Category:    Step1,
+			EnvVars:     []string{"HELMWAVE_ENABLE_DEPENDENCIES"},
+			Destination: &i.options.EnableDependencies,
 		},
 	}
 

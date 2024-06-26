@@ -130,10 +130,10 @@ func (ts *BuildReleasesTestSuite) TestNoReleases() {
 	p := New(filepath.Join(tmpDir, Dir))
 	p.NewBody()
 
-	releases, err := p.buildReleases([]string{}, false)
+	releases, err := p.buildReleases(BuildOptions{})
 
 	ts.Require().NoError(err)
-	ts.Require().Empty(releases)
+	ts.Empty(releases)
 }
 
 func (ts *BuildReleasesTestSuite) TestNoMatchingReleases() {
@@ -145,9 +145,9 @@ func (ts *BuildReleasesTestSuite) TestNoMatchingReleases() {
 
 	p.SetReleases(mockedRelease)
 
-	releases, err := p.buildReleases([]string{"abc"}, true)
+	releases, err := p.buildReleases(BuildOptions{Tags: []string{"abc"}, MatchAll: true})
 	ts.Require().NoError(err)
-	ts.Require().Empty(releases)
+	ts.Empty(releases)
 
 	mockedRelease.AssertExpectations(ts.T())
 }
@@ -171,7 +171,7 @@ func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(tags, true)
+	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 
 	var e *release.DuplicateError
 	ts.Require().ErrorAs(err, &e)
@@ -198,9 +198,9 @@ func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
 
 	p.SetReleases(rel)
 
-	releases, err := p.buildReleases(tags, true)
-	ts.Require().ErrorIs(err, release.ErrDepFailed)
-	ts.Require().Empty(releases)
+	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	ts.ErrorIs(err, release.ErrDepFailed)
+	ts.Empty(releases)
 
 	rel.AssertExpectations(ts.T())
 }
@@ -221,10 +221,10 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 
 	p.SetReleases(rel)
 
-	releases, err := p.buildReleases(tags, true)
+	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.Require().NoError(err)
-	ts.Require().Len(releases, 1)
-	ts.Require().Contains(releases, rel)
+	ts.Len(releases, 1)
+	ts.Contains(releases, rel)
 
 	rel.AssertExpectations(ts.T())
 }
@@ -253,11 +253,37 @@ func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(tags, true)
+	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.Require().NoError(err)
-	ts.Require().Len(releases, 2)
-	ts.Require().Contains(releases, rel1)
-	ts.Require().Contains(releases, rel2)
+	ts.Len(releases, 2)
+	ts.Contains(releases, rel1)
+	ts.Contains(releases, rel2)
+
+	rel1.AssertExpectations(ts.T())
+	rel2.AssertExpectations(ts.T())
+}
+
+func (ts *BuildReleasesTestSuite) TestDisabledDependencies() {
+	tmpDir := ts.T().TempDir()
+	p := New(filepath.Join(tmpDir, Dir))
+
+	tags := []string{"bla"}
+	u1 := uniqname.UniqName(ts.T().Name())
+
+	rel1 := &MockReleaseConfig{}
+	rel1.On("Tags").Return(tags)
+	rel1.On("Uniq").Return(u1)
+	rel1.On("SetDependsOn", []*release.DependsOnReference{}).Return()
+
+	rel2 := &MockReleaseConfig{}
+	rel2.On("Tags").Return([]string{})
+
+	p.SetReleases(rel1, rel2)
+
+	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: false})
+	ts.Require().NoError(err)
+	ts.Len(releases, 1)
+	ts.Contains(releases, rel1)
 
 	rel1.AssertExpectations(ts.T())
 	rel2.AssertExpectations(ts.T())
