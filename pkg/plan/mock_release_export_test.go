@@ -19,7 +19,7 @@ type MockReleaseConfig struct {
 	mock.Mock
 }
 
-func (r *MockReleaseConfig) HideSecret(hideSecret bool) {
+func (r *MockReleaseConfig) HideSecret(_ bool) {
 	r.Called()
 }
 
