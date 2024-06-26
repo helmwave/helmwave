@@ -50,6 +50,7 @@ func (rel *config) newInstall() *action.Install {
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 	client.Labels = rel.Labels
+	client.HideSecret = rel.hideSecret
 
 	rel.Chart().CopyOptions(&client.ChartPathOptions)
 
@@ -98,6 +99,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 	client.Labels = rel.Labels
+	client.HideSecret = rel.hideSecret
 
 	rel.Chart().CopyOptions(&client.ChartPathOptions)
 
