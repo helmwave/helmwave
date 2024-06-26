@@ -13,12 +13,13 @@ type ValidateTestSuite struct {
 
 func (s *ValidateTestSuite) TestGood() {
 	data := []string{
-		"my@test",
-		"my-release@test-1",
+		"my@test@Context",
+		"my-release@test-1@Context-1",
 	}
 
 	for _, d := range data {
-		s.NoError(uniqname.UniqName(d).Validate())
+		_, err := uniqname.NewFromString(d)
+		s.NoError(err)
 	}
 }
 
@@ -26,19 +27,19 @@ func (s *ValidateTestSuite) TestBad() {
 	data := []string{
 		"my-release",
 		"my",
-		"my@",
 		"my@-",
 		"my@ ",
-		"@name",
-		"@",
+		"@Name",
+		"",
 		"@-",
 		"-@-",
+		"my-release@test-1@Context-1@blabla",
 	}
 
 	for _, d := range data {
-		u := uniqname.UniqName(d)
+		_, err := uniqname.NewFromString(d)
 		var e *uniqname.ValidationError
-		s.ErrorAs(u.Validate(), &e)
+		s.ErrorAs(err, &e)
 		s.Equal(d, e.Uniq)
 	}
 }

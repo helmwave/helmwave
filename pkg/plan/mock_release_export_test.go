@@ -46,7 +46,7 @@ func (r *MockReleaseConfig) Uniq() uniqname.UniqName {
 		return args.Get(0).(uniqname.UniqName)
 	}
 
-	u, _ := uniqname.Generate(r.Name(), r.Namespace())
+	u, _ := uniqname.New(r.Name(), r.Namespace(), r.KubeContext())
 
 	return u
 }

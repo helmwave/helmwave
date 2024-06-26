@@ -19,7 +19,7 @@ func ContextGetReleaseUniq(ctx context.Context) (uniqname.UniqName, bool) {
 	case uniqname.UniqName:
 		return v, true
 	default:
-		return "", false
+		return uniqname.UniqName{}, false
 	}
 }
 

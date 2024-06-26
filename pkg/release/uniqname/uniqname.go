@@ -6,33 +6,47 @@ import (
 	"strings"
 )
 
-// Separator is a separator between release name and namespace.
+// Separator is a separator between release Name and Namespace.
 const Separator = "@"
 
 var validateRegexp = regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
 
-// UniqName is an alias for string.
-type UniqName string
+// UniqName is a unique identificator for release.
+type UniqName struct {
+	Name      string
+	Namespace string
+	Context   string
+}
 
-// Generate returns uniqname for provided release name and namespace.
-func Generate(name, namespace string) (UniqName, error) {
-	u := UniqName(fmt.Sprintf("%s%s%s", name, Separator, namespace))
+var _ fmt.Stringer = UniqName{}
+
+// New returns uniqname for provided release Name and Namespace.
+func New(name, namespace, context string) (UniqName, error) {
+	u := UniqName{
+		Name:      name,
+		Namespace: namespace,
+		Context:   context,
+	}
 
 	return u, u.Validate()
 }
 
-// GenerateWithDefaultNamespace parses uniqname out of provided line.
-// If there is no namespace in line, default namespace will be used.
-func GenerateWithDefaultNamespace(line, namespace string) (UniqName, error) {
-	s := strings.Split(line, Separator)
+func NewFromString(line string) (UniqName, error) {
+	parts := strings.Split(line, Separator)
 
-	name := s[0]
-
-	if len(s) > 1 && s[1] != "" {
-		namespace = s[1]
+	var u UniqName
+	switch len(parts) {
+	case 1:
+		u = UniqName{Name: parts[0]}
+	case 2:
+		u = UniqName{Name: parts[0], Namespace: parts[1]}
+	case 3:
+		u = UniqName{Name: parts[0], Namespace: parts[1], Context: parts[2]}
+	default:
+		return UniqName{}, NewValidationError(line)
 	}
 
-	return Generate(name, namespace)
+	return u, u.Validate()
 }
 
 // Equal checks whether uniqnames are equal.
@@ -42,16 +56,15 @@ func (n UniqName) Equal(a UniqName) bool {
 
 // Validate validates this object.
 func (n UniqName) Validate() error {
-	s := strings.Split(n.String(), Separator)
-	if len(s) != 2 {
+	if !validateRegexp.MatchString(n.Name) {
 		return NewValidationError(n.String())
 	}
 
-	if !validateRegexp.MatchString(s[0]) {
+	if !validateRegexp.MatchString(n.Namespace) {
 		return NewValidationError(n.String())
 	}
 
-	if !validateRegexp.MatchString(s[1]) {
+	if n.Context != "" && !validateRegexp.MatchString(n.Context) {
 		return NewValidationError(n.String())
 	}
 
@@ -59,5 +72,23 @@ func (n UniqName) Validate() error {
 }
 
 func (n UniqName) String() string {
-	return string(n)
+	str := n.Name
+
+	if n.Namespace == "" {
+		return str
+	}
+
+	str += Separator + n.Namespace
+
+	if n.Context == "" {
+		return str
+	}
+
+	str += Separator + n.Context
+
+	return str
+}
+
+func (n UniqName) Empty() bool {
+	return n.Name == "" && n.Namespace == "" && n.Context == ""
 }

@@ -21,6 +21,7 @@ func (s *ConfigTestSuite) TestConfigUniq() {
 	r := release.NewConfig()
 	r.NameF = "redis"
 	r.NamespaceF = "test"
+	r.KubeContextF = "ctx"
 
 	s.Require().NoError(r.Uniq().Validate())
 }
@@ -39,6 +40,7 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r := release.NewConfig()
 
 	r.NamespaceF = "testns"
+	r.KubeContextF = "testctx"
 	r.DependsOnF = []*release.DependsOnReference{
 		{Name: "bla"},
 		{Name: "blabla@testns"},
@@ -49,9 +51,9 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r.BuildAfterUnmarshal(r)
 
 	expected := []*release.DependsOnReference{
-		{Name: "bla@testns"},
-		{Name: "blabla@testns"},
-		{Name: "blablabla@testtestns"},
+		{Name: "bla@testns@testctx"},
+		{Name: "blabla@testns@testctx"},
+		{Name: "blablabla@testtestns@testctx"},
 	}
 	s.Require().ElementsMatch(r.DependsOn(), expected)
 }

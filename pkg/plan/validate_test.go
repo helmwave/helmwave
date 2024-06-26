@@ -81,8 +81,11 @@ func (ts *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("Namespace").Return(ts.T().Name())
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
+	mockedRelease.On("KubeContext").Return("")
+
 	v := release.ValuesReference{Src: tmpValues}
 	ts.Require().NoError(v.SetViaRelease(ts.ctx, mockedRelease, tmpDir, template.TemplaterSprig, nil))
+
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 
 	p.SetReleases(mockedRelease)
@@ -153,6 +156,7 @@ func (ts *ValidateTestSuite) TestValidateReleaseDuplicate() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Validate").Return(nil)
+	mockedRelease.On("KubeContext").Return("")
 
 	p.SetReleases(mockedRelease, mockedRelease)
 
