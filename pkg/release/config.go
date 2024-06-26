@@ -87,7 +87,7 @@ func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
 }
 
-// Uniq like redis@my-namespace@kubecontext
+// Uniq like redis@my-namespace@kubecontext.
 func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
 		var err error
@@ -209,7 +209,7 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 	rel.lock.Unlock()
 }
 
-// FillDepName fills the dependency name by own release
+// FillDepName fills the dependency name by own release.
 func (rel *config) FillDepName(line string) (uniqname.UniqName, error) {
 	s := strings.Split(line, uniqname.Separator)
 

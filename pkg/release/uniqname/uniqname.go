@@ -9,7 +9,7 @@ import (
 // Separator is a separator between release name and namespace.
 const Separator = "@"
 
-var validateRegexp = regexp.MustCompile("[a-z0-9]([_-a-z0-9]*[a-z0-9])?")
+var validateRegexp = regexp.MustCompile("[a-z0-9](_[-a-z0-9]*[a-z0-9])?")
 
 // UniqName is an alias for string.
 type UniqName string
@@ -34,7 +34,7 @@ func (n UniqName) Validate() error {
 	}
 
 	// I know, it should be just 3 items in slice
-	for i, _ := range s {
+	for i := range s {
 		if !validateRegexp.MatchString(s[i]) {
 			return NewValidationError(n.String())
 		}

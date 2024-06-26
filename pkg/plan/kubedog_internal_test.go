@@ -56,7 +56,7 @@ func (s *KubedogTestSuite) TestSyncSpecs() {
 	relName := "bla"
 	relNS := "blabla"
 	kubecontext := "blacontext"
-	u, _ := uniqname.Generate(relName, relNS)
+	u, _ := uniqname.Generate(relName, relNS, kubecontext)
 
 	p.manifests[u] = `
 kind: Canary
@@ -117,7 +117,7 @@ func (s *KubedogTestSuite) TestRollbackSpecs() {
 	relNS := "blabla"
 	kubecontext := "blacontext"
 	version := 666
-	u, _ := uniqname.Generate(relName, relNS)
+	u, _ := uniqname.Generate(relName, relNS, kubecontext)
 
 	manifest := `
 kind: Canary
@@ -197,7 +197,8 @@ func (s *KubedogTestSuite) TestSpecsMultipleContexts() {
 
 	relName := "bla"
 	relNS := "blabla"
-	u, _ := uniqname.Generate(relName, relNS)
+	kubecontext := "blacontext"
+	u, _ := uniqname.Generate(relName, relNS, kubecontext)
 
 	mockedRelease1 := &MockReleaseConfig{}
 	mockedRelease1.On("KubeContext").Return("bla1")
