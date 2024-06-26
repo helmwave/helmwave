@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
@@ -228,6 +229,10 @@ func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
 }
 
 func (rel *config) KubeContext() string {
+	if rel.KubeContextF == "" {
+		return helper.Helm.KubeContext
+	}
+
 	return rel.KubeContextF
 }
 
