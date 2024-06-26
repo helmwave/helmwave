@@ -81,7 +81,7 @@ func (n UniqName) Validate() error {
 		return NewValidationError(n.String())
 	}
 
-	if !validateRegexp.MatchString(n.context) {
+	if n.context != "" && !validateRegexp.MatchString(n.context) {
 		return NewValidationError(n.String())
 	}
 
