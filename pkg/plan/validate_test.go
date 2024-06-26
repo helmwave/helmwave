@@ -39,7 +39,7 @@ func (ts *ValidateTestSuite) TestInvalidRelease() {
 
 	err := errors.New("test error")
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Validate").Return(err)
 
 	p.SetReleases(mockedRelease)
@@ -57,7 +57,7 @@ func (ts *ValidateTestSuite) TestInvalidRepository() {
 
 	err := errors.New("test error")
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Validate").Return(err)
 
 	p.SetRepositories(mockedRepo)
@@ -76,7 +76,7 @@ func (ts *ValidateTestSuite) TestValidateValues() {
 	tmpValues := filepath.Join(tmpDir, "valuesName")
 	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return(ts.T().Name())
 	mockedRelease.On("Namespace").Return(ts.T().Name())
 	mockedRelease.On("Uniq").Return()
@@ -103,7 +103,7 @@ func (ts *ValidateTestSuite) TestValidateValuesNotFound() {
 	tmpValues := filepath.Join(tmpDir, "valuesName")
 	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
@@ -129,7 +129,7 @@ func (ts *ValidateTestSuite) TestValidateRepositoryDuplicate() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Name").Return("blabla")
 	mockedRepo.On("Validate").Return(nil)
 
@@ -151,7 +151,7 @@ func (ts *ValidateTestSuite) TestValidateReleaseDuplicate() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	body := p.NewBody()
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("blabla")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()

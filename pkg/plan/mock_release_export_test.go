@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"path/filepath"
+	"testing"
 
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -17,6 +18,15 @@ import (
 
 type MockReleaseConfig struct {
 	mock.Mock
+}
+
+func NewMockReleaseConfig(t *testing.T) *MockReleaseConfig {
+	t.Helper()
+
+	c := &MockReleaseConfig{}
+	c.Mock.Test(t)
+
+	return c
 }
 
 func (r *MockReleaseConfig) HideSecret(_ bool) {

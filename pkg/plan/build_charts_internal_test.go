@@ -28,9 +28,9 @@ func (ts *BuildRepositoriesTestSuite) TestEmptyReleases() {
 func (ts *BuildRepositoriesTestSuite) TestMultipleReleases() {
 	p := New(".")
 
-	rel1 := &MockReleaseConfig{}
+	rel1 := NewMockReleaseConfig(ts.T())
 	rel1.On("DownloadChart").Return(nil)
-	rel2 := &MockReleaseConfig{}
+	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("DownloadChart").Return(nil)
 
 	p.SetReleases(rel1, rel2)
@@ -45,9 +45,9 @@ func (ts *BuildRepositoriesTestSuite) TestMultipleReleases() {
 func (ts *BuildRepositoriesTestSuite) TestError() {
 	p := New(".")
 
-	rel1 := &MockReleaseConfig{}
+	rel1 := NewMockReleaseConfig(ts.T())
 	rel1.On("DownloadChart").Return(nil)
-	rel2 := &MockReleaseConfig{}
+	rel2 := NewMockReleaseConfig(ts.T())
 	errExpected := errors.New(ts.T().Name())
 	rel2.On("DownloadChart").Return(errExpected)
 

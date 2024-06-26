@@ -19,6 +19,15 @@ type MockHook struct {
 	mock.Mock
 }
 
+func NewMockHook(t *testing.T) *MockHook {
+	t.Helper()
+
+	c := &MockHook{}
+	c.Mock.Test(t)
+
+	return c
+}
+
 func (m *MockHook) Run(_ context.Context) error {
 	return m.Called().Error(0)
 }
@@ -43,7 +52,7 @@ func (ts *LifecycleRunTestSuite) SetupTest() {
 }
 
 func (ts *LifecycleRunTestSuite) TestRunNoError() {
-	hook := &MockHook{}
+	hook := NewMockHook(ts.T())
 	hook.On("Run").Return(nil)
 
 	lifecycle := hooks.Lifecycle{PreBuild: []hooks.Hook{hook}}
@@ -55,7 +64,7 @@ func (ts *LifecycleRunTestSuite) TestRunNoError() {
 }
 
 func (ts *LifecycleRunTestSuite) TestRunError() {
-	hook := &MockHook{}
+	hook := NewMockHook(ts.T())
 	errExpected := errors.New("test 123")
 	hook.On("Run").Return(errExpected)
 	hook.On("Log").Return(log.WithField("test", ts.T().Name()))

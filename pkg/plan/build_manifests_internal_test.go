@@ -40,7 +40,7 @@ func (ts *BuildManifestsTestSuite) TestEmptyReleases() {
 func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	p := New(".")
 
-	rel1 := &MockReleaseConfig{}
+	rel1 := NewMockReleaseConfig(ts.T())
 	u1, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel1.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel1.On("ChartDepsUpd").Return(nil)
@@ -49,7 +49,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel1.On("HooksDisabled").Return(false)
 	rel1.On("Uniq").Return(u1)
 
-	rel2 := &MockReleaseConfig{}
+	rel2 := NewMockReleaseConfig(ts.T())
 	u2, _ := uniqname.NewFromString("redis2@defaultblabla")
 	rel2.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel2.On("ChartDepsUpd").Return(nil)
@@ -76,7 +76,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(ts.T())
 	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	errExpected := errors.New(ts.T().Name())
 	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
@@ -101,7 +101,7 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 func (ts *BuildManifestsTestSuite) TestSyncError() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(ts.T())
 	errExpected := errors.New(ts.T().Name())
 	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(nil)
@@ -120,7 +120,7 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(ts.T())
 	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(nil)
@@ -147,7 +147,7 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(ts.T())
 	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(nil)

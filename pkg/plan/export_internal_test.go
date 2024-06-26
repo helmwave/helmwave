@@ -48,7 +48,7 @@ func (ts *ExportTestSuite) TestValuesOneRelease() {
 	tmpValues := filepath.Join(tmpDir, valuesName)
 	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},

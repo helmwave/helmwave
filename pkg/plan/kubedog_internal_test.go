@@ -41,7 +41,7 @@ func (s *KubedogTestSuite) TestCallsManifestFunction() {
 	p := New("")
 	p.NewBody()
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(s.T())
 	p.SetReleases(rel)
 
 	s.Require().Panics(func() {
@@ -86,7 +86,7 @@ metadata:
 ---
 `
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(s.T())
 	mockedRelease.On("KubeContext").Return(kubecontext)
 	mockedRelease.On("Uniq").Return(u)
 	mockedRelease.On("Namespace").Return(relNS)
@@ -147,7 +147,7 @@ metadata:
 ---
 `
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(s.T())
 	mockedRelease.On("KubeContext").Return(kubecontext)
 	mockedRelease.On("Uniq").Return(u)
 	mockedRelease.On("Namespace").Return(relNS)
@@ -179,7 +179,7 @@ func (s *KubedogTestSuite) TestRollbackSpecsGetError() {
 	version := 666
 	errExpected := errors.New("test error")
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(s.T())
 	mockedRelease.On("KubeContext").Return(kubecontext)
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	mockedRelease.On("Get", version).Return((*helmRelease.Release)(nil), errExpected)
@@ -199,13 +199,13 @@ func (s *KubedogTestSuite) TestSpecsMultipleContexts() {
 	relNS := "blabla"
 	u, _ := uniqname.New(relName, relNS, "")
 
-	mockedRelease1 := &MockReleaseConfig{}
+	mockedRelease1 := NewMockReleaseConfig(s.T())
 	mockedRelease1.On("KubeContext").Return("bla1")
 	mockedRelease1.On("Uniq").Return(u)
 	mockedRelease1.On("Namespace").Return(relNS)
 	mockedRelease1.On("Logger").Return(log.WithField("test", s.T().Name()))
 
-	mockedRelease2 := &MockReleaseConfig{}
+	mockedRelease2 := NewMockReleaseConfig(s.T())
 	mockedRelease2.On("KubeContext").Return("bla2")
 	mockedRelease2.On("Uniq").Return(u)
 	mockedRelease2.On("Namespace").Return(relNS)

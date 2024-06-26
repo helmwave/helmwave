@@ -34,7 +34,7 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 
 	repoName := ts.T().Name()
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(repoName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
@@ -42,7 +42,7 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 	mockedRelease.On("Chart").Return(&release.Chart{})
 	mockedRelease.On("KubeContext").Return("")
 
-	mockedRepo := &MockRepositoryConfig{}
+	mockedRepo := NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Name").Return(repoName)
 
 	p.SetRepositories(mockedRepo)
@@ -61,7 +61,7 @@ func (ts *BuildRepositoriesTestSuite) TestUnusedRepo() {
 	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	mockedRepo := &MockRepositoryConfig{}
+	mockedRepo := NewMockRepositoryConfig(ts.T())
 
 	p.SetRepositories(mockedRepo)
 
@@ -78,7 +78,7 @@ func (ts *BuildRepositoriesTestSuite) TestSuccess() {
 
 	repoName := "blablanami"
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(repoName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
@@ -86,7 +86,7 @@ func (ts *BuildRepositoriesTestSuite) TestSuccess() {
 	mockedRelease.On("Chart").Return(&release.Chart{})
 	mockedRelease.On("KubeContext").Return("")
 
-	mockedRepo := &MockRepositoryConfig{}
+	mockedRepo := NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Name").Return(repoName)
 
 	p.SetRepositories(mockedRepo)
@@ -107,7 +107,7 @@ func (ts *BuildRepositoriesTestSuite) TestMissingRepo() {
 
 	repoName := "blablanami"
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(repoName)
 	mockedRelease.On("Namespace").Return("defaultblabla")

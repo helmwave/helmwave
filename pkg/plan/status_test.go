@@ -20,7 +20,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(s.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
@@ -51,7 +51,7 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(s.T())
 	mockedRelease.On("Status").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 

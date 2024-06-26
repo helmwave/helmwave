@@ -32,7 +32,7 @@ func (ts *DestroyTestSuite) TestDestroy() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("KubeContext").Return("")
@@ -52,7 +52,7 @@ func (ts *DestroyTestSuite) TestDestroyFailedRelease() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("KubeContext").Return("")

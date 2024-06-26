@@ -37,7 +37,7 @@ func (ts *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	repoName := "blablanami"
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Name").Return(repoName)
 	e := errors.New(ts.T().Name())
 	mockedRepo.On("Install").Return(e)
@@ -54,7 +54,7 @@ func (ts *ApplyTestSuite) TestApplyNoReleases() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
@@ -70,7 +70,7 @@ func (ts *ApplyTestSuite) TestApplyFailedRelease() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
@@ -94,7 +94,7 @@ func (ts *ApplyTestSuite) TestApply() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
@@ -104,7 +104,7 @@ func (ts *ApplyTestSuite) TestApply() {
 	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 	mockedRelease.On("KubeContext").Return("")
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)

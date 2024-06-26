@@ -20,7 +20,7 @@ func (s *ListTestSuite) TestList() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(s.T())
 	r := &helmRelease.Release{
 		Info: &helmRelease.Info{},
 		Chart: &chart.Chart{
@@ -42,7 +42,7 @@ func (s *ListTestSuite) TestListError() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(s.T())
 	mockedRelease.On("List").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 

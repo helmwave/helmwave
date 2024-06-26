@@ -32,7 +32,7 @@ func (ts *RollbackTestSuite) TestRollback() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Rollback").Return(nil)
 	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 
@@ -48,7 +48,7 @@ func (ts *RollbackTestSuite) TestRollbackError() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	e := errors.New(ts.T().Name())
 	mockedRelease.On("Rollback").Return(e)
 	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))

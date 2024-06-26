@@ -140,7 +140,7 @@ func (ts *BuildReleasesTestSuite) TestNoMatchingReleases() {
 	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Tags").Return([]string{"bla"})
 
 	p.SetReleases(mockedRelease)
@@ -159,13 +159,13 @@ func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
 	tags := []string{"bla"}
 	u, _ := uniqname.New(ts.T().Name(), "", "")
 
-	rel1 := &MockReleaseConfig{}
+	rel1 := NewMockReleaseConfig(ts.T())
 	rel1.On("Tags").Return(tags)
 	rel1.On("Uniq").Return(u)
 	rel1.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel1.On("SetDependsOn", []*release.DependsOnReference{}).Return()
 
-	rel2 := &MockReleaseConfig{}
+	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return(tags)
 	rel2.On("Uniq").Return(u)
 
@@ -190,7 +190,7 @@ func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
 	tags := []string{"bla"}
 	u, _ := uniqname.New(ts.T().Name(), "", "")
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(ts.T())
 	rel.On("Tags").Return(tags)
 	rel.On("Uniq").Return(u)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{{Name: "blabla", Optional: false}})
@@ -212,7 +212,7 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 	tags := []string{"bla"}
 	u, _ := uniqname.New(ts.T().Name(), "", "")
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(ts.T())
 	rel.On("Tags").Return(tags)
 	rel.On("Uniq").Return(u)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{{Name: "blabla", Optional: true}})
@@ -238,14 +238,14 @@ func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
 	u2, _ := uniqname.New("blabla", "", "")
 	deps := []*release.DependsOnReference{{Name: u2.String()}}
 
-	rel1 := &MockReleaseConfig{}
+	rel1 := NewMockReleaseConfig(ts.T())
 	rel1.On("Tags").Return(tags)
 	rel1.On("Uniq").Return(u1)
 	rel1.On("DependsOn").Return(deps)
 	rel1.On("SetDependsOn", deps).Return()
 	rel1.On("Logger").Return(log.WithField("test", ts.T().Name()))
 
-	rel2 := &MockReleaseConfig{}
+	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return([]string{})
 	rel2.On("Uniq").Return(u2)
 	rel2.On("DependsOn").Return([]*release.DependsOnReference{})
@@ -270,12 +270,12 @@ func (ts *BuildReleasesTestSuite) TestDisabledDependencies() {
 	tags := []string{"bla"}
 	u1, _ := uniqname.NewFromString(ts.T().Name())
 
-	rel1 := &MockReleaseConfig{}
+	rel1 := NewMockReleaseConfig(ts.T())
 	rel1.On("Tags").Return(tags)
 	rel1.On("Uniq").Return(u1)
 	rel1.On("SetDependsOn", []*release.DependsOnReference{}).Return()
 
-	rel2 := &MockReleaseConfig{}
+	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return([]string{})
 
 	p.SetReleases(rel1, rel2)
