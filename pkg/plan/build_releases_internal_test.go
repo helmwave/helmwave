@@ -268,7 +268,7 @@ func (ts *BuildReleasesTestSuite) TestDisabledDependencies() {
 	p := New(filepath.Join(tmpDir, Dir))
 
 	tags := []string{"bla"}
-	u1 := uniqname.UniqName(ts.T().Name())
+	u1, _ := uniqname.NewFromString(ts.T().Name())
 
 	rel1 := &MockReleaseConfig{}
 	rel1.On("Tags").Return(tags)

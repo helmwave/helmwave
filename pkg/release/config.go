@@ -182,7 +182,9 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 		switch dep.Type() {
 		case DependencyRelease:
 			err := rel.buildAfterUnmarshalDependency(dep)
-			if err == nil {
+			if err != nil {
+				rel.Logger().WithField("dependency", dep).WithError(err).Error("can't parse dependency")
+			} else {
 				newDeps = append(newDeps, dep)
 			}
 		case DependencyTag:
@@ -207,18 +209,24 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 	rel.lock.Unlock()
 }
 
+// buildAfterUnmarshalDependency generates full uniqname for dependency if it was short using release as default.
 func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error {
-	u, err := uniqname.GenerateWithDefaultNamespaceContext(dep.Name, rel.Namespace(), rel.KubeContext())
+	u, err := uniqname.NewFromString(dep.Name)
 	if err != nil {
-		rel.Logger().WithField("dependency", dep).WithError(err).Error("can't parse dependency")
-
 		return err
 	}
 
-	// generate full uniqname string if it was short
+	if u.Namespace == "" {
+		u.Namespace = rel.Namespace()
+	}
+
+	if u.Context == "" {
+		u.Context = rel.KubeContext()
+	}
+
 	dep.Name = u.String()
 
-	return nil
+	return u.Validate()
 }
 
 func (rel *config) PostRenderer() (postrender.PostRenderer, error) {

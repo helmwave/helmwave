@@ -13,8 +13,8 @@ type ValidateTestSuite struct {
 
 func (s *ValidateTestSuite) TestGood() {
 	data := []string{
-		"my@test@context",
-		"my-release@test-1@context-1",
+		"my@test@Context",
+		"my-release@test-1@Context-1",
 	}
 
 	for _, d := range data {
@@ -29,11 +29,11 @@ func (s *ValidateTestSuite) TestBad() {
 		"my",
 		"my@-",
 		"my@ ",
-		"@name",
+		"@Name",
 		"",
 		"@-",
 		"-@-",
-		"my-release@test-1@context-1@blabla",
+		"my-release@test-1@Context-1@blabla",
 	}
 
 	for _, d := range data {
