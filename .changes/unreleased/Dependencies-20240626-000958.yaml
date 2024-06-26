@@ -1,0 +1,6 @@
+kind: Dependencies
+body: bump all dependencies, helm v3.15.2, bump alpine 3.20
+time: 2024-06-26T00:09:58.867112+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""
