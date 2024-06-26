@@ -1,7 +1,9 @@
 package release
 
 import (
+	"errors"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -85,16 +87,17 @@ func (rel *config) DryRun(b bool) {
 	rel.dryRun = b
 }
 
-// Uniq like redis@my-namespace.
+// Uniq like redis@my-namespace@kubecontext
 func (rel *config) Uniq() uniqname.UniqName {
 	if rel.uniqName == "" {
 		var err error
-		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace())
+		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace(), rel.KubeContext())
 		if err != nil {
 			rel.Logger().WithFields(log.Fields{
-				"name":       rel.Name(),
-				"namespace":  rel.Namespace(),
-				log.ErrorKey: err,
+				"name":        rel.Name(),
+				"namespace":   rel.Namespace(),
+				"kubecontext": rel.KubeContext(),
+				log.ErrorKey:  err,
 			}).Error("failed to generate valid uniqname")
 		}
 	}
@@ -206,8 +209,22 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 	rel.lock.Unlock()
 }
 
+// FillDepName fills the dependency name by own release
+func (rel *config) FillDepName(line string) (uniqname.UniqName, error) {
+	s := strings.Split(line, uniqname.Separator)
+
+	switch len(s) {
+	case 1:
+		return uniqname.Generate(s[0], rel.Namespace(), rel.KubeContext())
+	case 2:
+		return uniqname.Generate(s[0], s[1], rel.KubeContext())
+	}
+
+	return "", errors.New("fail with dependency name")
+}
+
 func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error {
-	u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
+	u, err := rel.FillDepName(dep.Name)
 	if err != nil {
 		rel.Logger().WithField("dependency", dep).WithError(err).Error("can't parse dependency")
 
