@@ -19,6 +19,10 @@ type MockReleaseConfig struct {
 	mock.Mock
 }
 
+func (r *MockReleaseConfig) HideSecret(hideSecret bool) {
+	r.Called()
+}
+
 func (r *MockReleaseConfig) SetChartName(_ string) {
 	r.Called()
 }
