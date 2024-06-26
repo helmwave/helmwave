@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
@@ -9,6 +10,19 @@ import (
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/urfave/cli/v2"
 )
+
+const ROOT_PREFIX = "HELMWAVE_"
+
+// EnvVars helper function for HELMWAVE environment variables
+func EnvVars(names ...string) []string {
+	a := make([]string, 0, len(names))
+	for _, name := range names {
+		s := strings.ToUpper(ROOT_PREFIX + name)
+		a = append(a, s)
+	}
+
+	return a
+}
 
 // flagPlandir pass val to urfave flag.
 func flagPlandir(v *string) cli.Flag {
@@ -18,7 +32,7 @@ func flagPlandir(v *string) cli.Flag {
 		Value:       plan.Dir,
 		Category:    "BUILD",
 		Usage:       "path to plandir",
-		EnvVars:     []string{"HELMWAVE_PLANDIR", "HELMWAVE_PLAN"},
+		EnvVars:     EnvVars("PLANDIR", "PLAN"),
 		Destination: v,
 	}
 }
@@ -30,7 +44,7 @@ func flagTags(v *cli.StringSlice) cli.Flag {
 		Aliases:     []string{"t"},
 		Usage:       "build releases by tags: -t tag1 -t tag3,tag4",
 		Category:    "SELECTION",
-		EnvVars:     []string{"HELMWAVE_TAGS"},
+		EnvVars:     EnvVars("TAGS"),
 		Destination: v,
 	}
 }
@@ -39,10 +53,11 @@ func flagTags(v *cli.StringSlice) cli.Flag {
 func flagMatchAllTags(v *bool) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "match-all-tags",
+		Aliases:     []string{"tt"},
 		Usage:       "match all provided tags",
 		Value:       false,
 		Category:    "SELECTION",
-		EnvVars:     []string{"HELMWAVE_MATCH_ALL_TAGS"},
+		EnvVars:     EnvVars("MATCH_ALL_TAGS"),
 		Destination: v,
 	}
 }
@@ -55,7 +70,7 @@ func flagYmlFile(v *string) cli.Flag {
 		Aliases:     []string{"f"},
 		Value:       plan.Body,
 		Usage:       "main yml file",
-		EnvVars:     []string{"HELMWAVE_YAML", "HELMWAVE_YML"},
+		EnvVars:     EnvVars("YAML", "YML"),
 		Destination: v,
 	}
 }
@@ -67,7 +82,7 @@ func flagTplFile(v *string) cli.Flag {
 		Category:    "YML",
 		Value:       "helmwave.yml.tpl",
 		Usage:       "main tpl file",
-		EnvVars:     []string{"HELMWAVE_TPL"},
+		EnvVars:     EnvVars("TPL"),
 		Destination: v,
 	}
 }
@@ -79,7 +94,7 @@ func flagDiffMode(v *string) cli.Flag {
 		Value:       "live",
 		Category:    "DIFF",
 		Usage:       "you can set: [ live | local | none ]",
-		EnvVars:     []string{"HELMWAVE_DIFF_MODE"},
+		EnvVars:     EnvVars("DIFF_MODE"),
 		Destination: v,
 	}
 }
@@ -91,7 +106,7 @@ func flagDiffWide(v *int) cli.Flag {
 		Value:       5,
 		Category:    "DIFF",
 		Usage:       "show line around changes",
-		EnvVars:     []string{"HELMWAVE_DIFF_WIDE"},
+		EnvVars:     EnvVars("DIFF_WIDE"),
 		Destination: v,
 	}
 }
@@ -103,7 +118,7 @@ func flagDiffShowSecret(v *bool) cli.Flag {
 		Value:       true,
 		Category:    "DIFF",
 		Usage:       "show secret in diff",
-		EnvVars:     []string{"HELMWAVE_DIFF_SHOW_SECRET"},
+		EnvVars:     EnvVars("DIFF_SHOW_SECRET"),
 		Destination: v,
 	}
 }
@@ -115,7 +130,7 @@ func flagTemplateEngine(v *string) cli.Flag {
 		Category:    "YML",
 		Value:       template.TemplaterSprig,
 		Usage:       fmt.Sprintf("select template engine: [ %s | %s ]", template.TemplaterSprig, template.TemplaterGomplate),
-		EnvVars:     []string{"HELMWAVE_TEMPLATER", "HELMWAVE_TEMPLATE_ENGINE"},
+		EnvVars:     EnvVars("TEMPLATER", "TEMPLATE_ENGINE"),
 		Destination: v,
 	}
 }
@@ -127,7 +142,7 @@ func flagAutoBuild(v *bool) cli.Flag {
 		Usage:       "auto build",
 		Value:       false,
 		Category:    "BUILD",
-		EnvVars:     []string{"HELMWAVE_AUTO_BUILD"},
+		EnvVars:     EnvVars("AUTO_BUILD"),
 		Destination: v,
 	}
 }
@@ -138,7 +153,7 @@ func flagDiffThreeWayMerge(v *bool) cli.Flag {
 		Usage:       "show 3-way merge diff",
 		Value:       false,
 		Category:    "DIFF",
-		EnvVars:     []string{"HELMWAVE_DIFF_3_WAY_MERGE"},
+		EnvVars:     EnvVars("DIFF_3_WAY_MERGE"),
 		Destination: v,
 	}
 }
@@ -150,7 +165,7 @@ func flagSkipUnchanged(v *bool) cli.Flag {
 		Usage:       "skip unchanged releases",
 		Value:       false,
 		Category:    "BUILD",
-		EnvVars:     []string{"HELMWAVE_SKIP_UNCHANGED"},
+		EnvVars:     EnvVars("SKIP_UNCHANGED"),
 		Destination: v,
 	}
 }
@@ -166,7 +181,7 @@ func flagGraphWidth(v *int) cli.Flag {
 			"N<0 – drop N symbols from end.",
 		Value:       0,
 		Category:    "BUILD",
-		EnvVars:     []string{"HELMWAVE_GRAPH_WIDTH"},
+		EnvVars:     EnvVars("GRAPH_WIDTH"),
 		Destination: v,
 	}
 }
@@ -178,7 +193,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 			Usage:       "enable/disable kubedog",
 			Value:       false,
 			Category:    "KUBEDOG",
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_ENABLED", "HELMWAVE_KUBEDOG"},
+			EnvVars:     EnvVars("KUBEDOG_ENABLED", "KUBEDOG"),
 			Destination: &dog.Enabled,
 		},
 		&cli.DurationFlag{
@@ -186,7 +201,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 			Usage:       "interval of kubedog status messages: set -1s to stop showing status progress",
 			Value:       5 * time.Second,
 			Category:    "KUBEDOG",
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_STATUS_INTERVAL"},
+			EnvVars:     EnvVars("KUBEDOG_STATUS_INTERVAL"),
 			Destination: &dog.StatusInterval,
 		},
 		&cli.DurationFlag{
@@ -194,7 +209,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 			Usage:       "delay kubedog start, don't make it too late",
 			Value:       time.Second,
 			Category:    "KUBEDOG",
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_START_DELAY"},
+			EnvVars:     EnvVars("KUBEDOG_START_DELAY"),
 			Destination: &dog.StartDelay,
 		},
 		&cli.DurationFlag{
@@ -202,7 +217,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 			Usage:       "timeout of kubedog multitrackers",
 			Value:       5 * time.Minute,
 			Category:    "KUBEDOG",
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_TIMEOUT"},
+			EnvVars:     EnvVars("KUBEDOG_TIMEOUT"),
 			Destination: &dog.Timeout,
 		},
 		&cli.IntFlag{
@@ -210,7 +225,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 			Usage:       "set kubedog max log line width",
 			Value:       140,
 			Category:    "KUBEDOG",
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_LOG_WIDTH"},
+			EnvVars:     EnvVars("KUBEDOG_LOG_WIDTH"),
 			Destination: &dog.LogWidth,
 		},
 		&cli.BoolFlag{
@@ -218,7 +233,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 			Usage:       "track almost all resources, experimental",
 			Value:       false,
 			Category:    "KUBEDOG",
-			EnvVars:     []string{"HELMWAVE_KUBEDOG_TRACK_ALL"},
+			EnvVars:     EnvVars("KUBEDOG_TRACK_ALL"),
 			Destination: &dog.TrackGeneric,
 		},
 	}

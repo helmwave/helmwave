@@ -171,7 +171,7 @@ func (i *Build) flags() []cli.Flag {
 			Usage:       "auto helmwave.yml.tpl --> helmwave.yml",
 			Value:       false,
 			Category:    "YML",
-			EnvVars:     []string{"HELMWAVE_AUTO_YML", "HELMWAVE_AUTO_YAML"},
+			EnvVars:     EnvVars("AUTO_YML", "AUTO_YAML"),
 			Destination: &i.autoYml,
 		},
 		&cli.StringFlag{
@@ -179,7 +179,7 @@ func (i *Build) flags() []cli.Flag {
 			Usage:       "go-getter URL to download build sources",
 			Value:       "",
 			Category:    "BUILD",
-			EnvVars:     []string{"HELMWAVE_REMOTE_SOURCE"},
+			EnvVars:     EnvVars("REMOTE_SOURCE"),
 			Destination: &i.remoteSource,
 		},
 		&cli.BoolFlag{
@@ -187,7 +187,7 @@ func (i *Build) flags() []cli.Flag {
 			Usage:       "evaluate releases dependencies and add them to the plan even if they don't match provided tags",
 			Value:       true,
 			Category:    Step1,
-			EnvVars:     []string{"HELMWAVE_ENABLE_DEPENDENCIES"},
+			EnvVars:     EnvVars("ENABLE_DEPENDENCIES"),
 			Destination: &i.options.EnableDependencies,
 		},
 	}

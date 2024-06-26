@@ -1,0 +1,6 @@
+kind: New feature
+body: Change find-renames to 1  by default, It's useful for diffing
+time: 2024-06-26T18:57:27.924093+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""
