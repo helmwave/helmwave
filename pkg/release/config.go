@@ -68,7 +68,16 @@ type config struct {
 	WaitForJobs              bool `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
 
 	// special field for templating and building
-	dryRun bool `jsonschema:"default=false,-"`
+	dryRun     bool `jsonschema:"default=false,-"`
+	hideSecret bool `jsonschema:"default=false,-"`
+}
+
+// HideSecret can be set to true when DryRun is enabled in order to hide
+// Kubernetes Secrets in the output. It cannot be used outside DryRun.
+func (rel *config) HideSecret(b bool) {
+	if rel.dryRun {
+		rel.hideSecret = b
+	}
 }
 
 func (rel *config) DryRun(b bool) {

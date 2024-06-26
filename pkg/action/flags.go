@@ -12,7 +12,7 @@ import (
 
 // flagPlandir pass val to urfave flag.
 func flagPlandir(v *string) cli.Flag {
-	return &cli.StringFlag{
+	return &cli.PathFlag{
 		Name:        "plandir",
 		Aliases:     []string{"p"},
 		Value:       plan.Dir,
@@ -49,7 +49,7 @@ func flagMatchAllTags(v *bool) cli.Flag {
 
 // flagYmlFile pass val to urfave flag.
 func flagYmlFile(v *string) cli.Flag {
-	return &cli.StringFlag{
+	return &cli.PathFlag{
 		Name:        "file",
 		Category:    "YML",
 		Aliases:     []string{"f"},
@@ -62,7 +62,7 @@ func flagYmlFile(v *string) cli.Flag {
 
 // flagTplFile pass val to urfave flag.
 func flagTplFile(v *string) cli.Flag {
-	return &cli.StringFlag{
+	return &cli.PathFlag{
 		Name:        "tpl",
 		Category:    "YML",
 		Value:       "helmwave.yml.tpl",

@@ -24,6 +24,7 @@ type Config interface {
 	Uniq() uniqname.UniqName
 	AllowFailure() bool
 	DryRun(dryRun bool)
+	HideSecret(hideSecret bool)
 	ChartDepsUpd() error
 	DownloadChart(tmpDir string) error
 	BuildValues(ctx context.Context, dir, templater string) error
