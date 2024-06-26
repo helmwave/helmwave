@@ -41,7 +41,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	p := New(".")
 
 	rel1 := &MockReleaseConfig{}
-	u1 := uniqname.UniqName("redis1@defaultblabla")
+	u1, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel1.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel1.On("ChartDepsUpd").Return(nil)
 	rel1.On("DryRun").Return()
@@ -50,7 +50,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel1.On("Uniq").Return(u1)
 
 	rel2 := &MockReleaseConfig{}
-	u2 := uniqname.UniqName("redis2@defaultblabla")
+	u2, _ := uniqname.NewFromString("redis2@defaultblabla")
 	rel2.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel2.On("ChartDepsUpd").Return(nil)
 	rel2.On("DryRun").Return()
@@ -77,7 +77,7 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 	p := New(".")
 
 	rel := &MockReleaseConfig{}
-	uniq := uniqname.UniqName("redis1@defaultblabla")
+	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	errExpected := errors.New(ts.T().Name())
 	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(errExpected)
@@ -121,7 +121,7 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 	p := New(".")
 
 	rel := &MockReleaseConfig{}
-	uniq := uniqname.UniqName("redis1@defaultblabla")
+	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(nil)
 	rel.On("DryRun").Return()
@@ -148,7 +148,7 @@ func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 	p := New(".")
 
 	rel := &MockReleaseConfig{}
-	uniq := uniqname.UniqName("redis1@defaultblabla")
+	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(nil)
 	rel.On("DryRun").Return()

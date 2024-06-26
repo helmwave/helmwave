@@ -25,6 +25,8 @@ func (s *StatusTestSuite) TestStatusByName() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("KubeContext").Return("")
+
 	r := &helmRelease.Release{
 		Info: &helmRelease.Info{},
 		Chart: &chart.Chart{
@@ -35,7 +37,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Status(string(mockedRelease.Uniq()))
+	err := p.Status(mockedRelease.Uniq().String())
 	s.Require().NoError(err)
 
 	err = p.Status()

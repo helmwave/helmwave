@@ -11,28 +11,59 @@ const Separator = "@"
 
 var validateRegexp = regexp.MustCompile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
 
-// UniqName is an alias for string.
-type UniqName string
+// UniqName is a unique identificator for release.
+type UniqName struct {
+	name      string
+	namespace string
+	context   string
+}
 
-// Generate returns uniqname for provided release name and namespace.
-func Generate(name, namespace string) (UniqName, error) {
-	u := UniqName(fmt.Sprintf("%s%s%s", name, Separator, namespace))
+var _ fmt.Stringer = UniqName{}
+
+// New returns uniqname for provided release name and namespace.
+func New(name, namespace, context string) (UniqName, error) {
+	u := UniqName{
+		name:      name,
+		namespace: namespace,
+		context:   context,
+	}
 
 	return u, u.Validate()
 }
 
-// GenerateWithDefaultNamespace parses uniqname out of provided line.
-// If there is no namespace in line, default namespace will be used.
-func GenerateWithDefaultNamespace(line, namespace string) (UniqName, error) {
-	s := strings.Split(line, Separator)
+func NewFromString(line string) (UniqName, error) {
+	parts := strings.Split(line, Separator)
 
-	name := s[0]
-
-	if len(s) > 1 && s[1] != "" {
-		namespace = s[1]
+	var u UniqName
+	switch len(parts) {
+	case 1:
+		u = UniqName{name: parts[0]}
+	case 2:
+		u = UniqName{name: parts[0], namespace: parts[1]}
+	case 3:
+		u = UniqName{name: parts[0], namespace: parts[1], context: parts[2]}
+	default:
+		return UniqName{}, NewValidationError(line)
 	}
 
-	return Generate(name, namespace)
+	return u, u.Validate()
+}
+
+// GenerateWithDefaultNamespaceContext parses uniqname out of provided line.
+// If there is no namespace in line, default namespace will be used.
+func GenerateWithDefaultNamespaceContext(line, namespace, context string) (UniqName, error) {
+	// ignoring error here because it will likely to be triggered by empty namespace or context
+	u, _ := NewFromString(line)
+
+	if u.namespace == "" {
+		u.namespace = namespace
+	}
+
+	if u.context == "" {
+		u.context = context
+	}
+
+	return u, u.Validate()
 }
 
 // Equal checks whether uniqnames are equal.
@@ -42,16 +73,15 @@ func (n UniqName) Equal(a UniqName) bool {
 
 // Validate validates this object.
 func (n UniqName) Validate() error {
-	s := strings.Split(n.String(), Separator)
-	if len(s) != 2 {
+	if !validateRegexp.MatchString(n.name) {
 		return NewValidationError(n.String())
 	}
 
-	if !validateRegexp.MatchString(s[0]) {
+	if !validateRegexp.MatchString(n.namespace) {
 		return NewValidationError(n.String())
 	}
 
-	if !validateRegexp.MatchString(s[1]) {
+	if !validateRegexp.MatchString(n.context) {
 		return NewValidationError(n.String())
 	}
 
@@ -59,5 +89,23 @@ func (n UniqName) Validate() error {
 }
 
 func (n UniqName) String() string {
-	return string(n)
+	str := n.name
+
+	if n.namespace == "" {
+		return str
+	}
+
+	str += Separator + n.namespace
+
+	if n.context == "" {
+		return str
+	}
+
+	str += Separator + n.context
+
+	return str
+}
+
+func (n UniqName) Empty() bool {
+	return n.name == "" && n.namespace == "" && n.context == ""
 }

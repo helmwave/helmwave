@@ -157,7 +157,7 @@ func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
 	p := New(filepath.Join(tmpDir, Dir))
 
 	tags := []string{"bla"}
-	u := uniqname.UniqName(ts.T().Name())
+	u, _ := uniqname.New(ts.T().Name(), "", "")
 
 	rel1 := &MockReleaseConfig{}
 	rel1.On("Tags").Return(tags)
@@ -188,7 +188,7 @@ func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
 	p := New(filepath.Join(tmpDir, Dir))
 
 	tags := []string{"bla"}
-	u := uniqname.UniqName(ts.T().Name())
+	u, _ := uniqname.New(ts.T().Name(), "", "")
 
 	rel := &MockReleaseConfig{}
 	rel.On("Tags").Return(tags)
@@ -210,7 +210,7 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 	p := New(filepath.Join(tmpDir, Dir))
 
 	tags := []string{"bla"}
-	u := uniqname.UniqName(ts.T().Name())
+	u, _ := uniqname.New(ts.T().Name(), "", "")
 
 	rel := &MockReleaseConfig{}
 	rel.On("Tags").Return(tags)
@@ -234,8 +234,8 @@ func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
 	p := New(filepath.Join(tmpDir, Dir))
 
 	tags := []string{"bla"}
-	u1 := uniqname.UniqName(ts.T().Name())
-	u2 := uniqname.UniqName("blabla")
+	u1, _ := uniqname.New(ts.T().Name(), "", "")
+	u2, _ := uniqname.New("blabla", "", "")
 	deps := []*release.DependsOnReference{{Name: u2.String()}}
 
 	rel1 := &MockReleaseConfig{}

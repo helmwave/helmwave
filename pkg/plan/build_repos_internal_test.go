@@ -40,6 +40,7 @@ func (ts *BuildRepositoriesTestSuite) TestLocalRepo() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Chart").Return(&release.Chart{})
+	mockedRelease.On("KubeContext").Return("")
 
 	mockedRepo := &MockRepositoryConfig{}
 	mockedRepo.On("Name").Return(repoName)
@@ -83,6 +84,7 @@ func (ts *BuildRepositoriesTestSuite) TestSuccess() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Chart").Return(&release.Chart{})
+	mockedRelease.On("KubeContext").Return("")
 
 	mockedRepo := &MockRepositoryConfig{}
 	mockedRepo.On("Name").Return(repoName)
@@ -111,6 +113,7 @@ func (ts *BuildRepositoriesTestSuite) TestMissingRepo() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Chart").Return(&release.Chart{})
+	mockedRelease.On("KubeContext").Return("")
 
 	p.SetReleases(mockedRelease)
 

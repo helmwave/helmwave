@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
@@ -86,13 +87,14 @@ func (rel *config) DryRun(b bool) {
 
 // Uniq like redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {
-	if rel.uniqName == "" {
+	if rel.uniqName.Empty() {
 		var err error
-		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace())
+		rel.uniqName, err = uniqname.New(rel.Name(), rel.Namespace(), rel.KubeContext())
 		if err != nil {
 			rel.Logger().WithFields(log.Fields{
 				"name":       rel.Name(),
 				"namespace":  rel.Namespace(),
+				"context":    rel.KubeContext(),
 				log.ErrorKey: err,
 			}).Error("failed to generate valid uniqname")
 		}
@@ -206,7 +208,7 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 }
 
 func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error {
-	u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
+	u, err := uniqname.GenerateWithDefaultNamespaceContext(dep.Name, rel.Namespace(), rel.KubeContext())
 	if err != nil {
 		rel.Logger().WithField("dependency", dep).WithError(err).Error("can't parse dependency")
 
@@ -228,6 +230,10 @@ func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
 }
 
 func (rel *config) KubeContext() string {
+	if rel.KubeContextF == "" {
+		rel.KubeContextF = helper.Helm.KubeContext
+	}
+
 	return rel.KubeContextF
 }
 

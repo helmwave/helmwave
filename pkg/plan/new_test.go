@@ -46,7 +46,7 @@ func (ts *NewTestSuite) TestLogger() {
 	body := p.NewBody()
 
 	rel := &plan.MockReleaseConfig{}
-	uniq := uniqname.UniqName("blabla@namespace")
+	uniq, _ := uniqname.New("blabla", "namespace", "")
 	rel.On("Uniq").Return(uniq)
 
 	repo := &plan.MockRepositoryConfig{}

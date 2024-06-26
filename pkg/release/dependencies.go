@@ -44,7 +44,9 @@ func (d *DependsOnReference) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func (d *DependsOnReference) Uniq() uniqname.UniqName {
-	return uniqname.UniqName(d.Name)
+	u, _ := uniqname.NewFromString(d.Name)
+
+	return u
 }
 
 func (d *DependsOnReference) Type() DependencyType {

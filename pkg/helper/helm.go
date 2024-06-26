@@ -7,7 +7,6 @@ import (
 	"k8s.io/apimachinery/pkg/version"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/pflag"
 	"helm.sh/helm/v3/pkg/action"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
@@ -52,11 +51,7 @@ func NewCfg(ns, kubecontext string) (*action.Configuration, error) {
 	config := genericclioptions.NewConfigFlags(true)
 	config.WrapConfigFn = wrapConfigFn
 	config.Namespace = &ns
-	if kubecontext != "" {
-		config.Context = &kubecontext
-	} else {
-		config.Context = &Helm.KubeContext
-	}
+	config.Context = &kubecontext
 
 	if Helm.Debug {
 		helmLogLevel = log.Infof
@@ -72,17 +67,11 @@ func NewCfg(ns, kubecontext string) (*action.Configuration, error) {
 }
 
 // NewHelm is a hack to create an instance of helm CLI and specifying namespace without environment variables.
-func NewHelm(ns string) (*helm.EnvSettings, error) {
+func NewHelm(ns string) *helm.EnvSettings {
 	env := helm.New()
-	fs := &pflag.FlagSet{}
-	env.AddFlags(fs)
-	flag := fs.Lookup("namespace")
+	env.SetNamespace(ns)
 
-	if err := flag.Value.Set(ns); err != nil {
-		return nil, fmt.Errorf("failed to set namespace %s for helm: %w", ns, err)
-	}
-
-	return env, nil
+	return env
 }
 
 // GetKubernetesVersion returns kubernetes server version.

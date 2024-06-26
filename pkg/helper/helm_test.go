@@ -21,9 +21,8 @@ func (s *HelmTestSuite) TestNewCfg() {
 
 func (s *HelmTestSuite) TestNewHelmNS() {
 	ns := s.T().Name()
-	h1, err := helper.NewHelm(ns)
+	h1 := helper.NewHelm(ns)
 
-	s.Require().NoError(err)
 	s.Require().NotNil(h1)
 	s.Require().Equal(ns, h1.Namespace())
 }

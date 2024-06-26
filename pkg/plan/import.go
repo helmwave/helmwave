@@ -67,7 +67,8 @@ func (p *Plan) importManifest() error {
 
 		n := strings.TrimSuffix(l.Name(), filepath.Ext(l.Name())) // drop extension of file
 
-		p.manifests[uniqname.UniqName(n)] = string(c)
+		u, _ := uniqname.NewFromString(n) // we don't expect errors here
+		p.manifests[u] = string(c)
 	}
 
 	return nil
