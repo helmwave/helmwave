@@ -10,7 +10,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/tests"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 )
@@ -75,7 +74,6 @@ func (ts *ApplyTestSuite) TestApplyFailedRelease() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	e := errors.New(ts.T().Name())
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, e)
 	mockedRelease.On("AllowFailure").Return(false)
@@ -100,7 +98,6 @@ func (ts *ApplyTestSuite) TestApply() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, nil)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
 	mockedRelease.On("KubeContext").Return("")
 

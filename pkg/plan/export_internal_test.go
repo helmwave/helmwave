@@ -55,6 +55,7 @@ func (ts *ExportTestSuite) TestValuesOneRelease() {
 	})
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("BuildValues").Return(nil)
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
 
 	p.body = &planBody{

@@ -6,7 +6,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -194,7 +193,6 @@ func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
 	rel.On("Tags").Return(tags)
 	rel.On("Uniq").Return(u)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{{Name: "blabla", Optional: false}})
-	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 
 	p.SetReleases(rel)
 
@@ -217,7 +215,6 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 	rel.On("Uniq").Return(u)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{{Name: "blabla", Optional: true}})
 	rel.On("SetDependsOn", []*release.DependsOnReference{}).Return()
-	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 
 	p.SetReleases(rel)
 
@@ -243,7 +240,6 @@ func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
 	rel1.On("Uniq").Return(u1)
 	rel1.On("DependsOn").Return(deps)
 	rel1.On("SetDependsOn", deps).Return()
-	rel1.On("Logger").Return(log.WithField("test", ts.T().Name()))
 
 	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return([]string{})

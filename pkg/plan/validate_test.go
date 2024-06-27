@@ -13,7 +13,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -80,7 +79,6 @@ func (ts *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("Name").Return(ts.T().Name())
 	mockedRelease.On("Namespace").Return(ts.T().Name())
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("KubeContext").Return("")
 
 	v := release.ValuesReference{Src: tmpValues}
@@ -104,7 +102,6 @@ func (ts *ValidateTestSuite) TestValidateValuesNotFound() {
 	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
 	mockedRelease := plan.NewMockReleaseConfig(ts.T())
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	v := release.ValuesReference{Src: tmpValues}
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 

@@ -7,7 +7,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRegistry "helm.sh/helm/v3/pkg/registry"
 )
@@ -61,8 +60,8 @@ func (ts *BuildRegistriesTestSuite) TestMissingRegistry() {
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(regiName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("Chart").Return(&release.Chart{Name: fmt.Sprintf("%s://%s", helmRegistry.OCIScheme, regiName)})
 
 	p.SetReleases(mockedRelease)
@@ -88,8 +87,8 @@ func (ts *BuildRegistriesTestSuite) TestSuccess() {
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(regiHost)
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("Chart").Return(&release.Chart{Name: fmt.Sprintf("%s://", helmRegistry.OCIScheme)})
 
 	regi := NewMockRegistryConfig(ts.T())

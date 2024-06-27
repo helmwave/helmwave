@@ -7,7 +7,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 )
@@ -42,6 +41,7 @@ func (s *KubedogTestSuite) TestCallsManifestFunction() {
 	p.NewBody()
 
 	rel := NewMockReleaseConfig(s.T())
+	rel.On("KubeContext").Return("")
 	p.SetReleases(rel)
 
 	s.Require().Panics(func() {
@@ -90,7 +90,6 @@ metadata:
 	mockedRelease.On("KubeContext").Return(kubecontext)
 	mockedRelease.On("Uniq").Return(u)
 	mockedRelease.On("Namespace").Return(relNS)
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	p.SetReleases(mockedRelease)
 
 	spec, context, err := p.kubedogSyncSpecs(&kubedog.Config{TrackGeneric: true})
@@ -151,7 +150,6 @@ metadata:
 	mockedRelease.On("KubeContext").Return(kubecontext)
 	mockedRelease.On("Uniq").Return(u)
 	mockedRelease.On("Namespace").Return(relNS)
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	mockedRelease.On("Get", version).Return(&helmRelease.Release{Manifest: manifest}, nil)
 	p.SetReleases(mockedRelease)
 
@@ -181,7 +179,6 @@ func (s *KubedogTestSuite) TestRollbackSpecsGetError() {
 
 	mockedRelease := NewMockReleaseConfig(s.T())
 	mockedRelease.On("KubeContext").Return(kubecontext)
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 	mockedRelease.On("Get", version).Return((*helmRelease.Release)(nil), errExpected)
 	p.SetReleases(mockedRelease)
 
@@ -203,13 +200,11 @@ func (s *KubedogTestSuite) TestSpecsMultipleContexts() {
 	mockedRelease1.On("KubeContext").Return("bla1")
 	mockedRelease1.On("Uniq").Return(u)
 	mockedRelease1.On("Namespace").Return(relNS)
-	mockedRelease1.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	mockedRelease2 := NewMockReleaseConfig(s.T())
 	mockedRelease2.On("KubeContext").Return("bla2")
 	mockedRelease2.On("Uniq").Return(u)
 	mockedRelease2.On("Namespace").Return(relNS)
-	mockedRelease2.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	p.SetReleases(mockedRelease1, mockedRelease2)
 

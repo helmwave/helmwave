@@ -9,15 +9,18 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chartutil"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 )
 
+//nolint:govet // field alignment doesn't matter in tests
 type MockReleaseConfig struct {
 	mock.Mock
+
+	t *testing.T
 }
 
 func NewMockReleaseConfig(t *testing.T) *MockReleaseConfig {
@@ -25,6 +28,7 @@ func NewMockReleaseConfig(t *testing.T) *MockReleaseConfig {
 
 	c := &MockReleaseConfig{}
 	c.Mock.Test(t)
+	c.t = t
 
 	return c
 }
@@ -164,8 +168,8 @@ func (r *MockReleaseConfig) Values() []release.ValuesReference {
 	return r.Called().Get(0).([]release.ValuesReference)
 }
 
-func (r *MockReleaseConfig) Logger() *logrus.Entry {
-	return r.Called().Get(0).(*logrus.Entry)
+func (r *MockReleaseConfig) Logger() *log.Entry {
+	return log.WithField("test", r.t.Name())
 }
 
 func (r *MockReleaseConfig) AllowFailure() bool {
