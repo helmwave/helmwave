@@ -15,6 +15,7 @@ func (s *ValidateTestSuite) TestGood() {
 	data := []string{
 		"my@test@context",
 		"my-release@test-1@context-1",
+		"my-release@test-1@gke_project_asia-southeast1_cluster-name",
 	}
 
 	for _, d := range data {
@@ -34,6 +35,7 @@ func (s *ValidateTestSuite) TestBad() {
 		"@-",
 		"-@-",
 		"my-release@test-1@Context-1@blabla",
+		"my-release@test-1@Context-1@-blabla",
 	}
 
 	for _, d := range data {
