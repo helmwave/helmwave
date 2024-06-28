@@ -20,7 +20,7 @@ func (s *ValidateTestSuite) TestGood() {
 
 	for _, d := range data {
 		_, err := uniqname.NewFromString(d)
-		s.NoError(err)
+		s.Require().NoError(err)
 	}
 }
 
@@ -40,7 +40,7 @@ func (s *ValidateTestSuite) TestBad() {
 
 	for _, d := range data {
 		_, err := uniqname.NewFromString(d)
-		s.Error(err)
+		s.Require().Error(err)
 	}
 }
 
