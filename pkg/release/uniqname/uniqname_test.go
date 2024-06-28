@@ -40,9 +40,7 @@ func (s *ValidateTestSuite) TestBad() {
 
 	for _, d := range data {
 		_, err := uniqname.NewFromString(d)
-		var e *uniqname.ValidationError
-		s.ErrorAs(err, &e)
-		s.Equal(d, e.Uniq)
+		s.Error(err)
 	}
 }
 

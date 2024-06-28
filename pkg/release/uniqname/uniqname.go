@@ -47,7 +47,7 @@ func NewFromString(line string) (UniqName, error) {
 	case 3:
 		u = UniqName{Name: parts[0], Namespace: parts[1], Context: parts[2]}
 	default:
-		return UniqName{}, NewValidationError(line)
+		return UniqName{}, u.Error(line)
 	}
 
 	return u, u.Validate()
@@ -61,15 +61,15 @@ func (n UniqName) Equal(a UniqName) bool {
 // Validate validates this object.
 func (n UniqName) Validate() error {
 	if !ReleaseRegexp.MatchString(n.Name) {
-		return NewValidationError(n.String())
+		return n.Error(n.Name)
 	}
 
 	if !NamespaceRegexp.MatchString(n.Namespace) {
-		return NewValidationError(n.String())
+		return n.Error(n.Namespace)
 	}
 
 	if n.Context != "" && !KubecontextRegexp.MatchString(n.Context) {
-		return NewValidationError(n.String())
+		return n.Error(n.Context)
 	}
 
 	return nil
