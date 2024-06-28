@@ -10,7 +10,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/tests"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 )
@@ -37,7 +36,7 @@ func (ts *ApplyTestSuite) TestApplyBadRepoInstallation() {
 
 	repoName := "blablanami"
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Name").Return(repoName)
 	e := errors.New(ts.T().Name())
 	mockedRepo.On("Install").Return(e)
@@ -54,7 +53,7 @@ func (ts *ApplyTestSuite) TestApplyNoReleases() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)
@@ -70,16 +69,16 @@ func (ts *ApplyTestSuite) TestApplyFailedRelease() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	e := errors.New(ts.T().Name())
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, e)
 	mockedRelease.On("AllowFailure").Return(false)
 	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
+	mockedRelease.On("KubeContext").Return("")
 
 	p.SetReleases(mockedRelease)
 
@@ -93,16 +92,16 @@ func (ts *ApplyTestSuite) TestApply() {
 	tmpDir := ts.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Sync").Return(&helmRelease.Release{}, nil)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("Monitors").Return([]release.MonitorReference{})
+	mockedRelease.On("KubeContext").Return("")
 
-	mockedRepo := &plan.MockRepositoryConfig{}
+	mockedRepo := plan.NewMockRepositoryConfig(ts.T())
 	mockedRepo.On("Install").Return(nil)
 
 	p.SetRepositories(mockedRepo)

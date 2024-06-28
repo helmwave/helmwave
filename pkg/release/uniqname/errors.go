@@ -1,17 +1,9 @@
 package uniqname
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 )
 
-type ValidationError struct {
-	Uniq string
-}
-
-func NewValidationError(uniq string) error {
-	return &ValidationError{Uniq: uniq}
-}
-
-func (err ValidationError) Error() string {
-	return fmt.Sprintf("failed to validate uniqname: %s", err.Uniq)
+func (n UniqName) Error(part string) error {
+	return errors.Errorf("failed to validate uniqname: %s, problem with: %s", n.String(), part)
 }

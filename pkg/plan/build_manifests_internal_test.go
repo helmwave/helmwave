@@ -8,7 +8,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/tests"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v3/pkg/release"
 )
@@ -40,18 +39,16 @@ func (ts *BuildManifestsTestSuite) TestEmptyReleases() {
 func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	p := New(".")
 
-	rel1 := &MockReleaseConfig{}
-	u1 := uniqname.UniqName("redis1@defaultblabla")
-	rel1.On("Logger").Return(log.WithField("test", ts.T().Name()))
+	rel1 := NewMockReleaseConfig(ts.T())
+	u1, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel1.On("ChartDepsUpd").Return(nil)
 	rel1.On("DryRun").Return()
 	rel1.On("Sync").Return(&helmRelease.Release{}, nil)
 	rel1.On("HooksDisabled").Return(false)
 	rel1.On("Uniq").Return(u1)
 
-	rel2 := &MockReleaseConfig{}
-	u2 := uniqname.UniqName("redis2@defaultblabla")
-	rel2.On("Logger").Return(log.WithField("test", ts.T().Name()))
+	rel2 := NewMockReleaseConfig(ts.T())
+	u2, _ := uniqname.NewFromString("redis2@defaultblabla")
 	rel2.On("ChartDepsUpd").Return(nil)
 	rel2.On("DryRun").Return()
 	rel2.On("Sync").Return(&helmRelease.Release{}, nil)
@@ -76,10 +73,9 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
-	uniq := uniqname.UniqName("redis1@defaultblabla")
+	rel := NewMockReleaseConfig(ts.T())
+	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	errExpected := errors.New(ts.T().Name())
-	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(errExpected)
 	rel.On("DryRun").Return()
 	rel.On("Sync").Return(&helmRelease.Release{}, nil)
@@ -101,9 +97,8 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 func (ts *BuildManifestsTestSuite) TestSyncError() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
+	rel := NewMockReleaseConfig(ts.T())
 	errExpected := errors.New(ts.T().Name())
-	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	rel.On("ChartDepsUpd").Return(nil)
 	rel.On("DryRun").Return()
 	rel.On("Sync").Return(&helmRelease.Release{}, errExpected)
@@ -120,9 +115,8 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
-	uniq := uniqname.UniqName("redis1@defaultblabla")
-	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
+	rel := NewMockReleaseConfig(ts.T())
+	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel.On("ChartDepsUpd").Return(nil)
 	rel.On("DryRun").Return()
 	rel.On("Sync").Return(&helmRelease.Release{
@@ -147,9 +141,8 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 	p := New(".")
 
-	rel := &MockReleaseConfig{}
-	uniq := uniqname.UniqName("redis1@defaultblabla")
-	rel.On("Logger").Return(log.WithField("test", ts.T().Name()))
+	rel := NewMockReleaseConfig(ts.T())
+	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	rel.On("ChartDepsUpd").Return(nil)
 	rel.On("DryRun").Return()
 	rel.On("Sync").Return(&helmRelease.Release{

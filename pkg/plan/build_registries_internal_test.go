@@ -7,7 +7,6 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	helmRegistry "helm.sh/helm/v3/pkg/registry"
 )
@@ -25,7 +24,7 @@ func (ts *BuildRegistriesTestSuite) TestUnusedRegistry() {
 	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	regi := &MockRegistryConfig{}
+	regi := NewMockRegistryConfig(ts.T())
 	p.SetRegistries(regi)
 
 	regis, err := p.buildRegistries()
@@ -39,7 +38,7 @@ func (ts *BuildRegistriesTestSuite) TestNoOCIRegistries() {
 	tmpDir := ts.T().TempDir()
 	p := New(filepath.Join(tmpDir, Dir))
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Chart").Return(&release.Chart{})
 
 	p.SetReleases(mockedRelease)
@@ -57,12 +56,12 @@ func (ts *BuildRegistriesTestSuite) TestMissingRegistry() {
 
 	regiName := "blablanami"
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(regiName)
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("Chart").Return(&release.Chart{Name: fmt.Sprintf("%s://%s", helmRegistry.OCIScheme, regiName)})
 
 	p.SetReleases(mockedRelease)
@@ -84,15 +83,15 @@ func (ts *BuildRegistriesTestSuite) TestSuccess() {
 
 	regiHost := "blablanami"
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Repo").Return(regiHost)
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Logger").Return(log.WithField("test", ts.T().Name()))
 	mockedRelease.On("Chart").Return(&release.Chart{Name: fmt.Sprintf("%s://", helmRegistry.OCIScheme)})
 
-	regi := &MockRegistryConfig{}
+	regi := NewMockRegistryConfig(ts.T())
 	regi.On("Host").Return(regiHost)
 
 	p.SetReleases(mockedRelease)

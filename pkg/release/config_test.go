@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -21,6 +20,7 @@ func (s *ConfigTestSuite) TestConfigUniq() {
 	r := release.NewConfig()
 	r.NameF = "redis"
 	r.NamespaceF = "test"
+	r.KubeContextF = "ctx"
 
 	s.Require().NoError(r.Uniq().Validate())
 }
@@ -30,15 +30,14 @@ func (s *ConfigTestSuite) TestConfigInvalidUniq() {
 	r.NameF = "redis"
 	r.NamespaceF = ""
 
-	var e *uniqname.ValidationError
-	s.Require().ErrorAs(r.Uniq().Validate(), &e)
-	s.Equal(r.Uniq().String(), e.Uniq)
+	s.Require().Error(r.Uniq().Validate())
 }
 
 func (s *ConfigTestSuite) TestDependsOn() {
 	r := release.NewConfig()
 
 	r.NamespaceF = "testns"
+	r.KubeContextF = "testctx"
 	r.DependsOnF = []*release.DependsOnReference{
 		{Name: "bla"},
 		{Name: "blabla@testns"},
@@ -49,9 +48,9 @@ func (s *ConfigTestSuite) TestDependsOn() {
 	r.BuildAfterUnmarshal(r)
 
 	expected := []*release.DependsOnReference{
-		{Name: "bla@testns"},
-		{Name: "blabla@testns"},
-		{Name: "blablabla@testtestns"},
+		{Name: "bla@testns@testctx"},
+		{Name: "blabla@testns@testctx"},
+		{Name: "blablabla@testtestns@testctx"},
 	}
 	s.Require().ElementsMatch(r.DependsOn(), expected)
 }

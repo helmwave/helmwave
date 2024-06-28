@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"helm.sh/helm/v3/pkg/chart"
 	helmRelease "helm.sh/helm/v3/pkg/release"
@@ -20,11 +19,12 @@ func (s *StatusTestSuite) TestStatusByName() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(s.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
+	mockedRelease.On("KubeContext").Return("")
+
 	r := &helmRelease.Release{
 		Info: &helmRelease.Info{},
 		Chart: &chart.Chart{
@@ -35,7 +35,7 @@ func (s *StatusTestSuite) TestStatusByName() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Status(string(mockedRelease.Uniq()))
+	err := p.Status(mockedRelease.Uniq().String())
 	s.Require().NoError(err)
 
 	err = p.Status()
@@ -49,9 +49,8 @@ func (s *StatusTestSuite) TestStatusFailedRelease() {
 	tmpDir := s.T().TempDir()
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 
-	mockedRelease := &plan.MockReleaseConfig{}
+	mockedRelease := plan.NewMockReleaseConfig(s.T())
 	mockedRelease.On("Status").Return(&helmRelease.Release{}, errors.New(s.T().Name()))
-	mockedRelease.On("Logger").Return(log.WithField("test", s.T().Name()))
 
 	p.SetReleases(mockedRelease)
 

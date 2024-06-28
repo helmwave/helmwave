@@ -1,12 +1,23 @@
 package plan
 
 import (
+	"testing"
+
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 )
 
 type MockRegistryConfig struct {
 	mock.Mock
+}
+
+func NewMockRegistryConfig(t *testing.T) *MockRegistryConfig {
+	t.Helper()
+
+	c := &MockRegistryConfig{}
+	c.Mock.Test(t)
+
+	return c
 }
 
 func (r *MockRegistryConfig) Install() error {

@@ -67,15 +67,15 @@ func (d *Diff) flags() []cli.Flag {
 			Usage:       "strip trailing carriage return on input",
 			Value:       false,
 			Category:    "DIFF",
-			EnvVars:     []string{"HELMWAVE_DIFF_STRIP_TRAILING_CR"},
+			EnvVars:     EnvVars("DIFF_STRIP_TRAILING_CR"),
 			Destination: &d.StripTrailingCR,
 		},
 		&cli.Float64Flag{
 			Name:        "find-renames",
 			Usage:       "enable rename detection if set to any value greater than 0.",
-			Value:       0, // TODO: maybe set 1 to default?
+			Value:       1,
 			Category:    "DIFF",
-			EnvVars:     []string{"HELMWAVE_DIFF_FIND_RENAMES"},
+			EnvVars:     EnvVars("DIFF_FIND_RENAMES"),
 			Destination: &d.findRenamesHelper,
 		},
 		&cli.StringSliceFlag{
@@ -83,7 +83,7 @@ func (d *Diff) flags() []cli.Flag {
 			Usage: "allows suppression kinds of the values listed in the diff output (\"Secret\" for example)",
 			// Value: cli.NewStringSlice("Secret"),
 			Category:    "DIFF",
-			EnvVars:     []string{"HELMWAVE_DIFF_SUPPRESS", "HELMWAVE_DIFF_SUPPRESS_KINDS"},
+			EnvVars:     EnvVars("DIFF_SUPPRESS", "DIFF_SUPPRESS_KINDS"),
 			Destination: &d.kindSuppressHelper,
 		},
 	}

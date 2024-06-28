@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"testing"
 
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/sirupsen/logrus"
@@ -12,6 +13,15 @@ import (
 
 type MockRepositoryConfig struct {
 	mock.Mock
+}
+
+func NewMockRepositoryConfig(t *testing.T) *MockRepositoryConfig {
+	t.Helper()
+
+	c := &MockRepositoryConfig{}
+	c.Mock.Test(t)
+
+	return c
 }
 
 func (r *MockRepositoryConfig) Equal(_ repo.Config) bool {

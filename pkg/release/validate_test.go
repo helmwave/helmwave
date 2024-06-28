@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
-
 	"github.com/stretchr/testify/suite"
 )
 
@@ -30,12 +28,10 @@ func (s *ValidateTestSuite) TestInvalidNamespace() {
 }
 
 func (s *ValidateTestSuite) TestInvalidUniq() {
-	rel := release.NewConfig()
-	rel.NameF = "bla@bla"
+	r := release.NewConfig()
+	r.NameF = "bla@1@2@3"
 
-	var e *uniqname.ValidationError
-	s.Require().ErrorAs(rel.Validate(), &e)
-	s.Equal(rel.Uniq().String(), e.Uniq)
+	s.Require().Error(r.Uniq().Validate())
 }
 
 func TestValidateTestSuite(t *testing.T) {

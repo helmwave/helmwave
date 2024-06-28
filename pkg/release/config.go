@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
@@ -86,13 +87,14 @@ func (rel *config) DryRun(b bool) {
 
 // Uniq like redis@my-namespace.
 func (rel *config) Uniq() uniqname.UniqName {
-	if rel.uniqName == "" {
+	if rel.uniqName.Empty() {
 		var err error
-		rel.uniqName, err = uniqname.Generate(rel.Name(), rel.Namespace())
+		rel.uniqName, err = uniqname.New(rel.Name(), rel.Namespace(), rel.KubeContext())
 		if err != nil {
 			rel.Logger().WithFields(log.Fields{
 				"name":       rel.Name(),
 				"namespace":  rel.Namespace(),
+				"context":    rel.KubeContext(),
 				log.ErrorKey: err,
 			}).Error("failed to generate valid uniqname")
 		}
@@ -180,7 +182,9 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 		switch dep.Type() {
 		case DependencyRelease:
 			err := rel.buildAfterUnmarshalDependency(dep)
-			if err == nil {
+			if err != nil {
+				rel.Logger().WithField("dependency", dep).WithError(err).Error("can't parse dependency")
+			} else {
 				newDeps = append(newDeps, dep)
 			}
 		case DependencyTag:
@@ -205,18 +209,22 @@ func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
 	rel.lock.Unlock()
 }
 
+// buildAfterUnmarshalDependency generates full uniqname for dependency if it was short using release as default.
 func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error {
-	u, err := uniqname.GenerateWithDefaultNamespace(dep.Name, rel.Namespace())
-	if err != nil {
-		rel.Logger().WithField("dependency", dep).WithError(err).Error("can't parse dependency")
+	// skipping error as it may fail due to missing namespace
+	u, _ := uniqname.NewFromString(dep.Name)
 
-		return err
+	if u.Namespace == "" {
+		u.Namespace = rel.Namespace()
 	}
 
-	// generate full uniqname string if it was short
+	if u.Context == "" {
+		u.Context = rel.KubeContext()
+	}
+
 	dep.Name = u.String()
 
-	return nil
+	return u.Validate()
 }
 
 func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
@@ -228,19 +236,25 @@ func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
 }
 
 func (rel *config) KubeContext() string {
+	if rel.KubeContextF == "" {
+		rel.KubeContextF = helper.Helm.KubeContext
+	}
+
 	return rel.KubeContextF
 }
 
 // MarshalYAML is a marshaller for gopkg.in/yaml.v3.
 // It is required to avoid data race with getting read lock.
+//
+//nolint:govet // we don't care about mutex copying during marshaling
 func (rel *config) MarshalYAML() (any, error) {
 	rel.lock.RLock()
 	defer rel.lock.RUnlock()
 
 	type raw config
-	r := raw(*rel) //nolint:govet
+	r := raw(*rel)
 
-	return r, nil //nolint:govet
+	return r, nil
 }
 
 func (rel *config) HooksDisabled() bool {

@@ -26,7 +26,7 @@ func (ts *ContextTestSuite) SetupTest() {
 }
 
 func (ts *ContextTestSuite) TestReleaseUniq() {
-	uniqBase := uniqname.UniqName("test")
+	uniqBase, _ := uniqname.NewFromString("test")
 	ctx := helper.ContextWithReleaseUniq(ts.ctx, uniqBase)
 
 	uniq, exists := helper.ContextGetReleaseUniq(ctx)

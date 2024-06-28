@@ -6,7 +6,6 @@ repositories:
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 
-
 releases:
 - name: nginx
   chart:

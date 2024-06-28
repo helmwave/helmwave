@@ -22,13 +22,7 @@ func (rel *config) Cfg() *action.Configuration {
 
 func (rel *config) Helm() *helm.EnvSettings {
 	if rel.helm == nil {
-		var err error
-		rel.helm, err = helper.NewHelm(rel.Namespace())
-		if err != nil {
-			rel.Logger().Fatal(err)
-
-			return nil
-		}
+		rel.helm = helper.NewHelm(rel.Namespace())
 
 		rel.helm.Debug = helper.Helm.Debug
 	}

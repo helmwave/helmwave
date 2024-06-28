@@ -53,9 +53,10 @@ func (ts *BuildValuesTestSuite) TestValuesBuildError() {
 	tmpValues := filepath.Join(tmpDir, "blablavalues.yaml")
 	ts.Require().NoError(os.WriteFile(tmpValues, []byte("a: b"), 0o600))
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},
@@ -81,12 +82,13 @@ func (ts *BuildValuesTestSuite) TestSuccess() {
 	tmpValues := filepath.Join(tmpDir, valuesName)
 	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
-	mockedRelease := &MockReleaseConfig{}
+	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
+	mockedRelease.On("Namespace").Return("defaultblabla")
+	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},
 	})
-	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("BuildValues").Return(nil)
 	mockedRelease.On("Uniq").Return()
 

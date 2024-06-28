@@ -13,7 +13,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
@@ -158,10 +157,10 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 
 	var e *release.DuplicateError
 	ts.Require().ErrorAs(sfail.Run(ts.ctx), &e)
-	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
+	ts.Equal("nginx@test", e.Uniq.String())
 
 	ts.Require().ErrorAs(sfailByTag.Run(ts.ctx), &e)
-	ts.Equal(uniqname.UniqName("nginx@test"), e.Uniq)
+	ts.Equal("nginx@test", e.Uniq.String())
 
 	ts.Require().NoError(sa.Run(ts.ctx))
 	ts.Require().NoError(sb.Run(ts.ctx))
