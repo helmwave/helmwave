@@ -9,7 +9,11 @@ import (
 // Separator is a separator between release Name and Namespace.
 const Separator = "@"
 
-var validateRegexp = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
+var (
+	NamespaceRegexp   = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
+	KubecontextRegexp = regexp.MustCompile("^[a-z0-9]([-a-z0-9_]*[a-z0-9])?$")
+	ReleaseRegexp     = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
+)
 
 // UniqName is a unique identificator for release.
 type UniqName struct {
@@ -56,15 +60,15 @@ func (n UniqName) Equal(a UniqName) bool {
 
 // Validate validates this object.
 func (n UniqName) Validate() error {
-	if !validateRegexp.MatchString(n.Name) {
+	if !ReleaseRegexp.MatchString(n.Name) {
 		return NewValidationError(n.String())
 	}
 
-	if !validateRegexp.MatchString(n.Namespace) {
+	if !NamespaceRegexp.MatchString(n.Namespace) {
 		return NewValidationError(n.String())
 	}
 
-	if n.Context != "" && !validateRegexp.MatchString(n.Context) {
+	if n.Context != "" && !KubecontextRegexp.MatchString(n.Context) {
 		return NewValidationError(n.String())
 	}
 
