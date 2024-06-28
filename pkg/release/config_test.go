@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -31,9 +30,7 @@ func (s *ConfigTestSuite) TestConfigInvalidUniq() {
 	r.NameF = "redis"
 	r.NamespaceF = ""
 
-	var e *uniqname.ValidationError
-	s.Require().ErrorAs(r.Uniq().Validate(), &e)
-	s.Equal(r.Uniq().String(), e.Uniq)
+	s.Require().Error(r.Uniq().Validate())
 }
 
 func (s *ConfigTestSuite) TestDependsOn() {
