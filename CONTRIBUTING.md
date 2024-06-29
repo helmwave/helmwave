@@ -13,7 +13,7 @@ We use [semver](https://semver.org/)
 
 ## Developing flow
 
-*fix/feature-branch --> release-$SEMVER --> main*
+*fix/feature-branch --> release/$SEMVER --> main*
 
 
 **Example:**
