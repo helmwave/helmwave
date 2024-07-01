@@ -1,5 +1,5 @@
 kind: New feature
-body: Now is possible use uniqname as a default tag. `helmwave build -t app@ns@ctx`
+body: You can use a `uniqname` as a default tag.. `helmwave build -t app@ns@ctx`
 time: 2024-07-01T05:33:55.012059+03:00
 custom:
   Author: zhilyaev
