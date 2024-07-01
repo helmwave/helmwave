@@ -175,7 +175,6 @@ func (rel *config) buildAfterUnmarshal(allReleases []*config) {
 
 	// Uniqname is default tag
 	rel.TagsF = append(rel.TagsF, rel.Uniq().String())
-
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {

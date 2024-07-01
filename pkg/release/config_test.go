@@ -32,7 +32,6 @@ func (s *ConfigTestSuite) TestConfigUniqTags() {
 	r.BuildAfterUnmarshal()
 
 	s.Require().True(slices.Contains(r.TagsF, r.Uniq().String()))
-
 }
 
 func (s *ConfigTestSuite) TestConfigInvalidUniq() {
