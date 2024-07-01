@@ -172,6 +172,10 @@ func (rel *config) buildAfterUnmarshal(allReleases []*config) {
 		rel.Logger().Debug("timeout is not set, defaulting to 5m")
 		rel.Timeout = 5 * time.Minute
 	}
+
+	// Uniqname is default tag
+	rel.TagsF = append(rel.TagsF, rel.Uniq().String())
+
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
