@@ -41,7 +41,7 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 	}()
 	go func() {
 		defer wg.Done()
-		if err := p.exportManifest(); err != nil {
+		if err := p.exportManifests(); err != nil {
 			wg.ErrChan() <- err
 		}
 	}()
@@ -67,6 +67,7 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 	return helper.SaveInterface(ctx, p.fullPath, p.body)
 }
 
+// removeUnchanged skip unchanged releases for plan
 func (p *Plan) removeUnchanged() {
 	p.body.Releases = slices.DeleteFunc(p.body.Releases, func(rel release.Config) bool {
 		return slices.ContainsFunc(p.unchanged, func(r release.Config) bool {
@@ -117,9 +118,9 @@ func (p *Plan) exportCharts() error {
 	return nil
 }
 
-func (p *Plan) exportManifest() error {
+func (p *Plan) exportManifests() error {
 	for k, v := range p.manifests {
-		m := filepath.Join(p.dir, Manifest, k.String()+".yml")
+		m := filepath.Join(p.dir, Manifests, k.String()+".yml")
 
 		f, err := helper.CreateFile(m)
 		if err != nil {
@@ -180,7 +181,7 @@ func (p *Plan) exportValues() error {
 		return nil
 	}
 
-	// It doesnt work if workdir has been mounted.
+	// It doesn't work if workdir has been mounted.
 	err := helper.MoveFile(
 		filepath.Join(p.tmpDir, Values),
 		filepath.Join(p.dir, Values),
@@ -199,5 +200,5 @@ func (p *Plan) IsExist() bool {
 
 // IsManifestExist returns true if planfile exists.
 func (p *Plan) IsManifestExist() bool {
-	return helper.IsExists(filepath.Join(p.dir, Manifest))
+	return helper.IsExists(filepath.Join(p.dir, Manifests))
 }

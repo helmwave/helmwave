@@ -24,7 +24,7 @@ func (p *Plan) Import(ctx context.Context) error {
 	err = p.importManifest()
 
 	switch {
-	case errors.Is(err, ErrManifestDirEmpty), errors.Is(err, fs.ErrNotExist):
+	case errors.Is(err, ErrManifestsDirEmpty), errors.Is(err, fs.ErrNotExist):
 		log.WithError(err).Warn("error caught while importing manifests")
 	case err != nil:
 		return err
@@ -44,14 +44,14 @@ func (p *Plan) Import(ctx context.Context) error {
 }
 
 func (p *Plan) importManifest() error {
-	d := filepath.Join(p.dir, Manifest)
+	d := filepath.Join(p.dir, Manifests)
 	ls, err := os.ReadDir(d)
 	if err != nil {
 		return fmt.Errorf("failed to read manifest dir %s: %w", d, err)
 	}
 
 	if len(ls) == 0 {
-		return ErrManifestDirEmpty
+		return ErrManifestsDirEmpty
 	}
 
 	for _, l := range ls {
@@ -59,7 +59,7 @@ func (p *Plan) importManifest() error {
 			continue
 		}
 
-		f := filepath.Join(p.dir, Manifest, l.Name())
+		f := filepath.Join(p.dir, Manifests, l.Name())
 		c, err := os.ReadFile(f)
 		if err != nil {
 			return fmt.Errorf("failed to read manifest %s: %w", f, err)

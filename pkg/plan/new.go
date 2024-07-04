@@ -30,11 +30,14 @@ const (
 	// Body is a default file name for the main config.
 	Body = "helmwave.yml"
 
-	// Manifest is the default directory under Dir for manifests.
-	Manifest = "manifest/"
+	// Manifests is the default directory under Dir for manifests.
+	Manifests = "manifests/"
 
 	// Values is default directory for values.
 	Values = "values/"
+
+	// Stores is the default directory for store files
+	Stores = "stores/"
 )
 
 // Plan contains full helmwave state.
