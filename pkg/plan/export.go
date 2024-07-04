@@ -173,7 +173,7 @@ func (p *Plan) exportValues() error {
 	for i, rel := range p.body.Releases {
 		for j := range p.body.Releases[i].Values() {
 			found = true
-			p.body.Releases[i].Values()[j].SetUniq(p.dir, rel.Uniq())
+			p.body.Releases[i].Values()[j].SetDstByRelease(p.dir, rel)
 		}
 	}
 

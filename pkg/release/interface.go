@@ -28,6 +28,7 @@ type Config interface {
 	ChartDepsUpd() error
 	DownloadChart(tmpDir string) error
 	BuildValues(ctx context.Context, dir, templater string) error
+	BuildStoreFiles(ctx context.Context, dir, templater string) error
 	Name() string
 	Namespace() string
 	Chart() *Chart

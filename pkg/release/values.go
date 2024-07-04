@@ -2,20 +2,18 @@ package release
 
 import (
 	"context"
-	"crypto"
 	_ "crypto/md5" // for crypto.MD5.New to work
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
@@ -108,14 +106,9 @@ func (v *ValuesReference) Download(ctx context.Context) error {
 //	return v.Dst
 // }
 
-// SetUniq generates unique file path based on provided base directory, release uniqname and sha1 of source path.
-func (v *ValuesReference) SetUniq(dir string, name uniqname.UniqName) *ValuesReference {
-	h := crypto.MD5.New()
-	h.Write([]byte(v.Src))
-	hash := h.Sum(nil)
-	s := hex.EncodeToString(hash)
-
-	v.Dst = filepath.Join(dir, "values", name.String(), s+".yml")
+func (v *ValuesReference) SetDstByRelease(dir string, rel Config) *ValuesReference {
+	i := strconv.Itoa(slices.Index(rel.Values(), *v))
+	v.Dst = filepath.Join(dir, "values", rel.Uniq().String(), i+".yml")
 
 	return v
 }
@@ -146,7 +139,7 @@ func (v *ValuesReference) SetViaRelease(
 		v.Renderer = templater
 	}
 
-	v.SetUniq(dir, rel.Uniq())
+	v.SetDstByRelease(dir, rel)
 
 	l := rel.Logger().WithField("values src", v.Src).WithField("values Dst", v.Dst)
 

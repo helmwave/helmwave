@@ -82,7 +82,7 @@ func (ts *BuildTestSuite) TestManifest() {
 	}
 
 	ts.Require().NoError(s.Run(ts.ctx))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifests))
 }
 
 // func (ts *BuildTestSuite) TestRepositories404() {
@@ -342,7 +342,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	ts.T().Setenv("NAMESPACE", value)
 
 	ts.Require().NoError(s.Run(ts.ctx))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifests))
 }
 
 func (ts *NonParallelBuildTestSuite) TestGomplate() {
@@ -364,7 +364,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	}
 
 	ts.Require().NoError(s.Run(ts.ctx))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifests))
 }
 
 func (ts *NonParallelBuildTestSuite) TestLifecycle() {
@@ -386,7 +386,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	}
 
 	ts.Require().NoError(s.Run(ts.ctx))
-	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifest))
+	ts.Require().DirExists(filepath.Join(s.plandir, plan.Manifests))
 
 	logMessages := ts.getLoggerMessages()
 	ts.Require().Contains(logMessages, "running pre_build script for nginx")
