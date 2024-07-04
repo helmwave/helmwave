@@ -3,6 +3,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/fileref"
 	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -27,8 +28,8 @@ type Config interface {
 	HideSecret(hideSecret bool)
 	ChartDepsUpd() error
 	DownloadChart(tmpDir string) error
-	BuildValues(ctx context.Context, dir, templater string) error
-	BuildStoreFiles(ctx context.Context, dir, templater string) error
+	BuildValues(ctx context.Context, dir string) error
+	BuildStoreFiles(ctx context.Context, dir string) error
 	Name() string
 	Namespace() string
 	Chart() *Chart
@@ -37,7 +38,8 @@ type Config interface {
 	SetDependsOn(deps []*DependsOnReference)
 	Tags() []string
 	Repo() string
-	Values() []ValuesReference
+	Values() []fileref.Config
+	StoreFiles() []fileref.Config
 	HelmWait() bool
 	KubeContext() string
 	Cfg() *action.Configuration
