@@ -16,7 +16,7 @@ jobs:
 
       - name: Trivy
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.23.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: "ghcr.io/${{ github.repository }}:latest"
           format: "sarif"
