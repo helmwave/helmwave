@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
@@ -129,7 +130,7 @@ func (ts *BuildReleasesTestSuite) TestNoReleases() {
 	p := New(filepath.Join(tmpDir, Dir))
 	p.NewBody()
 
-	releases, err := p.buildReleases(BuildOptions{})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{})
 
 	ts.Require().NoError(err)
 	ts.Empty(releases)
@@ -144,7 +145,7 @@ func (ts *BuildReleasesTestSuite) TestNoMatchingReleases() {
 
 	p.SetReleases(mockedRelease)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: []string{"abc"}, MatchAll: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: []string{"abc"}, MatchAll: true})
 	ts.Require().NoError(err)
 	ts.Empty(releases)
 
@@ -170,7 +171,7 @@ func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 
 	var e *release.DuplicateError
 	ts.Require().ErrorAs(err, &e)
@@ -196,7 +197,7 @@ func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
 
 	p.SetReleases(rel)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.ErrorIs(err, release.ErrDepFailed)
 	ts.Empty(releases)
 
@@ -218,7 +219,7 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 
 	p.SetReleases(rel)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.Require().NoError(err)
 	ts.Len(releases, 1)
 	ts.Contains(releases, rel)
@@ -249,7 +250,7 @@ func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.Require().NoError(err)
 	ts.Len(releases, 2)
 	ts.Contains(releases, rel1)
@@ -276,7 +277,7 @@ func (ts *BuildReleasesTestSuite) TestDisabledDependencies() {
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: false})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: false})
 	ts.Require().NoError(err)
 	ts.Len(releases, 1)
 	ts.Contains(releases, rel1)

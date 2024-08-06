@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -208,4 +209,8 @@ func (r *MockReleaseConfig) Monitors() []release.MonitorReference {
 
 func (r *MockReleaseConfig) NotifyMonitorsFailed(context.Context, ...monitor.Config) {
 	r.Called()
+}
+
+func (r *MockReleaseConfig) LifeCycle() hooks.Lifecycle {
+	return r.Called().Get(0).(hooks.Lifecycle)
 }

@@ -282,3 +282,7 @@ func (rel *config) Monitors() []MonitorReference {
 
 	return rel.MonitorsF
 }
+
+func (rel *config) LifeCycle() hooks.Lifecycle {
+	return rel.Lifecycle
+}

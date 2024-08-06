@@ -50,7 +50,7 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 	var err error
 
 	log.Info("🔨 Building releases...")
-	p.body.Releases, err = p.buildReleases(o)
+	p.body.Releases, err = p.buildReleases(ctx, o)
 	if err != nil {
 		return err
 	}

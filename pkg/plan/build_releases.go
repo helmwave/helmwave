@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -8,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *Plan) buildReleases(o BuildOptions) ([]release.Config, error) {
+func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Config, error) {
 	plan := make([]release.Config, 0)
 
 	planAdderFunction := addToPlanWithDependencies
@@ -22,7 +23,7 @@ func (p *Plan) buildReleases(o BuildOptions) ([]release.Config, error) {
 		}
 
 		var err error
-		plan, err = planAdderFunction(plan, r, p.body.Releases)
+		plan, err = planAdderFunction(ctx, plan, r, p.body.Releases)
 		if err != nil {
 			log.WithError(err).Error("failed to build releases plan")
 
@@ -34,9 +35,10 @@ func (p *Plan) buildReleases(o BuildOptions) ([]release.Config, error) {
 }
 
 func addToPlan(
+	ctx context.Context,
 	plan release.Configs,
 	rel release.Config,
-) (release.Configs, error) {
+) (_ release.Configs, err error) {
 	if r, contains := plan.Contains(rel); contains {
 		if r != rel {
 			return nil, release.NewDuplicateError(rel.Uniq())
@@ -45,15 +47,33 @@ func addToPlan(
 		}
 	}
 
+	// Run hooks
+	lifeCycle := rel.LifeCycle()
+	err = lifeCycle.RunPreBuild(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		lifecycleErr := lifeCycle.RunPostBuild(ctx)
+		if lifecycleErr != nil {
+			log.Errorf("got an error from postbuild hooks: %v", lifecycleErr)
+			if err == nil {
+				err = lifecycleErr
+			}
+		}
+	}()
+
 	return append(plan, rel), nil
 }
 
 func addToPlanWithoutDependencies(
+	ctx context.Context,
 	plan release.Configs,
 	rel release.Config,
 	_ release.Configs,
 ) (release.Configs, error) {
-	plan, err := addToPlan(plan, rel)
+	plan, err := addToPlan(ctx, plan, rel)
 	if err != nil {
 		return nil, err
 	}
@@ -64,11 +84,12 @@ func addToPlanWithoutDependencies(
 }
 
 func addToPlanWithDependencies(
+	ctx context.Context,
 	plan release.Configs,
 	rel release.Config,
 	releases release.Configs,
 ) (release.Configs, error) {
-	newPlan, err := addToPlan(plan, rel)
+	newPlan, err := addToPlan(ctx, plan, rel)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +104,7 @@ func addToPlanWithDependencies(
 		r, found := releases.ContainsUniq(dep.Uniq())
 		if found {
 			var err error
-			newPlan, err = addToPlanWithDependencies(newPlan, r, releases)
+			newPlan, err = addToPlanWithDependencies(ctx, newPlan, r, releases)
 			if err != nil {
 				return nil, err
 			}
