@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -204,10 +203,29 @@ func (rel *config) getChartRepoEntryFromIndex(u, repositoryCache string) (*repo.
 		return nil, fmt.Errorf("no cached repo found: %w", err)
 	}
 
+	rf, err := repo.LoadFile(rel.getDownloader().RepositoryConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load repository file: %w", err)
+	}
+	var baseUrl string
+	for _, rc := range rf.Repositories {
+		if rc.Name == repoName {
+			baseUrl = rc.URL
+		}
+	}
+
 	for _, entry := range i.Entries {
 		for _, ver := range entry {
-			if slices.Contains(ver.URLs, u) {
-				return ver, nil
+			for _, url := range ver.URLs {
+				if baseUrl != "" {
+					url, err = repo.ResolveReferenceURL(baseUrl, url)
+				}
+				if err != nil {
+					return nil, fmt.Errorf("failed to resolve reference URL %s: %w", url, err)
+				}
+				if u == url {
+					return ver, nil
+				}
 			}
 		}
 	}
