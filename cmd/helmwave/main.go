@@ -74,10 +74,10 @@ func CreateApp() *cli.App {
 		"2. $ helmwave up\n"
 
 	c.Before = func(ctx *cli.Context) error {
-		if ctx.Bool("cancel-on-kill") {
-			// cancel the ctx if it gets these signals
+		if ctx.Bool("handle-signal") {
 			ctx.Context = cancelCtxOnSignal(ctx.Context, syscall.SIGTERM, syscall.SIGINT)
 		}
+
 		err := logSetup.Default.Run(ctx)
 		if err != nil {
 			return err
@@ -131,48 +131,31 @@ func version() *cli.Command {
 
 func cancelFlag() *cli.BoolFlag {
 	return &cli.BoolFlag{
-		Name:  "cancel-on-kill",
+		Name:  "handle-signal",
 		Usage: "cancel helm on SigINT,SigTERM",
 
 		Value:   false,
 		EnvVars: []string{"HELMWAVE_HANDLE_SIGNAL"},
-		Hidden:  true, // experimental
 	}
-}
-
-type signalCtx struct {
-	context.Context
-}
-
-func (ctx signalCtx) Err() error {
-	// Unwrap for readablity, if ctx cancelled by reciving a signal
-	if sigErr, ok := context.Cause(ctx.Context).(signalErr); ok {
-		return sigErr
-	}
-	return ctx.Context.Err()
-}
-
-type signalErr struct {
-	sig os.Signal
-}
-
-func (e signalErr) Error() string {
-	return "context canceled: got signal " + e.sig.String()
 }
 
 // cancelCtxOnSignal closes Done channel when one of the listed signals arrives
 func cancelCtxOnSignal(parent context.Context, signals ...os.Signal) (ctx context.Context) {
 	ctx, cancel := context.WithCancelCause(parent)
-	ctx = signalCtx{ctx} // wrap for err handling
 
+	context.AfterFunc(ctx, func() {
+		if err := context.Cause(ctx); err != nil {
+			log.Error(err)
+		}
+	})
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, signals...)
 	if ctx.Err() == nil {
 		go func() {
 			select {
 			case sig := <-ch:
-				// log.Warn("got signal " + sig.String())
-				cancel(signalErr{sig})
+				cancel(fmt.Errorf("got signal %v", sig))
+
 			case <-ctx.Done():
 			}
 		}()
