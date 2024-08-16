@@ -23,10 +23,20 @@ func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Con
 		}
 
 		var err error
-		plan, err = planAdderFunction(ctx, plan, r, p.body.Releases)
+		plan, err = planAdderFunction(plan, r, p.body.Releases)
 		if err != nil {
 			log.WithError(err).Error("failed to build releases plan")
 
+			return nil, err
+		}
+	}
+
+	// Run per-release build hook (in dependency order)
+	for _, r := range plan {
+		// Run hooks
+		lifeCycle := r.LifeCycle()
+		err := lifeCycle.RunPreBuild(ctx)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -35,7 +45,6 @@ func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Con
 }
 
 func addToPlan(
-	ctx context.Context,
 	plan release.Configs,
 	rel release.Config,
 ) (_ release.Configs, err error) {
@@ -47,33 +56,15 @@ func addToPlan(
 		}
 	}
 
-	// Run hooks
-	lifeCycle := rel.LifeCycle()
-	err = lifeCycle.RunPreBuild(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	defer func() {
-		lifecycleErr := lifeCycle.RunPostBuild(ctx)
-		if lifecycleErr != nil {
-			log.Errorf("got an error from postbuild hooks: %v", lifecycleErr)
-			if err == nil {
-				err = lifecycleErr
-			}
-		}
-	}()
-
 	return append(plan, rel), nil
 }
 
 func addToPlanWithoutDependencies(
-	ctx context.Context,
 	plan release.Configs,
 	rel release.Config,
 	_ release.Configs,
 ) (release.Configs, error) {
-	plan, err := addToPlan(ctx, plan, rel)
+	plan, err := addToPlan(plan, rel)
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +75,11 @@ func addToPlanWithoutDependencies(
 }
 
 func addToPlanWithDependencies(
-	ctx context.Context,
 	plan release.Configs,
 	rel release.Config,
 	releases release.Configs,
 ) (release.Configs, error) {
-	newPlan, err := addToPlan(ctx, plan, rel)
+	newPlan, err := addToPlan(plan, rel)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +94,7 @@ func addToPlanWithDependencies(
 		r, found := releases.ContainsUniq(dep.Uniq())
 		if found {
 			var err error
-			newPlan, err = addToPlanWithDependencies(ctx, newPlan, r, releases)
+			newPlan, err = addToPlanWithDependencies(newPlan, r, releases)
 			if err != nil {
 				return nil, err
 			}
