@@ -34,21 +34,21 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 	}
 
 	defer func() {
-		lifeCycleErr := p.body.Lifecycle.RunPostBuild(ctx)
-		if lifeCycleErr != nil {
-			log.Errorf("got an error from postbuild hooks: %v", lifeCycleErr)
+		lifecycleErr := p.body.Lifecycle.RunPostBuild(ctx)
+		if lifecycleErr != nil {
+			log.Errorf("got an error from postbuild hooks: %v", lifecycleErr)
 			if err == nil {
-				err = lifeCycleErr
+				err = lifecycleErr
 			}
 			return
 		}
 		for _, r := range p.body.Releases {
-			lifeCycle := r.LifeCycle()
-			lifeCycleErr = lifeCycle.RunPostBuild(ctx)
-			if lifeCycleErr != nil {
-				log.Errorf("got an error from postbuild hooks for release %s: %v", r.Name(), lifeCycleErr)
+			lifecycle := r.Lifecycle()
+			lifecycleErr = lifecycle.RunPostBuild(ctx)
+			if lifecycleErr != nil {
+				log.Errorf("got an error from postbuild hooks for release %s: %v", r.Name(), lifecycleErr)
 				if err == nil {
-					err = lifeCycleErr
+					err = lifecycleErr
 				}
 				return
 			}

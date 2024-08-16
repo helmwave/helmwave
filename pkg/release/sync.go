@@ -56,11 +56,11 @@ type lifecycleHook func(context.Context) error
 
 func (rel *config) syncLifecycleHooks() (pre, post lifecycleHook) {
 	if rel.dryRun {
-		pre = rel.Lifecycle.RunPreBuild
-		post = rel.Lifecycle.RunPostBuild
+		pre = rel.LifecycleF.RunPreBuild
+		post = rel.LifecycleF.RunPostBuild
 	} else {
-		pre = rel.Lifecycle.RunPreUp
-		post = rel.Lifecycle.RunPostUp
+		pre = rel.LifecycleF.RunPreUp
+		post = rel.LifecycleF.RunPostUp
 	}
 
 	return

@@ -34,8 +34,8 @@ func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Con
 	// Run per-release build hook (in dependency order)
 	for _, r := range plan {
 		// Run hooks
-		lifeCycle := r.LifeCycle()
-		err := lifeCycle.RunPreBuild(ctx)
+		lifecycle := r.Lifecycle()
+		err := lifecycle.RunPreBuild(ctx)
 		if err != nil {
 			return nil, err
 		}

@@ -211,6 +211,6 @@ func (r *MockReleaseConfig) NotifyMonitorsFailed(context.Context, ...monitor.Con
 	r.Called()
 }
 
-func (r *MockReleaseConfig) LifeCycle() hooks.Lifecycle {
+func (r *MockReleaseConfig) Lifecycle() hooks.Lifecycle {
 	return r.Called().Get(0).(hooks.Lifecycle)
 }

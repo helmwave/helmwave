@@ -46,7 +46,7 @@ type Config interface {
 	Validate() error
 	Monitors() []MonitorReference
 	NotifyMonitorsFailed(ctx context.Context, monitors ...monitor.Config)
-	LifeCycle() hooks.Lifecycle
+	Lifecycle() hooks.Lifecycle
 }
 
 type HelmActionRunner interface {
