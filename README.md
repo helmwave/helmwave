@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://docs.helmwave.app?utm_source=github&utm_medium=project"><img alt="helwmave logo" src="https://raw.githubusercontent.com/helmwave/logo/main/signed_logo_top.svg" style="max-height:100%;" height="300px" /></a>
+  <a href="https://docs.helmwave.app?utm_source=github&utm_medium=project"><img alt="helmwave logo" src="https://raw.githubusercontent.com/helmwave/logo/main/signed_logo_top.svg" style="max-height:100%;" height="300px" /></a>
 </p>
 
 <p align="center">
