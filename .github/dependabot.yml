@@ -9,6 +9,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      # Prefix all commit messages with "bump(go.mod): "
+      prefix: "bump(go.mod)"
     labels:
       - "dependencies"
       - "go mod"
@@ -17,6 +20,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      # Prefix all commit messages with "bump(Dockerfile): "
+      prefix: "bump(Dockerfile)"
     labels:
       - "dependencies"
       - "dockerfile"
@@ -26,6 +32,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      # Prefix all commit messages with "bump(ci): "
+      prefix: "bump(ci)"
     labels:
       - "dependencies"
       - "ci"
