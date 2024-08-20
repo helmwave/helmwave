@@ -47,7 +47,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 			return fmt.Errorf("failed to parse remote source: %w", err)
 		}
 
-		downloadPath := cache.DefaultConfig.GetRemoteSourcePath(remoteSource)
+		downloadPath := cache.Default.GetRemoteSourcePath(remoteSource)
 		err = getter.Get(
 			downloadPath,
 			i.remoteSource,
