@@ -1,6 +1,7 @@
 package release_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
@@ -23,6 +24,14 @@ func (s *ConfigTestSuite) TestConfigUniq() {
 	r.KubeContextF = "ctx"
 
 	s.Require().NoError(r.Uniq().Validate())
+}
+
+func (s *ConfigTestSuite) TestConfigUniqTags() {
+	r := release.NewConfig()
+
+	r.BuildAfterUnmarshal()
+
+	s.Require().True(slices.Contains(r.TagsF, r.Uniq().String()))
 }
 
 func (s *ConfigTestSuite) TestConfigInvalidUniq() {

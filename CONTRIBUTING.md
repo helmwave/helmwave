@@ -31,6 +31,14 @@ When don't affect any `*.go` files we use [githubFlow](https://docs.github.com/e
 
 After merging new release branch (minor or major) a new branch and PR in [helmwave/docs](https://github.com/helmwave/docs) will be created automatically. You will need to update documentation (if necessary) and merge this PR into main branch.
 
+### CHANGELOG
+
+We use https://changie.dev to provide changes for users.
+
+Just install this tool
+
+`$ changie new` – it helps you write the changes
+
 ## How to build?
 
 https://helmwave.github.io/docs/0.17.x/install/#compile-from-source
