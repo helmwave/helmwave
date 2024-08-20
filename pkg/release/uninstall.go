@@ -12,13 +12,13 @@ func (rel *config) Uninstall(ctx context.Context) (resp *release.UninstallReleas
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks
-	err = rel.Lifecycle.RunPreDown(ctx)
+	err = rel.LifecycleF.RunPreDown(ctx)
 	if err != nil {
 		return
 	}
 
 	defer func() {
-		lifecycleErr := rel.Lifecycle.RunPostDown(ctx)
+		lifecycleErr := rel.LifecycleF.RunPostDown(ctx)
 		if lifecycleErr != nil {
 			if err == nil {
 				err = lifecycleErr
