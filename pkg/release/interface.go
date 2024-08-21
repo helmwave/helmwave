@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -45,6 +46,7 @@ type Config interface {
 	Validate() error
 	Monitors() []MonitorReference
 	NotifyMonitorsFailed(ctx context.Context, monitors ...monitor.Config)
+	Lifecycle() hooks.Lifecycle
 }
 
 type HelmActionRunner interface {
