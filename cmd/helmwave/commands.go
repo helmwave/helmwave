@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/helmwave/helmwave/pkg/action"
 	helmwave "github.com/helmwave/helmwave/pkg/version"
 	"github.com/urfave/cli/v2"
 )
 
-// commands is a registration list for commands
+// commands is a registration list for commands.
 var commands = []*cli.Command{
 	new(action.Build).Cmd(),
 	new(action.Diff).Cmd(),
