@@ -2,12 +2,13 @@ package action
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/helmwave/helmwave/pkg/cache"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/urfave/cli/v2"
-	"strings"
 )
 
 const ROOT_PREFIX = "HELMWAVE_"
@@ -23,7 +24,7 @@ func EnvVars(names ...string) []string {
 	return a
 }
 
-// GlobalFlags is a set of global flags
+// GlobalFlags is a set of global flags.
 func GlobalFlags() (r []cli.Flag) {
 	r = []cli.Flag{
 		flagCancel(),
@@ -35,7 +36,7 @@ func GlobalFlags() (r []cli.Flag) {
 	return r
 }
 
-// flagCancel is flag for canceling process on SigINT or SigTERM
+// flagCancel is flag for canceling process on SigINT or SigTERM.
 func flagCancel() cli.Flag {
 	return &cli.BoolFlag{
 		Name:    "handle-signal",
