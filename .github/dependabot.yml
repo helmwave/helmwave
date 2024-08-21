@@ -1,7 +1,5 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
 # Please see the documentation for all configuration options:
-# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
 updates:
@@ -9,6 +7,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      # Prefix all commit messages with "bump(go.mod): "
+      prefix: "bump(go.mod)"
     labels:
       - "dependencies"
       - "go mod"
@@ -17,6 +18,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      # Prefix all commit messages with "bump(Dockerfile): "
+      prefix: "bump(Dockerfile)"
     labels:
       - "dependencies"
       - "dockerfile"
@@ -26,6 +30,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      # Prefix all commit messages with "bump(CI): "
+      prefix: "bump(CI)"
     labels:
       - "dependencies"
       - "ci"
