@@ -16,14 +16,14 @@ func TestNonParallelConfigTestSuite(t *testing.T) {
 }
 
 // func (ts *NonParallelConfigTestSuite) TestInvalidCacheDir() {
-// 	oldConfig := cache.DefaultConfig
-// 	cache.DefaultConfig = cache.Config{
+// 	oldConfig := cache.Default
+// 	cache.Default = cache.Config{
 // 		Home:         "/proc/1/bla",
 // 	}
 // 	defer func() {
-// 		cache.DefaultConfig = oldConfig
+// 		cache.Default = oldConfig
 // 	}()
 //
-// 	err := cache.DefaultConfig.Init()
+// 	err := cache.Default.Init()
 // 	ts.Require().Error(err)
 // }

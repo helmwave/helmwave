@@ -445,7 +445,7 @@ func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
 		yml:          y,
 	}
 
-	cache.DefaultConfig.Home = ts.T().TempDir()
+	cache.Default.Home = ts.T().TempDir()
 
 	err = s.Run(ts.ctx)
 	ts.Require().NoError(err)
