@@ -139,7 +139,7 @@ func cancelFlag() *cli.BoolFlag {
 	}
 }
 
-// cancelCtxOnSignal closes Done channel when one of the listed signals arrives
+// cancelCtxOnSignal closes Done channel when one of the listed signals arrives.
 func cancelCtxOnSignal(parent context.Context, signals ...os.Signal) (ctx context.Context) {
 	ctx, cancel := context.WithCancelCause(parent)
 
@@ -160,5 +160,6 @@ func cancelCtxOnSignal(parent context.Context, signals ...os.Signal) (ctx contex
 			}
 		}()
 	}
+
 	return ctx
 }
