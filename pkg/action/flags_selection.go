@@ -27,14 +27,13 @@ func flagMatchAllTags(v *bool) cli.Flag {
 	}
 }
 
-// TODO: not implemented
-func flagLabels(v *cli.StringSlice) cli.Flag {
-	return &cli.StringSliceFlag{
-		Name:        "labels",
-		Aliases:     []string{"l"},
-		Usage:       "build releases by label: -l app=nginx",
-		Category:    "SELECTION",
-		EnvVars:     EnvVars("LABELS"),
-		Destination: v,
-	}
-}
+// func flagLabels(v *cli.StringSlice) cli.Flag {
+//	return &cli.StringSliceFlag{
+//		Name:        "labels",
+//		Aliases:     []string{"l"},
+//		Usage:       "build releases by label: -l app=nginx",
+//		Category:    "SELECTION",
+//		EnvVars:     EnvVars("LABELS"),
+//		Destination: v,
+//	}
+//}
