@@ -2,8 +2,8 @@ package plan
 
 import (
 	"context"
-	"github.com/helmwave/helmwave/pkg/hooks"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
 	log "github.com/sirupsen/logrus"
 )
 
