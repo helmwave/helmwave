@@ -25,12 +25,6 @@ type Diff struct {
 	findRenamesHelper  float64
 }
 
-func (d *Diff) FixFields() {
-	d.OutputFormat = logSetup.Default.Format()
-	d.SuppressedKinds = d.kindSuppressHelper.Value()
-	d.FindRenames = float32(d.findRenamesHelper)
-}
-
 // Cmd returns 'diff' *cli.Command.
 func (d *Diff) Cmd() *cli.Command {
 	plan := DiffLocal{diff: d}
@@ -89,4 +83,11 @@ func (d *Diff) flags() []cli.Flag {
 	}
 
 	return self
+}
+
+// FixFields initializes struct for diff action
+func (d *Diff) FixFields() {
+	d.OutputFormat = logSetup.Default.Format()
+	d.SuppressedKinds = d.kindSuppressHelper.Value()
+	d.FindRenames = float32(d.findRenamesHelper)
 }

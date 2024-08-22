@@ -32,57 +32,23 @@ type Build struct {
 	skipUnchanged bool
 }
 
-func (i *Build) CleanRemote(src, dest string) {
-	srcPlandir := filepath.Join(src, i.plandir)
-	destPlandir := filepath.Join(dest, i.plandir)
-
-	err := os.RemoveAll(destPlandir)
-	if err != nil {
-		log.WithError(err).Error("failed to clean plandir")
-	}
-
-	err = helper.MoveFile(srcPlandir, destPlandir)
-	if err != nil {
-		log.WithError(err).Error("failed to move plandir")
-	}
-}
-
 // Run is the main function for 'build' CLI command.
 //
 //nolint:funlen,gocognit,cyclop
 func (i *Build) Run(ctx context.Context) (err error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("failed to get current directory: %w", err)
-	}
-
-	// TODO: mv to func
+	// Download Remote source
 	if i.remoteSource != "" {
-		remoteSource, err := url.Parse(i.remoteSource)
+		downloadPath, err := i.downloadRemoteSrc(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to parse remote source: %w", err)
+			return err
 		}
 
-		downloadPath := cache.Default.GetRemoteSourcePath(remoteSource)
-		err = getter.Get(
-			downloadPath,
-			i.remoteSource,
-			getter.WithContext(ctx),
-			getter.WithDetectors(getter.Detectors),
-			getter.WithGetters(getter.Getters),
-			getter.WithDecompressors(getter.Decompressors),
-		)
+		wd, err := os.Getwd()
 		if err != nil {
-			return fmt.Errorf("failed to download remote source: %w", err)
+			return fmt.Errorf("failed to get current directory: %w", err)
 		}
 
-		// we need to move plandir back to where it should be
-		defer i.CleanRemote(downloadPath, wd)
-
-		err = os.Chdir(downloadPath)
-		if err != nil {
-			return fmt.Errorf("failed to chdir to downloaded remote source: %w", err)
-		}
+		defer i.cleanRemoteSrc(downloadPath, wd)
 	}
 
 	if i.autoYml {
@@ -123,31 +89,6 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	}
 
 	log.Info("🏗 Planfile is ready!")
-
-	return nil
-}
-
-func (i *Build) diffing(ctx context.Context, p *plan.Plan) error {
-	switch i.diffMode {
-	case DiffModeLocal:
-		oldPlan := plan.New(i.plandir)
-		if oldPlan.IsExist() {
-			log.Info("🆚 Diff with previous local plan")
-			if err := oldPlan.Import(ctx); err != nil {
-				return err
-			}
-
-			p.DiffPlan(oldPlan, i.diff.Options)
-		}
-
-	case DiffModeLive:
-		log.Info("🆚 Diff manifests in the kubernetes cluster")
-		p.DiffLive(ctx, i.diff.Options, i.diff.ThreeWayMerge)
-	case DiffModeNone:
-		log.Info("🆚 Skip diffing")
-	default:
-		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
-	}
 
 	return nil
 }
@@ -226,4 +167,71 @@ func normalizeTagList(tags []string) []string {
 	sort.Strings(m)
 
 	return m
+}
+
+func (i *Build) cleanRemoteSrc(src, dest string) {
+	srcPlandir := filepath.Join(src, i.plandir)
+	destPlandir := filepath.Join(dest, i.plandir)
+
+	err := os.RemoveAll(destPlandir)
+	if err != nil {
+		log.WithError(err).Error("failed to clean plandir")
+	}
+
+	err = helper.MoveFile(srcPlandir, destPlandir)
+	if err != nil {
+		log.WithError(err).Error("failed to move plandir")
+	}
+}
+
+func (i *Build) downloadRemoteSrc(ctx context.Context) (path string, err error) {
+	src, err := url.Parse(i.remoteSource)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse remote source: %w", err)
+	}
+
+	path = cache.Default.GetRemoteSourcePath(src)
+	err = getter.Get(
+		path,
+		i.remoteSource,
+		getter.WithContext(ctx),
+		getter.WithDetectors(getter.Detectors),
+		getter.WithGetters(getter.Getters),
+		getter.WithDecompressors(getter.Decompressors),
+	)
+	if err != nil {
+		return "", fmt.Errorf("failed to download remote source: %w", err)
+	}
+
+	err = os.Chdir(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to chdir to downloaded remote source: %w", err)
+	}
+
+	return
+}
+
+func (i *Build) diffing(ctx context.Context, p *plan.Plan) error {
+	switch i.diffMode {
+	case DiffModeLocal:
+		oldPlan := plan.New(i.plandir)
+		if oldPlan.IsExist() {
+			log.Info("🆚 Diff with previous local plan")
+			if err := oldPlan.Import(ctx); err != nil {
+				return err
+			}
+
+			p.DiffPlan(oldPlan, i.diff.Options)
+		}
+
+	case DiffModeLive:
+		log.Info("🆚 Diff manifests in the kubernetes cluster")
+		p.DiffLive(ctx, i.diff.Options, i.diff.ThreeWayMerge)
+	case DiffModeNone:
+		log.Info("🆚 Skip diffing")
+	default:
+		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
+	}
+
+	return nil
 }
