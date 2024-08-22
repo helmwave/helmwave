@@ -47,19 +47,16 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 	var err error
 
-	log.Info("🔨 Building releases...")
 	p.body.Releases, err = p.buildReleases(ctx, o)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🔨 Building values...")
 	err = p.buildValues(ctx)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🔨 Building repositories...")
 	p.body.Repositories, err = p.buildRepositories()
 	if err != nil {
 		return err
@@ -70,7 +67,6 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 		return err
 	}
 
-	log.Info("🔨 Building registries...")
 	p.body.Registries, err = p.buildRegistries()
 	if err != nil {
 		return err
@@ -81,19 +77,16 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 		return err
 	}
 
-	log.Info("🔨 Building charts...")
 	err = p.buildCharts()
 	if err != nil {
 		return err
 	}
 
-	// Validating plan after it was changed
 	err = p.body.Validate()
 	if err != nil {
 		return err
 	}
 
-	log.Info("🔨 Building manifests...")
 	err = p.buildManifest(ctx)
 	if err != nil {
 		return err

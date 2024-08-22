@@ -10,6 +10,8 @@ import (
 )
 
 func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Config, error) {
+	log.Info("🔨 Building releases...")
+
 	plan := make([]release.Config, 0)
 
 	planAdderFunction := addToPlanWithDependencies

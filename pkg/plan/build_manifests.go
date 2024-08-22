@@ -7,9 +7,12 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	log "github.com/sirupsen/logrus"
 )
 
 func (p *Plan) buildManifest(ctx context.Context) error {
+	log.Info("🔨 Building manifests...")
+
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 

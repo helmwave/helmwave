@@ -42,6 +42,8 @@ func buildRegistries(m map[string][]release.Config, in []regi.Config) (out []reg
 }
 
 func (p *Plan) buildRegistries() (out []regi.Config, err error) {
+	log.Info("🔨 Building registries...")
+
 	return buildRegistries(
 		buildRegistriesMapTop(p.body.Releases),
 		p.body.Registries,
