@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/joho/godotenv"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,18 +13,12 @@ import (
 	"github.com/helmwave/helmwave/pkg/cache"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	helmwave "github.com/helmwave/helmwave/pkg/version"
-	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	if _, err := os.Stat(".env"); err == nil {
-		err = godotenv.Load()
-		if err != nil {
-			log.Fatal("Error loading .env file")
-		}
-	}
+	dotenv()
 
 	c := CreateApp()
 
@@ -31,6 +26,15 @@ func main() {
 
 	if err := c.Run(os.Args); err != nil {
 		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regular command errors
+	}
+}
+
+func dotenv() {
+	if _, err := os.Stat(".env"); err == nil {
+		err = godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file: %s", err)
+		}
 	}
 }
 
