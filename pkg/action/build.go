@@ -32,6 +32,21 @@ type Build struct {
 	skipUnchanged bool
 }
 
+func (i *Build) CleanRemote(src, dest string) {
+	srcPlandir := filepath.Join(src, i.plandir)
+	destPlandir := filepath.Join(dest, i.plandir)
+
+	err := os.RemoveAll(destPlandir)
+	if err != nil {
+		log.WithError(err).Error("failed to clean plandir")
+	}
+
+	err = helper.MoveFile(srcPlandir, destPlandir)
+	if err != nil {
+		log.WithError(err).Error("failed to move plandir")
+	}
+}
+
 // Run is the main function for 'build' CLI command.
 //
 //nolint:funlen,gocognit,cyclop
@@ -41,6 +56,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		return fmt.Errorf("failed to get current directory: %w", err)
 	}
 
+	// TODO: mv to func
 	if i.remoteSource != "" {
 		remoteSource, err := url.Parse(i.remoteSource)
 		if err != nil {
@@ -61,18 +77,7 @@ func (i *Build) Run(ctx context.Context) (err error) {
 		}
 
 		// we need to move plandir back to where it should be
-		defer func() {
-			srcPlandir := filepath.Join(downloadPath, i.plandir)
-			destPlandir := filepath.Join(wd, i.plandir)
-			err := os.RemoveAll(destPlandir)
-			if err != nil {
-				log.WithError(err).Error("failed to clean plandir")
-			}
-			err = helper.MoveFile(srcPlandir, destPlandir)
-			if err != nil {
-				log.WithError(err).Error("failed to move plandir")
-			}
-		}()
+		defer i.CleanRemote(downloadPath, wd)
 
 		err = os.Chdir(downloadPath)
 		if err != nil {
@@ -105,6 +110,24 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	// Show current plan
 	newPlan.Logger().Info("🏗 Plan")
 
+	// Diff
+	err = i.diffing(ctx, newPlan)
+	if err != nil {
+		return err
+	}
+
+	// Save new plan
+	err = newPlan.Export(ctx, i.skipUnchanged)
+	if err != nil {
+		return err
+	}
+
+	log.Info("🏗 Planfile is ready!")
+
+	return nil
+}
+
+func (i *Build) diffing(ctx context.Context, p *plan.Plan) error {
 	switch i.diffMode {
 	case DiffModeLocal:
 		oldPlan := plan.New(i.plandir)
@@ -114,24 +137,17 @@ func (i *Build) Run(ctx context.Context) (err error) {
 				return err
 			}
 
-			newPlan.DiffPlan(oldPlan, i.diff.Options)
+			p.DiffPlan(oldPlan, i.diff.Options)
 		}
 
 	case DiffModeLive:
 		log.Info("🆚 Diff manifests in the kubernetes cluster")
-		newPlan.DiffLive(ctx, i.diff.Options, i.diff.ThreeWayMerge)
+		p.DiffLive(ctx, i.diff.Options, i.diff.ThreeWayMerge)
 	case DiffModeNone:
 		log.Info("🆚 Skip diffing")
 	default:
 		log.Warnf("🆚❔Unknown %q diff mode, skipping", i.diffMode)
 	}
-
-	err = newPlan.Export(ctx, i.skipUnchanged)
-	if err != nil {
-		return err
-	}
-
-	log.Info("🏗 Planfile is ready!")
 
 	return nil
 }
