@@ -3,16 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/joho/godotenv"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/helmwave/helmwave/pkg/action"
-
 	"github.com/helmwave/helmwave/pkg/cache"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	helmwave "github.com/helmwave/helmwave/pkg/version"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
