@@ -33,8 +33,6 @@ type Build struct {
 }
 
 // Run is the main function for 'build' CLI command.
-//
-//nolint:funlen,gocognit,cyclop
 func (i *Build) Run(ctx context.Context) (err error) {
 	// Download Remote source
 	if i.remoteSource != "" {

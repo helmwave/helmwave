@@ -85,7 +85,7 @@ func (d *Diff) flags() []cli.Flag {
 	return self
 }
 
-// FixFields initializes struct for diff action
+// FixFields initializes struct for diff action.
 func (d *Diff) FixFields() {
 	d.OutputFormat = logSetup.Default.Format()
 	d.SuppressedKinds = d.kindSuppressHelper.Value()
