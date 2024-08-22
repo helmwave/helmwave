@@ -3,7 +3,6 @@ package plan
 import (
 	"context"
 
-	"github.com/helmwave/helmwave/pkg/hooks"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,20 +27,24 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 	}
 	p.body = body
 
-	// Run hooks
+	// Run Pre hooks
 	err = p.body.Lifecycle.RunPreBuild(ctx)
 	if err != nil {
 		return
 	}
 
-	defer func(Lifecycle *hooks.Lifecycle, ctx context.Context) {
-		err := Lifecycle.RunPostBuild(ctx)
-		if err != nil {
-			return
-		}
-	}(&p.body.Lifecycle, ctx)
+	err = p.build(ctx, o)
+	if err != nil {
+		return
+	}
 
-	return p.build(ctx, o)
+	// Run Post hooks
+	err = p.body.Lifecycle.RunPostBuild(ctx)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func (p *Plan) build(ctx context.Context, o BuildOptions) error {
