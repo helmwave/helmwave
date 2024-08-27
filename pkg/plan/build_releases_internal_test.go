@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
@@ -216,6 +217,7 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 	rel.On("Uniq").Return(u)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{{Name: "blabla", Optional: true}})
 	rel.On("SetDependsOn", []*release.DependsOnReference{}).Return()
+	rel.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	p.SetReleases(rel)
 
@@ -241,12 +243,14 @@ func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
 	rel1.On("Uniq").Return(u1)
 	rel1.On("DependsOn").Return(deps)
 	rel1.On("SetDependsOn", deps).Return()
+	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return([]string{})
 	rel2.On("Uniq").Return(u2)
 	rel2.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel2.On("SetDependsOn", []*release.DependsOnReference{}).Return()
+	rel2.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	p.SetReleases(rel1, rel2)
 
@@ -271,6 +275,7 @@ func (ts *BuildReleasesTestSuite) TestDisabledDependencies() {
 	rel1.On("Tags").Return(tags)
 	rel1.On("Uniq").Return(u1)
 	rel1.On("SetDependsOn", []*release.DependsOnReference{}).Return()
+	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return([]string{})
