@@ -10,6 +10,11 @@ import (
 
 // MoveFile moves files or directories. It also handles move between different mounts (copy + rm).
 func MoveFile(src, dst string) error {
+	log.WithFields(log.Fields{
+		"src": src,
+		"dst": dst,
+	}).Trace("Moving")
+
 	// It doesn't work if workdir has been mounted.
 	err := os.Rename(src, dst)
 	if err != nil {
