@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"path"
 	"path/filepath"
@@ -15,6 +16,13 @@ import (
 
 // Export allows save plan to file.
 func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+
+	log.Tracef("I am exporting plan to %s", filepath.Join(wd, p.dir))
+
 	if err := os.RemoveAll(p.dir); err != nil {
 		return fmt.Errorf("failed to clean plan directory %s: %w", p.dir, err)
 	}
@@ -58,7 +66,7 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 		}
 	}()
 
-	err := wg.Wait()
+	err = wg.Wait()
 	if err != nil {
 		return err
 	}

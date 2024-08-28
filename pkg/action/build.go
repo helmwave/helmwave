@@ -34,16 +34,18 @@ type Build struct {
 
 // Run is the main function for 'build' CLI command.
 func (i *Build) Run(ctx context.Context) (err error) {
+
 	// Download Remote source
 	if i.remoteSource != "" {
-		downloadPath, err := i.downloadRemoteSrc(ctx)
-		if err != nil {
-			return err
-		}
-
 		wd, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("failed to get current directory: %w", err)
+		}
+		log.Tracef("Work dir: %s", wd)
+
+		downloadPath, err := i.downloadRemoteSrc(ctx)
+		if err != nil {
+			return err
 		}
 
 		defer i.cleanRemoteSrc(downloadPath, wd)
@@ -167,16 +169,11 @@ func normalizeTagList(tags []string) []string {
 	return m
 }
 
-func (i *Build) cleanRemoteSrc(src, dest string) {
-	srcPlandir := filepath.Join(src, i.plandir)
-	destPlandir := filepath.Join(dest, i.plandir)
+func (i *Build) cleanRemoteSrc(downloadPath, wd string) {
+	srcPlandir := filepath.Join(downloadPath, i.plandir)
+	destPlandir := filepath.Join(wd, i.plandir)
 
-	err := os.RemoveAll(destPlandir)
-	if err != nil {
-		log.WithError(err).Error("failed to clean plandir")
-	}
-
-	err = helper.MoveFile(srcPlandir, destPlandir)
+	err := helper.MoveFile(srcPlandir, destPlandir)
 	if err != nil {
 		log.WithError(err).Error("failed to move plandir")
 	}

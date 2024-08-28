@@ -439,7 +439,7 @@ func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
 		plandir:      plan.Dir,
 		tags:         cli.StringSlice{},
 		options:      plan.BuildOptions{},
-		remoteSource: "github.com/helmwave/helmwave",
+		remoteSource: "github.com/helmwave/helmwave/.",
 		yml:          y,
 	}
 
