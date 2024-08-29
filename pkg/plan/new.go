@@ -15,7 +15,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
-	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -92,18 +91,6 @@ type planBody struct {
 	Registries   registry.Configs `yaml:"registries" json:"registries" jsonschema:"title=registries list,description=helm OCI registries"`
 	Releases     release.Configs  `yaml:"releases" json:"releases" jsonschema:"title=helm releases,description=what you wanna deploy"`
 	Lifecycle    hooks.Lifecycle  `yaml:"lifecycle" json:"lifecycle" jsonschema:"title=lifecycle,description=helmwave lifecycle hooks"`
-}
-
-func GenSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{
-		DoNotReference:             true,
-		RequiredFromJSONSchemaTags: true,
-	}
-
-	schema := r.Reflect(&planBody{})
-	schema.AdditionalProperties = jsonschema.TrueSchema // to allow anchors at the top level
-
-	return schema
 }
 
 // NewBody parses plan from file.
