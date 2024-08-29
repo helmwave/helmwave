@@ -15,14 +15,17 @@ func (p *Plan) buildValues(ctx context.Context) error {
 		return err
 	}
 
+	ch := p.Graph().Run()
 	wg := parallel.NewWaitGroup()
-	wg.Add(len(p.body.Releases))
+	limiter := p.ParallelLimiter(ctx)
+	wg.Add(limiter)
 
-	for _, rel := range p.body.Releases {
+	for range limiter {
 		go func() {
-			defer wg.Done()
-
-			wg.ErrChan() <- p.buildReleaseValues(ctx, rel)
+			for n := range ch {
+				wg.ErrChan() <- p.buildReleaseValues(ctx, n.Data)
+			}
+			wg.Done()
 		}()
 	}
 
