@@ -179,6 +179,10 @@ func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqNam
 	return dependenciesGraph, nil
 }
 
+func (p *Plan) getParallelLimit(ctx context.Context) int {
+	return getParallelLimit(ctx, p.body.Releases)
+}
+
 func getParallelLimit(ctx context.Context, releases release.Configs) int {
 	parallelLimit, ok := clictx.GetFlagFromContext(ctx, "parallel-limit").(int)
 	if !ok {
@@ -217,18 +221,13 @@ func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 }
 
 func (p *Plan) syncReleases(ctx context.Context) (err error) {
-	dependenciesGraph, err := p.body.generateDependencyGraph()
-	if err != nil {
-		return err
-	}
-
-	parallelLimit := getParallelLimit(ctx, p.body.Releases)
+	parallelLimit := p.getParallelLimit(ctx)
 
 	monitorsLockMap := p.body.generateMonitorsLockMap()
 	monitorsCtx, monitorsCancel := context.WithCancel(ctx)
 	defer monitorsCancel()
 
-	releasesNodesChan := dependenciesGraph.Run()
+	releasesNodesChan := p.Graph().Run()
 
 	releasesWG := parallel.NewWaitGroup()
 	releasesWG.Add(parallelLimit)

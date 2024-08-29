@@ -11,12 +11,7 @@ import (
 
 // Down destroys all releases that exist in a plan.
 func (p *Plan) Down(ctx context.Context) (err error) {
-	dependenciesGraph, err := p.body.generateDependencyGraph()
-	if err != nil {
-		return err
-	}
-
-	dependenciesGraph, err = dependenciesGraph.Reverse()
+	dependenciesGraph, err := p.Graph().Reverse()
 	if err != nil {
 		return err
 	}
