@@ -27,41 +27,39 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 	}
 	p.body = body
 
-	// Run hooks
+	// Run Pre hooks
 	err = p.body.Lifecycle.RunPreBuild(ctx)
 	if err != nil {
 		return
 	}
 
-	defer func() {
-		lifecycleErr := p.body.Lifecycle.RunPostBuild(ctx)
-		if lifecycleErr != nil {
-			log.Errorf("got an error from postbuild hooks: %v", lifecycleErr)
-			if err == nil {
-				err = lifecycleErr
-			}
-		}
-	}()
+	err = p.build(ctx, o)
+	if err != nil {
+		return
+	}
 
-	return p.build(ctx, o)
+	// Run Post hooks
+	err = p.body.Lifecycle.RunPostBuild(ctx)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 	var err error
 
-	log.Info("🔨 Building releases...")
-	p.body.Releases, err = p.buildReleases(o)
+	p.body.Releases, err = p.buildReleases(ctx, o)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🔨 Building values...")
 	err = p.buildValues(ctx)
 	if err != nil {
 		return err
 	}
 
-	log.Info("🔨 Building repositories...")
 	p.body.Repositories, err = p.buildRepositories()
 	if err != nil {
 		return err
@@ -72,7 +70,6 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 		return err
 	}
 
-	log.Info("🔨 Building registries...")
 	p.body.Registries, err = p.buildRegistries()
 	if err != nil {
 		return err
@@ -83,19 +80,16 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 		return err
 	}
 
-	log.Info("🔨 Building charts...")
 	err = p.buildCharts()
 	if err != nil {
 		return err
 	}
 
-	// Validating plan after it was changed
 	err = p.body.Validate()
 	if err != nil {
 		return err
 	}
 
-	log.Info("🔨 Building manifests...")
 	err = p.buildManifest(ctx)
 	if err != nil {
 		return err

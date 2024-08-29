@@ -10,6 +10,7 @@ import (
 )
 
 func (p *Plan) buildValues(ctx context.Context) error {
+	log.Info("🔨 Building values...")
 	if err := p.ValidateValuesBuild(); err != nil {
 		return err
 	}

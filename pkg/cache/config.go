@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var DefaultConfig = Config{}
+var Default = Config{}
 
 type Config struct {
 	Home string

@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -196,18 +195,39 @@ func (rel *config) findChartInHelmCache() (string, error) {
 	return chartFile, nil
 }
 
-func (rel *config) getChartRepoEntryFromIndex(u, repositoryCache string) (*repo.ChartVersion, error) {
+func (rel *config) getChartRepoEntryFromIndex(url, repositoryCache string) (*repo.ChartVersion, error) { //nolint:gocognit
 	repoName := strings.SplitN(rel.Chart().Name, "/", 2)[0]
-	idxFile := filepath.Join(repositoryCache, helmpath.CacheIndexFile(repoName))
-	i, err := repo.LoadIndexFile(idxFile)
+	repositoryIndex, err := repo.LoadIndexFile(filepath.Join(repositoryCache, helmpath.CacheIndexFile(repoName)))
 	if err != nil {
 		return nil, fmt.Errorf("no cached repo found: %w", err)
 	}
 
-	for _, entry := range i.Entries {
-		for _, ver := range entry {
-			if slices.Contains(ver.URLs, u) {
-				return ver, nil
+	file, err := repo.LoadFile(rel.getDownloader().RepositoryConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load repository file: %w", err)
+	}
+
+	var baseUrl string
+	for _, r := range file.Repositories {
+		if r.Name == repoName {
+			baseUrl = r.URL
+
+			break
+		}
+	}
+
+	for _, e := range repositoryIndex.Entries {
+		for _, ver := range e {
+			for _, u := range ver.URLs {
+				if baseUrl != "" {
+					u, err = repo.ResolveReferenceURL(baseUrl, u)
+					if err != nil {
+						return nil, fmt.Errorf("failed to resolve reference URL %s: %w", u, err)
+					}
+				}
+				if u == url {
+					return ver, nil
+				}
 			}
 		}
 	}

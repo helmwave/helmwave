@@ -24,7 +24,7 @@ type config struct {
 	helm *helm.EnvSettings
 	log  *log.Entry
 
-	Lifecycle              hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
+	LifecycleF             hooks.Lifecycle `yaml:"lifecycle,omitempty" json:"lifecycle,omitempty" jsonschema:"description=Lifecycle hooks"`
 	Store                  map[string]any  `yaml:"store,omitempty" json:"store,omitempty" jsonschema:"title=The Store,description=It allows to pass your custom fields from helmwave.yml to values"`
 	ChartF                 Chart           `yaml:"chart,omitempty" json:"chart,omitempty" jsonschema:"title=Chart reference,description=Describes chart that release uses,oneof_type=string;object"`
 	Tests                  configTests     `yaml:"tests,omitempty" json:"tests,omitempty" jsonschema:"description=Configuration for helm tests"`
@@ -172,6 +172,9 @@ func (rel *config) buildAfterUnmarshal(allReleases []*config) {
 		rel.Logger().Debug("timeout is not set, defaulting to 5m")
 		rel.Timeout = 5 * time.Minute
 	}
+
+	// Uniqname is default tag
+	rel.TagsF = append(rel.TagsF, rel.Uniq().String())
 }
 
 func (rel *config) buildAfterUnmarshalDependsOn(allReleases []*config) {
@@ -281,4 +284,8 @@ func (rel *config) Monitors() []MonitorReference {
 	defer rel.lock.RUnlock()
 
 	return rel.MonitorsF
+}
+
+func (rel *config) Lifecycle() hooks.Lifecycle {
+	return rel.LifecycleF
 }

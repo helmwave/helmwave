@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -8,7 +9,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *Plan) buildReleases(o BuildOptions) ([]release.Config, error) {
+func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Config, error) {
+	log.Info("🔨 Building releases...")
+
 	plan := make([]release.Config, 0)
 
 	planAdderFunction := addToPlanWithDependencies
@@ -30,13 +33,23 @@ func (p *Plan) buildReleases(o BuildOptions) ([]release.Config, error) {
 		}
 	}
 
+	// Run per-release build hook (in dependency order)
+	for _, r := range plan {
+		// Run hooks
+		lifecycle := r.Lifecycle()
+		err := lifecycle.RunPreBuild(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return plan, nil
 }
 
 func addToPlan(
 	plan release.Configs,
 	rel release.Config,
-) (release.Configs, error) {
+) (_ release.Configs, err error) {
 	if r, contains := plan.Contains(rel); contains {
 		if r != rel {
 			return nil, release.NewDuplicateError(rel.Uniq())

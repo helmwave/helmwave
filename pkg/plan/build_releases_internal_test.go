@@ -1,9 +1,11 @@
 package plan
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/stretchr/testify/suite"
@@ -129,7 +131,7 @@ func (ts *BuildReleasesTestSuite) TestNoReleases() {
 	p := New(filepath.Join(tmpDir, Dir))
 	p.NewBody()
 
-	releases, err := p.buildReleases(BuildOptions{})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{})
 
 	ts.Require().NoError(err)
 	ts.Empty(releases)
@@ -144,7 +146,7 @@ func (ts *BuildReleasesTestSuite) TestNoMatchingReleases() {
 
 	p.SetReleases(mockedRelease)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: []string{"abc"}, MatchAll: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: []string{"abc"}, MatchAll: true})
 	ts.Require().NoError(err)
 	ts.Empty(releases)
 
@@ -170,7 +172,7 @@ func (ts *BuildReleasesTestSuite) TestDuplicateReleases() {
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 
 	var e *release.DuplicateError
 	ts.Require().ErrorAs(err, &e)
@@ -196,7 +198,7 @@ func (ts *BuildReleasesTestSuite) TestMissingRequiredDependency() {
 
 	p.SetReleases(rel)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.ErrorIs(err, release.ErrDepFailed)
 	ts.Empty(releases)
 
@@ -215,10 +217,11 @@ func (ts *BuildReleasesTestSuite) TestMissingOptionalDependency() {
 	rel.On("Uniq").Return(u)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{{Name: "blabla", Optional: true}})
 	rel.On("SetDependsOn", []*release.DependsOnReference{}).Return()
+	rel.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	p.SetReleases(rel)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.Require().NoError(err)
 	ts.Len(releases, 1)
 	ts.Contains(releases, rel)
@@ -240,16 +243,18 @@ func (ts *BuildReleasesTestSuite) TestUnmatchedDependency() {
 	rel1.On("Uniq").Return(u1)
 	rel1.On("DependsOn").Return(deps)
 	rel1.On("SetDependsOn", deps).Return()
+	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return([]string{})
 	rel2.On("Uniq").Return(u2)
 	rel2.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel2.On("SetDependsOn", []*release.DependsOnReference{}).Return()
+	rel2.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: true})
 	ts.Require().NoError(err)
 	ts.Len(releases, 2)
 	ts.Contains(releases, rel1)
@@ -270,13 +275,14 @@ func (ts *BuildReleasesTestSuite) TestDisabledDependencies() {
 	rel1.On("Tags").Return(tags)
 	rel1.On("Uniq").Return(u1)
 	rel1.On("SetDependsOn", []*release.DependsOnReference{}).Return()
+	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
 
 	rel2 := NewMockReleaseConfig(ts.T())
 	rel2.On("Tags").Return([]string{})
 
 	p.SetReleases(rel1, rel2)
 
-	releases, err := p.buildReleases(BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: false})
+	releases, err := p.buildReleases(context.Background(), BuildOptions{Tags: tags, MatchAll: true, EnableDependencies: false})
 	ts.Require().NoError(err)
 	ts.Len(releases, 1)
 	ts.Contains(releases, rel1)

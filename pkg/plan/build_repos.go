@@ -10,6 +10,8 @@ import (
 )
 
 func (p *Plan) buildRepositories() (out []repo.Config, err error) {
+	log.Info("🔨 Building repositories...")
+
 	return buildRepositories(
 		buildRepoMapTop(p.body.Releases),
 		p.body.Repositories,

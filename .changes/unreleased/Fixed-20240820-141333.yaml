@@ -1,0 +1,6 @@
+kind: Fixed
+body: Allow use colons and slaches in kubecontext
+time: 2024-08-20T14:13:33.773878+03:00
+custom:
+  Author: zhilyaev
+  Issue: "939"

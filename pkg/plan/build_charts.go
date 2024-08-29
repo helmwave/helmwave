@@ -3,9 +3,12 @@ package plan
 import (
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	log "github.com/sirupsen/logrus"
 )
 
 func (p *Plan) buildCharts() error {
+	log.Info("🔨 Building charts...")
+
 	wg := parallel.NewWaitGroup()
 	wg.Add(len(p.body.Releases))
 

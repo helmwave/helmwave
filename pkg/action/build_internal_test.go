@@ -436,16 +436,14 @@ func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
 	}
 
 	s := &Build{
-		plandir: plan.Dir,
-		tags:    cli.StringSlice{},
-		options: plan.BuildOptions{
-			MatchAll: true,
-		},
-		remoteSource: "github.com/helmwave/helmwave",
+		plandir:      plan.Dir,
+		tags:         cli.StringSlice{},
+		options:      plan.BuildOptions{},
+		remoteSource: "github.com/helmwave/helmwave/.",
 		yml:          y,
 	}
 
-	cache.DefaultConfig.Home = ts.T().TempDir()
+	cache.Default.Home = ts.T().TempDir()
 
 	err = s.Run(ts.ctx)
 	ts.Require().NoError(err)

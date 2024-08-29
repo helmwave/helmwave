@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/helmwave/helmwave/pkg/action"
 	"github.com/helmwave/helmwave/pkg/cache"
@@ -13,29 +16,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var commands = []*cli.Command{
-	new(action.Build).Cmd(),
-	new(action.Diff).Cmd(),
-	new(action.Up).Cmd(),
-	new(action.List).Cmd(),
-	new(action.Rollback).Cmd(),
-	new(action.Status).Cmd(),
-	new(action.Down).Cmd(),
-	new(action.Validate).Cmd(),
-	new(action.Yml).Cmd(),
-	new(action.GenSchema).Cmd(),
-	new(action.Graph).Cmd(),
-	version(),
-	completion(),
-}
-
 func main() {
-	if _, err := os.Stat(".env"); err == nil {
-		err = godotenv.Load()
-		if err != nil {
-			log.Fatal("Error loading .env file")
-		}
-	}
+	dotenv()
 
 	c := CreateApp()
 
@@ -46,11 +28,21 @@ func main() {
 	}
 }
 
+func dotenv() {
+	if _, err := os.Stat(".env"); err == nil {
+		err = godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file: %s", err)
+		}
+	}
+}
+
 func recoverPanic() {
 	if r := recover(); r != nil {
 		switch r.(type) {
 		case CommandNotFoundError:
 			log.Error(r)
+			// https://tldp.org/LDP/abs/html/exitcodes.html
 			log.Exit(127)
 		default:
 			log.Panic(r)
@@ -70,53 +62,53 @@ func CreateApp() *cli.App {
 		"1. $ helmwave build\n" +
 		"2. $ helmwave up\n"
 
-	c.Before = func(ctx *cli.Context) error {
-		err := logSetup.Default.Run(ctx)
-		if err != nil {
-			return err
-		}
-
-		err = cache.DefaultConfig.Run(ctx)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-	c.Flags = append(logSetup.Default.Flags(), cache.DefaultConfig.Flags()...)
-
+	c.Before = before
+	c.Flags = action.GlobalFlags()
 	c.Commands = commands
 	c.CommandNotFound = command404
 
 	return c
 }
 
-// CommandNotFoundError is return when CLI command is not found.
-type CommandNotFoundError struct {
-	Command string
-}
+// cancelCtxOnSignal closes Done channel when one of the listed signals arrives.
+func cancelCtxOnSignal(parent context.Context, signals ...os.Signal) (ctx context.Context) {
+	ctx, cancel := context.WithCancelCause(parent)
 
-func (e CommandNotFoundError) Error() string {
-	return fmt.Sprintf("👻 Command %q not found", e.Command)
-}
+	context.AfterFunc(ctx, func() {
+		if err := context.Cause(ctx); err != nil {
+			log.Error(err)
+		}
+	})
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, signals...)
+	if ctx.Err() == nil {
+		go func() {
+			select {
+			case sig := <-ch:
+				cancel(fmt.Errorf("got signal %v", sig))
 
-func command404(_ *cli.Context, s string) {
-	err := CommandNotFoundError{
-		Command: s,
+			case <-ctx.Done():
+			}
+		}()
 	}
-	panic(err)
+
+	return ctx
 }
 
-func version() *cli.Command {
-	return &cli.Command{
-		Name:     "version",
-		Aliases:  []string{"ver"},
-		Category: action.Step_,
-		Usage:    "show shorts version",
-		Action: func(c *cli.Context) error {
-			fmt.Println(helmwave.Version) //nolint:forbidigo // we need to use fmt.Println here
-
-			return nil
-		},
+func before(ctx *cli.Context) error {
+	if ctx.Bool("handle-signal") {
+		ctx.Context = cancelCtxOnSignal(ctx.Context, syscall.SIGTERM, syscall.SIGINT)
 	}
+
+	// Init flags first
+	err := logSetup.Default.Run(ctx)
+	if err != nil {
+		return err
+	}
+	err = cache.Default.Run(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
