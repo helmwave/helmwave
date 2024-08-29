@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/release/dependency"
 	"os"
 	"path/filepath"
 
@@ -47,6 +48,7 @@ type Plan struct {
 
 	manifests map[uniqname.UniqName]string
 	unchanged release.Configs
+	graph     *dependency.Graph[uniqname.UniqName, release.Config]
 }
 
 // NewAndImport wrapper for New and Import in one.
@@ -136,4 +138,17 @@ func New(dir string) *Plan {
 	}
 
 	return plan
+}
+
+func (p *Plan) Graph() *dependency.Graph[uniqname.UniqName, release.Config] {
+	if p.graph == nil {
+		graph, err := p.body.generateDependencyGraph()
+		if err != nil {
+			p.Logger().Fatal(err)
+		}
+
+		return graph
+	}
+
+	return p.graph
 }
