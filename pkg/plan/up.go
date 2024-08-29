@@ -188,6 +188,13 @@ func getParallelLimit(ctx context.Context, releases release.Configs) int {
 		parallelLimit = len(releases)
 	}
 
+	const msg = "Releases limited parallelization"
+	if parallelLimit == len(releases) {
+		log.WithField("limit", parallelLimit).Debug(msg)
+	} else {
+		log.WithField("limit", parallelLimit).Info(msg)
+	}
+
 	return parallelLimit
 }
 
@@ -216,13 +223,6 @@ func (p *Plan) syncReleases(ctx context.Context) (err error) {
 	}
 
 	parallelLimit := getParallelLimit(ctx, p.body.Releases)
-
-	const msg = "Deploying releases with limited parallelization"
-	if parallelLimit == len(p.body.Releases) {
-		log.WithField("limit", parallelLimit).Debug(msg)
-	} else {
-		log.WithField("limit", parallelLimit).Info(msg)
-	}
 
 	monitorsLockMap := p.body.generateMonitorsLockMap()
 	monitorsCtx, monitorsCancel := context.WithCancel(ctx)
