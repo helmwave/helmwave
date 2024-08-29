@@ -1,6 +1,0 @@
-kind: CI
-body: remove --skip-validate for goreleaser ci
-time: 2024-08-29T12:24:18.196594+03:00
-custom:
-  Author: zhilyaev
-  Issue: ""
