@@ -1,6 +1,0 @@
-kind: New feature
-body: Set env HELMWAVE_HANDLE_SIGNAL=true to handle SIGTERM and SIGINT
-time: 2024-08-15T18:41:14.599823654+03:30
-custom:
-    Author: amir3ash
-    Issue: ""

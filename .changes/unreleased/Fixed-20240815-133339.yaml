@@ -1,6 +1,0 @@
-kind: Fixed
-body: Fix cached chart with relative path in URL not selected during build
-time: 2024-08-15T13:33:39.233042343Z
-custom:
-    Author: Vigilans
-    Issue: "936"

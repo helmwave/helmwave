@@ -1,6 +1,0 @@
-kind: Fixed
-body: Fix release-scope build lifecycle hook
-time: 2024-08-15T13:31:06.514344721Z
-custom:
-    Author: Vigilans
-    Issue: "935"
