@@ -14,7 +14,7 @@ const (
 )
 
 // NodeStatus is used to code release status - success or failed.
-// Please use ReleaseSuccess and ReleaseFailed contants.
+// Please use ReleaseSuccess and ReleaseFailed constants.
 type NodeStatus int
 
 // Node is graph node. N stands for data type.
