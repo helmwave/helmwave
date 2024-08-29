@@ -7,25 +7,41 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *Plan) getParallelLimit(ctx context.Context) int {
-	return getParallelLimit(ctx, p.body.Releases)
+func (p *Plan) ParallelLimiter(ctx context.Context) int {
+	return ParallelLimit(ctx, p.body.Releases)
 }
 
-func getParallelLimit(ctx context.Context, releases release.Configs) int {
-	parallelLimit, ok := clictx.GetFlagFromContext(ctx, "parallel-limit").(int)
+func ParallelLimit(ctx context.Context, releases release.Configs) int {
+	limit, ok := clictx.GetFlagFromContext(ctx, "parallel-limit").(int)
 	if !ok {
-		parallelLimit = 0
+		limit = 0
 	}
-	if parallelLimit == 0 {
-		parallelLimit = len(releases)
+	if limit == 0 {
+		limit = len(releases)
 	}
 
 	const msg = "Releases limited parallelization"
-	if parallelLimit == len(releases) {
-		log.WithField("limit", parallelLimit).Debug(msg)
+	if limit == len(releases) {
+		log.WithField("limit", limit).Debug(msg)
 	} else {
-		log.WithField("limit", parallelLimit).Info(msg)
+		log.WithField("limit", limit).Info(msg)
 	}
 
-	return parallelLimit
+	return limit
 }
+
+//func (p *Plan) parallelWorker(ctx context.Context, fn func(any)) {
+//	ch := p.Graph().Run()
+//	wg := parallel.NewWaitGroup()
+//	limiter := p.ParallelLimiter(ctx)
+//	wg.Add(limiter)
+//
+//	for range limiter {
+//		go func() {
+//			defer wg.Done()
+//			for n := range ch {
+//				fn()
+//			}
+//		}()
+//	}
+//}

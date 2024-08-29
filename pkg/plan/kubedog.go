@@ -63,3 +63,11 @@ func (p *Plan) kubedogSpecs(
 
 	return specs, kubecontext, nil
 }
+
+func (p *Plan) kubedogSyncSpecs(kubedogConfig *kubedog.Config) (multitrack.MultitrackSpecs, string, error) {
+	return p.kubedogSpecs(kubedogConfig, p.kubedogSyncManifest)
+}
+
+func (p *Plan) kubedogSyncManifest(rel release.Config) (string, error) {
+	return p.manifests[rel.Uniq()], nil
+}

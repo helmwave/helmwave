@@ -13,7 +13,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/dependency"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/kube"
@@ -41,7 +40,7 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 	}()
 
 	log.Info("🗄 sync repositories...")
-	err = SyncRepositories(ctx, p.body.Repositories)
+	err = p.syncRepositories(ctx)
 	if err != nil {
 		return
 	}
@@ -69,28 +68,6 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 	return
 }
 
-func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
-	dependenciesGraph := dependency.NewGraph[uniqname.UniqName, release.Config]()
-
-	for _, rel := range p.Releases {
-		err := dependenciesGraph.NewNode(rel.Uniq(), rel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, dep := range rel.DependsOn() {
-			dependenciesGraph.AddDependency(rel.Uniq(), dep.Uniq())
-		}
-	}
-
-	err := dependenciesGraph.Build()
-	if err != nil {
-		return nil, err
-	}
-
-	return dependenciesGraph, nil
-}
-
 func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 	res := make(map[string]*parallel.WaitGroup)
 
@@ -110,7 +87,7 @@ func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 }
 
 func (p *Plan) syncReleases(ctx context.Context) (err error) {
-	parallelLimit := p.getParallelLimit(ctx)
+	parallelLimit := p.ParallelLimiter(ctx)
 
 	monitorsLockMap := p.body.generateMonitorsLockMap()
 	monitorsCtx, monitorsCancel := context.WithCancel(ctx)
@@ -375,12 +352,4 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	}
 
 	return nil
-}
-
-func (p *Plan) kubedogSyncSpecs(kubedogConfig *kubedog.Config) (multitrack.MultitrackSpecs, string, error) {
-	return p.kubedogSpecs(kubedogConfig, p.kubedogSyncManifest)
-}
-
-func (p *Plan) kubedogSyncManifest(rel release.Config) (string, error) {
-	return p.manifests[rel.Uniq()], nil
 }

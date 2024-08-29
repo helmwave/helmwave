@@ -141,14 +141,32 @@ func New(dir string) *Plan {
 }
 
 func (p *Plan) Graph() *dependency.Graph[uniqname.UniqName, release.Config] {
-	if p.graph == nil {
-		graph, err := p.body.generateDependencyGraph()
-		if err != nil {
-			p.Logger().Fatal(err)
-		}
-
-		return graph
+	graph, err := p.body.generateDependencyGraph()
+	if err != nil {
+		p.Logger().Fatal(err)
 	}
 
-	return p.graph
+	return graph
+}
+
+func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
+	graph := dependency.NewGraph[uniqname.UniqName, release.Config]()
+
+	for _, rel := range p.Releases {
+		err := graph.NewNode(rel.Uniq(), rel)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, dep := range rel.DependsOn() {
+			graph.AddDependency(rel.Uniq(), dep.Uniq())
+		}
+	}
+
+	err := graph.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	return graph, nil
 }
