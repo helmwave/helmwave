@@ -1,0 +1,6 @@
+kind: New feature
+body: New binary for gitops, that which returns only manifests
+time: 2024-08-30T19:53:34.759009+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""
