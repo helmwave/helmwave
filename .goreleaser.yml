@@ -455,7 +455,7 @@ changelog:
       - "^chore"
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 
 release:
   name_template: "v{{ .Version }}"
