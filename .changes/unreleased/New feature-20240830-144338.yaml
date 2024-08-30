@@ -1,0 +1,6 @@
+kind: New feature
+body: ' Allow --parallel-limit for building manifests'
+time: 2024-08-30T14:43:38.235646+03:00
+custom:
+  Author: zhilyaev
+  Issue: "940"
