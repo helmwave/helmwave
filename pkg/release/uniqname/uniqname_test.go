@@ -16,6 +16,8 @@ func (s *ValidateTestSuite) TestGood() {
 		"my@test@context",
 		"my-release@test-1@context-1",
 		"my-release@test-1@gke_project_asia-southeast1_cluster-name",
+		"istio-ingress-resources@istio-system@gate.k8s-stage",
+		"mysql@mysql-operator@path/to/agent/project:agent-name",
 	}
 
 	for _, d := range data {
@@ -27,6 +29,8 @@ func (s *ValidateTestSuite) TestGood() {
 func (s *ValidateTestSuite) TestBad() {
 	data := []string{
 		"my-release",
+		"my.release",
+		"my.release@my.ns",
 		"my",
 		"my@-",
 		"my@ ",
