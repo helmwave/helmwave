@@ -1,0 +1,6 @@
+kind: Fixed
+body: allow use dot in kubecontext
+time: 2024-08-30T19:13:57.1751+03:00
+custom:
+  Author: zhilyaev
+  Issue: "939"
