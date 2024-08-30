@@ -32,10 +32,12 @@ builds:
       - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{ .Version }}
   - <<: *bin
     main: ./cmd/schema
-    id: "schema"
+    id: schema
+    binary: schema
   - <<: *bin
     main: ./cmd/gitops
-    id: "gitops"
+    id: gitops
+    binary: gitops
 
 ###
 # Packages
