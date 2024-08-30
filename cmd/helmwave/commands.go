@@ -21,6 +21,7 @@ var commands = []*cli.Command{
 	new(action.Yml).Cmd(),
 	new(action.GenSchema).Cmd(),
 	new(action.Graph).Cmd(),
+	new(action.Manifests).Cmd(),
 	version(),
 	completion(),
 }
