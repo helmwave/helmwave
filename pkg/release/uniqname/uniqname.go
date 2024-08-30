@@ -11,7 +11,7 @@ const Separator = "@"
 
 var (
 	NamespaceRegexp   = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
-	KubecontextRegexp = regexp.MustCompile("^[a-z0-9]([-_:/a-z0-9]*[a-z0-9])?$")
+	KubecontextRegexp = regexp.MustCompile("^[a-z0-9]([-_.:/a-z0-9]*[a-z0-9])?$")
 	ReleaseRegexp     = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
 )
 
