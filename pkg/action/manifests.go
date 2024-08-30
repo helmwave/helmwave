@@ -68,7 +68,7 @@ func (l *Manifests) flags() []cli.Flag {
 		&cli.StringSliceFlag{
 			Name:     "uniqnames",
 			Aliases:  []string{"u"},
-			Usage:    "show manifest only for specific release: -u nginx@namespace -u nginx@namespace,redis@namespace",
+			Usage:    "show manifest only for specific release: -u nginx@namespace -u nginx@ns,redis@ns",
 			Category: "SELECTION",
 			EnvVars:  EnvVars("UNIQNAMES"),
 		},
