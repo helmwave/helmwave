@@ -9,6 +9,7 @@ dist/
 helmwave.yml
 .helmwave
 schema
+gitops
 
 tests.cov
 

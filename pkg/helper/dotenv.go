@@ -1,4 +1,4 @@
-package main
+package helper
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func dotenv() {
+func Dotenv() {
 	if _, err := os.Stat(".env"); err == nil {
 		err = godotenv.Load()
 		if err != nil {

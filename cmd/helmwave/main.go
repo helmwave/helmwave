@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/helper"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,7 +17,7 @@ import (
 )
 
 func main() {
-	dotenv()
+	helper.Dotenv()
 
 	c := CreateApp()
 

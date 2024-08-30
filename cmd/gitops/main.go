@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/helmwave/helmwave/pkg/helper"
 	"log"
 	"os"
 
@@ -10,8 +11,10 @@ import (
 )
 
 func main() {
+	helper.Dotenv()
+
 	c := cli.NewApp()
-	c.Usage = "just generates json schema for helmwave support"
+	c.Usage = "just generates manifests"
 	c.Commands = commands
 	c.Version = helmwave.Version
 
@@ -21,5 +24,5 @@ func main() {
 }
 
 var commands = []*cli.Command{
-	new(action.GenSchema).Cmd(),
+	new(action.Manifests).Cmd(),
 }

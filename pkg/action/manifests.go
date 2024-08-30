@@ -3,6 +3,8 @@ package action
 import (
 	"context"
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"os"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
@@ -22,6 +24,14 @@ type Manifests struct {
 //
 //nolint:forbidigo
 func (l *Manifests) Run(ctx context.Context) error {
+	l.disable()
+
+	if l.autoBuild {
+		if err := l.build.Run(ctx); err != nil {
+			return err
+		}
+	}
+
 	p, err := plan.NewAndImport(ctx, l.build.plandir)
 	if err != nil {
 		return err
@@ -49,12 +59,11 @@ func (l *Manifests) Run(ctx context.Context) error {
 // Cmd returns 'status' *cli.Command.
 func (l *Manifests) Cmd() *cli.Command {
 	return &cli.Command{
-		Name:     "manifests",
-		Aliases:  []string{"manifest"},
-		Category: Step1,
-		Usage:    "show only manifests",
-		Flags:    l.flags(),
-		Action:   toCtx(l.Run),
+		Name:    "manifests",
+		Aliases: []string{"manifest"},
+		Usage:   "show only manifests",
+		Flags:   l.flags(),
+		Action:  toCtx(l.Run),
 	}
 }
 
@@ -68,7 +77,7 @@ func (l *Manifests) flags() []cli.Flag {
 		&cli.StringSliceFlag{
 			Name:     "uniqnames",
 			Aliases:  []string{"u"},
-			Usage:    "show manifest only for specific release: -u nginx@namespace -u nginx@ns,redis@ns",
+			Usage:    "show manifest in the plan only for specific release: -u nginx@namespace -u nginx@ns,redis@ns",
 			Category: "SELECTION",
 			EnvVars:  EnvVars("UNIQNAMES"),
 		},
@@ -85,3 +94,8 @@ func (l *Manifests) flags() []cli.Flag {
 //
 //	return r
 //}
+
+func (l *Manifests) disable() {
+	// l.build.options.GraphWidth = 1
+	log.SetOutput(os.Stderr)
+}
