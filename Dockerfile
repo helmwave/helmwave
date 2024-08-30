@@ -32,7 +32,7 @@ COPY --chown=root:root --chmod=0775 --from=bitnami/kubectl:latest /opt/bitnami/k
 FROM base-release as goreleaser
 COPY ${PROJECT} /bin/
 
-### Debug tag
+### Debug tag, just manually
 FROM base-debug-release as debug-goreleaser
 COPY ${PROJECT} /bin/
 
