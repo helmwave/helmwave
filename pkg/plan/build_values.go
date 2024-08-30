@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 )
 
 func (p *Plan) buildValues(ctx context.Context) error {
@@ -15,20 +15,16 @@ func (p *Plan) buildValues(ctx context.Context) error {
 		return err
 	}
 
-	ch := p.Graph().Run()
-	wg := parallel.NewWaitGroup()
-	limiter := p.ParallelLimiter(ctx)
-	wg.Add(limiter)
+	limit := p.ParallelLimiter(ctx)
+	wg, ctx := errgroup.WithContext(ctx)
+	wg.SetLimit(limit)
 
-	for range limiter {
-		go func() {
-			for n := range ch {
-				wg.ErrChan() <- p.buildReleaseValues(ctx, n.Data)
-			}
-			wg.Done()
-		}()
+	for _, rel := range p.body.Releases {
+		wg.Go(func() error {
+			return p.buildReleaseValues(ctx, rel)
+		})
 	}
-
+	//nolint:wrapcheck
 	return wg.Wait()
 }
 

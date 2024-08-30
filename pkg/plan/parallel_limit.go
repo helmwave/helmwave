@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+
 	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -30,7 +31,7 @@ func ParallelLimit(ctx context.Context, releases release.Configs) int {
 	return limit
 }
 
-//func (p *Plan) parallelWorker(ctx context.Context, fn func(any)) {
+// func (p *Plan) parallelWorker(ctx context.Context, fn func(any)) {
 //	ch := p.Graph().Run()
 //	wg := parallel.NewWaitGroup()
 //	limiter := p.ParallelLimiter(ctx)

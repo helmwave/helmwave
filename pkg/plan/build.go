@@ -47,9 +47,7 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 	return
 }
 
-func (p *Plan) build(ctx context.Context, o BuildOptions) error {
-	var err error
-
+func (p *Plan) build(ctx context.Context, o BuildOptions) (err error) {
 	p.body.Releases, err = p.buildReleases(ctx, o)
 	if err != nil {
 		return err
@@ -65,7 +63,7 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) error {
 		return err
 	}
 
-	err = SyncRepositories(ctx, p.body.Repositories)
+	err = p.syncRepositories(ctx)
 	if err != nil {
 		return err
 	}

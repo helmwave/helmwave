@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/release/dependency"
 	"os"
 	"path/filepath"
+
+	"github.com/helmwave/helmwave/pkg/release/dependency"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
@@ -48,7 +49,6 @@ type Plan struct {
 
 	manifests map[uniqname.UniqName]string
 	unchanged release.Configs
-	graph     *dependency.Graph[uniqname.UniqName, release.Config]
 }
 
 // NewAndImport wrapper for New and Import in one.
