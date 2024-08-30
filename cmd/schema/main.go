@@ -11,11 +11,12 @@ import (
 
 func main() {
 	c := cli.NewApp()
+	c.Usage = "just generate json schema for helmwave support"
 	c.Commands = commands
 	c.Version = helmwave.Version
 
 	if err := c.Run(os.Args); err != nil {
-		log.Fatal(err) //nolint:gocritic // we try to recover panics, not regular command errors
+		log.Fatal(err)
 	}
 }
 

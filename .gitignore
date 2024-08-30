@@ -8,6 +8,7 @@ dist/
 /helmwave.yml.tpl
 helmwave.yml
 .helmwave
+schema
 
 tests.cov
 
