@@ -21,7 +21,7 @@ jobs:
           # https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/triggering-a-workflow#triggering-a-workflow-from-a-workflow
           github-token: ${{ secrets.PAT }}
           script: |-2
-            const tag = context.payload.pull_request.head.ref.replace("release/", "v");
+            const tag = context.payload.pull_request.head.ref.replace("release/", "v")
             const ref = {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -29,20 +29,7 @@ jobs:
                 sha: context.payload.pull_request.merge_commit_sha,
             }
           
-            try {
-              await github.rest.git.getRef(ref);
-              await github.rest.git.updateRef({...ref, force: true});
-              console.log("tag has been updated");
-          
-            } catch (err) {
-              if (err.status === 404) {
-                await github.rest.git.createRef(ref);
-                console.log("tag has been created");
-              } else {
-                console.log("just error");
-                throw err;
-              }
-            }
+            await github.rest.git.createRef(ref)
 
           result-encoding: string
           retry-exempt-status-codes: 400,401
