@@ -3,7 +3,6 @@ name: Go lint
 on:
   push:
     branches: [ "main", "release/*" ]
-    branches-ignore: [ "changelog/*" ]
     paths:
       - "**.go"
       - go.mod

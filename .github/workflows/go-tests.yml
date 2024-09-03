@@ -3,7 +3,6 @@ name: Go Test
 on:
   pull_request:
     branches: [ "main", "release/*" ]
-    branches-ignore: [ "changelog/*" ]
     # You can't use yaml anchors here
     paths:
       - "**.go"
@@ -13,7 +12,6 @@ on:
 
   push:
     branches: [ "main", "release/*" ]
-    branches-ignore: [ "changelog/*" ]
     paths:
       - "**.go"
       - "go.mod"
