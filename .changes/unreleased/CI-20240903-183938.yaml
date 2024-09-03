@@ -1,6 +1,0 @@
-kind: CI
-body: split goreleaser.yml
-time: 2024-09-03T18:39:38.768495+03:00
-custom:
-  Author: zhilyaev
-  Issue: ""
