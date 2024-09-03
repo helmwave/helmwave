@@ -1,4 +1,4 @@
-name: Create new tag base on release branch
+name: Create new tag
 
 on:
   pull_request:
@@ -18,7 +18,8 @@ jobs:
         id: create
         uses: actions/github-script@v7
         with:
-          github-token: ${{ github.token }}
+          # https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/triggering-a-workflow#triggering-a-workflow-from-a-workflow
+          github-token: ${{ secrets.PAT }}
           script: |
             const tag = context.payload.pull_request.head.ref.replace("release/", "v")
             try {
