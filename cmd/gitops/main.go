@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/helmwave/helmwave/pkg/helper"
 	"log"
 	"os"
+
+	"github.com/helmwave/helmwave/pkg/helper"
 
 	"github.com/helmwave/helmwave/pkg/action"
 	helmwave "github.com/helmwave/helmwave/pkg/version"
