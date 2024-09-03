@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # to create new tag
-    if: startsWith(github.event.pull_request.head.ref, 'release/')
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') }}
     steps:
       - name: Create tag
         id: create
