@@ -40,6 +40,12 @@ jobs:
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
 
+      - uses: wow-actions/use-app-token@v2
+        id: token
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
@@ -50,6 +56,6 @@ jobs:
           version: latest
           args: release --skip=validate --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
+          GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
           TELEGRAM_TOKEN: ${{ secrets.BOT_TOKEN }}

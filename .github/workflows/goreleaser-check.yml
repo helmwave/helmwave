@@ -2,9 +2,7 @@ name: Test GoReleaser config
 
 on:
   pull_request:
-    branches:
-      - main
-      - "release/*"
+    branches: [ "main", "release/*" ]
     paths:
       - ".goreleaser.yml"
 

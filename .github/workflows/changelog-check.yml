@@ -2,9 +2,7 @@ name: Check changelog
 
 on:
   pull_request:
-    branches:
-      - "main"
-      - "release/*"
+    branches: [ "main", "release/*" ]
 
 
 jobs:
