@@ -1,5 +1,13 @@
 version: 2
 
+metadata:
+  homepage: "https://helmwave.app/"
+  maintainers:
+    - "Dmitrii Zhiliaev"
+    - "Sviatoslav Dumchenko"
+  license: "MIT"
+  description: "Helmwave is true release management for helm"
+
 before:
   hooks:
     - go mod tidy
