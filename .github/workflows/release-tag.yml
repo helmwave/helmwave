@@ -27,23 +27,24 @@ jobs:
                 repo: context.repo.repo,
                 ref: 'refs/tags/' + tag,
                 sha: context.payload.pull_request.merge_commit_sha,
-                force: true,
             }
           
             try {
-              const r = await github.rest.git.createRef(ref)
-              console.log("tag has been created")
+              await github.rest.git.getRef(ref);
+              await github.rest.git.updateRef({...ref, force: true});
+              console.log("tag has been updated");
+          
             } catch (err) {
-              if (err.status == 422) { 
-                await github.rest.git.updateRef(ref) 
-                console.log("tag has been updated")
-              }
-              else { 
-                console.log("just error")
-                throw error
+              if (err.status === 404) {
+                await github.rest.git.createRef(ref);
+                console.log("tag has been created");
+              } else {
+                console.log("just error");
+                throw err;
               }
             }
 
           result-encoding: string
+          retry-exempt-status-codes: 400,401
           debug: true
 
