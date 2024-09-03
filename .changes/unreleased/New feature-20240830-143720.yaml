@@ -1,0 +1,6 @@
+kind: New feature
+body: Allow --parallel-limit for building release values
+time: 2024-08-30T14:37:20.67097+03:00
+custom:
+  Author: zhlyaev
+  Issue: "940"

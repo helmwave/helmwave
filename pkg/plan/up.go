@@ -3,29 +3,22 @@ package plan
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/gofrs/flock"
-	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/parallel"
-	regi "github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/dependency"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"github.com/werf/kubedog/pkg/kube"
 	"github.com/werf/kubedog/pkg/tracker"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 	"golang.org/x/exp/maps"
-	helmRepo "helm.sh/helm/v3/pkg/repo"
 )
 
 // Up syncs repositories and releases.
@@ -47,7 +40,7 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 	}()
 
 	log.Info("🗄 sync repositories...")
-	err = SyncRepositories(ctx, p.body.Repositories)
+	err = p.syncRepositories(ctx)
 	if err != nil {
 		return
 	}
@@ -75,122 +68,6 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 	return
 }
 
-func (p *Plan) syncRegistries(ctx context.Context) (err error) {
-	wg := parallel.NewWaitGroup()
-	wg.Add(len(p.body.Registries))
-
-	for i := range p.body.Registries {
-		go func(wg *parallel.WaitGroup, reg regi.Config) {
-			defer wg.Done()
-			err := reg.Install()
-			if err != nil {
-				wg.ErrChan() <- err
-			}
-		}(wg, p.body.Registries[i])
-	}
-
-	if err := wg.WaitWithContext(ctx); err != nil {
-		return err
-	}
-
-	return err
-}
-
-// SyncRepositories initializes helm repository.yaml file with flock and installs provided repositories.
-func SyncRepositories(ctx context.Context, repositories repo.Configs) error {
-	log.Trace("🗄 helm repository.yaml: ", helper.Helm.RepositoryConfig)
-
-	// Create if not exists
-	if !helper.IsExists(helper.Helm.RepositoryConfig) {
-		f, err := helper.CreateFile(helper.Helm.RepositoryConfig)
-		if err != nil {
-			return err
-		}
-		if err := f.Close(); err != nil {
-			return fmt.Errorf("failed to close fresh helm repository.yaml: %w", err)
-		}
-	}
-
-	// we need to get a flock first
-	lockPath := helper.Helm.RepositoryConfig + ".lock"
-	fileLock := flock.New(lockPath)
-	lockCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
-	defer cancel()
-
-	// We need to unlock in deferred mode in case of any other errors returned
-	defer func(fileLock *flock.Flock) {
-		err := fileLock.Unlock()
-		if err != nil {
-			log.Errorf("failed to release flock %s: %v", fileLock.Path(), err)
-		}
-	}(fileLock)
-
-	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
-	if err != nil && !locked {
-		return fmt.Errorf("failed to get lock %s: %w", fileLock.Path(), err)
-	}
-
-	f, err := helmRepo.LoadFile(helper.Helm.RepositoryConfig)
-	if err != nil {
-		return fmt.Errorf("failed to load helm repositories file: %w", err)
-	}
-
-	// We can't parallel repositories installation as helm manages single repositories.yaml.
-	// To prevent data race, we need to either make helm use futex or not parallel at all
-	for i := range repositories {
-		err := repositories[i].Install(ctx, helper.Helm, f)
-		if err != nil {
-			return fmt.Errorf("failed to install %s repository: %w", repositories[i].Name(), err)
-		}
-	}
-
-	err = f.WriteFile(helper.Helm.RepositoryConfig, os.FileMode(0o644))
-	if err != nil {
-		return fmt.Errorf("failed to write repositories file: %w", err)
-	}
-
-	// If we haven't met any errors yet unlock the repository file. Deferred unlock will exit quickly after this.
-	if err := fileLock.Unlock(); err != nil {
-		return fmt.Errorf("failed to unlock %s: %w", fileLock.Path(), err)
-	}
-
-	return nil
-}
-
-func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
-	dependenciesGraph := dependency.NewGraph[uniqname.UniqName, release.Config]()
-
-	for _, rel := range p.Releases {
-		err := dependenciesGraph.NewNode(rel.Uniq(), rel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, dep := range rel.DependsOn() {
-			dependenciesGraph.AddDependency(rel.Uniq(), dep.Uniq())
-		}
-	}
-
-	err := dependenciesGraph.Build()
-	if err != nil {
-		return nil, err
-	}
-
-	return dependenciesGraph, nil
-}
-
-func getParallelLimit(ctx context.Context, releases release.Configs) int {
-	parallelLimit, ok := clictx.GetFlagFromContext(ctx, "parallel-limit").(int)
-	if !ok {
-		parallelLimit = 0
-	}
-	if parallelLimit == 0 {
-		parallelLimit = len(releases)
-	}
-
-	return parallelLimit
-}
-
 func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 	res := make(map[string]*parallel.WaitGroup)
 
@@ -210,25 +87,13 @@ func (p *planBody) generateMonitorsLockMap() map[string]*parallel.WaitGroup {
 }
 
 func (p *Plan) syncReleases(ctx context.Context) (err error) {
-	dependenciesGraph, err := p.body.generateDependencyGraph()
-	if err != nil {
-		return err
-	}
-
-	parallelLimit := getParallelLimit(ctx, p.body.Releases)
-
-	const msg = "Deploying releases with limited parallelization"
-	if parallelLimit == len(p.body.Releases) {
-		log.WithField("limit", parallelLimit).Debug(msg)
-	} else {
-		log.WithField("limit", parallelLimit).Info(msg)
-	}
+	parallelLimit := p.ParallelLimiter(ctx)
 
 	monitorsLockMap := p.body.generateMonitorsLockMap()
 	monitorsCtx, monitorsCancel := context.WithCancel(ctx)
 	defer monitorsCancel()
 
-	releasesNodesChan := dependenciesGraph.Run()
+	releasesNodesChan := p.Graph().Run()
 
 	releasesWG := parallel.NewWaitGroup()
 	releasesWG.Add(parallelLimit)
@@ -487,12 +352,4 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 	}
 
 	return nil
-}
-
-func (p *Plan) kubedogSyncSpecs(kubedogConfig *kubedog.Config) (multitrack.MultitrackSpecs, string, error) {
-	return p.kubedogSpecs(kubedogConfig, p.kubedogSyncManifest)
-}
-
-func (p *Plan) kubedogSyncManifest(rel release.Config) (string, error) {
-	return p.manifests[rel.Uniq()], nil
 }

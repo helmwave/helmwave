@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/helmwave/helmwave/pkg/release/dependency"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -15,7 +17,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/pkg/version"
-	"github.com/invopop/jsonschema"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -94,18 +95,6 @@ type planBody struct {
 	Lifecycle    hooks.Lifecycle  `yaml:"lifecycle" json:"lifecycle" jsonschema:"title=lifecycle,description=helmwave lifecycle hooks"`
 }
 
-func GenSchema() *jsonschema.Schema {
-	r := &jsonschema.Reflector{
-		DoNotReference:             true,
-		RequiredFromJSONSchemaTags: true,
-	}
-
-	schema := r.Reflect(&planBody{})
-	schema.AdditionalProperties = jsonschema.TrueSchema // to allow anchors at the top level
-
-	return schema
-}
-
 // NewBody parses plan from file.
 func NewBody(_ context.Context, file string, validate bool) (*planBody, error) {
 	b := &planBody{
@@ -149,4 +138,35 @@ func New(dir string) *Plan {
 	}
 
 	return plan
+}
+
+func (p *Plan) Graph() *dependency.Graph[uniqname.UniqName, release.Config] {
+	graph, err := p.body.generateDependencyGraph()
+	if err != nil {
+		p.Logger().Fatal(err)
+	}
+
+	return graph
+}
+
+func (p *planBody) generateDependencyGraph() (*dependency.Graph[uniqname.UniqName, release.Config], error) {
+	graph := dependency.NewGraph[uniqname.UniqName, release.Config]()
+
+	for _, rel := range p.Releases {
+		err := graph.NewNode(rel.Uniq(), rel)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, dep := range rel.DependsOn() {
+			graph.AddDependency(rel.Uniq(), dep.Uniq())
+		}
+	}
+
+	err := graph.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	return graph, nil
 }

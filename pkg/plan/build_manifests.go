@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/helmwave/helmwave/pkg/parallel"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
 )
@@ -13,21 +14,23 @@ import (
 func (p *Plan) buildManifest(ctx context.Context) error {
 	log.Info("🔨 Building manifests...")
 
-	wg := parallel.NewWaitGroup()
-	wg.Add(len(p.body.Releases))
+	wg, ctx := errgroup.WithContext(ctx)
+	wg.SetLimit(p.ParallelLimiter(ctx))
 
 	mu := &sync.Mutex{}
 
 	for _, rel := range p.body.Releases {
-		go p.buildReleaseManifest(ctx, wg, rel, mu)
+		wg.Go(
+			func() error {
+				return p.buildReleaseManifest(ctx, rel, mu)
+			})
 	}
 
+	//nolint:wrapcheck
 	return wg.Wait()
 }
 
-func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup, rel release.Config, mu *sync.Mutex) {
-	defer wg.Done()
-
+func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu *sync.Mutex) error {
 	l := rel.Logger()
 
 	if err := rel.ChartDepsUpd(); err != nil {
@@ -37,9 +40,8 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup,
 	r, err := rel.SyncDryRun(ctx, true)
 	if err != nil || r == nil {
 		l.Errorf("❌ can't get manifests: %v", err)
-		wg.ErrChan() <- err
 
-		return
+		return err
 	}
 
 	hm := ""
@@ -61,4 +63,6 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, wg *parallel.WaitGroup,
 	mu.Unlock()
 
 	l.Info("✅  manifest done")
+
+	return nil
 }

@@ -41,7 +41,7 @@ Just install this tool
 
 ## How to build?
 
-https://helmwave.github.io/docs/0.17.x/install/#compile-from-source
+https://docs.helmwave.app/latest/install/#compile-from-source
 
 ## Pre commit
 

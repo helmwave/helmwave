@@ -28,6 +28,12 @@ func EnvVars(names ...string) []string {
 func GlobalFlags() (r []cli.Flag) {
 	r = []cli.Flag{
 		flagCancel(),
+		&cli.IntFlag{
+			Name:    "parallel-limit",
+			Usage:   "limit amount of parallel releases",
+			EnvVars: EnvVars("PARALLEL_LIMIT"),
+			Value:   0,
+		},
 	}
 
 	r = append(r, cache.Default.Flags()...)

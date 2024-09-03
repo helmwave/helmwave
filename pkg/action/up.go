@@ -81,12 +81,6 @@ func (i *Up) flags() []cli.Flag {
 			EnvVars:     EnvVars("PROGRESS"),
 			Destination: &helper.Helm.Debug,
 		},
-		&cli.IntFlag{
-			Name:    "parallel-limit",
-			Usage:   "limit amount of parallel releases",
-			EnvVars: EnvVars("PARALLEL_LIMIT"),
-			Value:   0,
-		},
 	}
 
 	self = append(self, flagsKubedog(i.dog)...)
