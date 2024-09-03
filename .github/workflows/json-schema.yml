@@ -1,0 +1,20 @@
+name: JSON Schema
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    container:
+      # I hate gha, Cause I can't pass variables to image tag with string manipulation.
+      image: ghcr.io/${{ github.repository }}:latest
+    steps:
+      - name: generate schema
+        run: helmwave schema > schema.json
+      - name: upload schema.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema.json
+          path: schema.json
