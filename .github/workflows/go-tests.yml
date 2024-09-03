@@ -4,21 +4,22 @@ on:
   pull_request:
     branches:
       - main
-    paths:
+      - "release/*"
+    paths: &files
       - "**.go"
       - "go.mod"
       - "go.sum"
+      - .github/workflows/go-tests.yml
+
   push:
     branches:
       - main
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
+    paths: *files
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
     steps:
       - name: Create KinD cluster
         uses: container-tools/kind-action@v2
@@ -37,15 +38,12 @@ jobs:
         run: go mod download
 
       - name: Run unit tests
-        if: github.actor == 'dependabot[bot]'
         run: go test -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
 
       - name: Run all tests
-        if: github.actor != 'dependabot[bot]'
         run: go test -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
 
       - uses: codecov/codecov-action@v4
-        if: github.actor != 'dependabot[bot]'
         with:
           files: ./tests.cov
           fail_ci_if_error: true
