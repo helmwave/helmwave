@@ -2,6 +2,7 @@ name: yamllint
 
 on:
   push:
+    branches: [ "main", "release/*" ]
     paths:
       - "**.yaml"
       - "**.yml"

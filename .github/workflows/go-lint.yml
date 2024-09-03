@@ -2,6 +2,7 @@ name: Go lint
 
 on:
   push:
+    branches: [ "main", "release/*" ]
     paths:
       - "**.go"
       - go.mod
