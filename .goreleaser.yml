@@ -326,7 +326,7 @@ docker_manifests:
 ###
 
 changelog:
-  disable: false
+  disable: true
   use: github
   sort: asc
 
