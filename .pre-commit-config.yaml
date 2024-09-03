@@ -7,6 +7,11 @@ repos:
       - id: go-mod-tidy
 
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v2.3.0
+    rev: v3.4.0
     hooks:
       - id: conventional-pre-commit
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
