@@ -1,8 +1,8 @@
 name: Container analysis
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [ published ]
   schedule:
     - cron: "44 10 * * 6"
 
@@ -13,6 +13,8 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Trivy
         continue-on-error: true
