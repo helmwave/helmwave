@@ -1,14 +1,5 @@
 version: 2
 
-metadata:
-
-  homepage: &homepage "https://helmwave.app/"
-  maintainers: &maintainers
-    - "Dmitrii Zhiliaev"
-    - "Sviatoslav Dumchenko"
-  license: &license "MIT"
-  description: &desc "Helmwave is true release management for helm"
-
 before:
   hooks:
     - go mod tidy
@@ -67,20 +58,20 @@ archives:
 
 
 nfpms:
-  - id: helmwave
+  - &nfpms
+    id: helmwave
+    maintainer: community@helmwave.app
     builds: [ helmwave ]
     formats:
       - apk
       - deb
       - rpm
 
-  - id: gitops
+  - <<: *nfpms
+    id: gitops
     package_name: gitops
     builds: [ gitops ]
-    formats:
-      - apk
-      - deb
-      - rpm
+
 
 checksum:
   name_template: "checksums.txt"
@@ -387,9 +378,9 @@ brews:
       pull_request:
         enabled: false
     goamd64: v1
-    homepage: *homepage
-    description: *desc
-    license: *license
+    homepage: https://helmwave.app/
+    description: "Helmwave is true release management for helm"
+    license: MIT
     directory: Formula
     skip_upload: auto
 
@@ -404,6 +395,8 @@ milestones:
   - close: true
     fail_on_error: false
     name_template: "{{ .Tag }}"
+
+report_sizes: true
 
 ###
 # Announces
