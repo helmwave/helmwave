@@ -22,19 +22,16 @@ jobs:
           github-token: ${{ secrets.PAT }}
           script: |
             const tag = context.payload.pull_request.head.ref.replace("release/", "v")
-            try {
-              await github.rest.git.deleteRef({
+            const ref = {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 ref: "refs/tags/" + tag,
-              })
-            } catch {
+                sha: context.payload.pull_request.merge_commit_sha,
             }
-            await github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: "refs/tags/" + tag,
-              sha: context.payload.pull_request.merge_commit_sha,
+            
+            github.rest.git.createRef(ref).catch(err => {
+              if (err.status !== 422) throw err;
+              github.rest.git.updateRef(ref);
             })
-            return tag
           result-encoding: string
+
