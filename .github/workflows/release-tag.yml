@@ -33,5 +33,4 @@ jobs:
 
           result-encoding: string
           retry-exempt-status-codes: 400,401
-          debug: true
 
