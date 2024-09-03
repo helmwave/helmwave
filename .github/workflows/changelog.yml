@@ -57,6 +57,12 @@ jobs:
           delete-branch: true
           title: "Changelog/${{ github.event.release.tag_name }}"
 
+      - uses: wow-actions/use-app-token@v2
+        id: token
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
       - uses: hmarr/auto-approve-action@v4
         with:
           pull-request-number: ${{ steps.pr.outputs.pull-request-number }}
+          github-token: ${{ steps.token.outputs.BOT_TOKEN }}
