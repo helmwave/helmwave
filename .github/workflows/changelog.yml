@@ -34,6 +34,11 @@ jobs:
           name: changelog
           path: .changes/${{ github.event.release.tag_name }}.md
 
+      - name: Update release notes
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release edit $TAG --notes-file .changes/$TAG.md
+
       - name: Merge changelog
         run: changie merge
 
