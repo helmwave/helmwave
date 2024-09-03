@@ -19,4 +19,4 @@ jobs:
           yamllint_config_filepath: .yamllint.yaml
           yamllint_comment: true
         env:
-          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ github.token }}

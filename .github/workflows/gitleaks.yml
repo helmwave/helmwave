@@ -18,7 +18,7 @@ jobs:
 
       - uses: gitleaks/gitleaks-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           # Only required for Organizations, not personal accounts.
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
           

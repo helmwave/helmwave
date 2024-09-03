@@ -37,6 +37,7 @@ jobs:
       - name: Update release notes
         env:
           TAG: ${{ github.event.release.tag_name }}
+          GH_TOKEN: ${{ github.token }}
         run: gh release edit $TAG --notes-file .changes/$TAG.md
 
       - name: Merge changelog
