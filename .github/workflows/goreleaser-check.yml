@@ -4,11 +4,12 @@ on:
   pull_request:
     branches:
       - main
+      - "release/*"
     paths:
       - ".goreleaser.yml"
 
 jobs:
-  goreleaser:
+  goreleaser-check:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Test GoReleaser
+      - name: GoReleaser check
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest

@@ -20,9 +20,6 @@ builds:
       # Go can build using different instruction sets - https://github.com/golang/go/wiki/MinimumRequirements#amd64
       # We don't really need this type of optimization (limiting CPUs helmwave can run on) so we use general v1.
       - v1
-      # - v2
-      # - v3
-      # - v4
     goos:
       - linux
       # - windows
@@ -30,10 +27,12 @@ builds:
     main: ./cmd/helmwave
     ldflags:
       - -s -w -X github.com/helmwave/helmwave/pkg/version.Version={{ .Version }}
-  - <<: *bin
-    main: ./cmd/schema
-    id: schema
-    binary: schema
+
+  #  - <<: *bin
+  #    main: ./cmd/schema
+  #    id: schema
+  #    binary: schema
+
   - <<: *bin
     main: ./cmd/gitops
     id: gitops
@@ -44,19 +43,35 @@ builds:
 ###
 
 archives:
-  - format: tar.gz
+  - &archive
+    builds: [ helmwave ]
+    id: helmwave
+    format: tar.gz
     format_overrides:
       - goos: windows
         format: zip
 
+  - <<: *archive
+    id: gitops
+    builds: [ gitops ]
+
+
+
 nfpms:
-  - homepage: https://helmwave.github.io/
-    license: MIT
-    maintainer: TBD
+  - &nfpms
+    id: helmwave
+    maintainer: community@helmwave.app
+    builds: [ helmwave ]
     formats:
       - apk
       - deb
       - rpm
+
+  - <<: *nfpms
+    id: gitops
+    package_name: gitops
+    builds: [ gitops ]
+
 
 checksum:
   name_template: "checksums.txt"
@@ -154,98 +169,6 @@ dockers:
       - "--platform=linux/arm64/v8"
       - "--target=goreleaser"
       - "--pull"
-    goos: linux
-    goarch: arm64
-    use: buildx
-
-  # schema
-  - dockerfile: Dockerfile
-    image_templates:
-      - ghcr.io/helmwave/schema:{{ .Version }}-scratch-amd64
-      - ghcr.io/helmwave/schema:scratch-amd64
-    build_flag_templates:
-      - "--label=org.opencontainers.image.description=Schema generator for helmwave"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.title=schema"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
-      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/schema"
-      - "--label=org.opencontainers.image.documentation=https://helmwave.app/"
-
-      - "--platform=linux/amd64"
-      - "--target=scratch-goreleaser"
-      - "--pull"
-      - "--build-arg=PROJECT=schema"
-    goos: linux
-    goarch: amd64
-    goamd64: v1
-    use: buildx
-  - dockerfile: Dockerfile
-    image_templates:
-      - ghcr.io/helmwave/schema:{{ .Version }}-scratch-arm64v8
-      - ghcr.io/helmwave/schema:scratch-arm64v8
-    build_flag_templates:
-      - "--label=org.opencontainers.image.description=Schema generator for helmwave"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.title=schema"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
-      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/schema"
-      - "--label=org.opencontainers.image.documentation=https://helmwave.app/"
-
-      - "--platform=linux/arm64/v8"
-      - "--target=scratch-goreleaser"
-      - "--pull"
-      - "--build-arg=PROJECT=schema"
-    goos: linux
-    goarch: arm64
-    use: buildx
-  - dockerfile: Dockerfile
-    image_templates:
-      - ghcr.io/helmwave/schema:{{ .Version }}-amd64
-      - ghcr.io/helmwave/schema:latest-amd64
-    build_flag_templates:
-      - "--label=org.opencontainers.image.description=Schema generator for helmwave"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.title=schema"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
-      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/schema"
-      - "--label=org.opencontainers.image.documentation=https://helmwave.app/"
-
-      - "--platform=linux/amd64"
-      - "--target=goreleaser"
-      - "--pull"
-      - "--build-arg=PROJECT=schema"
-    goos: linux
-    goarch: amd64
-    goamd64: v1
-    use: buildx
-  - dockerfile: Dockerfile
-    image_templates:
-      - ghcr.io/helmwave/schema:{{ .Version }}-arm64v8
-      - ghcr.io/helmwave/schema:latest-arm64v8
-    build_flag_templates:
-      - "--label=org.opencontainers.image.description=Schema generator for helmwave"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.title=schema"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.source=https://github.com/helmwave/helmwave"
-      - "--label=org.opencontainers.image.url=https://github.com/helmwave/helmwave/pkgs/container/schema"
-      - "--label=org.opencontainers.image.documentation=https://helmwave.app/"
-
-      - "--platform=linux/arm64/v8"
-      - "--target=goreleaser"
-      - "--pull"
-      - "--build-arg=PROJECT=schema"
     goos: linux
     goarch: arm64
     use: buildx
@@ -361,24 +284,6 @@ docker_manifests:
       - ghcr.io/helmwave/helmwave:latest-amd64
       - ghcr.io/helmwave/helmwave:latest-arm64v8
 
-  # schema: GitHub Container Registry
-  - name_template: ghcr.io/helmwave/schema:{{ .Version }}-scratch
-    image_templates:
-      - ghcr.io/helmwave/schema:{{ .Version }}-scratch-amd64
-      - ghcr.io/helmwave/schema:{{ .Version }}-scratch-arm64v8
-  - name_template: ghcr.io/helmwave/schema:scratch
-    image_templates:
-      - ghcr.io/helmwave/schema:scratch-amd64
-      - ghcr.io/helmwave/schema:scratch-arm64v8
-  - name_template: ghcr.io/helmwave/schema:{{ .Version }}
-    image_templates:
-      - ghcr.io/helmwave/schema:{{ .Version }}-amd64
-      - ghcr.io/helmwave/schema:{{ .Version }}-arm64v8
-  - name_template: ghcr.io/helmwave/schema:latest
-    image_templates:
-      - ghcr.io/helmwave/schema:latest-amd64
-      - ghcr.io/helmwave/schema:latest-arm64v8
-
   # gitops: GitHub Container Registry
   - name_template: ghcr.io/helmwave/gitops:{{ .Version }}-scratch
     image_templates:
@@ -465,16 +370,17 @@ release:
   prerelease: auto
 
 brews:
-  - repository:
+  - ids: [ helmwave ]
+    repository:
       owner: helmwave
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
       pull_request:
         enabled: false
     goamd64: v1
-    homepage: https://helmwave.app
+    homepage: https://helmwave.app/
     description: "Helmwave is true release management for helm"
-    license: "MIT"
+    license: MIT
     directory: Formula
     skip_upload: auto
 
@@ -489,6 +395,8 @@ milestones:
   - close: true
     fail_on_error: false
     name_template: "{{ .Tag }}"
+
+report_sizes: true
 
 ###
 # Announces

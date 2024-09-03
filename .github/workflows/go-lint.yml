@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - "**.go"
+      - go.mod
+      - go.sum
       - .github/workflows/go-lint.yml
       - .golangci.yml
 

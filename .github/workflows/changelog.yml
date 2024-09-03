@@ -1,0 +1,51 @@
+name: Changelog
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to commit merged changelog
+      pull-requests: write # to create PR
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Download changie
+        run: go install github.com/miniscruff/changie@v1
+
+      - name: Generate release changelog
+        run: changie batch $TAG --force
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+
+      - name: Upload changelog artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: .changes/${{ github.event.release.tag_name }}.md
+
+      - name: Merge changelog
+        run: changie merge
+
+      - name: Create Pull Request for changelog
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            CHANGELOG.md
+            .changes
+          commit-message: "chore: update changelog ${{ github.event.release.tag_name }}"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          branch: "changelog/${{ github.event.release.tag_name }}"
+          delete-branch: true
+          title: "Changelog/${{ github.event.release.tag_name }}"

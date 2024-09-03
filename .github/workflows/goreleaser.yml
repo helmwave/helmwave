@@ -1,120 +1,21 @@
 name: Goreleaser
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
   push:
     tags: ["v*"]
 
 jobs:
-  tagger:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # to create new tag
-    steps:
-      - name: Create tag
-        id: create
-        uses: actions/github-script@v7
-        if: github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/')
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const tag = context.payload.pull_request.head.ref.replace("release/", "v")
-            try {
-              await github.rest.git.deleteRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: "refs/tags/" + tag,
-              })
-            } catch {
-            }
-            await github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: "refs/tags/" + tag,
-              sha: context.payload.pull_request.merge_commit_sha,
-            })
-            return tag
-          result-encoding: string
-
-      - name: Get pushed tag
-        id: push
-        if: github.event_name == 'push'
-        run: echo "result=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-
-      - name: combine tags
-        id: combined
-        run: echo "tag=${PUSHED_TAG}${CREATED_TAG}" >> $GITHUB_OUTPUT
-        env:
-          CREATED_TAG: ${{ steps.create.outputs.result }}
-          PUSHED_TAG: ${{ steps.push.outputs.result }}
-    outputs:
-      tag: ${{ steps.combined.outputs.tag }}
-
-  generate-changelog:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # to commit merged changelog
-      pull-requests: write # to create PR
-    needs:
-      - tagger
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: main
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-
-      - name: Download changie
-        run: go install github.com/miniscruff/changie@v1
-
-      - name: Generate release changelog
-        run: changie batch $TAG --force
-        env:
-          TAG: ${{ needs.tagger.outputs.tag }}
-
-      - name: Upload changelog artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: changelog
-          path: .changes/${{ needs.tagger.outputs.tag }}.md
-
-      - name: Merge changelog
-        run: changie merge
-
-      - name: Create Pull Request for changelog
-        uses: peter-evans/create-pull-request@v6
-        with:
-          add-paths: |
-            CHANGELOG.md
-            .changes
-          commit-message: "chore: update changelog"
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          branch: "${{ needs.tagger.outputs.tag }}-changelog"
-          delete-branch: true
-          title: "chore: update changelog"
-
   goreleaser:
     runs-on: ubuntu-latest
     permissions:
       contents: write # to create release
       issues: write # to close milestone
       packages: write # to upload package
-    needs:
-      - tagger
-      - generate-changelog
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ needs.tagger.outputs.tag }}
+          ref: ${{ github.ref_name }}
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -143,50 +44,12 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Download changelog artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: changelog
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
-          args: release --skip=validate --clean --release-notes ${{ needs.tagger.outputs.tag }}.md
+          args: release --skip=validate --clean --release-notes ${{ github.ref_name }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
           TELEGRAM_TOKEN: ${{ secrets.BOT_TOKEN }}
-
-      - name: Generate schema.json
-        run: ./dist/helmwave_linux_amd64_v1/helmwave schema > schema.json
-
-      - name: Upload schema.json
-        uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: "schema.json"
-          update_latest_release: true
-
-  docs:
-    runs-on: ubuntu-latest
-    needs:
-      - tagger
-    steps:
-      - name: Trigger helmwave/docs workflow
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.PAT }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: "docs",
-              workflow_id: "generate-new-version.yml",
-              ref: "main",
-              inputs: {
-                tag: process.env.GITHUB_TAG,
-              },
-            })
-        env:
-          GITHUB_TAG: ${{ needs.tagger.outputs.tag }}

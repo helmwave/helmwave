@@ -1,0 +1,39 @@
+name: Create new tag base on release branch
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  tagger:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to create new tag
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') }}
+    steps:
+      - name: Create tag
+        id: create
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const tag = context.payload.pull_request.head.ref.replace("release/", "v")
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: "refs/tags/" + tag,
+              })
+            } catch {
+            }
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/" + tag,
+              sha: context.payload.pull_request.merge_commit_sha,
+            })
+            return tag
+          result-encoding: string
