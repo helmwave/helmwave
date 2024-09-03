@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/helper"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/helmwave/helmwave/pkg/helper"
 
 	"github.com/helmwave/helmwave/pkg/action"
 	"github.com/helmwave/helmwave/pkg/cache"

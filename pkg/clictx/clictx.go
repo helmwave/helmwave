@@ -11,7 +11,7 @@ type (
 	flagName string
 )
 
-var cliFlag = struct{}{}
+var cliFlag cli.Flag
 
 //nolint:fatcontext
 func CLIContextToContext(c *cli.Context) context.Context {
