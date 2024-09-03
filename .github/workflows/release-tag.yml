@@ -27,6 +27,7 @@ jobs:
                 repo: context.repo.repo,
                 ref: 'refs/tags/' + tag,
                 sha: context.payload.pull_request.merge_commit_sha,
+                force: true,
             }
           
             try {
@@ -44,4 +45,5 @@ jobs:
             }
 
           result-encoding: string
+          debug: true
 
