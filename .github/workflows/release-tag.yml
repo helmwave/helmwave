@@ -2,10 +2,8 @@ name: Create new tag
 
 on:
   pull_request:
-    branches:
-      - main
-    types:
-      - closed
+    branches: [ main ]
+    types: [ closed ]
 
 jobs:
   tagger:
@@ -14,9 +12,7 @@ jobs:
       contents: write # to create new tag
     if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') }}
     steps:
-      - name: Create tag
-        id: create
-        uses: actions/github-script@v7
+      - uses: actions/github-script@v7
         with:
           # https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/triggering-a-workflow#triggering-a-workflow-from-a-workflow
           github-token: ${{ secrets.PAT }}
@@ -30,7 +26,5 @@ jobs:
             }
           
             await github.rest.git.createRef(ref)
-
           result-encoding: string
-          retry-exempt-status-codes: 400,401
 
