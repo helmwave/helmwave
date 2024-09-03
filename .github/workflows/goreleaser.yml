@@ -48,7 +48,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
-          args: release --skip=validate --clean --release-notes ${{ github.ref_name }}.md
+          args: release --skip=validate --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CR_PAT }}
