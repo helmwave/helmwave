@@ -66,3 +66,8 @@ jobs:
         with:
           pull-request-number: ${{ steps.pr.outputs.pull-request-number }}
           github-token: ${{ steps.token.outputs.BOT_TOKEN }}
+
+#      - name: auto merge
+#        run: gh pr merge --merge ${{ steps.pr.outputs.pull-request-number }}
+#        env:
+#          GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
