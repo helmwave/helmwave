@@ -24,7 +24,7 @@ type Manifests struct {
 //
 //nolint:forbidigo
 func (l *Manifests) Run(ctx context.Context) error {
-	l.disable()
+	l.suppressOutput()
 
 	if l.autoBuild {
 		if err := l.build.Run(ctx); err != nil {
@@ -95,7 +95,7 @@ func (l *Manifests) flags() []cli.Flag {
 //	return r
 //}
 
-func (l *Manifests) disable() {
+func (l *Manifests) suppressOutput() {
 	// l.build.options.GraphWidth = 1
 	log.SetOutput(os.Stderr)
 }
