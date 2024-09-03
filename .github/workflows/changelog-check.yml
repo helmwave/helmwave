@@ -8,7 +8,6 @@ on:
 jobs:
   changelog-check:
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
     permissions:
       contents: read
     steps:

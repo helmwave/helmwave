@@ -12,7 +12,6 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
     steps:
       - uses: wow-actions/use-app-token@v2
         id: generate_token
