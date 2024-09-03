@@ -34,6 +34,7 @@ func (i *GenSchema) Cmd() *cli.Command {
 		Usage:    "generate json schema",
 		Flags:    i.flags(),
 		Action: func(c *cli.Context) error {
+			//nolint:staticcheck
 			return i.Run(nil)
 		},
 	}
