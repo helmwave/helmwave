@@ -5,7 +5,8 @@ on:
     branches:
       - main
       - "release/*"
-    paths: &files
+    # You can't use yaml anchors here
+    paths:
       - "**.go"
       - "go.mod"
       - "go.sum"
@@ -14,7 +15,11 @@ on:
   push:
     branches:
       - main
-    paths: *files
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - .github/workflows/go-tests.yml
 
 jobs:
   tests:
