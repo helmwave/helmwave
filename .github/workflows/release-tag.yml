@@ -1,4 +1,4 @@
-name: Create tag base on release branch
+name: Create new tag base on release branch
 
 on:
   pull_request:
