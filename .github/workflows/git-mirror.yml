@@ -3,8 +3,6 @@ name: Git mirror
 on:
   push:
     branches: [ main ]
-  delete:
-    branches: [ main ]
 
 jobs:
   sync:
