@@ -11,6 +11,7 @@ name: Hadolint
 on:
   push:
     branches: [ "main", "release/*" ]
+    branches-ignore: [ "changelog/*" ]
     paths: [ Dockerfile ]
   schedule:
     - cron: '37 1 * * 4'
