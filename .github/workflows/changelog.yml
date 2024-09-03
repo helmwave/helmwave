@@ -45,6 +45,7 @@ jobs:
 
       - name: Create Pull Request for changelog
         uses: peter-evans/create-pull-request@v6
+        id: pr
         with:
           add-paths: |
             CHANGELOG.md
@@ -55,3 +56,7 @@ jobs:
           branch: "changelog/${{ github.event.release.tag_name }}"
           delete-branch: true
           title: "Changelog/${{ github.event.release.tag_name }}"
+
+      - uses: hmarr/auto-approve-action@v4
+        with:
+          pull-request-number: ${{ steps.pr.outputs.pull-request-number }}
