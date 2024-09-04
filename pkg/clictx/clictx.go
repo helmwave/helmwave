@@ -9,9 +9,12 @@ import (
 
 type (
 	flagName string
+	cliKey   struct{}
 )
 
-var cliFlag cli.Flag
+var cliFlag = cliKey{}
+
+// var cliFlag cli.Flag
 
 //nolint:fatcontext
 func CLIContextToContext(c *cli.Context) context.Context {
