@@ -2,9 +2,9 @@ package clictx_test
 
 import (
 	"context"
-	"github.com/helmwave/helmwave/pkg/clictx"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,7 +25,7 @@ func (ts *CliCtxTestSuite) TestAddFlagToContext() {
 	ts.Require().Equal("testValue", value)
 }
 
-//func (ts *CliCtxTestSuite) TestAddAndRetrieveCLIContext(t *testing.T) {
+// func (ts *CliCtxTestSuite) TestAddAndRetrieveCLIContext(t *testing.T) {
 //	ts.Require().Error(nil)
 //}
 //
