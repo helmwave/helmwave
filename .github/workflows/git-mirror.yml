@@ -3,11 +3,9 @@ name: Git mirror
 on:
   push:
     branches: [ main ]
-  delete:
-    branches: [ main ]
 
 jobs:
-  sync:
+  git-mirror:
     runs-on: ubuntu-latest
     name: Git Repo Sync
     steps:

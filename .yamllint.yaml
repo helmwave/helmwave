@@ -11,6 +11,7 @@ ignore: |
   tests/
   .changie.yaml
   .github
+  dist/
 
 # See: https://yamllint.readthedocs.io/en/stable/rules.html
 rules:

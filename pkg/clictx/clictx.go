@@ -9,9 +9,12 @@ import (
 
 type (
 	flagName string
+	cliKey   struct{}
 )
 
-var cliFlag cli.Flag
+var cliFlag = cliKey{}
+
+// var cliFlag cli.Flag
 
 //nolint:fatcontext
 func CLIContextToContext(c *cli.Context) context.Context {
@@ -20,7 +23,7 @@ func CLIContextToContext(c *cli.Context) context.Context {
 	for _, f := range c.FlagNames() {
 		g := c.Value(f)
 		log.WithField("name", f).WithField("value", g).Trace("adding flag to action context.Context")
-		ctx = addFlagToContext(ctx, f, g)
+		ctx = AddFlagToContext(ctx, f, g)
 	}
 
 	ctx = addCLIToContext(ctx, c)
@@ -28,7 +31,7 @@ func CLIContextToContext(c *cli.Context) context.Context {
 	return ctx
 }
 
-func addFlagToContext(ctx context.Context, name string, value any) context.Context {
+func AddFlagToContext(ctx context.Context, name string, value any) context.Context {
 	return context.WithValue(ctx, flagName(name), value)
 }
 

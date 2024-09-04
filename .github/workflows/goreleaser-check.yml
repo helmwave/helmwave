@@ -1,4 +1,4 @@
-name: Test GoReleaser config
+name: GoReleaser check
 
 on:
   pull_request:

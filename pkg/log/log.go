@@ -1,6 +1,8 @@
 package log
 
 import (
+	"context"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	"github.com/mgutz/ansi"
@@ -66,7 +68,7 @@ func (l *Settings) Run(_ *cli.Context) error {
 func (l *Settings) Init() error {
 	// Skip various low-level k8s client errors
 	// There are a lot of context deadline errors being logged
-	utilruntime.ErrorHandlers = []func(error){ //nolint:reassign
+	utilruntime.ErrorHandlers = []utilruntime.ErrorHandler{ //nolint:reassign
 		logKubernetesClientError,
 	}
 
@@ -129,8 +131,8 @@ func (l *Settings) setFormat() {
 	}
 }
 
-func logKubernetesClientError(err error) {
-	log.WithError(err).Trace("kubernetes client error")
+func logKubernetesClientError(ctx context.Context, err error, msg string, keysAndValues ...interface{}) {
+	log.WithError(err).Trace("kubernetes client error, ", msg)
 }
 
 func (l *Settings) Format() string {

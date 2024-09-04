@@ -2,7 +2,7 @@ name: CodeQL
 
 
 on:
-  push:
+  pull_request:
     branches: [ "main", "release/*" ]
     paths:
       - '**.go'
@@ -10,7 +10,7 @@ on:
     - cron: '31 10 * * 5'
 
 jobs:
-  analyze:
+  codeql:
     permissions:
       security-events: write
       contents: read

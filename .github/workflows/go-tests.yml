@@ -1,9 +1,8 @@
-name: Go Test
+name: Go tests
 
 on:
   pull_request:
     branches: [ "main", "release/*" ]
-    branches-ignore: [ "changelog/*" ]
     # You can't use yaml anchors here
     paths:
       - "**.go"
@@ -11,19 +10,9 @@ on:
       - "go.sum"
       - .github/workflows/go-tests.yml
 
-  push:
-    branches: [ "main", "release/*" ]
-    branches-ignore: [ "changelog/*" ]
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
-      - .github/workflows/go-tests.yml
-
 jobs:
-  tests:
+  go-tests:
     runs-on: ubuntu-latest
-    # if: ${{ !startsWith(github.ref_name, 'changelog/') }}
     steps:
       - name: Create KinD cluster
         uses: container-tools/kind-action@v2

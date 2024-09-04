@@ -1,7 +1,7 @@
-name: yamllint
+name: Yamllint
 
 on:
-  push:
+  pull_request:
     branches: [ "main", "release/*" ]
     paths:
       - "**.yaml"

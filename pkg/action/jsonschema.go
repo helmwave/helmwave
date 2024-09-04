@@ -33,10 +33,7 @@ func (i *GenSchema) Cmd() *cli.Command {
 		Category: Step_,
 		Usage:    "generate json schema",
 		Flags:    i.flags(),
-		Action: func(c *cli.Context) error {
-			//nolint:staticcheck
-			return i.Run(nil)
-		},
+		Action:   toCtx(i.Run),
 	}
 }
 

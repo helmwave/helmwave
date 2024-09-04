@@ -41,15 +41,14 @@ builds:
 ###
 # Packages
 ###
-
 archives:
   - &archive
     builds: [ helmwave ]
     name_template: >-2
       {{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
-      {{ with .Arm }}v{{ . }}{{ end }}
-      {{ with .Mips }}_{{ . }}{{ end }}
-      {{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'
+      {{- with .Arm }}v{{ . }}{{ end -}}
+      {{- with .Mips }}_{{ . }}{{ end -}}
+      {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end -}}
     id: helmwave
     format: tar.gz
     format_overrides:
@@ -59,7 +58,6 @@ archives:
   - <<: *archive
     id: gitops
     builds: [ gitops ]
-
 
 
 nfpms:

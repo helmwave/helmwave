@@ -2,7 +2,7 @@ name: Goreleaser
 
 on:
   push:
-    tags: ["v*"]
+    tags: [ "v*.*.*" ]
 
 jobs:
   goreleaser:

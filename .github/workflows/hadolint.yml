@@ -9,18 +9,16 @@
 name: Hadolint
 
 on:
-  push:
+  pull_request:
     branches: [ "main", "release/*" ]
-    branches-ignore: [ "changelog/*" ]
     paths: [ Dockerfile ]
+
   schedule:
     - cron: '37 1 * * 4'
 
 jobs:
   hadolint:
-    name: Run hadolint scanning
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results

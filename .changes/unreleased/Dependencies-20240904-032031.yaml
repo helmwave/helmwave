@@ -1,0 +1,6 @@
+kind: Dependencies
+body: bump go get -u ./...
+time: 2024-09-04T03:20:31.008404+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""

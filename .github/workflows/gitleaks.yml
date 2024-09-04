@@ -1,15 +1,11 @@
 name: GitLeaks
+
 on:
-  push:
-    branches: [ "main", "release/*" ]
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: [ "main", "release/*" ]
 
 jobs:
-  scan:
-    name: GitLeaks
-    if: github.actor != 'dependabot[bot]'
+  gitleaks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
