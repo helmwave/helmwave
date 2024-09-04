@@ -5,7 +5,7 @@ on:
     types: [ published ]
 
 jobs:
-  schema:
+  generate-schema:
     runs-on: ubuntu-latest
     container:
       # I hate gha, Because I can't pass variables to image tag with string manipulation.

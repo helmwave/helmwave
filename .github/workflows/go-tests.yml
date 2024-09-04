@@ -1,4 +1,4 @@
-name: Go Test
+name: Go tests
 
 on:
   pull_request:
@@ -10,28 +10,8 @@ on:
       - "go.sum"
       - .github/workflows/go-tests.yml
 
-  push:
-    branches: [ "main", "release/*" ]
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
-      - .github/workflows/go-tests.yml
-
 jobs:
-  fix_duplicates:
-    runs-on: ubuntu-latest
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v5.3.1
-        with:
-          skip_after_successful_duplicate: 'true'
-
-  tests:
-    needs: fix_duplicates
-    if: ${{ needs.fix_duplicates.outputs.should_skip != 'true' }}
+  go-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Create KinD cluster

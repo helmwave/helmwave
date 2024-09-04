@@ -1,4 +1,4 @@
-name: Check changelog
+name: Changelog check
 
 on:
   pull_request:

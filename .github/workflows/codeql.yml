@@ -2,7 +2,7 @@ name: CodeQL
 
 
 on:
-  push:
+  pull_request:
     branches: [ "main", "release/*" ]
     paths:
       - '**.go'
@@ -10,19 +10,7 @@ on:
     - cron: '31 10 * * 5'
 
 jobs:
-  fix_duplicates:
-    runs-on: ubuntu-latest
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v5.3.1
-        with:
-          skip_after_successful_duplicate: 'true'
-
-  analyze:
-    needs: fix_duplicates
-    if: ${{ needs.fix_duplicates.outputs.should_skip != 'true' }}
+  codeql:
     permissions:
       security-events: write
       contents: read
