@@ -19,7 +19,7 @@ on:
       - .github/workflows/go-tests.yml
 
 jobs:
-  fix_dublicates:
+  fix_duplicates:
     runs-on: ubuntu-latest
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
@@ -30,7 +30,8 @@ jobs:
           concurrent_skipping: 'same_content'
 
   tests:
-    if: ${{ needs.fix_dublicates.outputs.should_skip != 'true' }}
+    needs: fix_duplicates
+    if: ${{ needs.fix_duplicates.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Create KinD cluster
