@@ -65,7 +65,7 @@ jobs:
 
       - name: auto approve and merge
         run: |
-          gh pr review --approve ${{ steps.pr.outputs.pull-request-url }}"
+          gh pr review --approve ${{ steps.pr.outputs.pull-request-url }}
           gh pr merge --admin --delete-branch --body-file .changes/${{ github.event.release.tag_name }}.md --merge ${{ steps.pr.outputs.pull-request-number }}
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
