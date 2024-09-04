@@ -8,7 +8,7 @@ jobs:
   schema:
     runs-on: ubuntu-latest
     container:
-      # I hate gha, Cause I can't pass variables to image tag with string manipulation.
+      # I hate gha, Because I can't pass variables to image tag with string manipulation.
       image: ghcr.io/${{ github.repository }}:latest
     steps:
       - name: generate schema
