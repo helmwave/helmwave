@@ -1,0 +1,6 @@
+kind: CI
+body: auto approve and merge changelog
+time: 2024-09-04T03:19:59.901679+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""
