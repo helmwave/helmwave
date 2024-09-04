@@ -62,12 +62,10 @@ jobs:
         with:
           app_id: ${{ secrets.GH_APP_ID }}
           private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-      - uses: hmarr/auto-approve-action@v4
-        with:
-          pull-request-number: ${{ steps.pr.outputs.pull-request-number }}
-          github-token: ${{ steps.token.outputs.BOT_TOKEN }}
 
-#      - name: auto merge
-#        run: gh pr merge --merge ${{ steps.pr.outputs.pull-request-number }}
-#        env:
-#          GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
+      - name: auto approve and merge
+        run: |
+          gh pr review --approve ${{ steps.pr.outputs.pull-request-url }}"
+          gh pr merge --admin --delete-branch --body-file .changes/${{ github.event.release.tag_name }}.md --merge ${{ steps.pr.outputs.pull-request-number }}
+        env:
+          GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
