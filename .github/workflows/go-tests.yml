@@ -19,9 +19,19 @@ on:
       - .github/workflows/go-tests.yml
 
 jobs:
-  tests:
+  fix_dublicates:
     runs-on: ubuntu-latest
-    # if: ${{ !startsWith(github.ref_name, 'changelog/') }}
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v3.4.0
+        with:
+          skip_after_successful_duplicate: 'true'
+
+  tests:
+    if: ${{ needs.fix_dublicates.outputs.should_skip != 'true' }}
+    runs-on: ubuntu-latest
     steps:
       - name: Create KinD cluster
         uses: container-tools/kind-action@v2

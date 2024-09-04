@@ -10,7 +10,18 @@ on:
     - cron: '31 10 * * 5'
 
 jobs:
+  fix_dublicates:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v3.4.0
+        with:
+          skip_after_successful_duplicate: 'true'
+
   analyze:
+    if: ${{ needs.fix_dublicates.outputs.should_skip != 'true' }}
     permissions:
       security-events: write
       contents: read
