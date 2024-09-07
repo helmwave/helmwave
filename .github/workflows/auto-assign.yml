@@ -1,6 +1,9 @@
 name: Auto assign
 
 on:
+  push:
+    branches-ignore:
+      - "dependabot/*"
   issues:
     types: [opened, reopened]
   pull_request:
