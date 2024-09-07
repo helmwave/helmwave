@@ -3,6 +3,7 @@ name: Dependabot
 on:
   pull_request:
     branches: [ main ]
+    #    types: [ opened ]
 
 permissions:
   contents: write
@@ -62,6 +63,14 @@ jobs:
 
       - name: change main to release branch
         run: gh pr edit ${{ github.event.number }} -B $BRANCH
+        env:
+          BRANCH: release/${{ steps.next.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+
+      - name: approve & merge
+        run: |
+          gh pr review --approve ${{ github.event.number }}
+          gh pr merge --auto --merge ${{ github.event.number }}
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
           GH_TOKEN: ${{ github.token }}
