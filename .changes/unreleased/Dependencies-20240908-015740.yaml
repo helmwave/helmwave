@@ -1,0 +1,6 @@
+kind: Dependencies
+body: gomplate v3 -> v4
+time: 2024-09-08T01:57:40.388927+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""
