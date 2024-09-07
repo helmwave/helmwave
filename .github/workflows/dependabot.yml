@@ -24,12 +24,14 @@ jobs:
 
       - uses: miniscruff/changie-action@v2
         id: changelog
+        if: github.actor == 'dependabot[bot]'
         with:
           version: latest
           args: |
-            new -k Dependencies -b "${{ steps.dependabot.outputs.dependency-names }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
+            new -k Dependencies -b "${{ github.event.pull_request.title }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
 
       - uses: stefanzweifel/git-auto-commit-action@v5
+        if: github.actor == 'dependabot[bot]'
         with:
           commit_message: "fix: changie"
       #
