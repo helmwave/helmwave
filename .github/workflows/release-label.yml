@@ -1,0 +1,27 @@
+name: Release label
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened ]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  release-label:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') }}
+    steps:
+      - uses: actions/github-script@v7
+        id: tag
+        with:
+          script: return context.payload.pull_request.head.ref.replace('release/', '')
+          result-encoding: string
+
+
+      - name: add release label
+        run: gh pr edit ${{ github.event.number }} --add-label "release,v$TAG" -t "Release/$TAG"
+        env:
+          TAG: ${{ steps.tag.outputs.result }}
+
