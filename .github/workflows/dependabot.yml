@@ -78,7 +78,7 @@ jobs:
 
       - name: approve & merge
         run: |
-          gh pr review ${{ github.event.number }} -a -c LGTM 
+          gh pr review ${{ github.event.number }} --approve -b "LGTM 🤪" 
           gh pr merge  ${{ github.event.number }} --auto --merge
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
