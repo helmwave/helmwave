@@ -1,6 +1,0 @@
-kind: Dependencies
-body: 'chore(deps): Bump peter-evans/create-pull-request from 6 to 7'
-time: 2024-09-07T17:58:10.6886616Z
-custom:
-    Author: dependabot
-    Issue: "994"

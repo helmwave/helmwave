@@ -1,6 +1,0 @@
-kind: Dependencies
-body: 'bump(go.mod): Bump github.com/prometheus/common from 0.58.0 to 0.59.1'
-time: 2024-09-07T20:27:18.501276951Z
-custom:
-    Author: dependabot
-    Issue: "990"
