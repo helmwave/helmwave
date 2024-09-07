@@ -3,7 +3,7 @@ name: Dependabot
 on:
   pull_request:
     branches: [ main ]
-    #    types: [ opened ] uncomment after debug
+    types: [ opened ]
 
 permissions:
   contents: write
