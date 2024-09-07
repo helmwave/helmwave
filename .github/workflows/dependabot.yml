@@ -36,6 +36,8 @@ jobs:
         if: github.actor == 'dependabot[bot]'
         with:
           commit_message: "chore: add changelog via changie #${{ github.event.number }}"
+          commit_user_name: ${{ github.actor }}
+          commit_user_email: "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
 
       #
       #  dependabot-base:
@@ -56,6 +58,7 @@ jobs:
 
 
       # TODO: Fix protected branch
+      # ? change to stefanzweifel/git-auto-commit-action@v5
       - name: create release branch
         continue-on-error: true
         run: |
@@ -75,7 +78,7 @@ jobs:
 
       - name: approve & merge
         run: |
-          gh pr review ${{ github.event.number }} -a -c LGTM 
+          gh pr review ${{ github.event.number }} --approve -b "LGTM 🤪" 
           gh pr merge  ${{ github.event.number }} --auto --merge
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
