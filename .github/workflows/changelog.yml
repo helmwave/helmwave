@@ -44,7 +44,7 @@ jobs:
         run: changie merge
 
       - name: Create Pull Request for changelog
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         id: pr
         with:
           add-paths: |
