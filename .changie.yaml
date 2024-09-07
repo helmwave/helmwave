@@ -22,11 +22,17 @@ custom:
 kinds:
   - label: Breaking change!
     format: "### **{{ .Kind }}**"
+    auto: major
   - label: New feature
+    auto: minor
   - label: Fixed
+    auto: patch
   - label: CI
+    auto: none
   - label: Dependencies
+    auto: patch
   - label: Other
+    auto: none
 
 newlines:
   afterChange: 0

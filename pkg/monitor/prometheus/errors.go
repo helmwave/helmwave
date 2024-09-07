@@ -6,13 +6,14 @@ import (
 )
 
 var (
-	ErrURLEmpty = errors.New("URL cannot be empty")
+	ErrURLEmpty           = errors.New("URL cannot be empty")
+	ErrExprEmpty          = errors.New("expression cannot be empty")
+	ErrInvalidSuccessMode = errors.New("invalid success mode")
 
-	ErrExprEmpty = errors.New("expression cannot be empty")
+	ErrInvalidResult = errors.New("failed to decode result")
 
-	ErrResultNotVector = errors.New("failed to get result as vector")
-
-	ErrResultEmpty = errors.New("result is empty")
+	ErrResultEmpty    = errors.New("result is empty")
+	ErrResultNotEmpty = errors.New("result is not empty")
 )
 
 type ClientError struct {
