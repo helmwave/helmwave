@@ -16,17 +16,19 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-
-      - name: Download changie
-        run: go install github.com/miniscruff/changie@v1
-
       - name: Generate release changelog
-        run: changie batch $TAG --force
+        uses: miniscruff/changie-action@v2
+        id: version
         env:
           TAG: ${{ github.event.release.tag_name }}
+        with:
+          version: latest
+          args: batch $TAG --force
+
+      - id: changelog
+        env:
+          FILEPATH: .changes/${{ github.event.release.tag_name }}.md
+        run: echo "changelog=$(cat $FILEPATH)" >> $GITHUB_OUTPUT
 
       - name: Upload changelog artifact
         uses: actions/upload-artifact@v4
@@ -43,6 +45,9 @@ jobs:
       - name: Merge changelog
         run: changie merge
 
+      - id: version
+        run: echo "version=${TAG#v}" >> $GITHUB_OUTPUT
+
       - name: Create Pull Request for changelog
         uses: peter-evans/create-pull-request@v7
         id: pr
@@ -53,9 +58,11 @@ jobs:
           commit-message: "chore: update changelog ${{ github.event.release.tag_name }}"
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          branch: "changelog/${{ github.event.release.tag_name }}"
+          branch: "changelog/${{ steps.version.outputs.version }}"
           delete-branch: true
-          title: "Changelog/${{ github.event.release.tag_name }}"
+          title: "Changelog/${{ steps.version.outputs.version }}"
+          labels: ${{ github.event.release.tag_name }},changelog
+          body: ${{ steps.changelog.outputs.changelog }}
 
       - uses: wow-actions/use-app-token@v2
         id: token
@@ -63,9 +70,10 @@ jobs:
           app_id: ${{ secrets.GH_APP_ID }}
           private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
-      - name: auto approve and merge
+      - name: approve & merge
         run: |
-          gh pr review --approve ${{ steps.pr.outputs.pull-request-url }}
-          gh pr merge --admin --delete-branch --body-file .changes/${{ github.event.release.tag_name }}.md --merge ${{ steps.pr.outputs.pull-request-number }}
+          gh pr review $PR --approve
+          gh pr merge  $PR --auto --merge -d -b ${{ steps.changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
+          PR: ${{ steps.pr.outputs.pull-request-number }}
