@@ -100,6 +100,5 @@ jobs:
           gh pr review ${{ github.event.number }} --approve -b "LGTM 🤪" 
           gh pr merge  ${{ github.event.number }} --auto --merge
         env:
-          BRANCH: release/${{ steps.next.outputs.version }}
           GH_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }} # merge via helmwave[bot]
 
