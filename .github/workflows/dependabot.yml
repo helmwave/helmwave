@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Fetch Dependabot metadata
         id: dependabot
@@ -52,7 +52,10 @@ jobs:
       - name: create release branch
         continue-on-error: true
         run: |
-          git checkout -b $BRANCH main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout main
+          git checkout -b $BRANCH
           git push origin $BRANCH
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
@@ -61,4 +64,5 @@ jobs:
         run: gh pr edit ${{ github.event.number }} -B $BRANCH
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
 
