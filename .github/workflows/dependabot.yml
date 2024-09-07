@@ -40,10 +40,10 @@ jobs:
       - name: get new patch version
         uses: miniscruff/changie-action@v2
         id: version
-        run: echo "version=hello" >> "$GITHUB_OUTPUT"
         with:
           version: latest
           args: next patch
+
       - id: next
         run: echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
         env:
