@@ -1,0 +1,65 @@
+name: Dependabot
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'dependabot/') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch Dependabot metadata
+        id: dependabot
+        uses: dependabot/fetch-metadata@v2
+
+      - uses: miniscruff/changie-action@v2
+        id: changelog
+        with:
+          version: latest
+          args: |
+            new -k Dependencies -b "${{ steps.dependabot.outputs.dependency-names }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "fix: changie"
+      #
+      #  dependabot-base:
+      #    if: ${{ startsWith(github.event.pull_request.head.ref, 'dependabot/') }}
+      #    runs-on: ubuntu-latest
+      #    steps:
+      - name: get new patch version
+        uses: miniscruff/changie-action@v2
+        id: version
+        run: echo "version=hello" >> "$GITHUB_OUTPUT"
+        with:
+          version: latest
+          args: next patch
+      - id: next
+        run: echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+        env:
+          TAG: ${{ steps.version.outputs.output }}
+
+
+      - name: create release branch
+        continue-on-error: true
+        run: |
+          git checkout -b $BRANCH main
+          git push origin $BRANCH
+        env:
+          BRANCH: release/${{ steps.next.outputs.version }}
+
+      - name: change main to release branch
+        run: gh pr edit ${{ github.event.number }} -B $BRANCH
+        env:
+          BRANCH: release/${{ steps.next.outputs.version }}
+
