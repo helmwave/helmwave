@@ -25,7 +25,9 @@ jobs:
 
 
       - name: add release label
-        run: gh pr edit ${{ github.event.number }} --add-label "release,v$TAG" -t "Release/$TAG"
+        run: |
+          gh label create $TAG -c "#298AAF" -d "v$TAG" -f
+          gh pr edit ${{ github.event.number }} --add-label "release,v$TAG" -t "Release/$TAG"
         env:
           TAG: ${{ steps.tag.outputs.result }}
           GH_TOKEN: ${{ github.token }}
