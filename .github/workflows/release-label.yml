@@ -3,7 +3,7 @@ name: Release label
 on:
   pull_request:
     branches: [ main ]
-    types: [ opened ]
+    types: [ opened, reopened ]
 
 permissions:
   pull-requests: write
@@ -24,4 +24,5 @@ jobs:
         run: gh pr edit ${{ github.event.number }} --add-label "release,v$TAG" -t "Release/$TAG"
         env:
           TAG: ${{ steps.tag.outputs.result }}
+          GH_TOKEN: ${{ github.token }}
 
