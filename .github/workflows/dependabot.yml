@@ -3,10 +3,12 @@ name: Dependabot
 on:
   pull_request:
     branches: [ main ]
+    #    types: [ opened ] uncomment after debug
 
 permissions:
   contents: write
   pull-requests: write
+
 
 jobs:
   dependabot:
@@ -17,20 +19,25 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Fetch Dependabot metadata
-        id: dependabot
+      - id: dependabot
         uses: dependabot/fetch-metadata@v2
 
-      - uses: miniscruff/changie-action@v2
-        id: changelog
+      - name: generate changelog
+        uses: miniscruff/changie-action@v2
+        if: github.actor == 'dependabot[bot]'
         with:
           version: latest
           args: |
-            new -k Dependencies -b "${{ steps.dependabot.outputs.dependency-names }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
+            new -k Dependencies -b "${{ github.event.pull_request.title }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: push changelog
+        uses: stefanzweifel/git-auto-commit-action@v5
+        if: github.actor == 'dependabot[bot]'
         with:
-          commit_message: "fix: changie"
+          commit_message: "chore: add changelog via changie #${{ github.event.number }}"
+          commit_user_name: ${{ github.actor }}
+          commit_user_email: "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
       #
       #  dependabot-base:
       #    if: ${{ startsWith(github.event.pull_request.head.ref, 'dependabot/') }}
@@ -48,21 +55,51 @@ jobs:
         env:
           TAG: ${{ steps.version.outputs.output }}
 
+      - uses: wow-actions/use-app-token@v2
+        id: token
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+
 
       - name: create release branch
+        uses: actions/github-script@v7
         continue-on-error: true
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout main
-          git checkout -b $BRANCH
-          git push origin $BRANCH
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
+        with:
+          github-token: ${{ steps.token.outputs.BOT_TOKEN }}
+          script: |-2
+            const main = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main',
+            })
+          
+            const ref = {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'heads/' + process.env.BRANCH,
+                sha: main.data.object.sha,
+            }
 
-      - name: change main to release branch
+            await github.rest.git.createRef(ref)
+          result-encoding: string
+
+
+
+      - name: main to release branch
         run: gh pr edit ${{ github.event.number }} -B $BRANCH
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
           GH_TOKEN: ${{ github.token }}
+
+      - name: approve & merge
+        run: |
+          gh pr review ${{ github.event.number }} --approve -b "LGTM 🤪" 
+          gh pr merge  ${{ github.event.number }} --auto --merge
+        env:
+          BRANCH: release/${{ steps.next.outputs.version }}
+          GH_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }} # merge via helmwave[bot]
 
