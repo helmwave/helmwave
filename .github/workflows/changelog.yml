@@ -74,6 +74,7 @@ jobs:
         run: |
           gh pr review $PR --approve
           gh pr merge  $PR --auto --merge -d -b ${{ steps.changelog.outputs.changelog }}
+          gh label create ${{ github.event.release.tag_name }} -c "#515C5D" -f
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
           PR: ${{ steps.pr.outputs.pull-request-number }}
