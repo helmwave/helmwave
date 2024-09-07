@@ -9,6 +9,7 @@ permissions:
   contents: write
   pull-requests: write
 
+
 jobs:
   dependabot:
     runs-on: ubuntu-latest
@@ -18,11 +19,11 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Fetch Dependabot metadata
-        id: dependabot
+      - id: dependabot
         uses: dependabot/fetch-metadata@v2
 
-      - uses: miniscruff/changie-action@v2
+      - name: generate changelog
+        uses: miniscruff/changie-action@v2
         id: changelog
         if: github.actor == 'dependabot[bot]'
         with:
@@ -30,10 +31,12 @@ jobs:
           args: |
             new -k Dependencies -b "${{ github.event.pull_request.title }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: push changelog
+        uses: stefanzweifel/git-auto-commit-action@v5
         if: github.actor == 'dependabot[bot]'
         with:
-          commit_message: "fix: changie"
+          commit_message: "chore: add changelog via changie #${{ github.event.number }}"
+
       #
       #  dependabot-base:
       #    if: ${{ startsWith(github.event.pull_request.head.ref, 'dependabot/') }}
@@ -52,6 +55,7 @@ jobs:
           TAG: ${{ steps.version.outputs.output }}
 
 
+      # TODO: Fix protected branch
       - name: create release branch
         continue-on-error: true
         run: |
@@ -64,7 +68,7 @@ jobs:
           BRANCH: release/${{ steps.next.outputs.version }}
 
       - name: change main to release branch
-        run: gh pr edit ${{ github.event.number }} -B $BRANCH --remove-reviewer helmwave/maintainers --add-assignee "@me"
+        run: gh pr edit ${{ github.event.number }} -B $BRANCH
         env:
           BRANCH: release/${{ steps.next.outputs.version }}
           GH_TOKEN: ${{ github.token }}
