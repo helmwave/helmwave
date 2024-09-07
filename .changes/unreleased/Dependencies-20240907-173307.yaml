@@ -1,0 +1,6 @@
+kind: Dependencies
+body: github.com/prometheus/client_golang
+time: 2024-09-07T17:33:07.175245301Z
+custom:
+    Author: dependabot
+    Issue: "991"
