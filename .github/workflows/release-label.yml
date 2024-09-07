@@ -19,6 +19,10 @@ jobs:
           script: return context.payload.pull_request.head.ref.replace('release/', '')
           result-encoding: string
 
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
 
       - name: add release label
         run: gh pr edit ${{ github.event.number }} --add-label "release,v$TAG" -t "Release/$TAG"
