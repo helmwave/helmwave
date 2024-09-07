@@ -4,11 +4,8 @@ on:
   push:
     branches-ignore:
       - "dependabot/*"
+      - main
   issues:
-    types: [opened, reopened]
-  pull_request:
-    branches-ignore:
-      - "dependabot/*"
     types: [opened, reopened]
 
 
