@@ -11,29 +11,29 @@ updates:
     #      # Prefix all commit messages with "bump(go.mod): "
     #      prefix: "bump(go.mod)"
     labels:
-      - "dependencies"
+      - "dependabot"
       - "go mod"
       
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     #    commit-message:
     #      # Prefix all commit messages with "bump(Dockerfile): "
     #      prefix: "bump(Dockerfile)"
     labels:
-      - "dependencies"
+      - "dependabot"
       - "dockerfile"
      
      
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     #    commit-message:
     #      # Prefix all commit messages with "bump(CI): "
     #      prefix: "bump(CI)"
     labels:
-      - "dependencies"
+      - "dependabot"
       - "ci"
 
