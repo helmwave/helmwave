@@ -18,8 +18,8 @@ We use [semver](https://semver.org/)
 
 **Example:**
 
-- my-feature --> release/0.17.0 --> main
-- my-fix --> release/0.17.1 --> main
+- bugfix/000 --> release/0.40.1 --> main
+- feature/000 --> release/0.41.0 --> main
 
 ### Non product update
 
