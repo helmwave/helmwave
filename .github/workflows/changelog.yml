@@ -18,12 +18,14 @@ jobs:
 
       - name: Generate release changelog
         uses: miniscruff/changie-action@v2
-        id: version
         env:
           TAG: ${{ github.event.release.tag_name }}
         with:
           version: latest
           args: batch $TAG --force
+
+      - id: version
+        run: echo "version=${TAG#v}" >> $GITHUB_OUTPUT
 
       - id: changelog
         env:
@@ -44,9 +46,6 @@ jobs:
 
       - name: Merge changelog
         run: changie merge
-
-      - id: version
-        run: echo "version=${TAG#v}" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request for changelog
         uses: peter-evans/create-pull-request@v7
