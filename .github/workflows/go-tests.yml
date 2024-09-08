@@ -14,15 +14,15 @@ jobs:
   go-tests:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Create KinD cluster
         uses: container-tools/kind-action@v2
         with:
           config: tests/kind-config.yaml
           registry: false
-
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-go@v5
         with:
