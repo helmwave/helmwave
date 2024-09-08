@@ -14,11 +14,21 @@ jobs:
       - name: generate schema
         run: helmwave schema > schema.json
 
-      - name: upload schema.json
+      - name: upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: schema.json
           path: schema.json
+
+  upload-schema:
+    runs-on: ubuntu-latest
+    needs:
+      - generate-schema
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schema.json
 
       - name: upload to release
         run: gh release upload $TAG schema.json
