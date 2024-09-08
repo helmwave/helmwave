@@ -3,7 +3,7 @@ name: Release label
 on:
   pull_request:
     branches: [ main ]
-    types: [ opened ]
+    types: [ opened, reopened ]
 
 permissions:
   pull-requests: write
@@ -19,9 +19,16 @@ jobs:
           script: return context.payload.pull_request.head.ref.replace('release/', '')
           result-encoding: string
 
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
 
       - name: add release label
-        run: gh pr edit ${{ github.event.number }} --add-label "release,v$TAG" -t "Release/$TAG"
+        run: |
+          gh label create v$TAG -c "#298AAF" -d "v$TAG" -f
+          gh pr edit ${{ github.event.number }} --add-label "release,v$TAG" -t "Release/$TAG"
         env:
           TAG: ${{ steps.tag.outputs.result }}
+          GH_TOKEN: ${{ github.token }}
 

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # to create new tag
-    if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') }}
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') && github.event.pull_request.merged == true }}
     steps:
       - uses: wow-actions/use-app-token@v2
         id: token

@@ -12,7 +12,7 @@ updates:
     #      prefix: "bump(go.mod)"
     labels:
       - "dependabot"
-      - "go mod"
+      - "go.mod"
       
   - package-ecosystem: "docker"
     directory: "/"
