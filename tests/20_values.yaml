@@ -1,0 +1,20 @@
+configmapReload:
+  prometheus:
+    enabled: false
+
+server:
+  persistentVolume:
+    enabled: false
+  hostPort: 9090
+
+alertmanager:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false

@@ -63,3 +63,25 @@ func (ts *UpTestSuite) TestAutoBuild() {
 
 	ts.Require().NoError(u.Run(ts.ctx))
 }
+
+func (ts *UpTestSuite) TestPrometheusMonitors() {
+	tmpDir := ts.T().TempDir()
+	y := &Yml{
+		tpl:       filepath.Join(tests.Root, "20_helmwave.yml"),
+		file:      filepath.Join(tests.Root, "20_helmwave.yml"),
+		templater: template.TemplaterSprig,
+	}
+
+	s := &Up{
+		build: &Build{
+			plandir: tmpDir,
+			tags:    cli.StringSlice{},
+			autoYml: false,
+			yml:     y,
+		},
+		dog:       &kubedog.Config{},
+		autoBuild: true,
+	}
+
+	ts.Require().NoError(s.Run(ts.ctx))
+}

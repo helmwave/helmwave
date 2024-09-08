@@ -17,6 +17,7 @@ jobs:
       - name: Create KinD cluster
         uses: container-tools/kind-action@v2
         with:
+          config: tests/kind-config.yaml
           registry: false
 
       - uses: actions/checkout@v4
