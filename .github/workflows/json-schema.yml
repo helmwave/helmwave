@@ -13,8 +13,15 @@ jobs:
     steps:
       - name: generate schema
         run: helmwave schema > schema.json
+
       - name: upload schema.json
         uses: actions/upload-artifact@v4
         with:
           name: schema.json
           path: schema.json
+
+      - name: upload to release
+        run: gh release upload $TAG schema.json
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+
