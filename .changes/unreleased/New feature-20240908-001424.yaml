@@ -1,0 +1,6 @@
+kind: New feature
+body: Allow prometheus monitors to specify which query result is considered successful
+time: 2024-09-08T00:14:24.577716+01:00
+custom:
+    Author: r3nic1e
+    Issue: ""
