@@ -18,14 +18,14 @@ jobs:
 
       - name: Generate release changelog
         uses: miniscruff/changie-action@v2
-        env:
-          TAG: ${{ github.event.release.tag_name }}
         with:
           version: latest
-          args: batch $TAG --force
+          args: batch "${{ github.event.release.tag_name }}" --force
 
       - id: version
         run: echo "version=${TAG#v}" >> $GITHUB_OUTPUT
+        env:
+          TAG: ${{ github.event.release.tag_name }}
 
       - id: changelog
         env:
