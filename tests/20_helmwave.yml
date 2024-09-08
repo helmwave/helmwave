@@ -1,0 +1,48 @@
+project: Test20
+
+repositories:
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+
+.options: &options
+  wait: true
+  wait_for_jobs: true
+  force: false
+  timeout: 10m
+  atomic: false
+  max_history: 3
+  namespace: test20
+  create_namespace: true
+
+monitors:
+  - &monitor
+    name: up-monitor
+    type: prometheus
+    total_timeout: 1m
+    iteration_timeout: 5s
+    interval: 10s
+    success_threshold: 3
+    failure_threshold: 3
+    prometheus: &monitor_prometheus
+      url: http://localhost:9090
+      success_mode: if_vector
+      expr: |
+        prometheus_build_info == 1
+  - <<: *monitor
+    name: error-monitor
+    prometheus:
+      <<: *monitor_prometheus
+      success_mode: if_empty
+      expr: |
+        prometheus_build_info == 0
+
+releases:
+  - name: prometheus
+    <<: *options
+    chart:
+      name: prometheus-community/prometheus
+    monitors:
+      - name: up-monitor
+      - name: error-monitor
+    values:
+      - ../../tests/20_values.yaml

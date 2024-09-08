@@ -1,0 +1,10 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      # prometheus
+      - containerPort: 9090
+        hostPort: 9090
+        listenAddress: "127.0.0.1"
+        protocol: TCP
