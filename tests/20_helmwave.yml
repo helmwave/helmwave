@@ -45,4 +45,4 @@ releases:
       - name: up-monitor
       - name: error-monitor
     values:
-      - tests/20_values.yaml
+      - ../../tests/20_values.yaml
