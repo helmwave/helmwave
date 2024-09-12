@@ -32,7 +32,7 @@ require (
 	golang.org/x/sync v0.8.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.15.4
-	k8s.io/apimachinery v0.31.0
+	k8s.io/apimachinery v0.31.1
 	k8s.io/cli-runtime v0.31.0
 	k8s.io/client-go v0.31.0
 	k8s.io/klog v1.0.0
