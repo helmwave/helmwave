@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/prometheus/client_golang from 1.20.3 to 1.20.4'
+time: 2024-09-17T22:14:12.991074358Z
+custom:
+    Author: dependabot
+    Issue: "1011"
