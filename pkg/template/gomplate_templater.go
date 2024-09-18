@@ -8,6 +8,8 @@ import (
 	"maps"
 	"text/template"
 
+	gomplateOldData "github.com/hairyhenderson/gomplate/v3/data"
+	gomplateOldFuncs "github.com/hairyhenderson/gomplate/v3/funcs" //nolint:staticcheck
 	"github.com/hairyhenderson/gomplate/v4"
 	"github.com/hairyhenderson/gomplate/v4/tmpl"
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -69,6 +71,7 @@ func (t gomplateTemplater) funcMap(ctx context.Context, tpl *template.Template, 
 	log.Debug("Loading gomplate template functions")
 	gomplateFuncMap := gomplate.CreateFuncs(ctx)
 
+	addToMap(funcMap, gomplateOldFuncs.CreateDataFuncs(ctx, &gomplateOldData.Data{Ctx: ctx}))
 	addToMap(funcMap, gomplateFuncMap)
 	addToMap(funcMap, customFuncs)
 
