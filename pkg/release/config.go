@@ -67,6 +67,7 @@ type config struct {
 	SubNotes                 bool `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"default=false"`
 	Wait                     bool `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
 	WaitForJobs              bool `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
+	TakeOwnership            bool `yaml:"take_ownership,omitempty" json:"take_ownership,omitempty" jsonschema:"description=will ignore the check for helm annotations and take ownership of the resources,default=false"`
 
 	// special field for templating and building
 	dryRun     bool `jsonschema:"default=false,-"`
