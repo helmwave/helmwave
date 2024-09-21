@@ -1,6 +1,0 @@
-kind: Fixed
-body: Returned back gomplate datasource functions
-time: 2024-09-10T21:26:57.504378+01:00
-custom:
-    Author: r3nic1e
-    Issue: "1001"

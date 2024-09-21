@@ -1,6 +1,0 @@
-kind: Breaking change!
-body: Rename ShowNotes to HideNotes (helm v3.16 supports it directly)
-time: 2024-09-21T20:04:30.558739+03:00
-custom:
-  Author: zhilyaev
-  Issue: ""
