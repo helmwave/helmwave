@@ -33,5 +33,5 @@ jobs:
       - name: upload to release
         run: gh release upload $TAG schema.json
         env:
+          GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name }}
-
