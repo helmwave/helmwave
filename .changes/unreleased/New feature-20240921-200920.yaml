@@ -1,0 +1,6 @@
+kind: New feature
+body: provide support for TakeOwnership in release config
+time: 2024-09-21T20:09:20.137174+03:00
+custom:
+  Author: zhilyaev
+  Issue: ""

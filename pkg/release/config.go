@@ -62,11 +62,13 @@ type config struct {
 	ResetValues              bool `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`
 	ReuseValues              bool `yaml:"reuse_values,omitempty" json:"reuse_values,omitempty" jsonschema:"default=false"`
 	ResetThenReuseValues     bool `yaml:"reset_then_reuse_values,omitempty" json:"reset_then_reuse_values,omitempty" jsonschema:"default=false"`
-	SkipCRDs                 bool `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty" jsonschema:"default=false"`
-	ShowNotes                bool `yaml:"show_notes,omitempty" json:"show_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install"`
-	SubNotes                 bool `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"default=false"`
+	SkipCRDs                 bool `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty" jsonschema:"description=Skips installing CRDs when install flag is enabled during upgrade,default=false"`
+	HideNotes                bool `yaml:"hide_notes,omitempty" json:"hide_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install,default=true"`
+	SubNotes                 bool `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"description=Determines whether sub-notes are rendered in the chart,default=false"`
 	Wait                     bool `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
 	WaitForJobs              bool `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
+	TakeOwnership            bool `yaml:"take_ownership,omitempty" json:"take_ownership,omitempty" jsonschema:"description=Will ignore the check for helm annotations and take ownership of the resources,default=false"`
+	SkipSchemaValidation     bool `yaml:"skip_schema_validation,omitempty" json:"skip_schema_validation,omitempty" jsonschema:"description=Determines if JSON schema validation is disabled.,default=false"`
 
 	// special field for templating and building
 	dryRun     bool `jsonschema:"default=false,-"`

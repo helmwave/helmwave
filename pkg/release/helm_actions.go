@@ -43,6 +43,8 @@ func (rel *config) newInstall() *action.Install {
 	client.DryRun = rel.dryRun
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
+	client.TakeOwnership = rel.TakeOwnership
+	client.SkipSchemaValidation = rel.SkipSchemaValidation
 	client.Labels = rel.Labels
 	client.HideSecret = rel.hideSecret
 
@@ -92,6 +94,8 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.DryRun = rel.dryRun
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
+	client.TakeOwnership = rel.TakeOwnership
+	client.SkipSchemaValidation = rel.SkipSchemaValidation
 	client.Labels = rel.Labels
 	client.HideSecret = rel.hideSecret
 
