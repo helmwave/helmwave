@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"go.mozilla.org/sops/v3/decrypt"
+	"github.com/getsops/sops/v3/decrypt"
 )
 
 const (
