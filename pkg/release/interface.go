@@ -3,6 +3,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/fileref"
 	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -37,7 +38,7 @@ type Config interface {
 	SetDependsOn(deps []*DependsOnReference)
 	Tags() []string
 	Repo() string
-	Values() []ValuesReference
+	Values() []fileref.Config
 	HelmWait() bool
 	KubeContext() string
 	Cfg() *action.Configuration

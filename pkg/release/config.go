@@ -1,6 +1,7 @@
 package release
 
 import (
+	"github.com/helmwave/helmwave/pkg/fileref"
 	"slices"
 	"sync"
 	"time"
@@ -40,7 +41,7 @@ type config struct {
 
 	DependsOnF    []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
 	MonitorsF     []MonitorReference    `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
-	ValuesF       []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release"`
+	ValuesF       []fileref.Config      `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release"`
 	TagsF         []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
 	Labels        map[string]string     `yaml:"labels,omitempty" json:"labels,omitempty" jsonschema:"Labels that would be added to release metadata on sync"`
 	PostRendererF []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
@@ -146,7 +147,7 @@ func (rel *config) Tags() []string {
 	return rel.TagsF
 }
 
-func (rel *config) Values() []ValuesReference {
+func (rel *config) Values() []fileref.Config {
 	return rel.ValuesF
 }
 

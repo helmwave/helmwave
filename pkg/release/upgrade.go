@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/fileref"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -24,7 +25,7 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 	}
 
 	// Values
-	valuesFiles := helper.SlicesMap(rel.Values(), func(v ValuesReference) string {
+	valuesFiles := helper.SlicesMap(rel.Values(), func(v fileref.Config) string {
 		return v.Dst
 	})
 
