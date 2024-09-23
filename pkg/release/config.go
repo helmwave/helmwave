@@ -1,18 +1,19 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"slices"
 	"sync"
 	"time"
 
-	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/hooks"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/chartutil"
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/postrender"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
+	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
 )
 
 type configTests struct {

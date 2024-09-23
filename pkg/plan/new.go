@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/templater"
 	"os"
 	"path/filepath"
 
@@ -45,7 +46,7 @@ type Plan struct {
 	fullPath  string
 	tmpDir    string
 	graphMD   string
-	templater string
+	templater templater.Templater
 
 	manifests map[uniqname.UniqName]string
 	unchanged release.Configs

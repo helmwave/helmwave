@@ -2,12 +2,14 @@ package action
 
 import (
 	"fmt"
+	"github.com/helmwave/helmwave/pkg/templater"
+	"github.com/helmwave/helmwave/pkg/templater/gomplate"
+	"github.com/helmwave/helmwave/pkg/templater/sprig"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/cache"
 	logSetup "github.com/helmwave/helmwave/pkg/log"
 	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/urfave/cli/v2"
 )
 
@@ -95,8 +97,8 @@ func flagTemplateEngine(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "templater",
 		Category:    "YML",
-		Value:       template.TemplaterSprig,
-		Usage:       fmt.Sprintf("select template engine: [ %s | %s ]", template.TemplaterSprig, template.TemplaterGomplate),
+		Value:       templater.Default.Name(),
+		Usage:       fmt.Sprintf("select template engine: [ %s | %s ]", sprig.TemplaterName, gomplate.TemplaterName),
 		EnvVars:     EnvVars("TEMPLATER", "TEMPLATE_ENGINE"),
 		Destination: v,
 	}

@@ -4,12 +4,13 @@ package action
 
 import (
 	"context"
+	"github.com/helmwave/helmwave/pkg/templater"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
-	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/templater/sprig"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -44,7 +45,7 @@ func (ts *UpTestSuite) TestAutoBuild() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tmpDir, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	u := &Up{
@@ -69,7 +70,7 @@ func (ts *UpTestSuite) TestPrometheusMonitors() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "20_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "20_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: templater.Default,
 	}
 
 	s := &Up{

@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/plan"
-	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/templater/sprig"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -42,7 +42,7 @@ func (ts *YmlTestSuite) TestRenderEnv() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tmpDir, "01_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	value := "test01"

@@ -3,8 +3,7 @@ package plan
 import (
 	"context"
 	"errors"
-	"github.com/helmwave/helmwave/pkg/templater/sprig"
-
+	"github.com/helmwave/helmwave/pkg/templater"
 	"os"
 	"path/filepath"
 	"testing"
@@ -34,7 +33,7 @@ func (ts *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
 	ts.T().Helper()
 
 	p := New(filepath.Join(tmpDir, Dir))
-	p.templater = sprig.TemplaterName
+	p.templater = templater.Default
 
 	return p
 }

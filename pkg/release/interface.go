@@ -3,19 +3,21 @@ package release
 import (
 	"context"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"slices"
 
-	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/hooks"
-	"github.com/helmwave/helmwave/pkg/log"
-	"github.com/helmwave/helmwave/pkg/monitor"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/release"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
+	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/helmwave/helmwave/pkg/log"
+	"github.com/helmwave/helmwave/pkg/monitor"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/helmwave/helmwave/pkg/templater"
 )
 
 // Config is an interface to manage particular helm release.
@@ -29,7 +31,7 @@ type Config interface {
 	HideSecret(hideSecret bool)
 	ChartDepsUpd() error
 	DownloadChart(tmpDir string) error
-	BuildValues(ctx context.Context, dir, templater string) error
+	BuildValues(ctx context.Context, dir string, templater templater.Templater) error
 	Name() string
 	Namespace() string
 	Chart() *Chart

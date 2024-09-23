@@ -1,4 +1,4 @@
-package template
+package gomplate
 
 import (
 	"bytes"
@@ -13,31 +13,32 @@ import (
 	"github.com/hairyhenderson/gomplate/v4"
 	"github.com/hairyhenderson/gomplate/v4/tmpl"
 	"github.com/helmwave/helmwave/pkg/parallel"
+	"github.com/helmwave/helmwave/pkg/templater/customs"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	TemplaterGomplate = "gomplate"
+	TemplaterName = "gomplate"
 )
 
-type gomplateTemplater struct {
-	additionalFuncs               map[string]any
+type Templater struct {
+	additionalFuncMap             map[string]any
 	delimiterLeft, delimiterRight string
 	additionalOutputs             []io.Writer
 }
 
-func (t gomplateTemplater) Name() string {
-	return TemplaterGomplate
+func (t Templater) Name() string {
+	return TemplaterName
 }
 
-func (t gomplateTemplater) Render(ctx context.Context, src string, data any) ([]byte, error) {
+func (t Templater) Render(ctx context.Context, src []byte, data any) ([]byte, error) {
 	tpl := template.New("tpl")
 	funcs := t.funcMap(ctx, tpl, data)
-	if t.additionalFuncs != nil {
-		maps.Copy(funcs, t.additionalFuncs)
+	if t.additionalFuncMap != nil {
+		maps.Copy(funcs, t.additionalFuncMap)
 	}
 
-	tpl, err := tpl.Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
+	tpl, err := tpl.Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(string(src))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -65,15 +66,15 @@ func (t gomplateTemplater) Render(ctx context.Context, src string, data any) ([]
 	return buf.Bytes(), nil
 }
 
-func (t gomplateTemplater) funcMap(ctx context.Context, tpl *template.Template, data any) template.FuncMap {
+func (t Templater) funcMap(ctx context.Context, tpl *template.Template, data any) template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading gomplate template functions")
 	gomplateFuncMap := gomplate.CreateFuncs(ctx)
 
-	addToMap(funcMap, gomplateOldFuncs.CreateDataFuncs(ctx, &gomplateOldData.Data{Ctx: ctx}))
-	addToMap(funcMap, gomplateFuncMap)
-	addToMap(funcMap, customFuncs)
+	maps.Copy(funcMap, gomplateOldFuncs.CreateDataFuncs(ctx, &gomplateOldData.Data{Ctx: ctx}))
+	maps.Copy(funcMap, gomplateFuncMap)
+	maps.Copy(funcMap, customs.FuncMap)
 
 	tp := tmpl.New(tpl, data, tpl.Name())
 	funcMap["tmpl"] = func() *tmpl.Template { return tp }
@@ -82,22 +83,22 @@ func (t gomplateTemplater) funcMap(ctx context.Context, tpl *template.Template, 
 	return funcMap
 }
 
-func (t *gomplateTemplater) Delims(left, right string) {
+func (t *Templater) Delims(left, right string) {
 	t.delimiterLeft = left
 	t.delimiterRight = right
 }
 
-func (t *gomplateTemplater) AddOutput(w io.Writer) {
+func (t *Templater) AddOutput(w io.Writer) {
 	if t.additionalOutputs == nil {
 		t.additionalOutputs = []io.Writer{}
 	}
 	t.additionalOutputs = append(t.additionalOutputs, w)
 }
 
-func (t *gomplateTemplater) AddFunc(name string, f any) {
-	if t.additionalFuncs == nil {
-		t.additionalFuncs = map[string]any{}
+func (t *Templater) AddFunc(name string, f any) {
+	if t.additionalFuncMap == nil {
+		t.additionalFuncMap = map[string]any{}
 	}
 
-	t.additionalFuncs[name] = f
+	t.additionalFuncMap[name] = f
 }

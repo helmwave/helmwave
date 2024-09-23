@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/databus23/helm-diff/v3/diff"
-	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/templater/sprig"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -44,7 +44,7 @@ func (ts *DiffLiveTestSuite) TestRun() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "02_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	s := &Build{

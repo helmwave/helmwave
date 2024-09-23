@@ -67,3 +67,9 @@ func IsURL(str string) bool {
 
 	return err == nil && u.Scheme != "" && u.Host != ""
 }
+
+// IsURI reports whether provided string is a valid URI.
+func IsURI(uri string) bool {
+	_, err := url.ParseRequestURI(uri)
+	return err == nil
+}

@@ -2,8 +2,8 @@ package action
 
 import (
 	"context"
+	"github.com/helmwave/helmwave/pkg/templater"
 
-	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -12,13 +12,15 @@ var _ Action = (*Yml)(nil)
 
 // Yml is a struct for running 'yml' command.
 type Yml struct {
-	tpl, file string
-	templater string
+	tpl, file     string
+	templaterName string
+
+	templater templater.Templater
 }
 
 // Run is the main function for 'yml' command.
 func (i *Yml) Run(ctx context.Context) error {
-	err := template.Tpl2yml(ctx, i.tpl, i.file, nil, i.templater)
+	err := templater.Tpl2yml(ctx, i.tpl, i.file, nil, i.templater)
 	if err != nil {
 		return err
 	}
@@ -46,6 +48,6 @@ func (i *Yml) flags() []cli.Flag {
 	return []cli.Flag{
 		flagTplFile(&i.tpl),
 		flagYmlFile(&i.file),
-		flagTemplateEngine(&i.templater),
+		flagTemplateEngine(&i.templaterName),
 	}
 }

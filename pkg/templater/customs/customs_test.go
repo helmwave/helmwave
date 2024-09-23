@@ -1,4 +1,4 @@
-package template_test
+package customs_test
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/templater/customs"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -24,7 +24,7 @@ func (s *ExtraTestSuite) TestToYaml() {
 	}
 	yamlData := "field: field"
 
-	y, err := template.ToYaml(data)
+	y, err := customs.ToYaml(data)
 	s.Require().NoError(err)
 	s.Require().YAMLEq(yamlData, y)
 }
@@ -37,20 +37,20 @@ func (r raw) MarshalYAML() (any, error) {
 
 func (s *ExtraTestSuite) TestToYamlNil() {
 	data := raw{}
-	y, err := template.ToYaml(data)
+	y, err := customs.ToYaml(data)
 	s.Require().Equal("", y)
 	s.Require().ErrorIs(err, os.ErrNotExist)
 }
 
 func (s *ExtraTestSuite) TestFromYaml() {
 	tests := []struct {
-		result template.Values
+		result customs.Values
 		yaml   string
 		fails  bool
 	}{
 		{
 			yaml:   "abc: 123",
-			result: template.Values{"abc": 123},
+			result: customs.Values{"abc": 123},
 			fails:  false,
 		},
 		{
@@ -60,7 +60,7 @@ func (s *ExtraTestSuite) TestFromYaml() {
 	}
 
 	for i := range tests {
-		v, err := template.FromYaml(tests[i].yaml)
+		v, err := customs.FromYaml(tests[i].yaml)
 		if tests[i].fails {
 			s.Error(err)
 			s.Empty(v)
@@ -72,7 +72,7 @@ func (s *ExtraTestSuite) TestFromYaml() {
 }
 
 func (s *ExtraTestSuite) TestExec() {
-	res, err := template.Exec("pwd", []any{})
+	res, err := customs.Exec("pwd", []any{})
 	s.Require().NoError(err)
 
 	pwd, err := os.Getwd()
@@ -80,32 +80,32 @@ func (s *ExtraTestSuite) TestExec() {
 
 	s.Require().Equal(pwd, strings.TrimSpace(res))
 
-	res, err = template.Exec("echo", []any{"-n", "123"})
+	res, err = customs.Exec("echo", []any{"-n", "123"})
 	s.Require().NoError(err)
 	s.Require().Equal("123", res)
 }
 
 func (s *ExtraTestSuite) TestExecInvalidArg() {
-	res, err := template.Exec("pwd", []any{123})
+	res, err := customs.Exec("pwd", []any{123})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
 
 func (s *ExtraTestSuite) TestExecError() {
-	res, err := template.Exec(s.T().Name(), []any{})
+	res, err := customs.Exec(s.T().Name(), []any{})
 	s.Require().Error(err)
 	s.Require().Empty(res)
 }
 
 func (s *ExtraTestSuite) TestExecStdin() {
 	input := "123"
-	res, err := template.Exec("cat", []any{}, input)
+	res, err := customs.Exec("cat", []any{}, input)
 	s.Require().NoError(err)
 	s.Require().Equal(input, res)
 }
 
 func (s *ExtraTestSuite) TestSetValueAtPath() {
-	data := template.Values{
+	data := customs.Values{
 		"a": map[string]any{
 			"b": "123",
 		},
@@ -116,7 +116,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	}
 
 	tests := []struct {
-		result template.Values
+		result customs.Values
 		value  any
 		path   string
 		fails  bool
@@ -124,7 +124,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		{
 			path:  "c",
 			value: 321,
-			result: template.Values{
+			result: customs.Values{
 				"a": map[string]any{"b": "123"},
 				"c": 321,
 				"d": map[any]any{
@@ -136,7 +136,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		{
 			path:  "a.b",
 			value: "321",
-			result: template.Values{
+			result: customs.Values{
 				"a": map[string]any{"b": "321"},
 				"c": 321,
 				"d": map[any]any{
@@ -148,7 +148,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		{
 			path:  "a.c",
 			value: "321",
-			result: template.Values{
+			result: customs.Values{
 				"a": map[string]any{"b": "321", "c": "321"},
 				"c": 321,
 				"d": map[any]any{
@@ -166,7 +166,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 		{
 			path:  "d.e",
 			value: "321",
-			result: template.Values{
+			result: customs.Values{
 				"a": map[string]any{"b": "321", "c": "321"},
 				"c": 321,
 				"d": map[any]any{
@@ -178,7 +178,7 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	}
 
 	for i := range tests {
-		res, err := template.SetValueAtPath(tests[i].path, tests[i].value, data)
+		res, err := customs.SetValueAtPath(tests[i].path, tests[i].value, data)
 		if tests[i].fails {
 			s.Error(err)
 			s.Nil(res)
@@ -213,7 +213,7 @@ func (s *ExtraTestSuite) TestRequired() {
 	}
 
 	for _, t := range tests {
-		res, err := template.Required("blabla", t.data)
+		res, err := customs.Required("blabla", t.data)
 		if t.fails {
 			s.Error(err)
 			s.Nil(res)
@@ -228,7 +228,7 @@ func (s *ExtraTestSuite) TestReadFile() {
 	tmpDir := s.T().TempDir()
 	tmpFile := filepath.Join(tmpDir, "blablafile")
 
-	res, err := template.ReadFile(tmpFile)
+	res, err := customs.ReadFile(tmpFile)
 
 	s.Require().Equal("", res)
 	s.Require().ErrorIs(err, os.ErrNotExist)
@@ -238,14 +238,14 @@ func (s *ExtraTestSuite) TestReadFile() {
 	s.Require().NoError(os.WriteFile(tmpFile, []byte(data), 0o600))
 	s.Require().FileExists(tmpFile)
 
-	res, err = template.ReadFile(tmpFile)
+	res, err = customs.ReadFile(tmpFile)
 
 	s.Require().NoError(err)
 	s.Require().Equal(data, res)
 }
 
 func (s *ExtraTestSuite) TestGet() {
-	data := template.Values{
+	data := customs.Values{
 		"a": map[string]any{
 			"b": "123",
 		},
@@ -288,7 +288,7 @@ func (s *ExtraTestSuite) TestGet() {
 	}
 
 	for i := range tests {
-		res, err := template.Get(tests[i].path, data)
+		res, err := customs.Get(tests[i].path, data)
 		if tests[i].fails {
 			s.Error(err)
 			s.Nil(res)
@@ -300,7 +300,7 @@ func (s *ExtraTestSuite) TestGet() {
 }
 
 func (s *ExtraTestSuite) TestHasKey() {
-	data := template.Values{
+	data := customs.Values{
 		"a": map[string]any{
 			"b": "123",
 		},
@@ -343,7 +343,7 @@ func (s *ExtraTestSuite) TestHasKey() {
 	}
 
 	for _, test := range tests {
-		res, err := template.HasKey(test.path, data)
+		res, err := customs.HasKey(test.path, data)
 		s.Equal(test.result, res)
 
 		if test.fails {
@@ -366,14 +366,14 @@ type NonParallelExtraTestSuite struct {
 func (s *NonParallelExtraTestSuite) TestRequiredEnv() {
 	name := s.T().Name()
 
-	res, err := template.RequiredEnv(name)
+	res, err := customs.RequiredEnv(name)
 	s.Require().Error(err)
 	s.Require().Empty(res)
 
 	data := "test"
 	s.T().Setenv(name, data)
 
-	res, err = template.RequiredEnv(name)
+	res, err = customs.RequiredEnv(name)
 	s.Require().NoError(err)
 	s.Require().Equal(data, res)
 }

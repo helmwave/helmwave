@@ -5,16 +5,18 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/hooks"
-	"github.com/helmwave/helmwave/pkg/monitor"
-	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chartutil"
 	helmRelease "helm.sh/helm/v3/pkg/release"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
+	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/helmwave/helmwave/pkg/monitor"
+	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/helmwave/helmwave/pkg/templater"
 )
 
 //nolint:govet // field alignment doesn't matter in tests
@@ -91,7 +93,7 @@ func (r *MockReleaseConfig) Equal(_ release.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater string) error {
+func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir string, tpl templater.Templater) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn
@@ -100,7 +102,7 @@ func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater stri
 	for i := len(r.Values()) - 1; i >= 0; i-- {
 		v := r.Values()[i]
 		dst := filepath.Join(dir, Values, filepath.Base(v.Src))
-		err := template.Tpl2yml(ctx, v.Src, dst, nil, templater)
+		err := templater.Tpl2yml(ctx, v.Src, dst, nil, tpl)
 		if err != nil {
 			return err
 		}
@@ -165,8 +167,8 @@ func (r *MockReleaseConfig) Repo() string {
 	return r.Called().String(0)
 }
 
-func (r *MockReleaseConfig) Values() []release.ValuesReference {
-	return r.Called().Get(0).([]release.ValuesReference)
+func (r *MockReleaseConfig) Values() []fileref.Config {
+	return r.Called().Get(0).([]fileref.Config)
 }
 
 func (r *MockReleaseConfig) Logger() *log.Entry {

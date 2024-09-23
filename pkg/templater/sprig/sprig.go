@@ -1,4 +1,4 @@
-package template
+package sprig
 
 import (
 	"bytes"
@@ -10,49 +10,36 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/helmwave/helmwave/pkg/parallel"
+	"github.com/helmwave/helmwave/pkg/templater/customs"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	TemplaterSprig = "sprig"
+	TemplaterName = "sprig"
 )
 
-var (
-	sprigAliases = map[string]string{
-		"get":    "sprigGet",
-		"hasKey": "sprigHasKey",
-	}
+var sprigAliases = map[string]string{
+	"get":    "sprigGet",
+	"hasKey": "sprigHasKey",
+}
 
-	customFuncs = map[string]any{
-		"toYaml":         ToYaml,
-		"fromYaml":       FromYaml,
-		"exec":           Exec,
-		"setValueAtPath": SetValueAtPath,
-		"requiredEnv":    RequiredEnv,
-		"required":       Required,
-		"readFile":       ReadFile,
-		"get":            Get,
-		"hasKey":         HasKey,
-	}
-)
-
-type sprigTemplater struct {
+type Templater struct {
 	additionalFuncs               map[string]any
 	delimiterLeft, delimiterRight string
 	additionalOutputs             []io.Writer
 }
 
-func (t sprigTemplater) Name() string {
-	return TemplaterSprig
+func (t Templater) Name() string {
+	return TemplaterName
 }
 
-func (t sprigTemplater) Render(ctx context.Context, src string, data any) ([]byte, error) {
+func (t Templater) Render(ctx context.Context, src []byte, data any) ([]byte, error) {
 	funcs := t.funcMap()
 	if t.additionalFuncs != nil {
 		maps.Copy(funcs, t.additionalFuncs)
 	}
 
-	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(src)
+	tpl, err := template.New("tpl").Delims(t.delimiterLeft, t.delimiterRight).Funcs(funcs).Parse(string(src))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -80,7 +67,7 @@ func (t sprigTemplater) Render(ctx context.Context, src string, data any) ([]byt
 	return buf.Bytes(), nil
 }
 
-func (t sprigTemplater) funcMap() template.FuncMap {
+func (t Templater) funcMap() template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading sprig template functions")
@@ -89,29 +76,25 @@ func (t sprigTemplater) funcMap() template.FuncMap {
 		sprigFuncMap[alias] = sprigFuncMap[orig]
 	}
 
-	addToMap(funcMap, sprigFuncMap)
-	addToMap(funcMap, customFuncs)
+	maps.Copy(funcMap, sprigFuncMap)
+	maps.Copy(funcMap, customs.FuncMap)
 
 	return funcMap
 }
 
-func addToMap(dst, src template.FuncMap) {
-	maps.Copy(dst, src)
-}
-
-func (t *sprigTemplater) Delims(left, right string) {
+func (t *Templater) Delims(left, right string) {
 	t.delimiterLeft = left
 	t.delimiterRight = right
 }
 
-func (t *sprigTemplater) AddOutput(w io.Writer) {
+func (t *Templater) AddOutput(w io.Writer) {
 	if t.additionalOutputs == nil {
 		t.additionalOutputs = []io.Writer{}
 	}
 	t.additionalOutputs = append(t.additionalOutputs, w)
 }
 
-func (t *sprigTemplater) AddFunc(name string, f any) {
+func (t *Templater) AddFunc(name string, f any) {
 	if t.additionalFuncs == nil {
 		t.additionalFuncs = map[string]any{}
 	}

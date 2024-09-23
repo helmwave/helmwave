@@ -1,4 +1,4 @@
-package template
+package customs
 
 import (
 	"bytes"
@@ -13,6 +13,18 @@ import (
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"gopkg.in/yaml.v3"
 )
+
+var FuncMap = map[string]any{
+	"toYaml":         ToYaml,
+	"fromYaml":       FromYaml,
+	"exec":           Exec,
+	"setValueAtPath": SetValueAtPath,
+	"requiredEnv":    RequiredEnv,
+	"required":       Required,
+	"readFile":       ReadFile,
+	"get":            Get,
+	"hasKey":         HasKey,
+}
 
 // Values is alias for string map of interfaces.
 type Values = map[string]any

@@ -24,6 +24,20 @@ func CreateFile(p string) (*os.File, error) {
 	return f, nil
 }
 
+func CreateWriteFile(path string, content string) (err error) {
+	f, err := CreateFile(path)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.WriteString(content)
+	if err != nil {
+		return err
+	}
+
+	return f.Close()
+}
+
 // IsExists return true if file exists.
 func IsExists(s string) bool {
 	_, err := os.Stat(s)

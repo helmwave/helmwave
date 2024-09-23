@@ -2,13 +2,14 @@ package plan
 
 import (
 	"context"
+	"github.com/helmwave/helmwave/pkg/templater"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type BuildOptions struct {
 	Yml                string
-	Templater          string
+	Templater          templater.Templater
 	Tags               []string
 	GraphWidth         int
 	MatchAll           bool

@@ -182,7 +182,7 @@ func (p *Plan) exportValues() error {
 		for j := range p.body.Releases[i].Values() {
 			found = true
 			v := p.body.Releases[i].Values()[j]
-			v.Dst = filepath.Join(p.dir, "values", p.body.Releases[i].Uniq().String(), strconv.Itoa(i)+".yml")
+			v.Dst = filepath.Join(p.dir, Values, p.body.Releases[i].Uniq().String(), strconv.Itoa(i)+".yml")
 		}
 	}
 

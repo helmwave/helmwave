@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"strings"
 
-	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/release"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
+	"github.com/helmwave/helmwave/pkg/helper"
 )
 
 // Helm wraps a lot of meta.NoKindMatchError into fmt.Errorf which makes errors.Is unusable.

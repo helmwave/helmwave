@@ -1,4 +1,4 @@
-package template_test
+package templater_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/templater"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -31,7 +31,7 @@ func (ts *Tpl2YmlTestSuite) TestNonExistingTemplate() {
 	tpl := filepath.Join(tmpDir, "values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(ts.ctx, tpl, dst, nil, template.TemplaterSprig)
+	err := templater.Tpl2yml(ts.ctx, tpl, dst, nil, templater.Default)
 	ts.Require().ErrorIs(err, os.ErrNotExist)
 }
 
@@ -40,7 +40,7 @@ func (ts *Tpl2YmlTestSuite) TestNonExistingDestDir() {
 	tpl := filepath.Join(tests.Root, "05_values.yaml")
 	dst := filepath.Join(tmpDir, "blabla", "values.yaml")
 
-	err := template.Tpl2yml(ts.ctx, tpl, dst, nil, template.TemplaterSprig)
+	err := templater.Tpl2yml(ts.ctx, tpl, dst, nil, templater.Default)
 	ts.Require().NoError(err)
 }
 
@@ -49,7 +49,7 @@ func (ts *Tpl2YmlTestSuite) TestMissingData() {
 	tpl := filepath.Join(tests.Root, "08_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(ts.ctx, tpl, dst, nil, template.TemplaterSprig)
+	err := templater.Tpl2yml(ts.ctx, tpl, dst, nil, templater.Default)
 	ts.Require().EqualError(err, "failed to render template: failed to parse template: template: tpl:1: function \"defineDatasource\" not defined")
 }
 
@@ -58,7 +58,7 @@ func (ts *Tpl2YmlTestSuite) TestDisabledGomplate() {
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(ts.ctx, tpl, dst, nil, template.TemplaterSprig)
+	err := templater.Tpl2yml(ts.ctx, tpl, dst, nil, templater.Default)
 	ts.Require().Error(err)
 }
 
@@ -67,6 +67,6 @@ func (ts *Tpl2YmlTestSuite) TestEnabledGomplate() {
 	tpl := filepath.Join(tests.Root, "09_values.yaml")
 	dst := filepath.Join(tmpDir, "values.yaml")
 
-	err := template.Tpl2yml(ts.ctx, tpl, dst, nil, template.TemplaterGomplate)
+	err := templater.Tpl2yml(ts.ctx, tpl, dst, nil, templater.Default)
 	ts.Require().NoError(err)
 }
