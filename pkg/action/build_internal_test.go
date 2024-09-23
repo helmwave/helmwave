@@ -2,6 +2,9 @@ package action
 
 import (
 	"context"
+	"github.com/helmwave/helmwave/pkg/templater"
+	"github.com/helmwave/helmwave/pkg/templater/gomplate"
+	"github.com/helmwave/helmwave/pkg/templater/sprig"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +17,6 @@ import (
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	log "github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
@@ -49,7 +51,7 @@ func (ts *BuildTestSuite) TestYmlError() {
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		file:      filepath.Join(tests.Root, "helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: templater.Default,
 	}
 
 	s := &Build{
@@ -69,7 +71,7 @@ func (ts *BuildTestSuite) TestManifest() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: templater.Default,
 	}
 
 	s := &Build{
@@ -106,7 +108,7 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "14_helmwave.yml"),
 		file:      filepath.Join(tmpDir, "14_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	sfail := &Build{
@@ -171,7 +173,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: templater.Default,
 	}
 
 	s := &Build{
@@ -198,7 +200,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tests.Root, "03_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	cases := []struct {
@@ -242,7 +244,7 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "07_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "07_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	s := &Build{
@@ -266,7 +268,7 @@ func (ts *BuildTestSuite) TestValuesDependency() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "19_helmwave.yml"),
 		file:      filepath.Join(tests.Root, "19_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	s := &Build{
@@ -325,7 +327,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
 		file:      filepath.Join(tmpDir, "01_auto_yaml_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: &sprig.Templater{},
 	}
 
 	s := &Build{
@@ -350,7 +352,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "08_helmwave.yml"),
 		file:      filepath.Join(tmpDir, "08_helmwave.yml"),
-		templater: template.TemplaterGomplate,
+		templater: &gomplate.Templater{},
 	}
 
 	s := &Build{
@@ -372,7 +374,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "13_helmwave.yml"),
 		file:      filepath.Join(tmpDir, "13_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: templater.Default,
 	}
 
 	s := &Build{
@@ -400,7 +402,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "17_helmwave.yml"),
 		file:      filepath.Join(tmpDir, "17_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: templater.Default,
 	}
 
 	s := &Build{
@@ -432,7 +434,7 @@ func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
 	y := &Yml{
 		tpl:       filepath.Join("tests", "02_helmwave.yml"),
 		file:      filepath.Join("tests", "02_helmwave.yml"),
-		templater: template.TemplaterSprig,
+		templater: templater.Default,
 	}
 
 	s := &Build{
