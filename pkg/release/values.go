@@ -42,9 +42,9 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 				Release: rel,
 			}
 
-			err := v.Set(filename, templater, data, renderedValuesMap, l)
+			err := v.Set(ctx, filename, templater, data, renderedValuesMap)
 			switch {
-			case !v.Strict && errors.Is(fileref.ErrValuesNotExist, err):
+			case !v.Strict && errors.Is(err, fileref.ErrValuesNotExist):
 				l.WithError(err).Warn("skipping values...")
 				toDeleteMap[v] = true
 			case err != nil:

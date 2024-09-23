@@ -2,8 +2,9 @@ package release_test
 
 import (
 	"context"
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"testing"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
 
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"

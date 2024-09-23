@@ -1,8 +1,9 @@
 package plan
 
 import (
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"os"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
 
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/registry"

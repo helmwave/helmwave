@@ -4,16 +4,17 @@ import (
 	"context"
 	_ "crypto/md5" // for crypto.MD5.New to work
 	"fmt"
+	"strings"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
-	"strings"
 )
 
 // Config is used to match source values file path and temporary.
 //
-//nolint:lll
+
 type Config struct {
 	Src            string `yaml:"src" json:"src" jsonschema:"required,description=Source of values. Can be local path or HTTP URL"`
 	Dst            string `yaml:"dst" json:"dst" jsonschema:"readOnly"`
@@ -21,22 +22,18 @@ type Config struct {
 	DelimiterRight string `yaml:"delimiter_right,omitempty" json:"delimiter_right,omitempty" jsonschema:"Set right delimiter for template engine,default=}}"`
 	Renderer       string `yaml:"renderer" json:"renderer" jsonschema:"description=How to render the file,enum=sprig,enum=gomplate,enum=copy,enum=sops"`
 	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
-
-	renderedFiles *renderedFiles `yaml:"-"`
-	l             *log.Entry
-	ctx           context.Context
 }
 
-func (v *Config) fetch() error {
+func (v *Config) fetch(ctx context.Context) error {
 	if v.isURL() {
-		err := v.Download(v.ctx)
+		err := v.Download(ctx)
 		if err != nil {
-			v.l.WithError(err).Warnf("%q skipping: cant download", v.Src)
+			log.WithError(err).Warnf("%q skipping: cant download", v.Src)
 
 			return ErrValuesNotExist
 		}
 	} else if !helper.IsExists(v.Src) {
-		v.l.Warn("skipping: local file not found")
+		log.Warn("skipping: local file not found")
 
 		return ErrValuesNotExist
 	}
@@ -44,26 +41,24 @@ func (v *Config) fetch() error {
 	return nil
 }
 
-func (v *Config) Set(filename, templater string, data any, files *renderedFiles, l *log.Entry) error {
+func (v *Config) Set(ctx context.Context, filename, templater string, data any, files *renderedFiles) error {
 	if v.Renderer == "" {
 		v.Renderer = templater
 	}
-	v.l = l
-	v.renderedFiles = files
 
 	v.Dst = filename
 
-	v.l.Trace("Building values reference")
+	log.Trace("Building values reference")
 
-	err := v.fetch()
+	err := v.fetch(ctx)
 	if err != nil {
 		return err
 	}
 
 	if v.isURL() {
-		err = template.Tpl2yml(v.ctx, v.Dst, v.Dst, data, v.Renderer, v.tplOpts()...)
+		err = template.Tpl2yml(ctx, v.Dst, v.Dst, data, v.Renderer, v.tplOpts(files)...)
 	} else {
-		err = template.Tpl2yml(v.ctx, v.Src, v.Dst, data, v.Renderer, v.tplOpts()...)
+		err = template.Tpl2yml(ctx, v.Src, v.Dst, data, v.Renderer, v.tplOpts(files)...)
 	}
 
 	if err != nil {
@@ -71,23 +66,22 @@ func (v *Config) Set(filename, templater string, data any, files *renderedFiles,
 	}
 
 	return nil
-
 }
 
-func (v *Config) tplOpts() (opts []template.TemplaterOptions) {
+func (v *Config) tplOpts(files *renderedFiles) (opts []template.TemplaterOptions) {
 	opts = []template.TemplaterOptions{
 		template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight),
 	}
 
-	if v.renderedFiles != nil {
+	if files != nil {
 		buf := &strings.Builder{}
-		defer v.renderedFiles.Add(v.Src, buf)
+		defer files.Add(v.Src, buf)
 		opts = append(
 			opts,
 			template.CopyOutput(buf),
 			template.AddFunc("getValues",
 				func(filename string) (any, error) {
-					s := v.renderedFiles.Get(filename).String()
+					s := files.Get(filename).String()
 
 					var res any
 					err := yaml.Unmarshal([]byte(s), &res)

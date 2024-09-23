@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -165,8 +167,8 @@ func (r *MockReleaseConfig) Repo() string {
 	return r.Called().String(0)
 }
 
-func (r *MockReleaseConfig) Values() []release.ValuesReference {
-	return r.Called().Get(0).([]release.ValuesReference)
+func (r *MockReleaseConfig) Values() []fileref.Config {
+	return r.Called().Get(0).([]fileref.Config)
 }
 
 func (r *MockReleaseConfig) Logger() *log.Entry {

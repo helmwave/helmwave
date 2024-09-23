@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
@@ -58,7 +60,7 @@ func (ts *BuildValuesTestSuite) TestValuesBuildError() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Values").Return([]release.ValuesReference{
+	mockedRelease.On("Values").Return([]fileref.Config{
 		{Src: tmpValues},
 	})
 
@@ -86,7 +88,7 @@ func (ts *BuildValuesTestSuite) TestSuccess() {
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("KubeContext").Return("")
-	mockedRelease.On("Values").Return([]release.ValuesReference{
+	mockedRelease.On("Values").Return([]fileref.Config{
 		{Src: tmpValues},
 	})
 	mockedRelease.On("BuildValues").Return(nil)

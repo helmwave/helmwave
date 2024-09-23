@@ -1,10 +1,11 @@
 package release
 
 import (
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"slices"
 	"sync"
 	"time"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"

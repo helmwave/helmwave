@@ -178,10 +178,11 @@ func (p *Plan) exportGraphMD() error {
 func (p *Plan) exportValues() error {
 	found := false
 
-	for i, _ := range p.body.Releases {
+	for i := range p.body.Releases {
 		for j := range p.body.Releases[i].Values() {
 			found = true
 			v := p.body.Releases[i].Values()[j]
+			//nolint: govet
 			v.Dst = filepath.Join(p.dir, "values", p.body.Releases[i].Uniq().String(), strconv.Itoa(i)+".yml")
 		}
 	}

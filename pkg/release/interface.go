@@ -3,8 +3,9 @@ package release
 import (
 	"context"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"slices"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"

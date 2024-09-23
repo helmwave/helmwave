@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/helmwave/helmwave/pkg/fileref"
 	"strings"
+
+	"github.com/helmwave/helmwave/pkg/fileref"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/chart"
