@@ -14,9 +14,6 @@ var (
 	// ErrPendingRelease is an error for fail strategy that release is in pending status.
 	ErrPendingRelease = errors.New("release is in pending status")
 
-	// ErrValuesNotExist is returned when values can't be used and are skipped.
-	ErrValuesNotExist = errors.New("values file doesn't exist")
-
 	// ErrNotFound is an error for not found release.
 	ErrNotFound = driver.ErrReleaseNotFound
 

@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
@@ -50,7 +52,7 @@ func (ts *ExportTestSuite) TestValuesOneRelease() {
 
 	mockedRelease := NewMockReleaseConfig(ts.T())
 	mockedRelease.On("Name").Return("redis")
-	mockedRelease.On("Values").Return([]release.ValuesReference{
+	mockedRelease.On("Values").Return([]fileref.Config{
 		{Src: tmpValues},
 	})
 	mockedRelease.On("Namespace").Return("defaultblabla")

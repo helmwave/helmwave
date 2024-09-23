@@ -3,6 +3,8 @@ package plan
 import (
 	"context"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
@@ -35,7 +37,7 @@ func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config) error
 
 		return err
 	} else {
-		vals := helper.SlicesMap(rel.Values(), func(v release.ValuesReference) string {
+		vals := helper.SlicesMap(rel.Values(), func(v fileref.Config) string {
 			return v.Dst
 		})
 

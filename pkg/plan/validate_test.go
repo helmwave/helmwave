@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/tests"
 
@@ -81,10 +83,10 @@ func (ts *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("Uniq").Return()
 	mockedRelease.On("KubeContext").Return("")
 
-	v := release.ValuesReference{Src: tmpValues}
-	ts.Require().NoError(v.SetViaRelease(ts.ctx, mockedRelease, tmpDir, template.TemplaterSprig, nil))
+	v := fileref.Config{Src: tmpValues}
+	ts.Require().NoError(v.Set(context.Background(), "test.values.yml", tmpDir, template.TemplaterSprig, nil))
 
-	mockedRelease.On("Values").Return([]release.ValuesReference{v})
+	mockedRelease.On("Values").Return([]fileref.Config{v})
 
 	p.SetReleases(mockedRelease)
 
@@ -102,8 +104,8 @@ func (ts *ValidateTestSuite) TestValidateValuesNotFound() {
 	ts.Require().NoError(os.WriteFile(tmpValues, valuesContents, 0o600))
 
 	mockedRelease := plan.NewMockReleaseConfig(ts.T())
-	v := release.ValuesReference{Src: tmpValues}
-	mockedRelease.On("Values").Return([]release.ValuesReference{v})
+	v := fileref.Config{Src: tmpValues}
+	mockedRelease.On("Values").Return([]fileref.Config{v})
 
 	p.SetReleases(mockedRelease)
 

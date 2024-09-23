@@ -3,6 +3,8 @@ package plan
 import (
 	"os"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -39,7 +41,7 @@ func (p *Plan) ValidateValuesImport() error {
 // Also, dst needs to unmarshal for import from plan.
 func (p *Plan) ValidateValuesBuild() error {
 	for _, rel := range p.body.Releases {
-		err := release.ProhibitDst(rel.Values())
+		err := fileref.ProhibitDst(rel.Values())
 		if err != nil {
 			return err
 		}

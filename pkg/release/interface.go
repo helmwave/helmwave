@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/log"
@@ -37,7 +39,7 @@ type Config interface {
 	SetDependsOn(deps []*DependsOnReference)
 	Tags() []string
 	Repo() string
-	Values() []ValuesReference
+	Values() []fileref.Config
 	HelmWait() bool
 	KubeContext() string
 	Cfg() *action.Configuration

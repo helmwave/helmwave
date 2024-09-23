@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/helper"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli/values"
@@ -24,7 +26,7 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 	}
 
 	// Values
-	valuesFiles := helper.SlicesMap(rel.Values(), func(v ValuesReference) string {
+	valuesFiles := helper.SlicesMap(rel.Values(), func(v fileref.Config) string {
 		return v.Dst
 	})
 

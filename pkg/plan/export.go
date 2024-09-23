@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"slices"
+	"strconv"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -177,10 +178,12 @@ func (p *Plan) exportGraphMD() error {
 func (p *Plan) exportValues() error {
 	found := false
 
-	for i, rel := range p.body.Releases {
+	for i := range p.body.Releases {
 		for j := range p.body.Releases[i].Values() {
 			found = true
-			p.body.Releases[i].Values()[j].SetUniq(p.dir, rel.Uniq())
+			v := p.body.Releases[i].Values()[j]
+			//nolint: govet
+			v.Dst = filepath.Join(p.dir, "values", p.body.Releases[i].Uniq().String(), strconv.Itoa(i)+".yml")
 		}
 	}
 

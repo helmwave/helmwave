@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
@@ -50,7 +51,7 @@ func (ts *SyncTestSuite) TestInstallUpgrade() {
 	rel.CreateNamespace = true
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
-	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{
+	rel.ValuesF = append(rel.ValuesF, fileref.Config{
 		Dst: filepath.Join(tests.Root, "06_values.yaml"),
 	})
 
@@ -69,7 +70,7 @@ func (ts *SyncTestSuite) TestInvalidValues() {
 	rel.CreateNamespace = true
 	rel.Wait = false
 	rel.ChartF.Name = "bitnami/nginx"
-	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{})
+	rel.ValuesF = append(rel.ValuesF, fileref.Config{})
 
 	r, err := rel.Sync(ts.ctx, false)
 	ts.Require().Error(err)

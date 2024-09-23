@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
+
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
@@ -28,7 +30,7 @@ func (ts *ValuesTestSuite) SetupTest() {
 
 func (ts *ValuesTestSuite) TestProhibitDst() {
 	type config struct {
-		Values []release.ValuesReference
+		Values []fileref.Config
 	}
 
 	src := `
@@ -43,13 +45,13 @@ values:
 	err := yaml.Unmarshal([]byte(src), c)
 	ts.Require().NoError(err)
 
-	err = release.ProhibitDst(c.Values)
+	err = fileref.ProhibitDst(c.Values)
 	ts.Require().Error(err)
 }
 
 func (ts *ValuesTestSuite) TestList() {
 	type config struct {
-		Values []release.ValuesReference
+		Values []fileref.Config
 	}
 
 	src := `
@@ -63,7 +65,7 @@ values:
 	ts.Require().NoError(err)
 
 	ts.Require().Equal(&config{
-		Values: []release.ValuesReference{
+		Values: []fileref.Config{
 			{Src: "a"},
 			{Src: "b"},
 		},
@@ -72,7 +74,7 @@ values:
 
 func (ts *ValuesTestSuite) TestMap() {
 	type config struct {
-		Values []release.ValuesReference
+		Values []fileref.Config
 	}
 
 	src := `
@@ -88,7 +90,7 @@ values:
 	ts.Require().NoError(err)
 
 	ts.Require().Equal(&config{
-		Values: []release.ValuesReference{
+		Values: []fileref.Config{
 			{Src: "1", Strict: false},
 			{Src: "2", Strict: true},
 		},
@@ -97,9 +99,9 @@ values:
 
 func (ts *ValuesTestSuite) TestBuildNonExistingNonStrict() {
 	r := release.NewConfig()
-	r.ValuesF = []release.ValuesReference{
+	r.ValuesF = []fileref.Config{
 		{
-			Src:    "nonexisting.values",
+			Src:    "non-existing.values",
 			Strict: false,
 		},
 	}
@@ -112,9 +114,9 @@ func (ts *ValuesTestSuite) TestBuildNonExistingNonStrict() {
 
 func (ts *ValuesTestSuite) TestBuildNonExistingStrict() {
 	r := release.NewConfig()
-	r.ValuesF = []release.ValuesReference{
+	r.ValuesF = []fileref.Config{
 		{
-			Src:    "nonexisting.values",
+			Src:    "non-existing.values",
 			Strict: true,
 		},
 	}
@@ -125,7 +127,7 @@ func (ts *ValuesTestSuite) TestBuildNonExistingStrict() {
 }
 
 func (ts *ValuesTestSuite) TestJSONSchema() {
-	schema := (&release.ValuesReference{}).JSONSchema()
+	schema := (&fileref.Config{}).JSONSchema()
 
 	ts.Require().NotNil(schema)
 
