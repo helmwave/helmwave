@@ -3,12 +3,14 @@ package plan
 import (
 	"context"
 	"errors"
+	"github.com/helmwave/helmwave/pkg/templater/sprig"
+
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/fileref"
 	"github.com/helmwave/helmwave/pkg/release"
-	"github.com/helmwave/helmwave/pkg/template"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -32,7 +34,7 @@ func (ts *BuildValuesTestSuite) createPlan(tmpDir string) *Plan {
 	ts.T().Helper()
 
 	p := New(filepath.Join(tmpDir, Dir))
-	p.templater = template.TemplaterSprig
+	p.templater = sprig.TemplaterName
 
 	return p
 }
@@ -58,7 +60,7 @@ func (ts *BuildValuesTestSuite) TestValuesBuildError() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Values").Return([]release.ValuesReference{
+	mockedRelease.On("Values").Return([]fileref.Config{
 		{Src: tmpValues},
 	})
 
@@ -86,9 +88,7 @@ func (ts *BuildValuesTestSuite) TestSuccess() {
 	mockedRelease.On("Name").Return("redis")
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("KubeContext").Return("")
-	mockedRelease.On("Values").Return([]release.ValuesReference{
-		{Src: tmpValues},
-	})
+	mockedRelease.On("Values").Return([]fileref.Config{{Src: tmpValues}})
 	mockedRelease.On("BuildValues").Return(nil)
 	mockedRelease.On("Uniq").Return()
 
