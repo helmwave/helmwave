@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/databus23/helm-diff/v3 from 3.9.10 to 3.9.11'
+time: 2024-09-23T22:38:32.011891231Z
+custom:
+    Author: dependabot
+    Issue: "1019"
