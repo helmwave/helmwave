@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/getsops/sops/v3 from 3.9.0 to 3.9.1'
+time: 2024-10-04T22:48:06.734234965Z
+custom:
+    Author: dependabot
+    Issue: "1023"
