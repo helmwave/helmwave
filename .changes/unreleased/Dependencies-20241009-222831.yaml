@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump helm.sh/helm/v3 from 3.16.1 to 3.16.2'
+time: 2024-10-09T22:28:31.315252984Z
+custom:
+    Author: dependabot
+    Issue: "1026"
