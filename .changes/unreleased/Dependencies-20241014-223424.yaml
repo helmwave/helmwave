@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/urfave/cli/v2 from 2.27.4 to 2.27.5'
+time: 2024-10-14T22:34:24.254353999Z
+custom:
+    Author: dependabot
+    Issue: "1029"
