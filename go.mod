@@ -26,7 +26,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stoewer/go-strcase v1.3.0
 	github.com/stretchr/testify v1.9.0
-	github.com/urfave/cli/v2 v2.27.4
+	github.com/urfave/cli/v2 v2.27.5
 	github.com/werf/kubedog v0.12.3
 	github.com/werf/logboek v0.6.1
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
@@ -117,7 +117,7 @@ require (
 	github.com/containerd/errdefs v0.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/platforms v0.2.1 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/cyphar/filepath-securejoin v0.3.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
