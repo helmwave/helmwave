@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump aquasecurity/trivy-action from 0.25.0 to 0.28.0'
+time: 2024-10-15T22:49:46.374535706Z
+custom:
+    Author: dependabot
+    Issue: "1030"
