@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/prometheus/common from 0.59.1 to 0.60.1'
+time: 2024-10-24T22:49:42.154224993Z
+custom:
+    Author: dependabot
+    Issue: "1033"
