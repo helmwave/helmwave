@@ -8,7 +8,7 @@ func flagDiffMode(v *string) cli.Flag {
 		Name:        "diff-mode",
 		Value:       "live",
 		Category:    "DIFF",
-		Usage:       "you can set: [ live | local | none ]",
+		Usage:       "you can set: [ live | local | none ]. Set `offline_kube_version` to use [ local | none ]",
 		EnvVars:     EnvVars("DIFF_MODE"),
 		Destination: v,
 	}
