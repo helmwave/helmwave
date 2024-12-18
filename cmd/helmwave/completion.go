@@ -61,6 +61,26 @@ fi
 
 compdef _helmwave helmwave
 `
+
+	fish = `function __fish_helmwave_generate_completions
+    set -l args (commandline -opc)
+    set -l current_token (commandline -ct)
+    if test (string match -r "^-" -- $current_token)
+        eval $args $current_token --generate-bash-completion
+    else
+        eval $args --generate-bash-completion
+    end
+end
+
+function __fish_helmwave_complete
+    set -l completions (__fish_helmwave_generate_completions)
+    for opt in $completions
+        echo "$opt"
+    end
+end
+
+complete -c helmwave -f -a '(__fish_helmwave_complete)'
+`
 )
 
 var (
@@ -79,6 +99,7 @@ func completion() *cli.Command {
 		Description: `
 			 echo "source <(helmwave completion bash)" >> ~/.bashrc
 			 echo "source <(helmwave completion zsh)" >> ~/.zshrc"
+             helmwave completion fish > ~/.config/fish/functions/helmwave.fish
 		`,
 		Action: func(c *cli.Context) error {
 			if c.Args().Len() == 0 {
@@ -92,6 +113,10 @@ func completion() *cli.Command {
 				return nil
 			case "zsh":
 				fmt.Print(zsh) //nolint:forbidigo
+
+				return nil
+			case "fish":
+				fmt.Print(fish) //nolint:forbidigo
 
 				return nil
 			default:
