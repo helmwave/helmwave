@@ -1,0 +1,6 @@
+kind: Fixed
+body: added fish completion
+time: 2024-12-18T14:28:50.23126+02:00
+custom:
+    Author: zhilyaev
+    Issue: "1048"
