@@ -51,7 +51,7 @@ require (
 	cloud.google.com/go/storage v1.43.0 // indirect
 	cuelang.org/go v0.9.2 // indirect
 	dario.cat/mergo v1.0.1 // indirect
-	filippo.io/age v1.2.0 // indirect
+	filippo.io/age v1.2.1 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.14.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0 // indirect
