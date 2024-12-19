@@ -13,6 +13,7 @@ linters:
   disable:
     - perfsprint
     - paralleltest
+    - recvcheck
     - gochecknoglobals # we use globals
     - musttag # we don't need tags always
     - depguard # we know what we do. We can check extra deps via PRs changes.
@@ -107,6 +108,7 @@ linters-settings:
     forbid:
       - ^print.*$
       - 'fmt\.Print.*'
+
 
   funlen:
     lines: 69
@@ -226,9 +228,6 @@ linters-settings:
       - all
 
   govet:
-    # report about shadowed variables
-    check-shadowing: false
-
     # settings per analyzer
     settings:
       printf: # analyzer name, run `go tool vet help` to see all analyzers
@@ -268,7 +267,7 @@ linters-settings:
     allow-unused: false
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
     require-specific: true
-    allow-leading-space: true
+
 
   prealloc:
     # XXX: we don't recommend using this linter before doing performance profiling.
@@ -472,13 +471,6 @@ linters-settings:
       - name: indent-error-flow
         severity: warning
         disabled: false
-      # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#imports-blacklist
-      - name: imports-blacklist
-        severity: warning
-        disabled: true
-        arguments:
-          - "crypto/md5"
-          - "crypto/sha1"
       # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#import-shadowing
       - name: import-shadowing
         severity: warning
@@ -791,6 +783,13 @@ issues:
         - lll
         - revive
         - wrapcheck
+        - dupword
+
+    - path: cmd/
+      linters:
+        - forbidigo
+        - dupword
+
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
