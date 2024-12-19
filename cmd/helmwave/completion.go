@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-
 	"github.com/helmwave/helmwave/pkg/action"
 	"github.com/urfave/cli/v2"
 )
@@ -97,31 +96,41 @@ func completion() *cli.Command {
 		Category: action.Step_,
 		Usage:    "generate completion script",
 		Description: `
-			 echo "source <(helmwave completion bash)" >> ~/.bashrc
-			 echo "source <(helmwave completion zsh)" >> ~/.zshrc"
-             helmwave completion fish > ~/.config/fish/functions/helmwave.fish
+			echo "source <(helmwave completion bash)" >> ~/.bashrc
+			echo "source <(helmwave completion zsh)" >> ~/.zshrc
+			helmwave completion fish > ~/.config/fish/functions/helmwave.fish
 		`,
-		Action: func(c *cli.Context) error {
-			if c.Args().Len() == 0 {
-				return ErrNotChose
-			}
+		Subcommands: []*cli.Command{
+			{
+				Name:     "bash",
+				Category: action.Step_,
+				Usage:    "generate bash completion script",
+				Action: func(c *cli.Context) error {
+					fmt.Print(bash)
 
-			switch c.Args().First() {
-			case "bash":
-				fmt.Print(bash) //nolint:forbidigo
+					return nil
+				},
+			},
+			{
+				Name:     "zsh",
+				Category: action.Step_,
+				Usage:    "generate zsh completion script",
+				Action: func(c *cli.Context) error {
+					fmt.Print(zsh)
 
-				return nil
-			case "zsh":
-				fmt.Print(zsh) //nolint:forbidigo
+					return nil
+				},
+			},
+			{
+				Name:     "fish",
+				Category: action.Step_,
+				Usage:    "generate fish completion script",
+				Action: func(c *cli.Context) error {
+					fmt.Print(fish)
 
-				return nil
-			case "fish":
-				fmt.Print(fish) //nolint:forbidigo
-
-				return nil
-			default:
-				return ErrWrongShell
-			}
+					return nil
+				},
+			},
 		},
 	}
 }
