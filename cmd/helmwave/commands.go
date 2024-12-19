@@ -33,7 +33,7 @@ func version() *cli.Command {
 		Category: action.Step_,
 		Usage:    "show shorts version",
 		Action: func(c *cli.Context) error {
-			fmt.Println(helmwave.Version) //nolint:forbidigo // we need to use fmt.Println here
+			fmt.Println(helmwave.Version)
 
 			return nil
 		},
