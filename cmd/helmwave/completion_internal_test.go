@@ -7,7 +7,7 @@ func (ts *CliTestSuite) TestCompletion() {
 	}{
 		{
 			args:  []string{"helmwave", "completion"},
-			fails: true,
+			fails: false,
 		},
 		{
 			args:  []string{"helmwave", "completion", "bash"},
@@ -18,21 +18,35 @@ func (ts *CliTestSuite) TestCompletion() {
 			fails: false,
 		},
 		{
+			args:  []string{"helmwave", "completion", "fish"},
+			fails: false,
+		},
+		{
 			args:  []string{"helmwave", "completion", "ash"},
 			fails: true,
 		},
 	}
 
-	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
+	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin/stderr
 
+	// Avoid copying structs by using indices.
 	for i := range tests {
-		tt := tests[i]
+		tt := &tests[i] // Take a pointer to the struct instead of copying it.
 
-		err := app.Run(tt.args)
 		if tt.fails {
-			ts.Error(err)
+			ts.Run("fails case", func() {
+				ts.Assert().Panics(func() {
+					err := app.Run(tt.args)
+					ts.Assert().NoError(err, "unexpected error occurred")
+				}, "Expected panic when args are: %v", tt.args)
+			})
 		} else {
-			ts.NoError(err)
+			ts.Run("success case", func() {
+				ts.Assert().NotPanics(func() {
+					err := app.Run(tt.args)
+					ts.Assert().NoError(err, "unexpected error occurred")
+				}, "Unexpected panic for args: %v", tt.args)
+			})
 		}
 	}
 }
