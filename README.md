@@ -14,21 +14,21 @@
 </p>
 
 
-🌊 Helmwave is **[helm3](https://github.com/helm/helm/)-native** tool for deploy your Helm Charts.
+🌊 Helmwave is **[helm3](https://github.com/helm/helm/)-native** tool for deploying your Helm Charts.
 
-> We focus on speed execution, tiny size, pretty debugging.
+> We focus on speed of execution, tiny size, pretty debugging.
 
-With 🌊 helmwave you will become a superhero:
+With 🌊 Helmwave you will become a superhero:
 
 - Deploy multiple environments by one step
-- Separate values for environments
+- Separate values for different environments
 - Common values for apps
 - Keep a directory of chart value files
 - Maintain changes in version control
 - Template values
-- Step by Step deployment (`depends_on`, `allow_failure`)
-- Live tracking kubernetes resources with kubedog
-- Fetch data from external datasource like vault, aws sm, sops
+- Step-by-step deployment (`depends_on`, `allow_failure`)
+- Live tracking of Kubernetes resources with [kubedog](https://github.com/werf/kubedog)
+- Fetch data from external data sources like Vault, AWS Secrets Manager and SOPS
 - ... and much more!
 
 [![asciicast](https://asciinema.org/a/591181.svg)](https://asciinema.org/a/591181)

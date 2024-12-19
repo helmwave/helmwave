@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump filippo.io/age from 1.2.0 to 1.2.1 in the go_modules group'
+time: 2024-12-18T18:25:07.39407219Z
+custom:
+    Author: dependabot
+    Issue: "1052"
