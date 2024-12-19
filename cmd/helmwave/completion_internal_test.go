@@ -27,9 +27,12 @@ func (ts *CliTestSuite) TestCompletion() {
 		},
 	}
 
-	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin or stdout or stderr
+	app, _, _, _ := ts.prepareApp() //nolint:dogsled // no need to access nor stdin/stderr
 
-	for _, tt := range tests {
+	// Avoid copying structs by using indices.
+	for i := range tests {
+		tt := &tests[i] // Take a pointer to the struct instead of copying it.
+
 		if tt.fails {
 			ts.Run("fails case", func() {
 				ts.Assert().Panics(func() {
