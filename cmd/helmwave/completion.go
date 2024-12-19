@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/action"
@@ -81,14 +80,6 @@ end
 
 complete -c helmwave -f -a '(__fish_helmwave_complete)'
 `
-)
-
-var (
-	// ErrWrongShell is an error for unsupported shell.
-	ErrWrongShell = errors.New("wrong shell")
-
-	// ErrNotChose is an error for not provided shell name.
-	ErrNotChose = errors.New("you did not specify a shell")
 )
 
 func completion() *cli.Command {
