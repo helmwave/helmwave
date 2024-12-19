@@ -1,7 +1,5 @@
 package main
 
-import "github.com/stretchr/testify/assert"
-
 func (ts *CliTestSuite) TestCompletion() {
 	tests := []struct {
 		args  []string
@@ -33,15 +31,19 @@ func (ts *CliTestSuite) TestCompletion() {
 
 	for _, tt := range tests {
 		if tt.fails {
-			assert.Panics(ts.T(), func() {
-				err := app.Run(tt.args)
-				assert.NoError(ts.T(), err, "unexpected error occurred")
-			}, "Expected panic when args are: %v", tt.args)
+			ts.Run("fails case", func() {
+				ts.Assert().Panics(func() {
+					err := app.Run(tt.args)
+					ts.Assert().NoError(err, "unexpected error occurred")
+				}, "Expected panic when args are: %v", tt.args)
+			})
 		} else {
-			assert.NotPanics(ts.T(), func() {
-				err := app.Run(tt.args)
-				assert.NoError(ts.T(), err, "unexpected error occurred")
-			}, "Unexpected panic for args: %v", tt.args)
+			ts.Run("success case", func() {
+				ts.Assert().NotPanics(func() {
+					err := app.Run(tt.args)
+					ts.Assert().NoError(err, "unexpected error occurred")
+				}, "Unexpected panic for args: %v", tt.args)
+			})
 		}
 	}
 }
