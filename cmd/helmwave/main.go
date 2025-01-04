@@ -64,13 +64,14 @@ func CreateApp() *cli.App {
 
 // cancelCtxOnSignal closes Done channel when one of the listed signals arrives.
 func cancelCtxOnSignal(parent context.Context, signals ...os.Signal) (ctx context.Context) {
-	ctx, cancel := context.WithCancelCause(parent)
+	ctx, cancel := context.WithCancelCause(parent) //nolint:govet
 
 	context.AfterFunc(ctx, func() {
 		if err := context.Cause(ctx); err != nil {
 			log.Error(err)
 		}
 	})
+
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, signals...)
 	if ctx.Err() == nil {
@@ -84,7 +85,7 @@ func cancelCtxOnSignal(parent context.Context, signals ...os.Signal) (ctx contex
 		}()
 	}
 
-	return ctx
+	return ctx //nolint:govet // lostcancel: this return statement may be reached without using the cancel var defined on line 67
 }
 
 func before(ctx *cli.Context) error {

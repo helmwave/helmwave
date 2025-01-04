@@ -58,4 +58,4 @@ We use https://pre-commit.com for git hooks
 
 > change a version in next files:
 
-1. [Dockerfile](Dockerfile): ALPINE_VERSION=3.18
+1. [Dockerfile](Dockerfile): ALPINE_VERSION=3.21

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/action"
@@ -61,14 +60,26 @@ fi
 
 compdef _helmwave helmwave
 `
-)
 
-var (
-	// ErrWrongShell is an error for unsupported shell.
-	ErrWrongShell = errors.New("wrong shell")
+	fish = `function __fish_helmwave_generate_completions
+    set -l args (commandline -opc)
+    set -l current_token (commandline -ct)
+    if test (string match -r "^-" -- $current_token)
+        eval $args $current_token --generate-bash-completion
+    else
+        eval $args --generate-bash-completion
+    end
+end
 
-	// ErrNotChose is an error for not provided shell name.
-	ErrNotChose = errors.New("you did not specify a shell")
+function __fish_helmwave_complete
+    set -l completions (__fish_helmwave_generate_completions)
+    for opt in $completions
+        echo "$opt"
+    end
+end
+
+complete -c helmwave -f -a '(__fish_helmwave_complete)'
+`
 )
 
 func completion() *cli.Command {
@@ -77,26 +88,41 @@ func completion() *cli.Command {
 		Category: action.Step_,
 		Usage:    "generate completion script",
 		Description: `
-			 echo "source <(helmwave completion bash)" >> ~/.bashrc
-			 echo "source <(helmwave completion zsh)" >> ~/.zshrc"
+			echo "source <(helmwave completion bash)" >> ~/.bashrc
+			echo "source <(helmwave completion zsh)" >> ~/.zshrc
+			helmwave completion fish > ~/.config/fish/functions/helmwave.fish
 		`,
-		Action: func(c *cli.Context) error {
-			if c.Args().Len() == 0 {
-				return ErrNotChose
-			}
+		Subcommands: []*cli.Command{
+			{
+				Name:     "bash",
+				Category: action.Step_,
+				Usage:    "generate bash completion script",
+				Action: func(c *cli.Context) error {
+					fmt.Print(bash)
 
-			switch c.Args().First() {
-			case "bash":
-				fmt.Print(bash) //nolint:forbidigo
+					return nil
+				},
+			},
+			{
+				Name:     "zsh",
+				Category: action.Step_,
+				Usage:    "generate zsh completion script",
+				Action: func(c *cli.Context) error {
+					fmt.Print(zsh)
 
-				return nil
-			case "zsh":
-				fmt.Print(zsh) //nolint:forbidigo
+					return nil
+				},
+			},
+			{
+				Name:     "fish",
+				Category: action.Step_,
+				Usage:    "generate fish completion script",
+				Action: func(c *cli.Context) error {
+					fmt.Print(fish)
 
-				return nil
-			default:
-				return ErrWrongShell
-			}
+					return nil
+				},
+			},
 		},
 	}
 }
