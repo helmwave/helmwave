@@ -13,7 +13,7 @@ We use [semver](https://semver.org/)
 
 ## Developing flow
 
-*fix/feature-branch --> release/$SEMVER --> main*
+*`fix/feature-branch` --> `release/$SEMVER` --> `main`*
 
 ```mermaid
 ---
@@ -39,8 +39,8 @@ gitGraph
 
 **Example:**
 
-- bugfix/000 --> release/0.40.1 --> main
-- feature/000 --> release/0.41.0 --> main
+- `bugfix/000` --> `release/0.40.1` --> `main`
+- `feature/000` --> `release/0.41.0` --> `main`
 
 ### Non product update
 
