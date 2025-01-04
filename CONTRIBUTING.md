@@ -15,6 +15,27 @@ We use [semver](https://semver.org/)
 
 *fix/feature-branch --> release/$SEMVER --> main*
 
+```mermaid
+---
+title: Developing flow
+---
+gitGraph
+    commit
+    commit
+    branch release/0.42.0
+    checkout release/0.42.0
+    commit
+    branch feature/a
+    checkout feature/a
+    commit
+    commit
+    checkout release/0.42.0
+    merge feature/a
+    checkout main
+    merge release/0.42.0
+    commit
+```
+
 
 **Example:**
 
