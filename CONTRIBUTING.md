@@ -13,13 +13,34 @@ We use [semver](https://semver.org/)
 
 ## Developing flow
 
-*fix/feature-branch --> release/$SEMVER --> main*
+*`fix/feature-branch` --> `release/$SEMVER` --> `main`*
+
+```mermaid
+---
+title: Developing flow
+---
+gitGraph
+    commit
+    commit
+    branch release/0.42.0
+    checkout release/0.42.0
+    commit
+    branch feature/a
+    checkout feature/a
+    commit
+    commit
+    checkout release/0.42.0
+    merge feature/a
+    checkout main
+    merge release/0.42.0
+    commit
+```
 
 
 **Example:**
 
-- bugfix/000 --> release/0.40.1 --> main
-- feature/000 --> release/0.41.0 --> main
+- `bugfix/000` --> `release/0.40.1` --> `main`
+- `feature/000` --> `release/0.41.0` --> `main`
 
 ### Non product update
 
