@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/helmwave/helmwave/pkg/plan"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -21,6 +22,11 @@ func (i *Down) Run(ctx context.Context) error {
 		if err := i.build.Run(ctx); err != nil {
 			return err
 		}
+	}
+
+	if i.build.skipUnchanged {
+		log.Warn("I can't use HELMWAVE_SKIP_UNCHANGED=true for down command. I've changed it to false")
+		i.build.skipUnchanged = false
 	}
 
 	p, err := plan.NewAndImport(ctx, i.build.plandir)
