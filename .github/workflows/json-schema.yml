@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       # I hate gha, Because I can't pass variables to image tag with string manipulation.
-      image: ${{ format('ghcr.io/${0}:v${1}', github.repository, github.event.inputs.tag) }}
+      image: ${{ format('ghcr.io/{0}:v{1}', github.repository, github.event.inputs.tag) }}
     steps:
       - name: generate schema
         run: helmwave schema > schema.json
