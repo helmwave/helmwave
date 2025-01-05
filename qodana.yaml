@@ -10,3 +10,4 @@ include:
 
 exclude:
   - name: GoMixedReceiverTypes
+
