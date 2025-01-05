@@ -3,8 +3,8 @@ repositories:
     name: eks
   - url: https://grafana.github.io/helm-charts
     name: grafana-new
-    insecure_skip_tls_verify: false
-    pass_credentials_all: true
+    insecure_skip_tls_verify: true
+    pass_credentials_all: false
     force: true
 
 releases:
