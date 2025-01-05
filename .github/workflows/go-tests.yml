@@ -37,7 +37,7 @@ jobs:
       - name: Run all tests
         run: go test -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           files: ./tests.cov
           fail_ci_if_error: true
