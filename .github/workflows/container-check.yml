@@ -5,6 +5,7 @@ on:
     types: [ published ]
   schedule:
     - cron: "44 10 * * 6"
+  workflow_dispatch:
 
 jobs:
   container-check:
