@@ -1,6 +1,0 @@
-kind: Fixed
-body: Ignore HELMWAVE_SKIP_UNCHANGED for down command
-time: 2025-01-05T20:54:31.132558+02:00
-custom:
-    Author: zhilyaev
-    Issue: "1054"
