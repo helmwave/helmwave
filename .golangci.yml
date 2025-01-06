@@ -14,6 +14,7 @@ linters:
     - perfsprint
     - paralleltest
     - recvcheck
+    - wrapcheck
     - gochecknoglobals # we use globals
     - musttag # we don't need tags always
     - depguard # we know what we do. We can check extra deps via PRs changes.
