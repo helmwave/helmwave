@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - generate-schema
+      - generate-schema-latest
     steps:
       - uses: actions/checkout@v4
         with:
