@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/adrg/xdg from 0.5.0 to 0.5.3'
+time: 2025-01-06T17:07:45.991954394Z
+custom:
+    Author: dependabot
+    Issue: "1076"
