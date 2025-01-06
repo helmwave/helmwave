@@ -1,6 +1,7 @@
 module github.com/helmwave/helmwave
 
-go 1.23
+go 1.23.4
+
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/adrg/xdg v0.5.0
