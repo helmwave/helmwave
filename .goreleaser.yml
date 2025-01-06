@@ -8,6 +8,21 @@ before:
 # Builds
 ###
 
+nix:
+  - url_template: "https://github.com/helmwave/helmwave/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+
+    homepage: https://helmwave.app/
+    description: "Helmwave is true release management for helm"
+    license: "MIT"
+
+    # Repository to push the generated files to.
+    repository:
+      owner: helmwave
+      name: NUR
+      branch: main
+
+
+
 builds:
   - &bin
     id: "helmwave"
