@@ -13,7 +13,7 @@ nix:
 
     homepage: https://helmwave.app/
     description: "Helmwave is true release management for helm"
-    license: "MIT"
+    license: "mit"
 
     # Repository to push the generated files to.
     repository:
