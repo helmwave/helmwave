@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/adrg/xdg v0.5.0
+	github.com/adrg/xdg v0.5.3
 	github.com/databus23/helm-diff/v3 v3.9.10
 	github.com/getsops/sops/v3 v3.9.3
 	github.com/gofrs/flock v0.12.1
