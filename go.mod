@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/adrg/xdg v0.5.0
+	github.com/adrg/xdg v0.5.3
 	github.com/databus23/helm-diff/v3 v3.9.10
 	github.com/getsops/sops/v3 v3.9.3
 	github.com/gofrs/flock v0.12.1
@@ -20,7 +20,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.14.0
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.20.4
+	github.com/prometheus/client_golang v1.20.5
 	github.com/prometheus/common v0.59.1
 	github.com/r3labs/diff/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.3
