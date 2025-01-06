@@ -1,7 +1,6 @@
 module github.com/helmwave/helmwave
 
 go 1.23
-
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/adrg/xdg v0.5.0
@@ -33,7 +32,7 @@ require (
 	golang.org/x/sync v0.10.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.16.4
-	k8s.io/apimachinery v0.31.3
+	k8s.io/apimachinery v0.32.0
 	k8s.io/cli-runtime v0.31.3
 	k8s.io/client-go v0.31.3
 	k8s.io/klog v1.0.0
@@ -334,13 +333,13 @@ require (
 	k8s.io/apiextensions-apiserver v0.31.3 // indirect
 	k8s.io/apiserver v0.31.3 // indirect
 	k8s.io/component-base v0.31.3 // indirect
-	k8s.io/kube-openapi v0.0.0-20240903163716-9e1beecbcb38 // indirect
+	k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f // indirect
 	k8s.io/kubectl v0.31.3 // indirect
-	k8s.io/utils v0.0.0-20240902221715-702e33fdd3c3 // indirect
+	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
 	oras.land/oras-go v1.2.6 // indirect
-	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
+	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
 	sigs.k8s.io/kustomize/api v0.17.3 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.17.2 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
