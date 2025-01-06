@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump k8s.io/client-go from 0.31.3 to 0.32.0'
+time: 2025-01-06T14:34:06.075499092Z
+custom:
+    Author: dependabot
+    Issue: "1069"
