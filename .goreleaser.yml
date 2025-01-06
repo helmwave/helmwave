@@ -10,6 +10,8 @@ before:
 
 nix:
   - url_template: "https://github.com/helmwave/helmwave/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    name: helmwave
+    ids: [ helmwave ]
 
     homepage: https://helmwave.app/
     description: "Helmwave is true release management for helm"
