@@ -80,7 +80,7 @@ jobs:
             const ref = {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'heads/' + process.env.BRANCH,
+                ref: 'refs/heads/' + process.env.BRANCH,
                 sha: main.data.object.sha,
             }
 
