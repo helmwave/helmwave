@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/otiai10/copy from 1.14.0 to 1.14.1'
+time: 2025-01-06T14:34:10.891794809Z
+custom:
+    Author: dependabot
+    Issue: "1070"
