@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump github.com/go-git/go-git/v5 from 5.11.0 to 5.13.1 in the go_modules group'
+time: 2025-01-06T18:16:35.725404904Z
+custom:
+    Author: dependabot
+    Issue: "1080"
