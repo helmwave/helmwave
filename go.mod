@@ -10,7 +10,7 @@ require (
 	github.com/gofrs/flock v0.12.1
 	github.com/hairyhenderson/gomplate/v3 v3.11.8
 	github.com/hairyhenderson/gomplate/v4 v4.3.0
-	github.com/hashicorp/go-getter v1.7.7
+	github.com/hashicorp/go-getter v1.7.8
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/helmwave/asciigraph v1.0.0
 	github.com/helmwave/logrus-emoji-formatter v1.1.0
