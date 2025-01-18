@@ -1,6 +1,0 @@
-kind: Dependencies
-body: 'chore: bump github.com/hashicorp/go-getter from 1.7.7 to 1.7.8'
-time: 2025-01-17T22:58:12.253958224Z
-custom:
-    Author: dependabot
-    Issue: "1090"
