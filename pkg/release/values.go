@@ -146,6 +146,11 @@ func (v *ValuesReference) SetViaRelease(
 		v.Renderer = templater
 	}
 
+	if v.Renderer == template.TemplaterGomplate {
+		v.DelimiterLeft = "[["
+		v.DelimiterRight = "]]"
+	}
+
 	v.SetUniq(dir, rel.Uniq())
 
 	l := rel.Logger().WithField("values src", v.Src).WithField("values Dst", v.Dst)
