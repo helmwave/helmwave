@@ -1,6 +1,0 @@
-kind: Dependencies
-body: 'chore: bump k8s.io/apimachinery from 0.32.0 to 0.32.1'
-time: 2025-01-20T22:53:22.573007373Z
-custom:
-    Author: dependabot
-    Issue: "1093"
