@@ -1,0 +1,14 @@
+repositories:
+  - url: https://aws.github.io/eks-charts
+    name: eks
+  - url: https://grafana.github.io/helm-charts
+    name: grafana-new
+    insecure_skip_tls_verify: true
+    pass_credentials_all: false
+    force: true
+
+releases:
+  - name: aasdfdsaf
+    namespace: aasdfdsaf
+    offline_kube_version: 1.24.0
+    chart: grafana-new/grafana

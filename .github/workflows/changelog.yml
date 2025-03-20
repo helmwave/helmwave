@@ -28,9 +28,8 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
 
       - id: changelog
-        env:
-          FILEPATH: .changes/${{ github.event.release.tag_name }}.md
-        run: echo "changelog=$(cat $FILEPATH)" >> $GITHUB_OUTPUT
+        run: |
+          cp -rf .changes/${{ github.event.release.tag_name }}.md ${{ github.event.release.tag_name }}.md
 
       - name: Upload changelog artifact
         uses: actions/upload-artifact@v4
@@ -61,7 +60,7 @@ jobs:
           delete-branch: true
           title: "Changelog/${{ steps.version.outputs.version }}"
           labels: ${{ github.event.release.tag_name }},changelog
-          body: ${{ steps.changelog.outputs.changelog }}
+          body-path: ${{ github.event.release.tag_name }}.md
 
       - uses: wow-actions/use-app-token@v2
         id: token
@@ -72,7 +71,7 @@ jobs:
       - name: approve & merge
         run: |
           gh pr review $PR --approve
-          gh pr merge  $PR --auto --merge -d -b ${{ steps.changelog.outputs.changelog }}
+          gh pr merge  $PR --auto --merge -d -F ${{ github.event.release.tag_name }}.md
           gh label create ${{ github.event.release.tag_name }} -c "#515C5D" -f
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.BOT_TOKEN }}
