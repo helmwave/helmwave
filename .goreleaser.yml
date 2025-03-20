@@ -102,8 +102,6 @@ dockers:
     image_templates:
       - ghcr.io/helmwave/helmwave:{{ .Version }}-scratch-amd64
       - ghcr.io/helmwave/helmwave:scratch-amd64
-      - diamon/helmwave:{{ .Version }}-scratch-amd64
-      - diamon/helmwave:scratch-amd64
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is true release management for helm"
       - "--label=org.opencontainers.image.created={{ .Date }}"
@@ -126,8 +124,6 @@ dockers:
     image_templates:
       - ghcr.io/helmwave/helmwave:{{ .Version }}-scratch-arm64v8
       - ghcr.io/helmwave/helmwave:scratch-arm64v8
-      - diamon/helmwave:{{ .Version }}-scratch-arm64v8
-      - diamon/helmwave:scratch-arm64v8
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is true release management for helm"
       - "--label=org.opencontainers.image.created={{ .Date }}"
@@ -149,8 +145,6 @@ dockers:
     image_templates:
       - ghcr.io/helmwave/helmwave:{{ .Version }}-amd64
       - ghcr.io/helmwave/helmwave:latest-amd64
-      - diamon/helmwave:{{ .Version }}-amd64
-      - diamon/helmwave:latest-amd64
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is true release management for helm"
       - "--label=org.opencontainers.image.created={{ .Date }}"
@@ -173,8 +167,6 @@ dockers:
     image_templates:
       - ghcr.io/helmwave/helmwave:{{ .Version }}-arm64v8
       - ghcr.io/helmwave/helmwave:latest-arm64v8
-      - diamon/helmwave:{{ .Version }}-arm64v8
-      - diamon/helmwave:latest-arm64v8
     build_flag_templates:
       - "--label=org.opencontainers.image.description=Helmwave is true release management for helm"
       - "--label=org.opencontainers.image.created={{ .Date }}"
@@ -321,25 +313,6 @@ docker_manifests:
     image_templates:
       - ghcr.io/helmwave/gitops:latest-amd64
       - ghcr.io/helmwave/gitops:latest-arm64v8
-
-  # helmwave: DockerHub
-  - name_template: diamon/helmwave:{{ .Version }}
-    image_templates:
-      - diamon/helmwave:{{ .Version }}-amd64
-      - diamon/helmwave:{{ .Version }}-arm64v8
-  - name_template: diamon/helmwave:latest
-    image_templates:
-      - diamon/helmwave:latest-amd64
-      - diamon/helmwave:latest-arm64v8
-  - name_template: diamon/helmwave:{{ .Version }}-scratch
-    image_templates:
-      - diamon/helmwave:{{ .Version }}-scratch-amd64
-      - diamon/helmwave:{{ .Version }}-scratch-arm64v8
-  - name_template: diamon/helmwave:scratch
-    image_templates:
-      - diamon/helmwave:scratch-amd64
-      - diamon/helmwave:scratch-arm64v8
-
 
 ###
 # Publishes
