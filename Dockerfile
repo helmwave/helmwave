@@ -19,7 +19,7 @@ RUN go build -a -o "/${PROJECT}" "./cmd/${PROJECT}"
 ## Base image with shell
 FROM alpine:${ALPINE_VERSION} as base-release
 RUN apk --update --no-cache add ca-certificates && update-ca-certificates
-ENTRYPOINT ["/bin/${PROJECT}}"]
+ENTRYPOINT ["/bin/${PROJECT}"]
 
 
 ### Base image with shell and debugging tools
