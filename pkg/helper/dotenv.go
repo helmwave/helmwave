@@ -5,6 +5,7 @@ import (
 
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
+	helm "helm.sh/helm/v3/pkg/cli"
 )
 
 func Dotenv() {
@@ -14,4 +15,5 @@ func Dotenv() {
 			log.Fatalf("Error loading .env file: %s", err)
 		}
 	}
+	Helm = helm.New() // Recreate helm instance to respect helm variables from .env file
 }
