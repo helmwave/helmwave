@@ -1,6 +1,0 @@
-kind: Fixed
-body: Recreate global helm instance on loading dotenv
-time: 2025-04-28T15:38:36.188411734Z
-custom:
-    Author: Vigilans
-    Issue: "1112"

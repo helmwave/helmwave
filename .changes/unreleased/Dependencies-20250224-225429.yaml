@@ -1,6 +1,0 @@
-kind: Dependencies
-body: 'chore: bump the go_modules group with 2 updates'
-time: 2025-02-24T22:54:29.962975644Z
-custom:
-    Author: dependabot
-    Issue: "1101"
