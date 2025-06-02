@@ -1,6 +1,0 @@
-kind: Dependencies
-body: 'chore: bump golang.org/x/sync from 0.10.0 to 0.14.0'
-time: 2025-05-30T23:01:00.023588184Z
-custom:
-    Author: dependabot
-    Issue: "1122"
