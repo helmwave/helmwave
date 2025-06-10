@@ -31,7 +31,7 @@ jobs:
             new -k Dependencies -b "${{ github.event.pull_request.title }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
 
       - name: push changelog
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         if: github.actor == 'dependabot[bot]'
         with:
           commit_message: "chore: add changelog via changie #${{ github.event.number }}"
