@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'chore: bump JetBrains/qodana-action from 2024.2 to 2025.2'
+time: 2025-08-13T22:57:10.845546573Z
+custom:
+    Author: dependabot
+    Issue: "1134"
