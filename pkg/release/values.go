@@ -222,6 +222,7 @@ func (v *ValuesReference) fetch(ctx context.Context, l *log.Entry) error {
 }
 
 func (rel *config) BuildValues(ctx context.Context, dir, templater string) error {
+	var mu sync.Mutex
 	vals := rel.Values()
 
 	wg := parallel.NewWaitGroup()
@@ -248,7 +249,9 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 			switch {
 			case !v.Strict && errors.Is(ErrValuesNotExist, err):
 				l.WithError(err).Warn("skipping values...")
+				mu.Lock()
 				toDeleteMap[v] = true
+				mu.Unlock()
 			case err != nil:
 				l.WithError(err).Error("failed to build values")
 
