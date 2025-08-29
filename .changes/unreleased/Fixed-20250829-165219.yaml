@@ -1,0 +1,6 @@
+kind: Fixed
+body: fix concurrent map writes for toDeleteMap
+time: 2025-08-29T16:52:19.120568023+03:00
+custom:
+    Author: alexchspb
+    Issue: ""
