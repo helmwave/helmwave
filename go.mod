@@ -27,7 +27,7 @@ require (
 	github.com/stoewer/go-strcase v1.3.0
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.4
-	github.com/werf/kubedog v0.12.3
+	github.com/werf/kubedog v0.13.0
 	github.com/werf/logboek v0.6.1
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
 	golang.org/x/sync v0.14.0
