@@ -260,7 +260,7 @@ func (rel *config) chartCheck(ch *chart.Chart) error {
 		}
 	}
 
-	if !(ch.Metadata.Type == "" || ch.Metadata.Type == "application") {
+	if ch.Metadata.Type != "" && ch.Metadata.Type != "application" {
 		rel.Logger().Warnf("%s charts are not installable", ch.Metadata.Type)
 	}
 

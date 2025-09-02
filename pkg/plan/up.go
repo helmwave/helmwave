@@ -3,7 +3,9 @@ package plan
 import (
 	"context"
 	"errors"
+	"maps"
 	"os"
+	"slices"
 	"sync"
 	"time"
 
@@ -18,7 +20,6 @@ import (
 	"github.com/werf/kubedog/pkg/kube"
 	"github.com/werf/kubedog/pkg/tracker"
 	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
-	"golang.org/x/exp/maps"
 )
 
 // Up syncs repositories and releases.
@@ -130,7 +131,7 @@ func (p *Plan) runMonitorsActions(
 	ctx context.Context,
 	fails map[monitor.Config]error,
 ) {
-	mons := maps.Keys(fails)
+	mons := slices.Collect(maps.Keys(fails))
 
 	for _, rel := range p.body.Releases {
 		rel.NotifyMonitorsFailed(ctx, mons...)
