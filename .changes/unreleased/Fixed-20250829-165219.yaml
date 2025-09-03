@@ -1,6 +1,0 @@
-kind: Fixed
-body: Resolved a bug that occurred when deleting releases in parallel.
-time: 2025-08-29T16:52:19.120568023+03:00
-custom:
-    Author: alexchspb
-    Issue: ""
