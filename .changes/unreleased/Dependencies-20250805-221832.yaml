@@ -1,6 +1,0 @@
-kind: Dependencies
-body: 'chore: bump actions/download-artifact from 4 to 5'
-time: 2025-08-05T22:18:32.864731122Z
-custom:
-    Author: dependabot
-    Issue: "1132"
