@@ -1,6 +1,6 @@
 package registry
 
-import "golang.org/x/exp/slices"
+import "slices"
 
 // IndexOfHost searches registry in slice of registries by host. Returns offset.
 func IndexOfHost(a []Config, host string) (int, bool) {

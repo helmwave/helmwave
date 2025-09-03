@@ -2,8 +2,7 @@ package dependency
 
 import (
 	"fmt"
-
-	"golang.org/x/exp/maps"
+	"maps"
 )
 
 // Graph is dependencies graph. K stands for map keys type (e.g. string names), N for data type.

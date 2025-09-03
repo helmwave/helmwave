@@ -93,7 +93,7 @@ func (p *Plan) DiffLive(ctx context.Context, opts *diff.Options, threeWayMerge b
 	showChangesReport(p.body.Releases, visited, k)
 }
 
-func get3WayMergeManifests(rel release.Config, oldManifest string) string { //nolint:funlen,gocognit
+func get3WayMergeManifests(rel release.Config, oldManifest string) string { //nolint:gocognit
 	cfg := rel.Cfg()
 
 	err := cfg.KubeClient.IsReachable()

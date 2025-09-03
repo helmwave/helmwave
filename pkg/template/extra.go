@@ -57,7 +57,6 @@ func Exec(command string, args []any, inputs ...string) (string, error) {
 			return "", fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
 		}
 	}
-
 	cmd := exec.Command(command, strArgs...)
 	// cmd.Dir = c.basePath
 
