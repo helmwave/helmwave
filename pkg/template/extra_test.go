@@ -71,6 +71,80 @@ func (s *ExtraTestSuite) TestFromYaml() {
 	}
 }
 
+func (s *ExtraTestSuite) TestFromYamlArray() {
+	tests := []struct {
+		result []interface{}
+		yaml   string
+		fails  bool
+	}{
+		{
+			yaml:   "[1, 2, 3]",
+			result: []interface{}{1, 2, 3},
+			fails:  false,
+		},
+		{
+			yaml:   "- a\n- b\n- c",
+			result: []interface{}{"a", "b", "c"},
+			fails:  false,
+		},
+		{
+			yaml:  "a: 123",
+			fails: true,
+		},
+	}
+
+	for i := range tests {
+		v, err := template.FromYamlArray(tests[i].yaml)
+		if tests[i].fails {
+			s.Error(err)
+			s.Empty(v)
+		} else {
+			s.NoError(err)
+			s.Equal(tests[i].result, v)
+		}
+	}
+}
+
+func (s *ExtraTestSuite) TestFromYamlAll() {
+	tests := []struct {
+		result []interface{}
+		yaml   string
+		fails  bool
+	}{
+		{
+			yaml:   "1",
+			result: []interface{}{1},
+			fails:  false,
+		},
+		{
+			yaml:   "1\n---\na: 123\n---\n[1, 2, 3]",
+			result: []interface{}{1, template.Values{"a": 123}, []interface{}{1, 2, 3}},
+			fails:  false,
+		},
+		{
+			yaml:   "---\napiVersion: v1\nkind: ConfigMap",
+			result: []interface{}{template.Values{"apiVersion": "v1", "kind": "ConfigMap"}},
+			fails:  false,
+		},
+		{
+			yaml:   "---\napiVersion: v1\n---\nkind: ConfigMap",
+			result: []interface{}{template.Values{"apiVersion": "v1"}, template.Values{"kind": "ConfigMap"}},
+			fails:  false,
+		},
+	}
+
+	for i := range tests {
+		v, err := template.FromYamlAll(tests[i].yaml)
+		if tests[i].fails {
+			s.Error(err)
+			s.Empty(v)
+		} else {
+			s.NoError(err)
+			s.Equal(tests[i].result, v)
+		}
+	}
+}
+
 func (s *ExtraTestSuite) TestExec() {
 	res, err := template.Exec("pwd", []any{})
 	s.Require().NoError(err)

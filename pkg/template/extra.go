@@ -40,6 +40,42 @@ func FromYaml(str string) (Values, error) {
 	return m, nil
 }
 
+// FromYAMLArray parses YAML array string into data.
+// Used as custom template function.
+func FromYamlArray(str string) ([]any, error) {
+	a := []any{}
+
+	if err := yaml.Unmarshal([]byte(str), &a); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal %s from YAML as array: %w", str, err)
+	}
+
+	return a, nil
+}
+
+// FromYamlAll parses multiple YAML documents separated by `---`.
+// Returns an array of all documents.
+// Used as custom template function.
+func FromYamlAll(str string) ([]any, error) {
+	a := []any{}
+
+	d := yaml.NewDecoder(strings.NewReader(str))
+	for {
+		var v any
+		err := d.Decode(&v)
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, fmt.Errorf("failed to unmarshal YAML document: %w", err)
+		}
+		if v != nil {
+			a = append(a, v)
+		}
+	}
+
+	return a, nil
+}
+
 // Exec runs external binary and returns its standard output.
 // Used as custom template function.
 func Exec(command string, args []any, inputs ...string) (string, error) {
