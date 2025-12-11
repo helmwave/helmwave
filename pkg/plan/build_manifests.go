@@ -6,39 +6,93 @@ import (
 	"strings"
 	"sync"
 
-	"golang.org/x/sync/errgroup"
-
+	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/dependency"
 	log "github.com/sirupsen/logrus"
 )
 
 func (p *Plan) buildManifest(ctx context.Context) error {
 	log.Info("🔨 Building manifests...")
 
-	wg, ctx := errgroup.WithContext(ctx)
-	wg.SetLimit(p.ParallelLimiter(ctx))
+	parallelLimit := p.ParallelLimiter(ctx)
 
-	mu := &sync.Mutex{}
+	releasesNodesChan := p.Graph().Run()
 
-	for _, rel := range p.body.Releases {
-		wg.Go(
-			func() error {
-				return p.buildReleaseManifest(ctx, rel, mu)
-			})
+	releasesWG := parallel.NewWaitGroup()
+	releasesWG.Add(parallelLimit)
+
+	releasesFails := make(map[release.Config]error)
+
+	releasesMutex := &sync.Mutex{}
+
+	for range parallelLimit {
+		go p.buildReleaseManifestWorker(ctx, releasesWG, releasesNodesChan, releasesMutex, releasesFails)
 	}
 
-	//nolint:wrapcheck
-	return wg.Wait()
+	if err := releasesWG.WaitWithContext(ctx); err != nil {
+		return err
+	}
+
+	return p.ApplyReport(releasesFails, nil)
 }
 
-func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu *sync.Mutex) error {
+//nolint:dupl
+func (p *Plan) buildReleaseManifestWorker(
+	ctx context.Context,
+	wg *parallel.WaitGroup,
+	nodesChan <-chan *dependency.Node[release.Config],
+	mu *sync.Mutex,
+	fails map[release.Config]error,
+) {
+	for node := range nodesChan {
+		rel := node.Data
+		err := p.buildReleaseManifest(ctx, rel, mu)
+		if err != nil {
+			if rel.AllowFailure() {
+				rel.Logger().Errorf("release is allowed to fail, marked as succeeded to dependencies")
+				node.SetSucceeded()
+			} else {
+				node.SetFailed()
+			}
+
+			mu.Lock()
+			fails[rel] = err
+			mu.Unlock()
+
+			wg.ErrChan() <- err
+		} else {
+			node.SetSucceeded()
+		}
+	}
+	wg.Done()
+}
+
+func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu *sync.Mutex) (err error) {
 	l := rel.Logger()
 
 	if err := rel.ChartDepsUpd(); err != nil {
 		l.WithError(err).Warn("❌ can't get dependencies")
 	}
 
-	r, err := rel.SyncDryRun(ctx, true)
+	lifecycle := rel.Lifecycle()
+	err = lifecycle.RunPreBuild(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		lifecycleErr := lifecycle.RunPostBuild(ctx)
+		if lifecycleErr != nil && err == nil {
+			err = lifecycleErr
+		}
+	}()
+
+	err = p.buildReleaseValues(ctx, rel)
+	if err != nil {
+		return err
+	}
+
+	r, err := rel.SyncDryRun(ctx, false)
 	if err != nil || r == nil {
 		l.Errorf("❌ can't get manifests: %v", err)
 
