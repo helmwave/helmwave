@@ -74,6 +74,7 @@ func (t gomplateTemplater) funcMap(ctx context.Context, tpl *template.Template, 
 	addToMap(funcMap, gomplateOldFuncs.CreateDataFuncs(ctx, &gomplateOldData.Data{Ctx: ctx}))
 	addToMap(funcMap, gomplateFuncMap)
 	addToMap(funcMap, customFuncs)
+	addToMap(funcMap, renderFuncs(ctx, &t, data))
 
 	tp := tmpl.New(tpl, data, tpl.Name())
 	funcMap["tmpl"] = func() *tmpl.Template { return tp }

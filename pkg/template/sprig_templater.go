@@ -36,6 +36,18 @@ var (
 	}
 )
 
+func renderFuncs(ctx context.Context, t Templater, data any) template.FuncMap {
+	return template.FuncMap{
+		"renderTemplate": func(tpl string) (string, error) {
+			b, err := t.Render(ctx, tpl, data)
+			if err != nil {
+				return "", err
+			}
+			return string(b), nil
+		},
+	}
+}
+
 type sprigTemplater struct {
 	additionalFuncs               map[string]any
 	delimiterLeft, delimiterRight string
@@ -47,7 +59,7 @@ func (t sprigTemplater) Name() string {
 }
 
 func (t sprigTemplater) Render(ctx context.Context, src string, data any) ([]byte, error) {
-	funcs := t.funcMap()
+	funcs := t.funcMap(ctx, data)
 	if t.additionalFuncs != nil {
 		maps.Copy(funcs, t.additionalFuncs)
 	}
@@ -80,7 +92,7 @@ func (t sprigTemplater) Render(ctx context.Context, src string, data any) ([]byt
 	return buf.Bytes(), nil
 }
 
-func (t sprigTemplater) funcMap() template.FuncMap {
+func (t sprigTemplater) funcMap(ctx context.Context, data any) template.FuncMap {
 	funcMap := template.FuncMap{}
 
 	log.Debug("Loading sprig template functions")
@@ -91,6 +103,7 @@ func (t sprigTemplater) funcMap() template.FuncMap {
 
 	addToMap(funcMap, sprigFuncMap)
 	addToMap(funcMap, customFuncs)
+	addToMap(funcMap, renderFuncs(ctx, &t, data))
 
 	return funcMap
 }
