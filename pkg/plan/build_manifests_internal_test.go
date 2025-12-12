@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/helmwave/helmwave/pkg/hooks"
+	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
@@ -46,6 +48,10 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel1.On("Sync").Return(&helmRelease.Release{}, nil)
 	rel1.On("HooksDisabled").Return(false)
 	rel1.On("Uniq").Return(u1)
+	rel1.On("DependsOn").Return([]*release.DependsOnReference{})
+	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
+	rel1.On("BuildValues").Return(nil)
+	rel1.On("Values").Return([]release.ValuesReference{})
 
 	rel2 := NewMockReleaseConfig(ts.T())
 	u2, _ := uniqname.NewFromString("redis2@defaultblabla")
@@ -54,6 +60,10 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel2.On("Sync").Return(&helmRelease.Release{}, nil)
 	rel2.On("HooksDisabled").Return(false)
 	rel2.On("Uniq").Return(u2)
+	rel2.On("DependsOn").Return([]*release.DependsOnReference{})
+	rel2.On("Lifecycle").Return(hooks.Lifecycle{})
+	rel2.On("BuildValues").Return(nil)
+	rel2.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel1, rel2)
 
@@ -81,6 +91,10 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 	rel.On("Sync").Return(&helmRelease.Release{}, nil)
 	rel.On("HooksDisabled").Return(false)
 	rel.On("Uniq").Return(uniq)
+	rel.On("DependsOn").Return([]*release.DependsOnReference{})
+	rel.On("Lifecycle").Return(hooks.Lifecycle{})
+	rel.On("BuildValues").Return(nil)
+	rel.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel)
 
@@ -98,10 +112,17 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 	p := New(".")
 
 	rel := NewMockReleaseConfig(ts.T())
+	uniq, _ := uniqname.NewFromString("redis1@defaultblabla")
 	errExpected := errors.New(ts.T().Name())
 	rel.On("ChartDepsUpd").Return(nil)
 	rel.On("DryRun").Return()
 	rel.On("Sync").Return(&helmRelease.Release{}, errExpected)
+	rel.On("Uniq").Return(uniq)
+	rel.On("DependsOn").Return([]*release.DependsOnReference{})
+	rel.On("Lifecycle").Return(hooks.Lifecycle{})
+	rel.On("BuildValues").Return(nil)
+	rel.On("Values").Return([]release.ValuesReference{})
+	rel.On("AllowFailure").Return(false)
 
 	p.SetReleases(rel)
 
@@ -125,6 +146,10 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 	}, nil)
 	rel.On("HooksDisabled").Return(true)
 	rel.On("Uniq").Return(uniq)
+	rel.On("DependsOn").Return([]*release.DependsOnReference{})
+	rel.On("Lifecycle").Return(hooks.Lifecycle{})
+	rel.On("BuildValues").Return(nil)
+	rel.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel)
 
@@ -156,6 +181,10 @@ func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 	}, nil)
 	rel.On("HooksDisabled").Return(false)
 	rel.On("Uniq").Return(uniq)
+	rel.On("DependsOn").Return([]*release.DependsOnReference{})
+	rel.On("Lifecycle").Return(hooks.Lifecycle{})
+	rel.On("BuildValues").Return(nil)
+	rel.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel)
 
