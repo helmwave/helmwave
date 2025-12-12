@@ -4,6 +4,7 @@ import (
 	"context"
 	"path/filepath"
 	"testing"
+	gotemplate "text/template"
 
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -91,7 +92,7 @@ func (r *MockReleaseConfig) Equal(_ release.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater string) error {
+func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater string, templateFuncs gotemplate.FuncMap) error {
 	args := r.Called()
 	if errReturn := args.Error(0); errReturn != nil {
 		return errReturn

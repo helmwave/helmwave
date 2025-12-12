@@ -87,7 +87,7 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu 
 		}
 	}()
 
-	err = p.buildReleaseValues(ctx, rel)
+	err = p.buildReleaseValues(ctx, rel, mu)
 	if err != nil {
 		return err
 	}

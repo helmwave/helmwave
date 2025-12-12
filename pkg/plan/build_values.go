@@ -49,7 +49,7 @@ func (p *Plan) buildReleaseValuesWorker(
 ) {
 	for node := range nodesChan {
 		rel := node.Data
-		err := p.buildReleaseValues(ctx, rel)
+		err := p.buildReleaseValues(ctx, rel, mu)
 		if err != nil {
 			if rel.AllowFailure() {
 				rel.Logger().Errorf("release is allowed to fail, marked as succeeded to dependencies")
@@ -70,10 +70,12 @@ func (p *Plan) buildReleaseValuesWorker(
 	wg.Done()
 }
 
-func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config) error {
+func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config, mu *sync.Mutex) error {
 	log.Info("🔨 Building release values...")
 
-	err := rel.BuildValues(ctx, p.tmpDir, p.templater)
+	templateFuncs := p.templateFuncs(mu)
+
+	err := rel.BuildValues(ctx, p.tmpDir, p.templater, templateFuncs)
 	if err != nil {
 		log.Errorf("❌ %s values: %v", rel.Uniq(), err)
 
