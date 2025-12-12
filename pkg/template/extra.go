@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/parallel"
@@ -141,9 +142,15 @@ func SetValueAtPath(path string, value any, values Values) (Values, error) {
 				return nil, fmt.Errorf("failed to set value at path %q: value for key %q does not exist", path, k)
 			}
 			current = v
+		case []any:
+			idx, err := strconv.Atoi(k)
+			if err != nil || idx < 0 || idx >= len(typedCurrent) {
+				return nil, fmt.Errorf("failed to walk over path %q: invalid array index %q", path, k)
+			}
+			current = typedCurrent[idx]
 		default:
 			return nil, fmt.Errorf(
-				"failed to walk over path %q: value for key %q is not a map: %v",
+				"failed to walk over path %q: value for key %q is not a map or array: %v",
 				path,
 				k,
 				reflect.TypeOf(current),
@@ -156,9 +163,15 @@ func SetValueAtPath(path string, value any, values Values) (Values, error) {
 		typedCurrent[key] = value
 	case map[any]any:
 		typedCurrent[key] = value
+	case []any:
+		idx, err := strconv.Atoi(key)
+		if err != nil || idx < 0 || idx >= len(typedCurrent) {
+			return nil, fmt.Errorf("failed to set value at path %q: invalid array index %q", path, key)
+		}
+		typedCurrent[idx] = value
 	default:
 		return nil, fmt.Errorf(
-			"failed to set value at path %q: value for key %q is not a map: %v",
+			"failed to set value at path %q: value for key %q is not a map or array: %v",
 			path,
 			key,
 			reflect.TypeOf(current),
