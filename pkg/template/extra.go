@@ -185,8 +185,28 @@ func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGrou
 
 	bs, err := cmd.Output()
 	if err != nil {
-		wg.ErrChan() <- fmt.Errorf("failed to get command output: %w", err)
-
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			// Combine stdout and stderr, only include non-empty parts
+			var combinedOutput string
+			stdout := strings.TrimSpace(string(bs))
+			stderr := strings.TrimSpace(string(exitErr.Stderr))
+			switch {
+			case stdout != "" && stderr != "":
+				combinedOutput = stdout + "\n" + stderr
+			case stderr != "":
+				combinedOutput = stderr
+			case stdout != "":
+				combinedOutput = stdout
+			}
+			if combinedOutput != "" {
+				wg.ErrChan() <- fmt.Errorf("command failed: %w: %s", err, combinedOutput)
+			} else {
+				wg.ErrChan() <- fmt.Errorf("command failed: %w", err)
+			}
+		} else {
+			wg.ErrChan() <- fmt.Errorf("failed to run command: %w", err)
+		}
 		return
 	}
 
