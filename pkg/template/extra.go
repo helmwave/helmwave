@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/google/shlex"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"gopkg.in/yaml.v3"
 )
@@ -42,21 +43,72 @@ func FromYaml(str string) (Values, error) {
 
 // Exec runs external binary and returns its standard output.
 // Used as custom template function.
-func Exec(command string, args []any, inputs ...string) (string, error) {
+//
+// Can be called in 4 ways:
+// {{ exec "command arg1 arg2" }} - command string with arguments, split by shell-like rules
+// {{ exec "command" (list "arg1" "arg2") }} - command with explicit argument list
+// {{ "input" | exec "command arg1 arg2" }} - piped input with command string
+// {{ "input" | exec "command" (list "arg1" "arg2") }} - piped input with explicit argument list
+func Exec(command string, args ...any) (string, error) {
 	var input string
-	if len(inputs) > 0 {
-		input = inputs[0]
+	var strArgs []string
+
+	switch len(args) {
+	case 0: // {{ exec "command arg1 arg2" }}
+		var err error
+		strArgs, err = parseCommandArgs(command)
+		if err != nil {
+			return "", err
+		}
+		command = strArgs[0]
+		strArgs = strArgs[1:]
+	case 1:
+		switch v := args[0].(type) {
+		case []any: // {{ exec "command" (list "arg1" "arg2") }}
+			var err error
+			strArgs, err = convertArgsToStrings(v)
+			if err != nil {
+				return "", err
+			}
+		case string: // {{ "input" | exec "command arg1 arg2" }}
+			input = v
+			var err error
+			strArgs, err = parseCommandArgs(command)
+			if err != nil {
+				return "", err
+			}
+			command = strArgs[0]
+			strArgs = strArgs[1:]
+		case nil: // {{ exec "command arg1 arg2" }} with nil args
+			var err error
+			strArgs, err = parseCommandArgs(command)
+			if err != nil {
+				return "", err
+			}
+			command = strArgs[0]
+			strArgs = strArgs[1:]
+		default:
+			return "", fmt.Errorf("unexpected type of args[0]: %s", reflect.TypeOf(args[0]))
+		}
+	case 2: // {{ "input" | exec "command" (list "arg1" "arg2") }}
+		argList, ok := args[0].([]any)
+		if !ok {
+			return "", fmt.Errorf("expected []any for args[0], got %s", reflect.TypeOf(args[0]))
+		}
+		inputStr, ok := args[1].(string)
+		if !ok {
+			return "", fmt.Errorf("expected string for args[1] (input), got %s", reflect.TypeOf(args[1]))
+		}
+		var err error
+		strArgs, err = convertArgsToStrings(argList)
+		if err != nil {
+			return "", err
+		}
+		input = inputStr
+	default:
+		return "", fmt.Errorf("exec expects 0-2 arguments after command, got %d", len(args))
 	}
 
-	strArgs := make([]string, len(args))
-	for i, a := range args {
-		switch a := a.(type) {
-		case string:
-			strArgs[i] = a
-		default:
-			return "", fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
-		}
-	}
 	cmd := exec.Command(command, strArgs...)
 	// cmd.Dir = c.basePath
 
@@ -79,6 +131,32 @@ func Exec(command string, args []any, inputs ...string) (string, error) {
 	}
 
 	return output.String(), nil
+}
+
+// convertArgsToStrings converts []any to []string.
+func convertArgsToStrings(args []any) ([]string, error) {
+	strArgs := make([]string, len(args))
+	for i, a := range args {
+		switch a := a.(type) {
+		case string:
+			strArgs[i] = a
+		default:
+			return nil, fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
+		}
+	}
+	return strArgs, nil
+}
+
+// parseCommandArgs parses a command string into command and arguments.
+func parseCommandArgs(command string) ([]string, error) {
+	result, err := shlex.Split(command)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse command %q: %w", command, err)
+	}
+	if len(result) == 0 {
+		result = []string{command}
+	}
+	return result, nil
 }
 
 func writeCommandInput(stdin io.WriteCloser, input string, wg *parallel.WaitGroup) {

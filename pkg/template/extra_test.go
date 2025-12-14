@@ -104,6 +104,59 @@ func (s *ExtraTestSuite) TestExecStdin() {
 	s.Require().Equal(input, res)
 }
 
+func (s *ExtraTestSuite) TestExecCommandString() {
+	// Test: {{ exec "echo -n 123" }}
+	res, err := template.Exec("echo -n 123")
+	s.Require().NoError(err)
+	s.Require().Equal("123", res)
+
+	// Test: {{ exec "echo -n hello world" }}
+	res, err = template.Exec("echo -n hello world")
+	s.Require().NoError(err)
+	s.Require().Equal("hello world", res)
+}
+
+func (s *ExtraTestSuite) TestExecCommandStringWithQuotes() {
+	// Test: {{ exec "echo -n 'hello world'" }} - single quotes
+	res, err := template.Exec("echo -n 'hello world'")
+	s.Require().NoError(err)
+	s.Require().Equal("hello world", res)
+
+	// Test: {{ exec `echo -n "hello world"` }} - double quotes
+	res, err = template.Exec(`echo -n "hello world"`)
+	s.Require().NoError(err)
+	s.Require().Equal("hello world", res)
+}
+
+func (s *ExtraTestSuite) TestExecCommandStringWithStdin() {
+	// Test: {{ "input" | exec "cat" }}
+	input := "test input"
+	res, err := template.Exec("cat", input)
+	s.Require().NoError(err)
+	s.Require().Equal(input, res)
+}
+
+func (s *ExtraTestSuite) TestExecCommandStringWithNilArgs() {
+	// Test: {{ exec "pwd" }} with nil passed (simulating template behavior)
+	pwd, err := os.Getwd()
+	s.Require().NoError(err)
+
+	res, err := template.Exec("pwd", nil)
+	s.Require().NoError(err)
+	s.Require().Equal(pwd, strings.TrimSpace(res))
+}
+
+func (s *ExtraTestSuite) TestExecUnclosedQuote() {
+	// Test unclosed quote error (shlex returns "EOF found when expecting closing quote")
+	_, err := template.Exec("echo 'unclosed")
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "expecting closing quote")
+
+	_, err = template.Exec(`echo "unclosed`)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "expecting closing quote")
+}
+
 func (s *ExtraTestSuite) TestSetValueAtPath() {
 	data := template.Values{
 		"a": map[string]any{
