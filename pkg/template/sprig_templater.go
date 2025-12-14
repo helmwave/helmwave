@@ -38,8 +38,12 @@ var (
 
 func renderFuncs(ctx context.Context, t Templater, data any) template.FuncMap {
 	return template.FuncMap{
-		"renderTemplate": func(tpl string) (string, error) {
-			b, err := t.Render(ctx, tpl, data)
+		"renderTemplate": func(tpl string, args ...any) (string, error) {
+			d := data
+			if len(args) > 0 {
+				d = args[0]
+			}
+			b, err := t.Render(ctx, tpl, d)
 			if err != nil {
 				return "", err
 			}
