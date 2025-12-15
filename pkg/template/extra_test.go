@@ -178,6 +178,59 @@ func (s *ExtraTestSuite) TestExecStdin() {
 	s.Require().Equal(input, res)
 }
 
+func (s *ExtraTestSuite) TestExecCommandString() {
+	// Test: {{ exec "echo -n 123" }}
+	res, err := template.Exec("echo -n 123")
+	s.Require().NoError(err)
+	s.Require().Equal("123", res)
+
+	// Test: {{ exec "echo -n hello world" }}
+	res, err = template.Exec("echo -n hello world")
+	s.Require().NoError(err)
+	s.Require().Equal("hello world", res)
+}
+
+func (s *ExtraTestSuite) TestExecCommandStringWithQuotes() {
+	// Test: {{ exec "echo -n 'hello world'" }} - single quotes
+	res, err := template.Exec("echo -n 'hello world'")
+	s.Require().NoError(err)
+	s.Require().Equal("hello world", res)
+
+	// Test: {{ exec `echo -n "hello world"` }} - double quotes
+	res, err = template.Exec(`echo -n "hello world"`)
+	s.Require().NoError(err)
+	s.Require().Equal("hello world", res)
+}
+
+func (s *ExtraTestSuite) TestExecCommandStringWithStdin() {
+	// Test: {{ "input" | exec "cat" }}
+	input := "test input"
+	res, err := template.Exec("cat", input)
+	s.Require().NoError(err)
+	s.Require().Equal(input, res)
+}
+
+func (s *ExtraTestSuite) TestExecCommandStringWithNilArgs() {
+	// Test: {{ exec "pwd" }} with nil passed (simulating template behavior)
+	pwd, err := os.Getwd()
+	s.Require().NoError(err)
+
+	res, err := template.Exec("pwd", nil)
+	s.Require().NoError(err)
+	s.Require().Equal(pwd, strings.TrimSpace(res))
+}
+
+func (s *ExtraTestSuite) TestExecUnclosedQuote() {
+	// Test unclosed quote error (shlex returns "EOF found when expecting closing quote")
+	_, err := template.Exec("echo 'unclosed")
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "expecting closing quote")
+
+	_, err = template.Exec(`echo "unclosed`)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "expecting closing quote")
+}
+
 func (s *ExtraTestSuite) TestSetValueAtPath() {
 	data := template.Values{
 		"a": map[string]any{
@@ -261,6 +314,37 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 			s.Equal(tests[i].result, res)
 		}
 	}
+}
+
+func (s *ExtraTestSuite) TestSetValueAtPathWithArrayIndex() {
+	data := template.Values{
+		"items": []any{"a", "b", "c"},
+		"nested": map[string]any{
+			"list": []any{
+				map[string]any{"name": "first"},
+				map[string]any{"name": "second"},
+			},
+		},
+	}
+
+	// Test setting array element with dot notation: items.1
+	res, err := template.SetValueAtPath("items.1", "updated", data)
+	s.NoError(err)
+	s.Equal("updated", res["items"].([]any)[1])
+
+	// Test setting nested array element property: nested.list.0.name
+	res, err = template.SetValueAtPath("nested.list.0.name", "changed", data)
+	s.NoError(err)
+	s.Equal("changed", res["nested"].(map[string]any)["list"].([]any)[0].(map[string]any)["name"])
+
+	// Test out of bounds error
+	_, err = template.SetValueAtPath("items.10", "x", data)
+	s.Error(err)
+
+	// Numeric key on map sets key "0"
+	res, err = template.SetValueAtPath("nested.0", "x", data)
+	s.NoError(err)
+	s.Equal("x", res["nested"].(map[string]any)["0"])
 }
 
 func (s *ExtraTestSuite) TestRequired() {

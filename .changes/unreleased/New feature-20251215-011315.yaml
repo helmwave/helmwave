@@ -1,0 +1,6 @@
+kind: New feature
+body: 'feat: print stdout and stderr on command error in `exec` template function'
+time: 2025-12-15T01:13:15.979480522+08:00
+custom:
+    Author: Vigilans
+    Issue: ""
