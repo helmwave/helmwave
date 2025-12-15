@@ -42,7 +42,7 @@ func FromYaml(str string) (Values, error) {
 	return m, nil
 }
 
-// FromYAMLArray parses YAML array string into data.
+// FromYamlArray parses YAML array string into data.
 // Used as custom template function.
 func FromYamlArray(str string) ([]any, error) {
 	a := []any{}
