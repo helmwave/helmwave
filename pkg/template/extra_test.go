@@ -242,6 +242,37 @@ func (s *ExtraTestSuite) TestSetValueAtPath() {
 	}
 }
 
+func (s *ExtraTestSuite) TestSetValueAtPathWithArrayIndex() {
+	data := template.Values{
+		"items": []any{"a", "b", "c"},
+		"nested": map[string]any{
+			"list": []any{
+				map[string]any{"name": "first"},
+				map[string]any{"name": "second"},
+			},
+		},
+	}
+
+	// Test setting array element with dot notation: items.1
+	res, err := template.SetValueAtPath("items.1", "updated", data)
+	s.NoError(err)
+	s.Equal("updated", res["items"].([]any)[1])
+
+	// Test setting nested array element property: nested.list.0.name
+	res, err = template.SetValueAtPath("nested.list.0.name", "changed", data)
+	s.NoError(err)
+	s.Equal("changed", res["nested"].(map[string]any)["list"].([]any)[0].(map[string]any)["name"])
+
+	// Test out of bounds error
+	_, err = template.SetValueAtPath("items.10", "x", data)
+	s.Error(err)
+
+	// Numeric key on map sets key "0"
+	res, err = template.SetValueAtPath("nested.0", "x", data)
+	s.NoError(err)
+	s.Equal("x", res["nested"].(map[string]any)["0"])
+}
+
 func (s *ExtraTestSuite) TestRequired() {
 	tests := []struct {
 		data  any
