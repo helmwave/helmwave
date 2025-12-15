@@ -65,7 +65,7 @@ func FromYamlAll(str string) ([]any, error) {
 		var v any
 		err := d.Decode(&v)
 		if err != nil {
-			if err.Error() == "EOF" {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, fmt.Errorf("failed to unmarshal YAML document: %w", err)
