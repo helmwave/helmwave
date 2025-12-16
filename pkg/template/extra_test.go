@@ -73,18 +73,18 @@ func (s *ExtraTestSuite) TestFromYaml() {
 
 func (s *ExtraTestSuite) TestFromYamlArray() {
 	tests := []struct {
-		result []interface{}
 		yaml   string
+		result []any
 		fails  bool
 	}{
 		{
 			yaml:   "[1, 2, 3]",
-			result: []interface{}{1, 2, 3},
+			result: []any{1, 2, 3},
 			fails:  false,
 		},
 		{
 			yaml:   "- a\n- b\n- c",
-			result: []interface{}{"a", "b", "c"},
+			result: []any{"a", "b", "c"},
 			fails:  false,
 		},
 		{
@@ -107,28 +107,28 @@ func (s *ExtraTestSuite) TestFromYamlArray() {
 
 func (s *ExtraTestSuite) TestFromYamlAll() {
 	tests := []struct {
-		result []interface{}
 		yaml   string
+		result []any
 		fails  bool
 	}{
 		{
 			yaml:   "1",
-			result: []interface{}{1},
+			result: []any{1},
 			fails:  false,
 		},
 		{
 			yaml:   "1\n---\na: 123\n---\n[1, 2, 3]",
-			result: []interface{}{1, template.Values{"a": 123}, []interface{}{1, 2, 3}},
+			result: []any{1, template.Values{"a": 123}, []any{1, 2, 3}},
 			fails:  false,
 		},
 		{
 			yaml:   "---\napiVersion: v1\nkind: ConfigMap",
-			result: []interface{}{template.Values{"apiVersion": "v1", "kind": "ConfigMap"}},
+			result: []any{template.Values{"apiVersion": "v1", "kind": "ConfigMap"}},
 			fails:  false,
 		},
 		{
 			yaml:   "---\napiVersion: v1\n---\nkind: ConfigMap",
-			result: []interface{}{template.Values{"apiVersion": "v1"}, template.Values{"kind": "ConfigMap"}},
+			result: []any{template.Values{"apiVersion": "v1"}, template.Values{"kind": "ConfigMap"}},
 			fails:  false,
 		},
 	}
