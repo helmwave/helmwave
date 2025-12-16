@@ -146,7 +146,7 @@ func (v *ValuesReference) SetViaRelease(
 		v.Renderer = templater
 	}
 
-	if v.Renderer == template.TemplaterGomplate {
+	if v.Renderer == template.TemplaterGomplate && v.DelimiterLeft == "" && v.DelimiterRight == "" {
 		v.DelimiterLeft = "[["
 		v.DelimiterRight = "]]"
 	}
