@@ -16,9 +16,9 @@ import (
 // Resource is base structure for all k8s resources that have replicas.
 // Used to parse out replicas count.
 type Resource struct {
-	Spec             `yaml:"spec,omitempty" json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	Spec             `yaml:"spec" json:"spec" protobuf:"bytes,2,opt,name=spec"`
 	meta1.TypeMeta   `yaml:",inline" json:",inline"`
-	meta1.ObjectMeta `yaml:"metadata,omitempty" json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	meta1.ObjectMeta `yaml:"metadata" json:"metadata" protobuf:"bytes,1,opt,name=metadata"`
 }
 
 // DeepCopyObject is required to implement runtime.Object interface. It doesn't actually do anything, don't use.
