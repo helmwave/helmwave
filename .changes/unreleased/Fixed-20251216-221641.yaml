@@ -1,6 +1,0 @@
-kind: Fixed
-body: 'fix: use `--dry-run=server` during build to support `lookup` function in helm charts'
-time: 2025-12-16T22:16:41.698765176+08:00
-custom:
-    Author: Vigilans
-    Issue: ""
