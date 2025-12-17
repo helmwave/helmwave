@@ -1,6 +1,0 @@
-kind: Fixed
-body: 'fix: prevent forcibly overridng value delimiter when using gomplateS'
-time: 2025-12-17T00:27:19.412779577+08:00
-custom:
-    Author: Vigilans
-    Issue: ""
