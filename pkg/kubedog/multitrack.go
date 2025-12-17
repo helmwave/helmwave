@@ -284,7 +284,7 @@ func (*Resource) handleAnnotationLogRegexFor(name, value string, spec *multitrac
 }
 
 func splitContainers(name, value string) (containers []string, err error) {
-	for _, v := range strings.Split(value, ",") {
+	for v := range strings.SplitSeq(value, ",") {
 		container := strings.TrimSpace(v)
 		if container == "" {
 			return nil, NewEmptyContainerNameError(name, value)

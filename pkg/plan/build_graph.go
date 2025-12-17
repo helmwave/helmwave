@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/helmwave/asciigraph"
+	dgraph "github.com/helmwave/asciigraph"
 	"github.com/helmwave/asciigraph/ascii"
 	"github.com/helmwave/asciigraph/core"
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -13,22 +13,23 @@ import (
 )
 
 func buildGraphMD(releases release.Configs) string {
-	md := "# Depends On\n\n" +
-		"```mermaid\ngraph RL\n"
+	var md strings.Builder
+	md.WriteString("# Depends On\n\n")
+	md.WriteString("```mermaid\ngraph RL\n")
 
 	for _, r := range releases {
 		for _, dep := range r.DependsOn() {
-			md += fmt.Sprintf(
+			md.WriteString(fmt.Sprintf(
 				"\t%s[%q] --> %s[%q]\n",
 				strings.ReplaceAll(r.Uniq().String(), "@", "_"), r.Uniq(),
 				strings.ReplaceAll(dep.Uniq().String(), "@", "_"), dep.Uniq().String(),
-			)
+			))
 		}
 	}
 
-	md += "```"
+	md.WriteString("```")
 
-	return md
+	return md.String()
 }
 
 func buildGraphASCII(releases release.Configs, width int) string {
