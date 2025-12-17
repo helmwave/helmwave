@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -44,16 +45,16 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu 
 		return err
 	}
 
-	hm := ""
+	var hm strings.Builder
 	if !rel.HooksDisabled() {
 		for _, h := range r.Hooks {
-			hm += fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest)
+			hm.WriteString(fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest))
 		}
 	}
 
 	document := r.Manifest
 	if len(r.Hooks) > 0 {
-		document += hm
+		document += hm.String()
 	}
 
 	l.Trace(document)

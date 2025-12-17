@@ -68,6 +68,7 @@ func FromYamlAll(str string) ([]any, error) {
 			if errors.Is(err, io.EOF) {
 				break
 			}
+
 			return nil, fmt.Errorf("failed to unmarshal YAML document: %w", err)
 		}
 		if v != nil {
@@ -85,7 +86,9 @@ func FromYamlAll(str string) ([]any, error) {
 // {{ exec "command arg1 arg2" }} - command string with arguments, split by shell-like rules
 // {{ exec "command" (list "arg1" "arg2") }} - command with explicit argument list
 // {{ "input" | exec "command arg1 arg2" }} - piped input with command string
-// {{ "input" | exec "command" (list "arg1" "arg2") }} - piped input with explicit argument list
+// {{ "input" | exec "command" (list "arg1" "arg2") }} - piped input with explicit argument list.
+//
+//nolint:gocognit,cyclop
 func Exec(command string, args ...any) (string, error) {
 	var input string
 	var strArgs []string
@@ -93,12 +96,10 @@ func Exec(command string, args ...any) (string, error) {
 	switch len(args) {
 	case 0: // {{ exec "command arg1 arg2" }}
 		var err error
-		strArgs, err = parseCommandArgs(command)
+		command, strArgs, err = parseCommandArgs(command)
 		if err != nil {
 			return "", err
 		}
-		command = strArgs[0]
-		strArgs = strArgs[1:]
 	case 1:
 		switch v := args[0].(type) {
 		case []any: // {{ exec "command" (list "arg1" "arg2") }}
@@ -110,20 +111,16 @@ func Exec(command string, args ...any) (string, error) {
 		case string: // {{ "input" | exec "command arg1 arg2" }}
 			input = v
 			var err error
-			strArgs, err = parseCommandArgs(command)
+			command, strArgs, err = parseCommandArgs(command)
 			if err != nil {
 				return "", err
 			}
-			command = strArgs[0]
-			strArgs = strArgs[1:]
 		case nil: // {{ exec "command arg1 arg2" }} with nil args
 			var err error
-			strArgs, err = parseCommandArgs(command)
+			command, strArgs, err = parseCommandArgs(command)
 			if err != nil {
 				return "", err
 			}
-			command = strArgs[0]
-			strArgs = strArgs[1:]
 		default:
 			return "", fmt.Errorf("unexpected type of args[0]: %s", reflect.TypeOf(args[0]))
 		}
@@ -181,19 +178,21 @@ func convertArgsToStrings(args []any) ([]string, error) {
 			return nil, fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
 		}
 	}
+
 	return strArgs, nil
 }
 
 // parseCommandArgs parses a command string into command and arguments.
-func parseCommandArgs(command string) ([]string, error) {
+func parseCommandArgs(command string) (string, []string, error) {
 	result, err := shlex.Split(command)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse command %q: %w", command, err)
+		return "", nil, fmt.Errorf("failed to parse command %q: %w", command, err)
 	}
 	if len(result) == 0 {
-		result = []string{command}
+		return command, []string{}, nil
 	}
-	return result, nil
+
+	return result[0], result[1:], nil
 }
 
 func writeCommandInput(stdin io.WriteCloser, input string, wg *parallel.WaitGroup) {
@@ -244,6 +243,7 @@ func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGrou
 		} else {
 			wg.ErrChan() <- fmt.Errorf("failed to run command: %w", err)
 		}
+
 		return
 	}
 
@@ -255,6 +255,8 @@ func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGrou
 
 // SetValueAtPath sets value in map by dot-separated key path.
 // Used as custom template function.
+//
+//nolint:gocognit,cyclop
 func SetValueAtPath(path string, value any, values Values) (Values, error) {
 	var current any
 	current = values
