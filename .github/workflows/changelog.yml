@@ -32,7 +32,7 @@ jobs:
           cp -rf .changes/${{ github.event.release.tag_name }}.md ${{ github.event.release.tag_name }}.md
 
       - name: Upload changelog artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: changelog
           path: .changes/${{ github.event.release.tag_name }}.md
