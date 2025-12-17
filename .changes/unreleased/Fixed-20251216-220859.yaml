@@ -1,0 +1,6 @@
+kind: Fixed
+body: 'fix: use `shlex.Split` to process lifecycle command string'
+time: 2025-12-16T22:08:59.601664329+08:00
+custom:
+    Author: Vigilans
+    Issue: ""
