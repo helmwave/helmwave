@@ -8,8 +8,10 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"strconv"
 	"strings"
 
+	"github.com/google/shlex"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"gopkg.in/yaml.v3"
 )
@@ -40,23 +42,107 @@ func FromYaml(str string) (Values, error) {
 	return m, nil
 }
 
-// Exec runs external binary and returns its standard output.
+// FromYamlArray parses YAML array string into data.
 // Used as custom template function.
-func Exec(command string, args []any, inputs ...string) (string, error) {
-	var input string
-	if len(inputs) > 0 {
-		input = inputs[0]
+func FromYamlArray(str string) ([]any, error) {
+	a := []any{}
+
+	if err := yaml.Unmarshal([]byte(str), &a); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal %s from YAML as array: %w", str, err)
 	}
 
-	strArgs := make([]string, len(args))
-	for i, a := range args {
-		switch a := a.(type) {
-		case string:
-			strArgs[i] = a
-		default:
-			return "", fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
+	return a, nil
+}
+
+// FromYamlAll parses multiple YAML documents separated by `---`.
+// Returns an array of all documents.
+// Used as custom template function.
+func FromYamlAll(str string) ([]any, error) {
+	a := []any{}
+
+	d := yaml.NewDecoder(strings.NewReader(str))
+	for {
+		var v any
+		err := d.Decode(&v)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+
+			return nil, fmt.Errorf("failed to unmarshal YAML document: %w", err)
+		}
+		if v != nil {
+			a = append(a, v)
 		}
 	}
+
+	return a, nil
+}
+
+// Exec runs external binary and returns its standard output.
+// Used as custom template function.
+//
+// Can be called in 4 ways:
+// {{ exec "command arg1 arg2" }} - command string with arguments, split by shell-like rules
+// {{ exec "command" (list "arg1" "arg2") }} - command with explicit argument list
+// {{ "input" | exec "command arg1 arg2" }} - piped input with command string
+// {{ "input" | exec "command" (list "arg1" "arg2") }} - piped input with explicit argument list.
+//
+//nolint:gocognit,cyclop
+func Exec(command string, args ...any) (string, error) {
+	var input string
+	var strArgs []string
+
+	switch len(args) {
+	case 0: // {{ exec "command arg1 arg2" }}
+		var err error
+		command, strArgs, err = parseCommandArgs(command)
+		if err != nil {
+			return "", err
+		}
+	case 1:
+		switch v := args[0].(type) {
+		case []any: // {{ exec "command" (list "arg1" "arg2") }}
+			var err error
+			strArgs, err = convertArgsToStrings(v)
+			if err != nil {
+				return "", err
+			}
+		case string: // {{ "input" | exec "command arg1 arg2" }}
+			input = v
+			var err error
+			command, strArgs, err = parseCommandArgs(command)
+			if err != nil {
+				return "", err
+			}
+		case nil: // {{ exec "command arg1 arg2" }} with nil args
+			var err error
+			command, strArgs, err = parseCommandArgs(command)
+			if err != nil {
+				return "", err
+			}
+		default:
+			return "", fmt.Errorf("unexpected type of args[0]: %s", reflect.TypeOf(args[0]))
+		}
+	case 2: // {{ "input" | exec "command" (list "arg1" "arg2") }}
+		argList, ok := args[0].([]any)
+		if !ok {
+			return "", fmt.Errorf("expected []any for args[0], got %s", reflect.TypeOf(args[0]))
+		}
+		inputStr, ok := args[1].(string)
+		if !ok {
+			return "", fmt.Errorf("expected string for args[1] (input), got %s", reflect.TypeOf(args[1]))
+		}
+		var err error
+		strArgs, err = convertArgsToStrings(argList)
+		if err != nil {
+			return "", err
+		}
+		input = inputStr
+	default:
+		return "", fmt.Errorf("exec expects 0-2 arguments after command, got %d", len(args))
+	}
+
 	cmd := exec.Command(command, strArgs...)
 	// cmd.Dir = c.basePath
 
@@ -79,6 +165,34 @@ func Exec(command string, args []any, inputs ...string) (string, error) {
 	}
 
 	return output.String(), nil
+}
+
+// convertArgsToStrings converts []any to []string.
+func convertArgsToStrings(args []any) ([]string, error) {
+	strArgs := make([]string, len(args))
+	for i, a := range args {
+		switch a := a.(type) {
+		case string:
+			strArgs[i] = a
+		default:
+			return nil, fmt.Errorf("unexpected type of arg \"%s\" in args %v at index %d", reflect.TypeOf(a), args, i)
+		}
+	}
+
+	return strArgs, nil
+}
+
+// parseCommandArgs parses a command string into command and arguments.
+func parseCommandArgs(command string) (string, []string, error) {
+	result, err := shlex.Split(command)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to parse command %q: %w", command, err)
+	}
+	if len(result) == 0 {
+		return command, []string{}, nil
+	}
+
+	return result[0], result[1:], nil
 }
 
 func writeCommandInput(stdin io.WriteCloser, input string, wg *parallel.WaitGroup) {
@@ -107,7 +221,28 @@ func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGrou
 
 	bs, err := cmd.Output()
 	if err != nil {
-		wg.ErrChan() <- fmt.Errorf("failed to get command output: %w", err)
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			// Combine stdout and stderr, only include non-empty parts
+			var combinedOutput string
+			stdout := strings.TrimSpace(string(bs))
+			stderr := strings.TrimSpace(string(exitErr.Stderr))
+			switch {
+			case stdout != "" && stderr != "":
+				combinedOutput = stdout + "\n" + stderr
+			case stderr != "":
+				combinedOutput = stderr
+			case stdout != "":
+				combinedOutput = stdout
+			}
+			if combinedOutput != "" {
+				wg.ErrChan() <- fmt.Errorf("command failed: %w: %s", err, combinedOutput)
+			} else {
+				wg.ErrChan() <- fmt.Errorf("command failed: %w", err)
+			}
+		} else {
+			wg.ErrChan() <- fmt.Errorf("failed to run command: %w", err)
+		}
 
 		return
 	}
@@ -120,6 +255,8 @@ func getCommandOutput(cmd *exec.Cmd, output *bytes.Buffer, wg *parallel.WaitGrou
 
 // SetValueAtPath sets value in map by dot-separated key path.
 // Used as custom template function.
+//
+//nolint:gocognit,cyclop
 func SetValueAtPath(path string, value any, values Values) (Values, error) {
 	var current any
 	current = values
@@ -141,9 +278,15 @@ func SetValueAtPath(path string, value any, values Values) (Values, error) {
 				return nil, fmt.Errorf("failed to set value at path %q: value for key %q does not exist", path, k)
 			}
 			current = v
+		case []any:
+			idx, err := strconv.Atoi(k)
+			if err != nil || idx < 0 || idx >= len(typedCurrent) {
+				return nil, fmt.Errorf("failed to walk over path %q: invalid array index %q", path, k)
+			}
+			current = typedCurrent[idx]
 		default:
 			return nil, fmt.Errorf(
-				"failed to walk over path %q: value for key %q is not a map: %v",
+				"failed to walk over path %q: value for key %q is not a map or array: %v",
 				path,
 				k,
 				reflect.TypeOf(current),
@@ -156,9 +299,15 @@ func SetValueAtPath(path string, value any, values Values) (Values, error) {
 		typedCurrent[key] = value
 	case map[any]any:
 		typedCurrent[key] = value
+	case []any:
+		idx, err := strconv.Atoi(key)
+		if err != nil || idx < 0 || idx >= len(typedCurrent) {
+			return nil, fmt.Errorf("failed to set value at path %q: invalid array index %q", path, key)
+		}
+		typedCurrent[idx] = value
 	default:
 		return nil, fmt.Errorf(
-			"failed to set value at path %q: value for key %q is not a map: %v",
+			"failed to set value at path %q: value for key %q is not a map or array: %v",
 			path,
 			key,
 			reflect.TypeOf(current),
