@@ -77,7 +77,7 @@ func (rel *config) upgrade(ctx context.Context) (*release.Release, error) {
 func (rel *config) installWithRetry(
 	ctx context.Context,
 	ch *chart.Chart,
-	vals map[string]interface{},
+	vals map[string]any,
 ) (*release.Release, error) {
 	r, err := rel.newInstall().RunWithContext(ctx, ch, vals)
 
@@ -98,7 +98,7 @@ func (rel *config) installWithRetry(
 func (rel *config) upgradeWithRetry(
 	ctx context.Context,
 	ch *chart.Chart,
-	vals map[string]interface{},
+	vals map[string]any,
 ) (*release.Release, error) {
 	r, err := rel.newUpgrade().RunWithContext(ctx, rel.Name(), ch, vals)
 

@@ -26,6 +26,8 @@ var (
 	customFuncs = map[string]any{
 		"toYaml":         ToYaml,
 		"fromYaml":       FromYaml,
+		"fromYamlArray":  FromYamlArray,
+		"fromYamlAll":    FromYamlAll,
 		"exec":           Exec,
 		"setValueAtPath": SetValueAtPath,
 		"requiredEnv":    RequiredEnv,
