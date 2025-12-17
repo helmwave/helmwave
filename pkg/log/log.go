@@ -131,7 +131,7 @@ func (l *Settings) setFormat() {
 	}
 }
 
-func logKubernetesClientError(ctx context.Context, err error, msg string, keysAndValues ...interface{}) {
+func logKubernetesClientError(ctx context.Context, err error, msg string, keysAndValues ...any) {
 	log.WithError(err).Trace("kubernetes client error, ", msg)
 }
 
