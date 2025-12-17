@@ -32,7 +32,7 @@ jobs:
 
       
       - name: push changelog
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         if: github.actor == 'dependabot[bot]'
         with:
           commit_message: "chore: add changelog via changie #${{ github.event.number }}"
