@@ -8,6 +8,7 @@ require (
 	github.com/databus23/helm-diff/v3 v3.9.10
 	github.com/getsops/sops/v3 v3.9.3
 	github.com/gofrs/flock v0.12.1
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/hairyhenderson/gomplate/v3 v3.11.8
 	github.com/hairyhenderson/gomplate/v4 v4.3.0
 	github.com/hashicorp/go-getter v1.7.8
@@ -29,8 +30,6 @@ require (
 	github.com/urfave/cli/v2 v2.27.4
 	github.com/werf/kubedog v0.13.0
 	github.com/werf/logboek v0.6.1
-	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
-	golang.org/x/sync v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.18.4
 	k8s.io/apimachinery v0.33.2
@@ -164,7 +163,6 @@ require (
 	github.com/google/gnostic-models v0.6.9 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/google/wire v0.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
@@ -296,9 +294,11 @@ require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	gocloud.dev v0.40.0 // indirect
 	golang.org/x/crypto v0.39.0 // indirect
+	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
 	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/oauth2 v0.28.0 // indirect
+	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/text v0.26.0 // indirect

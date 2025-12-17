@@ -68,6 +68,7 @@ func (rel *config) newInstall() *action.Install {
 	}
 
 	if client.DryRun {
+		client.DryRunOption = "server"
 		client.Replace = true
 	}
 

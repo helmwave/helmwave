@@ -1,8 +1,7 @@
 package hooks
 
 import (
-	"strings"
-
+	"github.com/google/shlex"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"gopkg.in/yaml.v3"
 )
@@ -37,7 +36,11 @@ func (h *hook) UnmarshalYAML(node *yaml.Node) error {
 		}
 
 		// Short name
-		words := strings.Fields(script)
+		words, err := shlex.Split(script)
+		if err != nil {
+			return NewYAMLDecodeError(err)
+		}
+
 		if len(words) > 1 {
 			h.Cmd = words[0]
 			h.Args = words[1:]
