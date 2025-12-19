@@ -30,11 +30,11 @@ var (
 		"fromYamlAll":    FromYamlAll,
 		"exec":           Exec,
 		"setValueAtPath": SetValueAtPath,
+		"getValueAtPath": GetValueAtPath,
+		"hasValueAtPath": HasValueAtPath,
 		"requiredEnv":    RequiredEnv,
 		"required":       Required,
 		"readFile":       ReadFile,
-		"get":            Get,
-		"hasKey":         HasKey,
 	}
 )
 
