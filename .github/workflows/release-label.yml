@@ -19,7 +19,7 @@ jobs:
           script: return context.payload.pull_request.head.ref.replace('release/', '')
           result-encoding: string
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
