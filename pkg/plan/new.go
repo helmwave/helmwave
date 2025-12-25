@@ -48,6 +48,7 @@ type Plan struct {
 	templater string
 
 	manifests map[uniqname.UniqName]string
+	values    map[uniqname.UniqName]map[string]string
 	unchanged release.Configs
 }
 
@@ -135,6 +136,7 @@ func New(dir string) *Plan {
 		dir:       dir,
 		fullPath:  filepath.Join(dir, File),
 		manifests: make(map[uniqname.UniqName]string),
+		values:    make(map[uniqname.UniqName]map[string]string),
 	}
 
 	return plan

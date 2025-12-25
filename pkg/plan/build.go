@@ -53,11 +53,6 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) (err error) {
 		return err
 	}
 
-	err = p.buildValues(ctx)
-	if err != nil {
-		return err
-	}
-
 	p.body.Repositories, err = p.buildRepositories()
 	if err != nil {
 		return err
@@ -85,6 +80,10 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) (err error) {
 
 	err = p.body.Validate()
 	if err != nil {
+		return err
+	}
+
+	if err := p.ValidateValuesBuild(); err != nil {
 		return err
 	}
 
