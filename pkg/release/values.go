@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	gotemplate "text/template"
 	"time"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -140,6 +141,7 @@ func (v *ValuesReference) SetViaRelease(
 	ctx context.Context,
 	rel Config,
 	dir, templater string,
+	templateFuncs gotemplate.FuncMap,
 	renderedFiles *renderedValuesFiles,
 ) error {
 	if v.Renderer == "" {
@@ -168,8 +170,9 @@ func (v *ValuesReference) SetViaRelease(
 		return err
 	}
 
-	opts := []template.TemplaterOptions{
-		template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight),
+	opts := []template.TemplaterOptions{template.SetDelimiters(v.DelimiterLeft, v.DelimiterRight)}
+	for name, value := range templateFuncs {
+		opts = append(opts, template.AddFunc(name, value))
 	}
 
 	if renderedFiles != nil {
@@ -221,8 +224,12 @@ func (v *ValuesReference) fetch(ctx context.Context, l *log.Entry) error {
 	return nil
 }
 
-func (rel *config) BuildValues(ctx context.Context, dir, templater string) error {
-	var mu sync.Mutex
+func (rel *config) BuildValues(
+	ctx context.Context,
+	dir, templater string,
+	templateFuncs gotemplate.FuncMap,
+) error {
+	mu := &sync.Mutex{}
 	vals := rel.Values()
 
 	wg := parallel.NewWaitGroup()
@@ -245,7 +252,7 @@ func (rel *config) BuildValues(ctx context.Context, dir, templater string) error
 
 			l := l.WithField("values", v)
 
-			err := v.SetViaRelease(ctx, rel, dir, templater, renderedValuesMap)
+			err := v.SetViaRelease(ctx, rel, dir, templater, templateFuncs, renderedValuesMap)
 			switch {
 			case !v.Strict && errors.Is(ErrValuesNotExist, err):
 				l.WithError(err).Warn("skipping values...")

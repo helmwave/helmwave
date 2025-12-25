@@ -3,6 +3,7 @@ package release
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -28,7 +29,7 @@ type Config interface {
 	HideSecret(hideSecret bool)
 	ChartDepsUpd() error
 	DownloadChart(tmpDir string) error
-	BuildValues(ctx context.Context, dir, templater string) error
+	BuildValues(ctx context.Context, dir, templater string, templateFuncs template.FuncMap) error
 	Name() string
 	Namespace() string
 	Chart() *Chart
