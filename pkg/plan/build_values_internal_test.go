@@ -61,6 +61,8 @@ func (ts *BuildValuesTestSuite) TestValuesBuildError() {
 	mockedRelease.On("Values").Return([]release.ValuesReference{
 		{Src: tmpValues},
 	})
+	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
+	mockedRelease.On("AllowFailure").Return(false)
 
 	errBuildValues := errors.New("values build error")
 	mockedRelease.On("BuildValues").Return(errBuildValues)
@@ -91,6 +93,7 @@ func (ts *BuildValuesTestSuite) TestSuccess() {
 	})
 	mockedRelease.On("BuildValues").Return(nil)
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 
 	p.body = &planBody{
 		Releases: release.Configs{mockedRelease},
