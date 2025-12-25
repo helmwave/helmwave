@@ -91,13 +91,40 @@ func flagTplFile(v *string) cli.Flag {
 }
 
 // flagTemplateEngine pass val to urfave flag.
-func flagTemplateEngine(v *string) cli.Flag {
+func flagTemplateEngine() cli.Flag {
 	return &cli.StringFlag{
-		Name:        "templater",
-		Category:    "YML",
-		Value:       template.TemplaterSprig,
-		Usage:       fmt.Sprintf("select template engine: [ %s | %s ]", template.TemplaterSprig, template.TemplaterGomplate),
-		EnvVars:     EnvVars("TEMPLATER", "TEMPLATE_ENGINE"),
+		Name:     "templater",
+		Category: "YML",
+		Value:    template.TemplaterSprig,
+		Usage:    fmt.Sprintf("select template engine: [ %s | %s ]", template.TemplaterSprig, template.TemplaterGomplate),
+		EnvVars:  EnvVars("TEMPLATER", "TEMPLATE_ENGINE"),
+	}
+}
+
+// flagYmlTemplateEngine pass val to urfave flag for yml templating.
+func flagYmlTemplateEngine(v *string) cli.Flag {
+	return &cli.StringFlag{
+		Name:     "yml-templater",
+		Category: "YML",
+		Usage: fmt.Sprintf(
+			"select template engine for rendering helmwave.yml: [ %s | %s ]",
+			template.TemplaterSprig, template.TemplaterGomplate,
+		),
+		EnvVars:     EnvVars("YML_TEMPLATER", "YML_TEMPLATE_ENGINE"),
+		Destination: v,
+	}
+}
+
+// flagBuildTemplateEngine pass val to urfave flag for values templating.
+func flagBuildTemplateEngine(v *string) cli.Flag {
+	return &cli.StringFlag{
+		Name:     "build-templater",
+		Category: "YML",
+		Usage: fmt.Sprintf(
+			"select template engine for rendering values: [ %s | %s ]",
+			template.TemplaterSprig, template.TemplaterGomplate,
+		),
+		EnvVars:     EnvVars("BUILD_TEMPLATER", "BUILD_TEMPLATE_ENGINE"),
 		Destination: v,
 	}
 }
