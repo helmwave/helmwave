@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.pull_request.head.ref, 'dependabot/') }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -30,13 +30,15 @@ jobs:
           args: |
             new -k Dependencies -b "${{ github.event.pull_request.title }}" -m Issue=${{ github.event.number }} -m Author=dependabot 
 
+      
       - name: push changelog
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         if: github.actor == 'dependabot[bot]'
         with:
           commit_message: "chore: add changelog via changie #${{ github.event.number }}"
           commit_user_name: ${{ github.actor }}
           commit_user_email: "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          create_branch: true
 
       #
       #  dependabot-base:
@@ -64,7 +66,7 @@ jobs:
 
 
       - name: create release branch
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         continue-on-error: true
         env:
           BRANCH: release/${{ steps.next.outputs.version }}

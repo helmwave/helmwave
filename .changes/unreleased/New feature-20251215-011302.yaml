@@ -1,6 +1,0 @@
-kind: New feature
-body: 'feat: support single command string with arguments in `exec` template function'
-time: 2025-12-15T01:13:02.784995418+08:00
-custom:
-    Author: Vigilans
-    Issue: ""

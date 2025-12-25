@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"context"
 	"slices"
 
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -9,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Config, error) {
+func (p *Plan) buildReleases(o BuildOptions) ([]release.Config, error) {
 	log.Info("🔨 Building releases...")
 
 	plan := make([]release.Config, 0)
@@ -29,16 +28,6 @@ func (p *Plan) buildReleases(ctx context.Context, o BuildOptions) ([]release.Con
 		if err != nil {
 			log.WithError(err).Error("failed to build releases plan")
 
-			return nil, err
-		}
-	}
-
-	// Run per-release build hook (in dependency order)
-	for _, r := range plan {
-		// Run hooks
-		lifecycle := r.Lifecycle()
-		err := lifecycle.RunPreBuild(ctx)
-		if err != nil {
 			return nil, err
 		}
 	}
