@@ -187,3 +187,31 @@ func (ts *TemplateFuncsTestSuite) TestGetManifestsNotFound() {
 	ts.Require().Error(err)
 	ts.Require().ErrorContains(err, "not found")
 }
+
+func (ts *TemplateFuncsTestSuite) TestGetValuesCrossRelease() {
+	p := New(".")
+	p.NewBody()
+
+	uniq1, _ := uniqname.NewFromString("redis@default")
+	p.values[uniq1] = map[string]string{
+		"config.yaml": `redis:
+  host: redis.example.com
+  port: 6379`,
+	}
+
+	uniq2, _ := uniqname.NewFromString("nginx@default")
+	p.values[uniq2] = map[string]string{
+		"config.yaml": `nginx:
+  port: 80`,
+	}
+
+	mu := &sync.Mutex{}
+	templateFuncs := p.templateFuncs(mu)
+
+	ctx := context.Background()
+	tpl := `{{ $redis := getValues "redis@default" "config.yaml" }}{{ $nginx := getValues "nginx@default" "config.yaml" }}{{ $redis.redis.host }}:{{ $nginx.nginx.port }}`
+	rendered, err := ts.renderTemplate(ctx, tpl, nil, templateFuncs)
+	ts.Require().NoError(err)
+
+	ts.Require().Equal("redis.example.com:80", rendered)
+}

@@ -51,7 +51,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel1.On("Uniq").Return(u1)
 	rel1.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel1.On("BuildValues").Return(nil)
+	rel1.On("BuildValues").Return(map[string]string{}, nil)
 	rel1.On("Values").Return([]release.ValuesReference{})
 
 	rel2 := NewMockReleaseConfig(ts.T())
@@ -63,7 +63,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel2.On("Uniq").Return(u2)
 	rel2.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel2.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel2.On("BuildValues").Return(nil)
+	rel2.On("BuildValues").Return(map[string]string{}, nil)
 	rel2.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel1, rel2)
@@ -94,7 +94,7 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 	rel.On("Uniq").Return(uniq)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel.On("BuildValues").Return(nil)
+	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel)
@@ -121,7 +121,7 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 	rel.On("Uniq").Return(uniq)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel.On("BuildValues").Return(nil)
+	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
 	rel.On("AllowFailure").Return(false)
 
@@ -149,7 +149,7 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 	rel.On("Uniq").Return(uniq)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel.On("BuildValues").Return(nil)
+	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel)
@@ -184,7 +184,7 @@ func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 	rel.On("Uniq").Return(uniq)
 	rel.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel.On("BuildValues").Return(nil)
+	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
 
 	p.SetReleases(rel)

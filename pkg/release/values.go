@@ -180,19 +180,10 @@ func (v *ValuesReference) SetViaRelease(
 		defer func() {
 			renderedFiles.Add(v.Src, buf)
 		}()
-
 		opts = append(opts,
 			template.CopyOutput(buf),
-			template.AddFunc("getValues", func(filename string) (any, error) {
-				s := renderedFiles.Get(filename).String()
-
-				var res any
-				err := yaml.Unmarshal([]byte(s), &res)
-
-				//nolint:wrapcheck
-				return res, err
-			},
-			))
+			createGetValuesFunc(rel, templateFuncs, renderedFiles),
+		)
 	}
 	if v.isURL() {
 		err = template.Tpl2yml(ctx, v.Dst, v.Dst, data, v.Renderer, opts...)
@@ -205,6 +196,45 @@ func (v *ValuesReference) SetViaRelease(
 	}
 
 	return nil
+}
+
+func createGetValuesFunc(
+	rel Config,
+	templateFuncs gotemplate.FuncMap,
+	renderedFiles *renderedValuesFiles,
+) template.TemplaterOptions {
+	return template.AddFunc("getValues", func(args ...string) (any, error) {
+		var release string
+		var filename string
+		switch len(args) {
+		case 1:
+			filename = args[0]
+		case 2:
+			release = args[0]
+			filename = args[1]
+		default:
+			return nil, fmt.Errorf("getValues requires 1 or 2 arguments")
+		}
+
+		// Return values from current rendering release
+		if release == "" || release == rel.Uniq().String() {
+			s := renderedFiles.Get(filename).String()
+
+			var res any
+			err := yaml.Unmarshal([]byte(s), &res)
+
+			//nolint:wrapcheck
+			return res, err
+		}
+
+		// Forward to plan-level template function
+		getValues, ok := templateFuncs["getValues"].(func(string, string) (any, error))
+		if !ok {
+			return nil, fmt.Errorf("plan-level getValues function not found")
+		}
+
+		return getValues(release, filename)
+	})
 }
 
 func (v *ValuesReference) fetch(ctx context.Context, l *log.Entry) error {
@@ -228,7 +258,7 @@ func (rel *config) BuildValues(
 	ctx context.Context,
 	dir, templater string,
 	templateFuncs gotemplate.FuncMap,
-) error {
+) (map[string]string, error) {
 	mu := &sync.Mutex{}
 	vals := rel.Values()
 
@@ -269,7 +299,7 @@ func (rel *config) BuildValues(
 
 	err := wg.WaitWithContext(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for i := len(vals) - 1; i >= 0; i-- {
@@ -279,7 +309,13 @@ func (rel *config) BuildValues(
 	}
 	rel.ValuesF = vals
 
-	return nil
+	renderedValues := make(map[string]string)
+	for i := range vals {
+		src := vals[i].Src
+		renderedValues[src] = renderedValuesMap.Get(src).String()
+	}
+
+	return renderedValues, nil
 }
 
 type renderedValuesFiles struct {

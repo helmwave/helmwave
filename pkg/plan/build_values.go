@@ -75,7 +75,7 @@ func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config, mu *s
 
 	templateFuncs := p.templateFuncs(mu)
 
-	err := rel.BuildValues(ctx, p.tmpDir, p.templater, templateFuncs)
+	renderedValues, err := rel.BuildValues(ctx, p.tmpDir, p.templater, templateFuncs)
 	if err != nil {
 		log.Errorf("❌ %s values: %v", rel.Uniq(), err)
 
@@ -90,6 +90,10 @@ func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config, mu *s
 		} else {
 			log.WithField("release", rel.Uniq()).WithField("values", vals).Infof("✅ found %d values count", len(vals))
 		}
+
+		mu.Lock()
+		p.values[rel.Uniq()] = renderedValues
+		mu.Unlock()
 	}
 
 	return nil

@@ -56,5 +56,32 @@ func (p *Plan) templateFuncs(mu *sync.Mutex) gotemplate.FuncMap {
 		return manifest, nil
 	}
 
+	// `getValues` template function
+	var values map[string]map[string]any
+	funcMap["getValues"] = func(release string, filename string) (any, error) {
+		if values == nil {
+			mu.Lock()
+			defer mu.Unlock()
+			values = make(map[string]map[string]any)
+			for uniq, valuesYaml := range p.values {
+				releaseValues := make(map[string]any)
+				for filename, value := range valuesYaml {
+					value, err := template.FromYaml(value)
+					if err != nil {
+						return nil, fmt.Errorf("failed to unmarshal value: %w", err)
+					}
+					releaseValues[filename] = value
+				}
+				values[uniq.String()] = releaseValues
+			}
+		}
+		releaseValues, found := values[release]
+		if !found {
+			return nil, fmt.Errorf("values for release %q not found", release)
+		}
+
+		return releaseValues[filename], nil
+	}
+
 	return funcMap
 }

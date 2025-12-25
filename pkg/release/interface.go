@@ -29,7 +29,7 @@ type Config interface {
 	HideSecret(hideSecret bool)
 	ChartDepsUpd() error
 	DownloadChart(tmpDir string) error
-	BuildValues(ctx context.Context, dir, templater string, templateFuncs template.FuncMap) error
+	BuildValues(ctx context.Context, dir, templater string, templateFuncs template.FuncMap) (map[string]string, error)
 	Name() string
 	Namespace() string
 	Chart() *Chart
