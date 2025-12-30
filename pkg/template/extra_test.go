@@ -402,7 +402,7 @@ func (s *ExtraTestSuite) TestReadFile() {
 	s.Require().Equal(data, res)
 }
 
-func (s *ExtraTestSuite) TestGet() {
+func (s *ExtraTestSuite) TestGetValueAtPath() {
 	data := template.Values{
 		"a": map[string]any{
 			"b": "123",
@@ -446,7 +446,7 @@ func (s *ExtraTestSuite) TestGet() {
 	}
 
 	for i := range tests {
-		res, err := template.Get(tests[i].path, data)
+		res, err := template.GetValueAtPath(tests[i].path, data)
 		if tests[i].fails {
 			s.Error(err)
 			s.Nil(res)
@@ -457,7 +457,42 @@ func (s *ExtraTestSuite) TestGet() {
 	}
 }
 
-func (s *ExtraTestSuite) TestHasKey() {
+func (s *ExtraTestSuite) TestGetValueAtPathWithArrayIndex() {
+	data := template.Values{
+		"items": []any{"a", "b", "c"},
+		"nested": map[string]any{
+			"list": []any{
+				map[string]any{"name": "first"},
+				map[string]any{"name": "second"},
+			},
+		},
+	}
+
+	// Test getting array element with dot notation: items.1
+	res, err := template.GetValueAtPath("items.1", data)
+	s.NoError(err)
+	s.Equal("b", res)
+
+	// Test getting nested array element property: nested.list.0.name
+	res, err = template.GetValueAtPath("nested.list.0.name", data)
+	s.NoError(err)
+	s.Equal("first", res)
+
+	// Test out of bounds error
+	_, err = template.GetValueAtPath("items.10", data)
+	s.Error(err)
+
+	// Test invalid index error
+	_, err = template.GetValueAtPath("items.abc", data)
+	s.Error(err)
+
+	// Test with default value for out of bounds
+	res, err = template.GetValueAtPath("items.10", "default", data)
+	s.NoError(err)
+	s.Equal("default", res)
+}
+
+func (s *ExtraTestSuite) TestHasValueAtPath() {
 	data := template.Values{
 		"a": map[string]any{
 			"b": "123",
@@ -501,7 +536,7 @@ func (s *ExtraTestSuite) TestHasKey() {
 	}
 
 	for _, test := range tests {
-		res, err := template.HasKey(test.path, data)
+		res, err := template.HasValueAtPath(test.path, data)
 		s.Equal(test.result, res)
 
 		if test.fails {
@@ -510,6 +545,43 @@ func (s *ExtraTestSuite) TestHasKey() {
 			s.NoError(err)
 		}
 	}
+}
+
+func (s *ExtraTestSuite) TestHasValueAtPathWithArrayIndex() {
+	data := template.Values{
+		"items": []any{"a", "b", "c"},
+		"nested": map[string]any{
+			"list": []any{
+				map[string]any{"name": "first"},
+				map[string]any{"name": "second"},
+			},
+		},
+	}
+
+	// Test checking array element exists: items.1
+	res, err := template.HasValueAtPath("items.1", data)
+	s.NoError(err)
+	s.True(res)
+
+	// Test checking nested array element property exists: nested.list.0.name
+	res, err = template.HasValueAtPath("nested.list.0.name", data)
+	s.NoError(err)
+	s.True(res)
+
+	// Test out of bounds returns false
+	res, err = template.HasValueAtPath("items.10", data)
+	s.NoError(err)
+	s.False(res)
+
+	// Test invalid index returns false
+	res, err = template.HasValueAtPath("items.abc", data)
+	s.NoError(err)
+	s.False(res)
+
+	// Test with default (defSet=true) for out of bounds
+	res, err = template.HasValueAtPath("items.10", true, data)
+	s.NoError(err)
+	s.True(res)
 }
 
 func TestExtraTestSuite(t *testing.T) {

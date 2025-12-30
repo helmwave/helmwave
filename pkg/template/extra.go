@@ -356,14 +356,14 @@ func noKeyError(key string, obj any) error {
 	return fmt.Errorf("key %q is not present in %v", key, obj)
 }
 
-// Get returns value in map by dot-separated key path.
+// GetValueAtPath returns value in map by dot-separated key path.
 // First argument is dot-separated key path.
 // Second argument is default value if key not found and is optional.
 // Third argument is map to search in.
 // Used as custom template function.
 //
-//nolint:gocognit
-func Get(path string, varArgs ...any) (any, error) {
+//nolint:gocognit,cyclop
+func GetValueAtPath(path string, varArgs ...any) (any, error) {
 	defSet, def, obj, err := parseGetVarArgs(varArgs)
 	if err != nil {
 		return nil, err
@@ -395,6 +395,16 @@ func Get(path string, varArgs ...any) (any, error) {
 
 			return nil, noKeyError(key, obj)
 		}
+	case []any:
+		idx, err := strconv.Atoi(key)
+		if err != nil || idx < 0 || idx >= len(typedObj) {
+			if defSet {
+				return def, nil
+			}
+
+			return nil, fmt.Errorf("invalid array index %q for path", key)
+		}
+		v = typedObj[idx]
 	default:
 		r, err := tryReflectGet(obj, key, defSet, def)
 		if err != nil {
@@ -404,10 +414,10 @@ func Get(path string, varArgs ...any) (any, error) {
 	}
 
 	if defSet {
-		return Get(strings.Join(keys[1:], "."), def, v)
+		return GetValueAtPath(strings.Join(keys[1:], "."), def, v)
 	}
 
-	return Get(strings.Join(keys[1:], "."), v)
+	return GetValueAtPath(strings.Join(keys[1:], "."), v)
 }
 
 func tryReflectGet(obj any, key string, defSet bool, def any) (any, error) {
@@ -433,9 +443,11 @@ func tryReflectGet(obj any, key string, defSet bool, def any) (any, error) {
 	return f.Interface(), nil
 }
 
-// HasKey searches for any value by dot-separated key path in map.
+// HasValueAtPath searches for any value by dot-separated key path in map.
 // Used as custom template function.
-func HasKey(path string, varArgs ...any) (bool, error) {
+//
+//nolint:gocognit,cyclop
+func HasValueAtPath(path string, varArgs ...any) (bool, error) {
 	defSet, def, obj, err := parseGetVarArgs(varArgs)
 	if err != nil {
 		return false, err
@@ -458,6 +470,12 @@ func HasKey(path string, varArgs ...any) (bool, error) {
 		if !ok {
 			return defSet, nil
 		}
+	case []any:
+		idx, err := strconv.Atoi(keys[0])
+		if err != nil || idx < 0 || idx >= len(typedObj) {
+			return defSet, err
+		}
+		v = typedObj[idx]
 	default:
 		found, f, err := tryReflectHasKey(obj, keys[0], defSet, def)
 		if err != nil {
@@ -471,10 +489,10 @@ func HasKey(path string, varArgs ...any) (bool, error) {
 	}
 
 	if defSet {
-		return HasKey(strings.Join(keys[1:], "."), def, v)
+		return HasValueAtPath(strings.Join(keys[1:], "."), def, v)
 	}
 
-	return HasKey(strings.Join(keys[1:], "."), v)
+	return HasValueAtPath(strings.Join(keys[1:], "."), v)
 }
 
 func tryReflectHasKey(obj any, key string, defSet bool, def any) (bool, any, error) {
