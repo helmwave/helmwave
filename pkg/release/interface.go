@@ -3,8 +3,8 @@ package release
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"slices"
+	"text/template"
 
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/hooks"

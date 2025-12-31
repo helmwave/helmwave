@@ -217,7 +217,7 @@ func (ts *BuildManifestsTestSuite) TestReleasesWithDependency() {
 	rel1.On("Uniq").Return(u1)
 	rel1.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel1.On("BuildValues").Return(nil)
+	rel1.On("BuildValues").Return(map[string]string{}, nil)
 	rel1.On("Values").Return([]release.ValuesReference{})
 
 	// rel2 depends on rel1
@@ -234,7 +234,7 @@ func (ts *BuildManifestsTestSuite) TestReleasesWithDependency() {
 		{Name: u1.String()},
 	})
 	rel2.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel2.On("BuildValues").Return(nil)
+	rel2.On("BuildValues").Return(map[string]string{}, nil)
 	rel2.On("Values").Return([]release.ValuesReference{})
 
 	// Pass in reverse order to verify dependency graph corrects the order
@@ -269,7 +269,7 @@ func (ts *BuildManifestsTestSuite) TestReleasesWithDependencyFailure() {
 	rel1.On("Uniq").Return(u1)
 	rel1.On("DependsOn").Return([]*release.DependsOnReference{})
 	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
-	rel1.On("BuildValues").Return(nil)
+	rel1.On("BuildValues").Return(map[string]string{}, nil)
 	rel1.On("Values").Return([]release.ValuesReference{})
 	rel1.On("AllowFailure").Return(false)
 
