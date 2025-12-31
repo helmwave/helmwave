@@ -68,13 +68,14 @@ func (rel *config) newInstall() *action.Install {
 	}
 
 	if client.DryRun {
-		client.DryRunOption = "server"
 		client.Replace = true
 	}
 
 	if client.DryRun && nil != rel.OfflineKubeVersion() {
 		client.ClientOnly = true
 		client.KubeVersion = rel.OfflineKubeVersion()
+	} else {
+		client.DryRunOption = "server"
 	}
 
 	return client

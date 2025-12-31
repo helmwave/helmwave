@@ -54,9 +54,10 @@ func (ts *ExportTestSuite) TestValuesOneRelease() {
 		{Src: tmpValues},
 	})
 	mockedRelease.On("Namespace").Return("defaultblabla")
-	mockedRelease.On("BuildValues").Return(nil)
+	mockedRelease.On("BuildValues").Return(map[string]string{}, nil)
 	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
+	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 
 	p.body = &planBody{
 		Releases: release.Configs{mockedRelease},
