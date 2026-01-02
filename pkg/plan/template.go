@@ -80,7 +80,12 @@ func (p *Plan) templateFuncs(mu *sync.Mutex) gotemplate.FuncMap {
 			return nil, fmt.Errorf("values for release %q not found", release)
 		}
 
-		return releaseValues[filename], nil
+		value, found := releaseValues[filename]
+		if !found {
+			return nil, fmt.Errorf("values file %q for release %q not found", filename, release)
+		}
+
+		return value, nil
 	}
 
 	return funcMap
