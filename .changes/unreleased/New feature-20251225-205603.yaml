@@ -1,0 +1,6 @@
+kind: New feature
+body: 'feat: build manifests and values in release dependency order'
+time: 2025-12-25T20:56:03.287219431+08:00
+custom:
+    Author: Vigilans
+    Issue: ""

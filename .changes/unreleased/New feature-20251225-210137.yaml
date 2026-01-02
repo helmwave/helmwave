@@ -1,0 +1,6 @@
+kind: New feature
+body: 'feat: add `getPlan` and `getManifests` template functions'
+time: 2025-12-25T21:01:37.066270238+08:00
+custom:
+    Author: Vigilans
+    Issue: ""
