@@ -34,6 +34,8 @@ type Build struct {
 }
 
 // Run is the main function for 'build' CLI command.
+//
+//nolint:gocognit
 func (i *Build) Run(ctx context.Context) (err error) {
 	cliCtx := clictx.GetCLIFromContext(ctx)
 	if cliCtx == nil {
