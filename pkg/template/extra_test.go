@@ -573,9 +573,10 @@ func (s *ExtraTestSuite) TestHasValueAtPathWithArrayIndex() {
 	s.NoError(err)
 	s.False(res)
 
-	// Test invalid index returns false
+	// Test invalid index returns error
 	res, err = template.HasValueAtPath("items.abc", data)
-	s.NoError(err)
+	s.Error(err)
+	s.Contains(err.Error(), "invalid syntax")
 	s.False(res)
 
 	// Test with default (defSet=true) for out of bounds

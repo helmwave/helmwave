@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//nolint:gocognit
+//nolint:gocognit,cyclop,funlen
 func (p *Plan) templateFuncs(mu *sync.Mutex) gotemplate.FuncMap {
 	funcMap := gotemplate.FuncMap{}
 
