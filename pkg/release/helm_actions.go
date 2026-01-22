@@ -60,7 +60,7 @@ func (rel *config) newInstall() *action.Install {
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
 
-	pr, err := rel.PostRenderer()
+	pr, err := rel.PostRenderer().HelmPostRenderer()
 	if err != nil {
 		rel.Logger().WithError(err).Warn("failed to create post-renderer")
 	} else {
@@ -114,7 +114,7 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
 
-	pr, err := rel.PostRenderer()
+	pr, err := rel.PostRenderer().HelmPostRenderer()
 	if err != nil {
 		rel.Logger().WithError(err).Warn("failed to create post_renderer")
 	} else {

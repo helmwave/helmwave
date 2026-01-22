@@ -53,6 +53,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel1.On("BuildValues").Return(map[string]string{}, nil)
 	rel1.On("Values").Return([]release.ValuesReference{})
+	rel1.On("BuildPostRenderer").Return(nil)
 
 	rel2 := NewMockReleaseConfig(ts.T())
 	u2, _ := uniqname.NewFromString("redis2@defaultblabla")
@@ -65,6 +66,7 @@ func (ts *BuildManifestsTestSuite) TestMultipleReleases() {
 	rel2.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel2.On("BuildValues").Return(map[string]string{}, nil)
 	rel2.On("Values").Return([]release.ValuesReference{})
+	rel2.On("BuildPostRenderer").Return(nil)
 
 	p.SetReleases(rel1, rel2)
 
@@ -96,6 +98,7 @@ func (ts *BuildManifestsTestSuite) TestChartDepsUpdError() {
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
+	rel.On("BuildPostRenderer").Return(nil)
 
 	p.SetReleases(rel)
 
@@ -123,6 +126,7 @@ func (ts *BuildManifestsTestSuite) TestSyncError() {
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
+	rel.On("BuildPostRenderer").Return(nil)
 	rel.On("AllowFailure").Return(false)
 
 	p.SetReleases(rel)
@@ -151,6 +155,7 @@ func (ts *BuildManifestsTestSuite) TestDisabledHooks() {
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
+	rel.On("BuildPostRenderer").Return(nil)
 
 	p.SetReleases(rel)
 
@@ -186,6 +191,7 @@ func (ts *BuildManifestsTestSuite) TestEnabledHooks() {
 	rel.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel.On("BuildValues").Return(map[string]string{}, nil)
 	rel.On("Values").Return([]release.ValuesReference{})
+	rel.On("BuildPostRenderer").Return(nil)
 
 	p.SetReleases(rel)
 
@@ -219,6 +225,7 @@ func (ts *BuildManifestsTestSuite) TestReleasesWithDependency() {
 	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel1.On("BuildValues").Return(map[string]string{}, nil)
 	rel1.On("Values").Return([]release.ValuesReference{})
+	rel1.On("BuildPostRenderer").Return(nil)
 
 	// rel2 depends on rel1
 	rel2 := NewMockReleaseConfig(ts.T())
@@ -236,6 +243,7 @@ func (ts *BuildManifestsTestSuite) TestReleasesWithDependency() {
 	rel2.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel2.On("BuildValues").Return(map[string]string{}, nil)
 	rel2.On("Values").Return([]release.ValuesReference{})
+	rel2.On("BuildPostRenderer").Return(nil)
 
 	// Pass in reverse order to verify dependency graph corrects the order
 	p.SetReleases(rel2, rel1)
@@ -271,6 +279,7 @@ func (ts *BuildManifestsTestSuite) TestReleasesWithDependencyFailure() {
 	rel1.On("Lifecycle").Return(hooks.Lifecycle{})
 	rel1.On("BuildValues").Return(map[string]string{}, nil)
 	rel1.On("Values").Return([]release.ValuesReference{})
+	rel1.On("BuildPostRenderer").Return(nil)
 	rel1.On("AllowFailure").Return(false)
 
 	// rel2 depends on rel1, should NOT be built because rel1 fails

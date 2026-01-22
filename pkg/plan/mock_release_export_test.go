@@ -110,6 +110,21 @@ func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater stri
 	return map[string]string{}, nil
 }
 
+func (r *MockReleaseConfig) BuildPostRenderer(_ context.Context, _, _ string, _ gotemplate.FuncMap) error {
+	args := r.Called()
+
+	return args.Error(0)
+}
+
+func (r *MockReleaseConfig) PostRenderer() *release.PostRendererReference {
+	args := r.Called()
+	if args.Get(0) == nil {
+		return nil
+	}
+
+	return args.Get(0).(*release.PostRendererReference)
+}
+
 func (r *MockReleaseConfig) Uninstall(context.Context) (*helmRelease.UninstallReleaseResponse, error) {
 	args := r.Called()
 

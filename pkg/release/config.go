@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"helm.sh/helm/v3/pkg/chartutil"
 	helm "helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/postrender"
 )
 
 type configTests struct {
@@ -20,6 +19,7 @@ type configTests struct {
 	ForceShowLogs bool                `yaml:"force_show_logs,omitempty" json:"force_show_logs,omitempty" jsonschema:"description=Always show tests logs, not only if they failed,default=false"`
 }
 
+//nolint:govet // field order is more important than alignment
 type config struct {
 	helm *helm.EnvSettings
 	log  *log.Entry
@@ -38,13 +38,13 @@ type config struct {
 	KubeContextF        string `yaml:"context,omitempty" json:"context,omitempty"`
 	DeletePropagation   string `yaml:"delete_propagation,omitempty" json:"delete_propagation,omitempty" jsonschema:"description=Selects the deletion cascading strategy for the dependents,enum=background,enum=orphan,enum=foreground,default=background"`
 
-	DependsOnF    []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
-	MonitorsF     []MonitorReference    `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
-	ValuesF       []ValuesReference     `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release"`
-	TagsF         []string              `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
-	Labels        map[string]string     `yaml:"labels,omitempty" json:"labels,omitempty" jsonschema:"Labels that would be added to release metadata on sync"`
-	PostRendererF []string              `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=List of post_renders to manipulate with manifests"`
-	Timeout       time.Duration         `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;integer,default=5m"`
+	DependsOnF    []*DependsOnReference  `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
+	MonitorsF     []MonitorReference     `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
+	ValuesF       []ValuesReference      `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"title=Values of the release"`
+	TagsF         []string               `yaml:"tags,omitempty" json:"tags,omitempty" jsonschema:"description=Tags allows you choose releases for build"`
+	Labels        map[string]string      `yaml:"labels,omitempty" json:"labels,omitempty" jsonschema:"Labels that would be added to release metadata on sync"`
+	PostRendererF *PostRendererReference `yaml:"post_renderer,omitempty" json:"post_renderer,omitempty" jsonschema:"description=Post-renderer configuration to manipulate with manifests"`
+	Timeout       time.Duration          `yaml:"timeout,omitempty" json:"timeout,omitempty" jsonschema:"oneof_type=string;integer,default=5m"`
 
 	// Lock for parallel testing
 	lock sync.RWMutex
@@ -232,12 +232,8 @@ func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error 
 	return u.Validate()
 }
 
-func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
-	if len(rel.PostRendererF) < 1 {
-		return nil, nil //nolint:nilnil
-	}
-
-	return postrender.NewExec(rel.PostRendererF[0], rel.PostRendererF[1:]...) //nolint:wrapcheck
+func (rel *config) PostRenderer() *PostRendererReference {
+	return rel.PostRendererF
 }
 
 func (rel *config) KubeContext() string {
