@@ -14,6 +14,12 @@ import (
 func (p *Plan) templateFuncs(mu *sync.Mutex) gotemplate.FuncMap {
 	funcMap := gotemplate.FuncMap{}
 
+	// `getTags` template function
+	tags := p.tags
+	funcMap["getTags"] = func() []string {
+		return tags
+	}
+
 	// `getPlan` template function
 	var plan map[string]any
 	funcMap["getPlan"] = func() (map[string]any, error) {
