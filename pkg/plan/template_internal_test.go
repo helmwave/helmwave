@@ -194,14 +194,14 @@ func (ts *TemplateFuncsTestSuite) TestGetValuesCrossRelease() {
 
 	uniq1, _ := uniqname.NewFromString("redis@default")
 	p.values[uniq1] = map[string]string{
-		"config.yaml": `redis:
+		"values/redis.yaml": `redis:
   host: redis.example.com
   port: 6379`,
 	}
 
 	uniq2, _ := uniqname.NewFromString("nginx@default")
 	p.values[uniq2] = map[string]string{
-		"config.yaml": `nginx:
+		"values/nginx.yaml": `nginx:
   port: 80`,
 	}
 
@@ -209,7 +209,7 @@ func (ts *TemplateFuncsTestSuite) TestGetValuesCrossRelease() {
 	templateFuncs := p.templateFuncs(mu)
 
 	ctx := context.Background()
-	tpl := `{{ $redis := getValues "redis@default" "config.yaml" }}{{ $nginx := getValues "nginx@default" "config.yaml" }}{{ $redis.redis.host }}:{{ $nginx.nginx.port }}`
+	tpl := `{{ $redis := getValues "redis@default" "values/redis.yaml" }}{{ $nginx := getValues "nginx@default" "nginx.yaml" }}{{ $redis.redis.host }}:{{ $nginx.nginx.port }}`
 	rendered, err := ts.renderTemplate(ctx, tpl, nil, templateFuncs)
 	ts.Require().NoError(err)
 
