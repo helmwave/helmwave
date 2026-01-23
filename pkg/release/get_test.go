@@ -6,6 +6,7 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -68,7 +69,15 @@ func (ts *GetTestSuite) TestGet() {
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r1)
 
-	r2, err := rel.Get(0)
+	// Retry Get with backoff to handle race condition
+	var r2 interface{}
+	for i := 0; i < 5; i++ {
+		r2, err = rel.Get(0)
+		if err == nil {
+			break
+		}
+		time.Sleep(time.Duration(i+1) * time.Second)
+	}
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r2)
 

@@ -4,9 +4,11 @@ package action
 
 import (
 	"context"
+	"net/http"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/template"
@@ -65,6 +67,14 @@ func (ts *UpTestSuite) TestAutoBuild() {
 }
 
 func (ts *UpTestSuite) TestPrometheusMonitors() {
+	// Skip test if Prometheus is not accessible on localhost:9090
+	// This test requires port-forward to work properly
+	client := &http.Client{Timeout: 2 * time.Second}
+	_, err := client.Get("http://localhost:9090/-/healthy")
+	if err != nil {
+		ts.T().Skip("Skipping test: Prometheus is not accessible on localhost:9090 (requires port-forward)")
+	}
+
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "20_helmwave.yml"),
