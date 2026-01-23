@@ -2,7 +2,6 @@ package action
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/template"
@@ -20,13 +19,11 @@ type Yml struct {
 
 // Run is the main function for 'yml' command.
 func (i *Yml) Run(ctx context.Context) error {
-	cliCtx := clictx.GetCLIFromContext(ctx)
-	if cliCtx == nil {
-		return fmt.Errorf("failed to get CLI context")
-	}
-
 	if i.templater == "" {
-		i.templater = cliCtx.String("templater")
+		cliCtx := clictx.GetCLIFromContext(ctx)
+		if cliCtx != nil {
+			i.templater = cliCtx.String("templater")
+		}
 	}
 
 	err := template.Tpl2yml(ctx, i.tpl, i.file, nil, i.templater)

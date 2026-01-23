@@ -30,6 +30,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.4
 	github.com/werf/kubedog v0.13.0
 	github.com/werf/logboek v0.6.1
+	golang.org/x/sync v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.18.4
 	k8s.io/apimachinery v0.33.2
@@ -298,7 +299,6 @@ require (
 	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/oauth2 v0.28.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/text v0.26.0 // indirect

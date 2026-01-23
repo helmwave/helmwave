@@ -14,6 +14,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -37,11 +38,6 @@ type Build struct {
 //
 //nolint:gocognit
 func (i *Build) Run(ctx context.Context) (err error) {
-	cliCtx := clictx.GetCLIFromContext(ctx)
-	if cliCtx == nil {
-		return fmt.Errorf("failed to get CLI context")
-	}
-
 	// Download Remote source
 	if i.remoteSource != "" {
 		wd, err := os.Getwd()
@@ -74,7 +70,12 @@ func (i *Build) Run(ctx context.Context) (err error) {
 	i.options.Tags = i.normalizeTags()
 	i.options.Yml = i.yml.file
 	if i.options.Templater == "" {
-		i.options.Templater = cliCtx.String("templater")
+		cliCtx := clictx.GetCLIFromContext(ctx)
+		if cliCtx != nil {
+			i.options.Templater = cliCtx.String("templater")
+		} else {
+			i.options.Templater = template.TemplaterSprig
+		}
 	}
 
 	err = newPlan.Build(ctx, i.options)
