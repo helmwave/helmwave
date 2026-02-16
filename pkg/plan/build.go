@@ -73,11 +73,6 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) (err error) {
 		return err
 	}
 
-	err = p.buildCharts()
-	if err != nil {
-		return err
-	}
-
 	err = p.body.Validate()
 	if err != nil {
 		return err

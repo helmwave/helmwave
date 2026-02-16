@@ -24,3 +24,7 @@ func (p *Plan) buildCharts() error {
 
 	return wg.Wait()
 }
+
+func (p *Plan) buildReleaseChart(rel release.Config) error {
+	return rel.DownloadChart(p.tmpDir)
+}
