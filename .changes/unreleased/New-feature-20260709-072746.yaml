@@ -1,0 +1,6 @@
+kind: New feature
+body: Only create a namespace when it is missing (get-first) so `create_namespace` works with identities that cannot create namespaces at the cluster scope
+time: 2026-07-09T07:27:46.000000000Z
+custom:
+  Issue: "1196"
+  Author: elkh510

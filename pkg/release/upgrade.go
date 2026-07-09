@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/getter"
@@ -79,7 +80,10 @@ func (rel *config) installWithRetry(
 	ch *chart.Chart,
 	vals map[string]any,
 ) (*release.Release, error) {
-	r, err := rel.newInstall().RunWithContext(ctx, ch, vals)
+	client := rel.newInstall()
+	rel.adjustCreateNamespace(ctx, client)
+
+	r, err := client.RunWithContext(ctx, ch, vals)
 
 	if err != nil && strings.Contains(err.Error(), errMissingCRD) && rel.dryRun {
 		er := rel.forceOfflineKubeVersion()
@@ -88,10 +92,55 @@ func (rel *config) installWithRetry(
 			return r, err
 		}
 
-		return rel.newInstall().RunWithContext(ctx, ch, vals)
+		client = rel.newInstall()
+		rel.adjustCreateNamespace(ctx, client)
+
+		return client.RunWithContext(ctx, ch, vals)
 	}
 
 	return r, err
+}
+
+// adjustCreateNamespace implements a get-first namespace creation strategy.
+//
+// Helm's CreateNamespace issues an unconditional `create`, which the Kubernetes API
+// rejects at the authorization layer before the object is checked for existence. As a
+// result, an identity that may only `get/list/watch` namespaces (but is admin inside
+// its own, already provisioned namespace) fails with a 403 even though the namespace
+// already exists.
+//
+// To avoid requiring cluster-scoped `create` on namespaces for that common case, we
+// first check whether the namespace exists and, if so, disable helm's creation. When
+// the namespace is missing, or the existence check cannot be performed, we keep the
+// original behaviour and let helm create it.
+func (rel *config) adjustCreateNamespace(ctx context.Context, client *action.Install) {
+	if !client.CreateNamespace || rel.dryRun {
+		return
+	}
+
+	exists, err := rel.namespaceExists(ctx)
+	if err != nil {
+		rel.Logger().WithError(err).Warnf(
+			"failed to check if namespace %q exists, will attempt to create it",
+			rel.Namespace(),
+		)
+
+		return
+	}
+
+	if exists {
+		rel.Logger().Debugf("namespace %q already exists, skipping namespace creation", rel.Namespace())
+		client.CreateNamespace = false
+	}
+}
+
+func (rel *config) namespaceExists(ctx context.Context) (bool, error) {
+	clientSet, err := rel.Cfg().KubernetesClientSet()
+	if err != nil {
+		return false, fmt.Errorf("failed to create kubernetes clientset: %w", err)
+	}
+
+	return helper.NamespaceExists(ctx, clientSet, rel.Namespace())
 }
 
 //nolint:wrapcheck // we wrap it later

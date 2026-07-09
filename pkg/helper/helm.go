@@ -1,9 +1,12 @@
 package helper
 
 import (
+	"context"
 	"fmt"
 	"os"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/version"
 
 	log "github.com/sirupsen/logrus"
@@ -11,6 +14,7 @@ import (
 	helm "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
@@ -84,4 +88,20 @@ func GetKubernetesVersion(cfg *action.Configuration) (*version.Info, error) {
 	}
 
 	return clientSet.Discovery().ServerVersion()
+}
+
+// NamespaceExists reports whether the given namespace already exists in the cluster.
+// It relies only on a `get` on the namespace, so it works with identities that are
+// not allowed to `create` namespaces at the cluster scope.
+func NamespaceExists(ctx context.Context, clientSet kubernetes.Interface, ns string) (bool, error) {
+	_, err := clientSet.CoreV1().Namespaces().Get(ctx, ns, metav1.GetOptions{})
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("failed to check if namespace %q exists: %w", ns, err)
+	}
+
+	return true, nil
 }

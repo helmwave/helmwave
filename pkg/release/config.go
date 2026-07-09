@@ -53,7 +53,7 @@ type config struct {
 	AllowFailureF            bool `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
 	Atomic                   bool `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
 	CleanupOnFail            bool `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
-	CreateNamespace          bool `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exits,default=false"`
+	CreateNamespace          bool `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exist. The namespace is only created when it is missing (get-first) so this works with identities that cannot create namespaces at the cluster scope,default=false"`
 	DisableHooks             bool `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
 	EnableDNS                bool `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
