@@ -54,7 +54,7 @@ func (ts *CreateNamespaceTestSuite) SetupSuite() {
 	ts.Require().NoError(plan.SyncRepositories(ts.ctx, rs))
 }
 
-// TestSyncIntoExistingNamespace verifies the get-first behaviour: when the target
+// TestSyncIntoExistingNamespace verifies the get-first behavior: when the target
 // namespace already exists, a release with create_namespace=true installs without
 // attempting to create the namespace.
 func (ts *CreateNamespaceTestSuite) TestSyncIntoExistingNamespace() {

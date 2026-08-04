@@ -112,7 +112,7 @@ func (rel *config) installWithRetry(
 // To avoid requiring cluster-scoped `create` on namespaces for that common case, we
 // first check whether the namespace exists and, if so, disable helm's creation. When
 // the namespace is missing, or the existence check cannot be performed, we keep the
-// original behaviour and let helm create it.
+// original behavior and let helm create it.
 func (rel *config) adjustCreateNamespace(ctx context.Context, client *action.Install) {
 	if !client.CreateNamespace || rel.dryRun {
 		return
