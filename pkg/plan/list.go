@@ -6,7 +6,7 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
-	"helm.sh/helm/v3/pkg/release"
+	"helm.sh/helm/v4/pkg/release/common"
 )
 
 var (
@@ -38,7 +38,7 @@ func (p *Plan) List() error {
 		status := r.Info.Status
 
 		statusColor := SuccessStatusColor
-		if status != release.StatusDeployed {
+		if status != common.StatusDeployed {
 			statusColor = FailStatusColor
 		}
 

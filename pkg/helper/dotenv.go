@@ -5,7 +5,7 @@ import (
 
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
-	helm "helm.sh/helm/v3/pkg/cli"
+	helm "helm.sh/helm/v4/pkg/cli"
 )
 
 func Dotenv() {

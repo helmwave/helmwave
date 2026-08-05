@@ -3,7 +3,7 @@ package release
 import (
 	"errors"
 
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/storage/driver"
 )
 
 func (rel *config) isInstalled() bool {

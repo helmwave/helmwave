@@ -3,7 +3,7 @@ package release
 import (
 	"strings"
 
-	"helm.sh/helm/v3/pkg/registry"
+	"helm.sh/helm/v4/pkg/registry"
 )
 
 func (rel *config) Repo() string {

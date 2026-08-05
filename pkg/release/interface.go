@@ -13,9 +13,10 @@ import (
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chartutil"
-	"helm.sh/helm/v3/pkg/release"
+	"helm.sh/helm/v4/pkg/action"
+	"helm.sh/helm/v4/pkg/chart/common"
+	releaseiface "helm.sh/helm/v4/pkg/release"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 // Config is an interface to manage particular helm release.
@@ -43,7 +44,7 @@ type Config interface {
 	KubeContext() string
 	Cfg() *action.Configuration
 	HooksDisabled() bool
-	OfflineKubeVersion() *chartutil.KubeVersion
+	OfflineKubeVersion() *common.KubeVersion
 	Validate() error
 	Monitors() []MonitorReference
 	NotifyMonitorsFailed(ctx context.Context, monitors ...monitor.Config)
@@ -53,7 +54,7 @@ type Config interface {
 type HelmActionRunner interface {
 	SyncDryRun(ctx context.Context, runHooks bool) (*release.Release, error)
 	Sync(ctx context.Context, runHooks bool) (*release.Release, error)
-	Uninstall(ctx context.Context) (*release.UninstallReleaseResponse, error)
+	Uninstall(ctx context.Context) (*releaseiface.UninstallReleaseResponse, error)
 	Get(version int) (*release.Release, error)
 	List() (*release.Release, error)
 	Rollback(ctx context.Context, version int) error

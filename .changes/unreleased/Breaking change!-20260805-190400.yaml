@@ -1,0 +1,6 @@
+kind: Breaking change!
+body: '`wait` now takes a helm v4 strategy (`watcher`, `legacy`, `hookOnly`) — previous booleans are rejected: use `watcher` instead of `true` and `hookOnly` instead of `false`'
+time: 2026-08-05T19:04:00.000000+01:00
+custom:
+    Author: r3nic1e
+    Issue: "1201"

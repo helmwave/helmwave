@@ -1,0 +1,6 @@
+kind: New feature
+body: 'Build on the Helm v4 SDK: Helm 3 reaches EOL in November 2026. Based on the helmtide migration by @semx'
+time: 2026-08-05T19:00:00.000000+01:00
+custom:
+    Author: semx
+    Issue: "1201"

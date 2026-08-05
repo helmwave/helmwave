@@ -16,8 +16,8 @@ import (
 	structDiff "github.com/r3labs/diff/v3"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
-	"helm.sh/helm/v3/pkg/chart"
-	live "helm.sh/helm/v3/pkg/release"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	live "helm.sh/helm/v4/pkg/release/v1"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/cli-runtime/pkg/resource"
 )

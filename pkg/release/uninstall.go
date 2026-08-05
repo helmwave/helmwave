@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/release"
+	releaseiface "helm.sh/helm/v4/pkg/release"
 )
 
-func (rel *config) Uninstall(ctx context.Context) (resp *release.UninstallReleaseResponse, err error) {
+func (rel *config) Uninstall(ctx context.Context) (resp *releaseiface.UninstallReleaseResponse, err error) {
 	ctx = helper.ContextWithReleaseUniq(ctx, rel.Uniq())
 
 	// Run hooks

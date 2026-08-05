@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	helm "helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/getter"
-	"helm.sh/helm/v3/pkg/repo"
+	helm "helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/getter"
+	"helm.sh/helm/v4/pkg/repo/v1"
 )
 
 func (c *config) Install(_ context.Context, settings *helm.EnvSettings, f *repo.File) error {
