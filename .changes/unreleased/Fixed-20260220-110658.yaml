@@ -1,0 +1,6 @@
+kind: Fixed
+body: 'fix: build release chart after `pre_build` hook'
+time: 2026-02-20T11:06:58.552961012+08:00
+custom:
+    Author: Vigilans
+    Issue: ""

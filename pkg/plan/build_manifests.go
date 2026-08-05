@@ -87,6 +87,11 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu 
 		}
 	}()
 
+	err = p.buildReleaseChart(rel)
+	if err != nil {
+		return err
+	}
+
 	err = p.buildReleaseValues(ctx, rel, mu)
 	if err != nil {
 		return err
