@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -139,7 +140,7 @@ func (i *Build) flags() []cli.Flag {
 			Name:        "yml",
 			Usage:       "auto helmwave.yml.tpl --> helmwave.yml",
 			Value:       false,
-			Category:    "YML",
+			Category:    CategoryYML,
 			EnvVars:     EnvVars("AUTO_YML", "AUTO_YAML"),
 			Destination: &i.autoYml,
 		},
@@ -147,7 +148,7 @@ func (i *Build) flags() []cli.Flag {
 			Name:        "remote-source",
 			Usage:       "go-getter URL to download build sources",
 			Value:       "",
-			Category:    "BUILD",
+			Category:    Step1,
 			EnvVars:     EnvVars("REMOTE_SOURCE"),
 			Destination: &i.remoteSource,
 		},
@@ -161,10 +162,7 @@ func (i *Build) flags() []cli.Flag {
 		},
 	}
 
-	self = append(self, i.diff.flags()...)
-	self = append(self, i.yml.flags()...)
-
-	return self
+	return slices.Concat(self, i.diff.flags(), i.yml.flags())
 }
 
 // normalizeTags is wrapper for normalizeTagList.

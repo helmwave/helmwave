@@ -70,7 +70,7 @@ func (ts *GetTestSuite) TestGet() {
 	ts.Require().NotNil(r1)
 
 	// Retry Get with backoff to handle race condition
-	var r2 interface{}
+	var r2 any
 	for i := range 5 {
 		r2, err = rel.Get(0)
 		if err == nil {

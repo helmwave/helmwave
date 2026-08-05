@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"slices"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/urfave/cli/v2"
@@ -51,5 +52,5 @@ func (l *List) flags() []cli.Flag {
 		flagAutoBuild(&l.autoBuild),
 	}
 
-	return append(self, l.build.flags()...)
+	return slices.Concat(self, l.build.flags())
 }

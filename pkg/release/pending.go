@@ -18,7 +18,7 @@ const (
 
 func (PendingStrategy) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
-		Type: "string",
+		Type: jsonSchemaString,
 		Enum: []any{
 			PendingStrategyRollback,
 			PendingStrategyUninstall,

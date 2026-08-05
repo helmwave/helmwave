@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"path/filepath"
+	"slices"
 	"testing"
 	gotemplate "text/template"
 
@@ -98,10 +99,10 @@ func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater stri
 		return nil, errReturn
 	}
 
-	for i := len(r.Values()) - 1; i >= 0; i-- {
-		v := r.Values()[i]
-		dst := filepath.Join(dir, Values, filepath.Base(v.Src))
-		err := template.Tpl2yml(ctx, v.Src, dst, nil, templater)
+	vals := r.Values()
+	for i := range slices.Backward(vals) {
+		dst := filepath.Join(dir, Values, filepath.Base(vals[i].Src))
+		err := template.Tpl2yml(ctx, vals[i].Src, dst, nil, templater)
 		if err != nil {
 			return nil, err
 		}

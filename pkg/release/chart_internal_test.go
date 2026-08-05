@@ -37,8 +37,7 @@ func (ts *ChartInternalTestSuite) TestChartTypeFields() {
 		fieldsR[i] = f.Name
 	}
 
-	for i := range bb.NumField() {
-		f := bb.Field(i)
+	for f := range bb.Fields() {
 		if !f.IsExported() {
 			continue
 		}

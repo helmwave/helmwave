@@ -7,7 +7,7 @@ func flagDiffMode(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "diff-mode",
 		Value:       "live",
-		Category:    "DIFF",
+		Category:    CategoryDiff,
 		Usage:       "you can set: [ live | local | none ]",
 		EnvVars:     EnvVars("DIFF_MODE"),
 		Destination: v,
@@ -19,7 +19,7 @@ func flagDiffWide(v *int) cli.Flag {
 	return &cli.IntFlag{
 		Name:        "wide",
 		Value:       5,
-		Category:    "DIFF",
+		Category:    CategoryDiff,
 		Usage:       "show line around changes",
 		EnvVars:     EnvVars("DIFF_WIDE"),
 		Destination: v,
@@ -31,7 +31,7 @@ func flagDiffShowSecret(v *bool) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "show-secret",
 		Value:       true,
-		Category:    "DIFF",
+		Category:    CategoryDiff,
 		Usage:       "show secret in diff",
 		EnvVars:     EnvVars("DIFF_SHOW_SECRET"),
 		Destination: v,
@@ -43,7 +43,7 @@ func flagDiffThreeWayMerge(v *bool) cli.Flag {
 		Name:        "3-way-merge",
 		Usage:       "show 3-way merge diff",
 		Value:       false,
-		Category:    "DIFF",
+		Category:    CategoryDiff,
 		EnvVars:     EnvVars("DIFF_3_WAY_MERGE"),
 		Destination: v,
 	}

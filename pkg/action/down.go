@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"slices"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	log "github.com/sirupsen/logrus"
@@ -57,5 +58,5 @@ func (i *Down) flags() []cli.Flag {
 		flagAutoBuild(&i.autoBuild),
 	}
 
-	return append(self, i.build.flags()...)
+	return slices.Concat(self, i.build.flags())
 }

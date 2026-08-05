@@ -102,7 +102,7 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu 
 	var hm strings.Builder
 	if !rel.HooksDisabled() {
 		for _, h := range r.Hooks {
-			hm.WriteString(fmt.Sprintf("---\n# Source: %s\n%s\n", h.Path, h.Manifest))
+			fmt.Fprintf(&hm, "---\n# Source: %s\n%s\n", h.Path, h.Manifest)
 		}
 	}
 

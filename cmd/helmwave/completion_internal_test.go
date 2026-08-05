@@ -6,23 +6,23 @@ func (ts *CliTestSuite) TestCompletion() {
 		fails bool
 	}{
 		{
-			args:  []string{"helmwave", "completion"},
+			args:  []string{"helmwave", completionCommandName},
 			fails: false,
 		},
 		{
-			args:  []string{"helmwave", "completion", "bash"},
+			args:  []string{"helmwave", completionCommandName, "bash"},
 			fails: false,
 		},
 		{
-			args:  []string{"helmwave", "completion", "zsh"},
+			args:  []string{"helmwave", completionCommandName, "zsh"},
 			fails: false,
 		},
 		{
-			args:  []string{"helmwave", "completion", "fish"},
+			args:  []string{"helmwave", completionCommandName, "fish"},
 			fails: false,
 		},
 		{
-			args:  []string{"helmwave", "completion", "ash"},
+			args:  []string{"helmwave", completionCommandName, "ash"},
 			fails: true,
 		},
 	}

@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/cache"
@@ -25,8 +26,8 @@ func EnvVars(names ...string) []string {
 }
 
 // GlobalFlags is a set of global flags.
-func GlobalFlags() (r []cli.Flag) {
-	r = []cli.Flag{
+func GlobalFlags() []cli.Flag {
+	r := []cli.Flag{
 		flagCancel(),
 		&cli.IntFlag{
 			Name:    "parallel-limit",
@@ -36,10 +37,7 @@ func GlobalFlags() (r []cli.Flag) {
 		},
 	}
 
-	r = append(r, cache.Default.Flags()...)
-	r = append(r, logSetup.Default.Flags()...)
-
-	return r
+	return slices.Concat(r, cache.Default.Flags(), logSetup.Default.Flags())
 }
 
 // flagCancel is flag for canceling process on SigINT or SigTERM.
@@ -58,7 +56,7 @@ func flagPlandir(v *string) cli.Flag {
 		Name:        "plandir",
 		Aliases:     []string{"p"},
 		Value:       plan.Dir,
-		Category:    "BUILD",
+		Category:    Step1,
 		Usage:       "path to plandir",
 		EnvVars:     EnvVars("PLANDIR", "PLAN"),
 		Destination: v,
@@ -69,7 +67,7 @@ func flagPlandir(v *string) cli.Flag {
 func flagYmlFile(v *string) cli.Flag {
 	return &cli.PathFlag{
 		Name:        "file",
-		Category:    "YML",
+		Category:    CategoryYML,
 		Aliases:     []string{"f"},
 		Value:       plan.Body,
 		Usage:       "main yml file",
@@ -82,7 +80,7 @@ func flagYmlFile(v *string) cli.Flag {
 func flagTplFile(v *string) cli.Flag {
 	return &cli.PathFlag{
 		Name:        "tpl",
-		Category:    "YML",
+		Category:    CategoryYML,
 		Value:       "helmwave.yml.tpl",
 		Usage:       "main tpl file",
 		EnvVars:     EnvVars("TPL"),
@@ -94,7 +92,7 @@ func flagTplFile(v *string) cli.Flag {
 func flagTemplateEngine() cli.Flag {
 	return &cli.StringFlag{
 		Name:     "templater",
-		Category: "YML",
+		Category: CategoryYML,
 		Value:    template.TemplaterSprig,
 		Usage:    fmt.Sprintf("select template engine: [ %s | %s ]", template.TemplaterSprig, template.TemplaterGomplate),
 		EnvVars:  EnvVars("TEMPLATER", "TEMPLATE_ENGINE"),
@@ -105,7 +103,7 @@ func flagTemplateEngine() cli.Flag {
 func flagYmlTemplateEngine(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "yml-templater",
-		Category: "YML",
+		Category: CategoryYML,
 		Usage: fmt.Sprintf(
 			"select template engine for rendering helmwave.yml: [ %s | %s ]",
 			template.TemplaterSprig, template.TemplaterGomplate,
@@ -119,7 +117,7 @@ func flagYmlTemplateEngine(v *string) cli.Flag {
 func flagBuildTemplateEngine(v *string) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "build-templater",
-		Category: "YML",
+		Category: CategoryYML,
 		Usage: fmt.Sprintf(
 			"select template engine for rendering values: [ %s | %s ]",
 			template.TemplaterSprig, template.TemplaterGomplate,
@@ -135,7 +133,7 @@ func flagAutoBuild(v *bool) cli.Flag {
 		Name:        "build",
 		Usage:       "auto build",
 		Value:       false,
-		Category:    "BUILD",
+		Category:    Step1,
 		EnvVars:     EnvVars("AUTO_BUILD"),
 		Destination: v,
 	}
@@ -147,7 +145,7 @@ func flagSkipUnchanged(v *bool) cli.Flag {
 		Name:        "skip-unchanged",
 		Usage:       "skip unchanged releases",
 		Value:       false,
-		Category:    "BUILD",
+		Category:    Step1,
 		EnvVars:     EnvVars("SKIP_UNCHANGED"),
 		Destination: v,
 	}
@@ -163,7 +161,7 @@ func flagGraphWidth(v *int) cli.Flag {
 			"N>1 – show only N symbols; " +
 			"N<0 – drop N symbols from end.",
 		Value:       0,
-		Category:    "BUILD",
+		Category:    Step1,
 		EnvVars:     EnvVars("GRAPH_WIDTH"),
 		Destination: v,
 	}

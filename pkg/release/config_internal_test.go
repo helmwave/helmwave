@@ -36,8 +36,7 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 	c := r.newUpgrade()
 	rc := reflect.ValueOf(c).Elem().Type()
 
-	for i := range rr.NumField() {
-		f := rr.Field(i)
+	for f := range rr.Fields() {
 		if !f.IsExported() {
 			continue
 		}
@@ -48,8 +47,7 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 		fieldsR = append(fieldsR, f.Name)
 	}
 
-	for i := range rc.NumField() {
-		f := rc.Field(i)
+	for f := range rc.Fields() {
 		if !f.IsExported() {
 			continue
 		}

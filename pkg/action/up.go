@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"slices"
 
 	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/helper"
@@ -77,14 +78,11 @@ func (i *Up) flags() []cli.Flag {
 			Name:        "progress",
 			Usage:       "enable progress logs of helm (INFO log level)",
 			Value:       false,
-			Category:    "KUBEDOG",
+			Category:    CategoryKubedog,
 			EnvVars:     EnvVars("PROGRESS"),
 			Destination: &helper.Helm.Debug,
 		},
 	}
 
-	self = append(self, flagsKubedog(i.dog)...)
-	self = append(self, i.build.flags()...)
-
-	return self
+	return slices.Concat(self, flagsKubedog(i.dog), i.build.flags())
 }

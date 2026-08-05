@@ -70,7 +70,7 @@ func (p *Plan) List() error {
 
 func newListTable() *tablewriter.Table {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"name", "namespace", "revision", "updated", "status", "chart", "version"})
+	table.SetHeader([]string{fieldName, fieldNamespace, "revision", "updated", "status", fieldChart, "version"})
 	table.SetAutoFormatHeaders(true)
 	table.SetBorder(false)
 

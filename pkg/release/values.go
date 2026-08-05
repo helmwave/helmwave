@@ -36,6 +36,8 @@ type ValuesReference struct {
 	Strict         bool   `yaml:"strict" json:"strict" jsonschema:"description=Whether to fail if values is not found,default=false"`
 }
 
+const jsonSchemaString = "string"
+
 //nolint:gocritic
 func (v ValuesReference) JSONSchema() *jsonschema.Schema {
 	r := &jsonschema.Reflector{
@@ -48,7 +50,7 @@ func (v ValuesReference) JSONSchema() *jsonschema.Schema {
 	schema := r.Reflect(values(v))
 	schema.OneOf = []*jsonschema.Schema{
 		{
-			Type: "string",
+			Type: jsonSchemaString,
 		},
 		{
 			Type: "object",
@@ -302,7 +304,7 @@ func (rel *config) BuildValues(
 		return nil, err
 	}
 
-	for i := len(vals) - 1; i >= 0; i-- {
+	for i := range slices.Backward(vals) {
 		if toDeleteMap[&vals[i]] {
 			vals = slices.Delete(vals, i, i+1)
 		}

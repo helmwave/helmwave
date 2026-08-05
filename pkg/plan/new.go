@@ -36,6 +36,10 @@ const (
 
 	// Values is default directory for values.
 	Values = "values/"
+
+	fieldName      = "name"
+	fieldNamespace = "namespace"
+	fieldChart     = "chart"
 )
 
 // Plan contains full helmwave state.

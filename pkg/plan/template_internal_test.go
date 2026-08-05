@@ -30,7 +30,7 @@ func (ts *TemplateFuncsTestSuite) renderTemplate(ctx context.Context, tpl string
 	err := os.WriteFile(tplFile, []byte(tpl), 0o600)
 	ts.Require().NoError(err)
 
-	opts := []template.TemplaterOptions{}
+	opts := make([]template.TemplaterOptions, 0, len(templateFuncs))
 	for name, value := range templateFuncs {
 		opts = append(opts, template.AddFunc(name, value))
 	}
