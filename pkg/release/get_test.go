@@ -71,7 +71,7 @@ func (ts *GetTestSuite) TestGet() {
 
 	// Retry Get with backoff to handle race condition
 	var r2 interface{}
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		r2, err = rel.Get(0)
 		if err == nil {
 			break

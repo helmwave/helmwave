@@ -70,7 +70,9 @@ func (ts *UpTestSuite) TestPrometheusMonitors() {
 	// Skip test if Prometheus is not accessible on localhost:9090
 	// This test requires port-forward to work properly
 	client := &http.Client{Timeout: 2 * time.Second}
-	_, err := client.Get("http://localhost:9090/-/healthy")
+	b, err := client.Get("http://localhost:9090/-/healthy")
+	defer b.Body.Close()
+
 	if err != nil {
 		ts.T().Skip("Skipping test: Prometheus is not accessible on localhost:9090 (requires port-forward)")
 	}
