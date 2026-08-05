@@ -30,6 +30,7 @@ func TestUpTestSuite(t *testing.T) {
 }
 
 func (ts *UpTestSuite) SetupTest() {
+	tests.RequireCluster(ts.T())
 	ts.ctx = tests.GetContext(ts.T())
 }
 

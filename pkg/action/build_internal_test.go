@@ -65,6 +65,7 @@ func (ts *BuildTestSuite) TestYmlError() {
 }
 
 func (ts *BuildTestSuite) TestManifest() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
@@ -102,6 +103,7 @@ func (ts *BuildTestSuite) TestManifest() {
 // }
 
 func (ts *BuildTestSuite) TestNonUniqueReleases() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "14_helmwave.yml"),
@@ -167,6 +169,7 @@ func (ts *BuildTestSuite) TestNonUniqueReleases() {
 }
 
 func (ts *BuildTestSuite) TestRepositories() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
@@ -194,6 +197,7 @@ func (ts *BuildTestSuite) TestRepositories() {
 }
 
 func (ts *BuildTestSuite) TestReleasesMatchGroup() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
@@ -238,6 +242,7 @@ func (ts *BuildTestSuite) TestReleasesMatchGroup() {
 }
 
 func (ts *BuildTestSuite) TestDiffLocal() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "07_helmwave.yml"),
@@ -262,6 +267,7 @@ func (ts *BuildTestSuite) TestDiffLocal() {
 }
 
 func (ts *BuildTestSuite) TestValuesDependency() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "19_helmwave.yml"),
@@ -321,6 +327,7 @@ func (ts *NonParallelBuildTestSuite) getLoggerMessages() []string {
 }
 
 func (ts *NonParallelBuildTestSuite) TestAutoYml() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "01_helmwave.yml.tpl"),
@@ -346,6 +353,7 @@ func (ts *NonParallelBuildTestSuite) TestAutoYml() {
 }
 
 func (ts *NonParallelBuildTestSuite) TestGomplate() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "08_helmwave.yml"),
@@ -368,6 +376,7 @@ func (ts *NonParallelBuildTestSuite) TestGomplate() {
 }
 
 func (ts *NonParallelBuildTestSuite) TestLifecycle() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "13_helmwave.yml"),
@@ -396,6 +405,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecycle() {
 }
 
 func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	y := &Yml{
 		tpl:       filepath.Join(tests.Root, "17_helmwave.yml"),
@@ -420,6 +430,7 @@ func (ts *NonParallelBuildTestSuite) TestLifecyclePost() {
 }
 
 func (ts *NonParallelBuildTestSuite) TestRemoteSource() {
+	tests.RequireCluster(ts.T())
 	tmpDir := ts.T().TempDir()
 	d, err := os.Getwd()
 	ts.Require().NoError(err)

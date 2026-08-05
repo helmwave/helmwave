@@ -26,6 +26,7 @@ func TestYmlTestSuite(t *testing.T) {
 }
 
 func (ts *YmlTestSuite) SetupTest() {
+	tests.RequireCluster(ts.T())
 	ts.ctx = tests.GetContext(ts.T())
 }
 
