@@ -1,0 +1,6 @@
+kind: New feature
+body: 'feat: implement dedicated kustomize post-renderer'
+time: 2026-02-20T12:01:04.791217652+08:00
+custom:
+    Author: Vigilans
+    Issue: "1189"

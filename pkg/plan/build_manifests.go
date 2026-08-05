@@ -92,6 +92,11 @@ func (p *Plan) buildReleaseManifest(ctx context.Context, rel release.Config, mu 
 		return err
 	}
 
+	err = p.buildReleasePostRenderer(ctx, rel, mu)
+	if err != nil {
+		return err
+	}
+
 	r, err := rel.SyncDryRun(ctx, false)
 	if err != nil || r == nil {
 		l.Errorf("❌ can't get manifests: %v", err)

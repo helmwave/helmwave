@@ -15,6 +15,8 @@ import (
 )
 
 // Export allows save plan to file.
+//
+//nolint:gocognit
 func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -39,7 +41,7 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 	}
 
 	wg := parallel.NewWaitGroup()
-	wg.Add(4)
+	wg.Add(5)
 
 	go func() {
 		defer wg.Done()
@@ -56,6 +58,12 @@ func (p *Plan) Export(ctx context.Context, skipUnchanged bool) error {
 	go func() {
 		defer wg.Done()
 		if err := p.exportValues(); err != nil {
+			wg.ErrChan() <- err
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		if err := p.exportKustomize(); err != nil {
 			wg.ErrChan() <- err
 		}
 	}()
@@ -195,6 +203,32 @@ func (p *Plan) exportValues() error {
 	)
 	if err != nil {
 		return fmt.Errorf("failed to copy values from %s to %s: %w", p.tmpDir, p.dir, err)
+	}
+
+	return nil
+}
+
+func (p *Plan) exportKustomize() error {
+	found := false
+
+	for _, rel := range p.body.Releases {
+		pr := rel.PostRenderer()
+		if pr != nil && pr.Kustomize != nil {
+			found = true
+			pr.Kustomize.SetUniq(p.dir, rel.Uniq())
+		}
+	}
+
+	if !found {
+		return nil
+	}
+
+	err := helper.MoveFile(
+		filepath.Join(p.tmpDir, "kustomize"),
+		filepath.Join(p.dir, "kustomize"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to move kustomize from %s to %s: %w", p.tmpDir, p.dir, err)
 	}
 
 	return nil

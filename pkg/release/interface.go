@@ -30,6 +30,7 @@ type Config interface {
 	ChartDepsUpd() error
 	DownloadChart(tmpDir string) error
 	BuildValues(ctx context.Context, dir, templater string, templateFuncs template.FuncMap) (map[string]string, error)
+	BuildPostRenderer(ctx context.Context, dir, templater string, templateFuncs template.FuncMap) error
 	Name() string
 	Namespace() string
 	Chart() *Chart
@@ -39,6 +40,7 @@ type Config interface {
 	Tags() []string
 	Repo() string
 	Values() []ValuesReference
+	PostRenderer() *PostRendererReference
 	HelmWait() bool
 	KubeContext() string
 	Cfg() *action.Configuration
