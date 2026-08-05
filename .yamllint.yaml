@@ -10,6 +10,7 @@ ignore: |
   .helmwave/
   tests/
   .changie.yaml
+  .changes
   .github
   dist/
 
