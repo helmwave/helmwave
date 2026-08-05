@@ -1,6 +1,0 @@
-kind: Breaking change!
-body: '`recreate` is no longer applied: helm v4 removed the option behind it'
-time: 2026-08-05T19:05:00.000000+01:00
-custom:
-    Author: r3nic1e
-    Issue: "1201"
