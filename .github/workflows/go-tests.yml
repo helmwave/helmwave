@@ -11,7 +11,26 @@ on:
       - .github/workflows/go-tests.yml
 
 jobs:
-  go-tests:
+  # No cluster and no HELMWAVE_TEST_CLUSTER: cluster tests must skip, proving
+  # the suite is green on any laptop.
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Install go modules
+        run: go mod download
+
+      - name: Run unit tests
+        run: go test -v -timeout=10m ./...
+
+  integration-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -31,11 +50,10 @@ jobs:
       - name: Install go modules
         run: go mod download
 
-      - name: Run unit tests
-        run: go test -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
-
       - name: Run all tests
         run: go test -coverprofile=./tests.cov -v -covermode=atomic -timeout=20m --tags=integration ./...
+        env:
+          HELMWAVE_TEST_CLUSTER: /home/runner/.kube/config
 
       - uses: codecov/codecov-action@v5
         with:

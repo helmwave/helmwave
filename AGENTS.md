@@ -6,8 +6,8 @@ Docs: https://docs.helmwave.app (source: `helmwave/docs` repo; reference pages: 
 ## Commands
 
 - Build: `go build ./cmd/helmwave`
-- Unit tests: `go test ./...`
-- Integration tests: need KinD cluster from `tests/kind-config.yaml`, then `go test --tags=integration -timeout=20m ./...`
+- Unit tests: `go test ./...` — never touches a cluster; cluster tests skip without `HELMWAVE_TEST_CLUSTER`
+- Integration tests: KinD cluster from `tests/kind-config.yaml`, then `HELMWAVE_TEST_CLUSTER=~/.kube/config go test --tags=integration -timeout=20m ./...`
 - Lint: `golangci-lint run` (config enables almost all linters; builds with `integration` tag)
 - JSON schema: `go run ./cmd/helmwave schema` (from `jsonschema` struct tags; CI attaches to releases)
 

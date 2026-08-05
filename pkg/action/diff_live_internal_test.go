@@ -28,6 +28,7 @@ func TestDiffLiveTestSuite(t *testing.T) {
 }
 
 func (ts *DiffLiveTestSuite) SetupTest() {
+	tests.RequireCluster(ts.T())
 	ts.ctx = tests.GetContext(ts.T())
 }
 

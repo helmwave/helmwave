@@ -28,6 +28,7 @@ func TestSyncTestSuite(t *testing.T) {
 }
 
 func (ts *SyncTestSuite) SetupSuite() {
+	tests.RequireCluster(ts.T())
 	ts.ctx = tests.GetContext(ts.T())
 
 	var rs repo.Configs
