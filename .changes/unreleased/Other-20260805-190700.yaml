@@ -1,6 +1,0 @@
-kind: Other
-body: '`post_renderer` commands are now executed by helmwave itself, since helm v4 only supports plugin post-renderers'
-time: 2026-08-05T19:07:00.000000+01:00
-custom:
-    Author: r3nic1e
-    Issue: "1201"

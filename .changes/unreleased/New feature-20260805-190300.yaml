@@ -1,6 +1,0 @@
-kind: New feature
-body: 'New release option `post_render_strategy` (combined/separate/nohooks) controls how manifests are handed to the post_renderer'
-time: 2026-08-05T19:03:00.000000+01:00
-custom:
-    Author: r3nic1e
-    Issue: "1201"
