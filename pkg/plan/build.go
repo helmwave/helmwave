@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"slices"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -26,6 +27,17 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 		return
 	}
 	p.body = body
+
+	// Calculate tags
+	tags := o.Tags
+	if len(tags) == 0 {
+		for _, rel := range p.body.Releases {
+			tags = append(tags, rel.Tags()...)
+		}
+		slices.Sort(tags)
+		tags = slices.Compact(tags)
+	}
+	p.tags = tags
 
 	// Run Pre hooks
 	err = p.body.Lifecycle.RunPreBuild(ctx)

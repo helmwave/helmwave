@@ -46,6 +46,7 @@ type Plan struct {
 	tmpDir    string
 	graphMD   string
 	templater string
+	tags      []string
 
 	manifests map[uniqname.UniqName]string
 	values    map[uniqname.UniqName]map[string]string
