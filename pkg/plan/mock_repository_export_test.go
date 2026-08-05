@@ -7,8 +7,8 @@ import (
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
-	"helm.sh/helm/v3/pkg/cli"
-	repo2 "helm.sh/helm/v3/pkg/repo"
+	"helm.sh/helm/v4/pkg/cli"
+	repo2 "helm.sh/helm/v4/pkg/repo/v1"
 )
 
 type MockRepositoryConfig struct {

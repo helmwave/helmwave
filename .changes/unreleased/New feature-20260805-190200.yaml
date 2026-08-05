@@ -1,0 +1,6 @@
+kind: New feature
+body: 'New release option `force_conflicts` forces server-side apply changes against field-ownership conflicts'
+time: 2026-08-05T19:02:00.000000+01:00
+custom:
+    Author: r3nic1e
+    Issue: "1201"

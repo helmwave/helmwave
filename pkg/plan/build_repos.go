@@ -6,7 +6,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
-	"helm.sh/helm/v3/pkg/registry"
+	"helm.sh/helm/v4/pkg/registry"
 )
 
 func (p *Plan) buildRepositories() (out []repo.Config, err error) {

@@ -31,7 +31,7 @@ monitors:
 .default: &default
   timeout: 1m
   create_namespace: true
-  wait: false
+  wait: hookOnly
   wait_for_jobs: false
   pending_release_strategy: rollback
 

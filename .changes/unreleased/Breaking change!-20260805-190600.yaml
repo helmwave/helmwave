@@ -1,0 +1,6 @@
+kind: Breaking change!
+body: 'A configured `post_renderer` now also receives hook manifests, matching helm v4''s default — set `post_render_strategy: nohooks` for the previous behavior'
+time: 2026-08-05T19:06:00.000000+01:00
+custom:
+    Author: r3nic1e
+    Issue: "1201"

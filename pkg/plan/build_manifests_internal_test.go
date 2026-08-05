@@ -12,7 +12,7 @@ import (
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	helmRelease "helm.sh/helm/v3/pkg/release"
+	helmRelease "helm.sh/helm/v4/pkg/release/v1"
 )
 
 type BuildManifestsTestSuite struct {

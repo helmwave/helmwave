@@ -3,7 +3,7 @@ package release
 import (
 	"fmt"
 
-	"helm.sh/helm/v3/pkg/release"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 func (rel *config) Get(version int) (*release.Release, error) {
@@ -15,7 +15,7 @@ func (rel *config) Get(version int) (*release.Release, error) {
 		return nil, fmt.Errorf("failed to get release %s: %w", rel.Uniq(), err)
 	}
 
-	return r, nil
+	return asRelease(r)
 }
 
 func (rel *config) GetValues() (map[string]any, error) {

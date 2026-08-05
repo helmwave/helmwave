@@ -19,14 +19,14 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 		"ChartPathOptions",
 		"Install",
 		"Namespace",
-		"DryRun",
+		"DryRunStrategy", // helmwave drives dry-run itself, it is not a release setting
 		"HideSecret",
-		"DryRunOption",
 		"Description",
 		"PostRenderer",
 		"DependencyUpdate",
 		"Lock",
-		"Devel", // we removed that to force everyone specify the version
+		"WaitOptions", // a slice of Go option funcs, nothing a YAML file can express
+		"Devel",       // we removed that to force everyone specify the version
 	}
 
 	r := NewConfig()

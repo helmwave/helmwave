@@ -4,7 +4,7 @@ import (
 	regi "github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	log "github.com/sirupsen/logrus"
-	"helm.sh/helm/v3/pkg/registry"
+	"helm.sh/helm/v4/pkg/registry"
 )
 
 func buildRegistriesMapTop(releases []release.Config) map[string][]release.Config {

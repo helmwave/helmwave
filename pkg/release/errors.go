@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/storage/driver"
 )
 
 var (
@@ -29,6 +29,9 @@ var (
 	ErrUnknownFormat = errors.New("unknown format")
 
 	ErrDigestNotMatch = errors.New("chart digest doesn't match")
+
+	// ErrNilRelease is returned when helm hands back no release at all.
+	ErrNilRelease = errors.New("helm returned no release")
 )
 
 type DuplicateError struct {
@@ -86,6 +89,82 @@ func (err ChartCacheError) Error() string {
 
 func (err ChartCacheError) Unwrap() error {
 	return err.Err
+}
+
+type PostRendererNotFoundError struct {
+	Err    error
+	Binary string
+}
+
+func NewPostRendererNotFoundError(binary string, err error) error {
+	return &PostRendererNotFoundError{Binary: binary, Err: err}
+}
+
+func (err PostRendererNotFoundError) Error() string {
+	return fmt.Sprintf("failed to find post_renderer %q: %s", err.Binary, err.Err)
+}
+
+func (err PostRendererNotFoundError) Unwrap() error {
+	return err.Err
+}
+
+type PostRendererError struct {
+	Err    error
+	Binary string
+	Output string
+}
+
+func NewPostRendererError(binary, output string, err error) error {
+	return &PostRendererError{Binary: binary, Output: output, Err: err}
+}
+
+func (err PostRendererError) Error() string {
+	return fmt.Sprintf("post_renderer %q failed: %s\n%s", err.Binary, err.Err, err.Output)
+}
+
+func (err PostRendererError) Unwrap() error {
+	return err.Err
+}
+
+type InvalidWaitStrategyError struct {
+	Strategy string
+}
+
+func NewInvalidWaitStrategyError(strategy string) error {
+	return &InvalidWaitStrategyError{Strategy: strategy}
+}
+
+func (err InvalidWaitStrategyError) Error() string {
+	return fmt.Sprintf(
+		"invalid wait strategy %q, expected one of: %s, %s, %s"+
+			" (helm 3 booleans are gone: use %s instead of true and %s instead of false)",
+		err.Strategy, WaitStrategyWatcher, WaitStrategyLegacy, WaitStrategyHookOnly,
+		WaitStrategyWatcher, WaitStrategyHookOnly,
+	)
+}
+
+type InvalidServerSideApplyError struct {
+	Value string
+}
+
+func NewInvalidServerSideApplyError(value string) error {
+	return &InvalidServerSideApplyError{Value: value}
+}
+
+func (err InvalidServerSideApplyError) Error() string {
+	return fmt.Sprintf("invalid server_side_apply %q, expected one of: true, false, auto", err.Value)
+}
+
+type UnexpectedReleaseTypeError struct {
+	Release any
+}
+
+func NewUnexpectedReleaseTypeError(rel any) error {
+	return &UnexpectedReleaseTypeError{Release: rel}
+}
+
+func (err UnexpectedReleaseTypeError) Error() string {
+	return fmt.Sprintf("helm returned an unsupported release type: %T", err.Release)
 }
 
 type HelmTestsError struct {

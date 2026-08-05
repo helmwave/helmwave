@@ -5,8 +5,8 @@ import (
 	"regexp"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/action"
-	helm "helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v4/pkg/action"
+	helm "helm.sh/helm/v4/pkg/cli"
 )
 
 func (rel *config) Cfg() *action.Configuration {
@@ -40,7 +40,6 @@ func (rel *config) newInstall() *action.Install {
 	client.ReleaseName = rel.Name()
 
 	// Common Part
-	client.DryRun = rel.dryRun
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 	client.TakeOwnership = rel.TakeOwnership
@@ -49,13 +48,18 @@ func (rel *config) newInstall() *action.Install {
 	client.HideSecret = rel.hideSecret
 
 	rel.Chart().CopyOptions(&client.ChartPathOptions)
+	rel.applyOCIRegistryClient(client.SetRegistryClient)
 
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
-	client.Wait = rel.Wait
+	client.WaitStrategy = rel.WaitStrategy.Helm()
 	client.WaitForJobs = rel.WaitForJobs
-	client.Atomic = rel.Atomic
+	client.RollbackOnFailure = rel.RollbackOnFailure
+	client.ForceConflicts = rel.ForceConflicts
+	// install takes a boolean where upgrade takes true/false/auto, the same way helm's own CLI
+	// narrows it when it turns an upgrade into an install.
+	client.ServerSideApply = rel.serverSideApply() != "false"
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
@@ -65,16 +69,21 @@ func (rel *config) newInstall() *action.Install {
 		rel.Logger().WithError(err).Warn("failed to create post-renderer")
 	} else {
 		client.PostRenderer = pr
+		client.PostRenderStrategy = rel.postRenderStrategy()
 	}
 
-	if client.DryRun {
+	if rel.dryRun {
 		client.Replace = true
+
+		// The strategy is what helm actually looks at, and "server" makes it render through a
+		// live REST client. That is what we want for a normal build, so `lookup` in a chart sees
+		// the cluster. With offline_kube_version the user asked for the opposite, so say
+		// "client" — otherwise helm builds a REST config and renders against the cluster.
 		if rel.OfflineKubeVersion() != nil {
-			client.DryRunOption = "client"
-			client.ClientOnly = true
+			client.DryRunStrategy = action.DryRunClient
 			client.KubeVersion = rel.OfflineKubeVersion()
 		} else {
-			client.DryRunOption = "server"
+			client.DryRunStrategy = action.DryRunServer
 		}
 	}
 
@@ -87,13 +96,11 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	// Only Upgrade
 	client.CleanupOnFail = rel.CleanupOnFail
 	client.MaxHistory = rel.MaxHistory
-	client.Recreate = rel.Recreate
 	client.ReuseValues = rel.ReuseValues
 	client.ResetValues = rel.ResetValues
 	client.ResetThenReuseValues = rel.ResetThenReuseValues
 
 	// Common Part
-	client.DryRun = rel.dryRun
 	client.Namespace = rel.Namespace()
 	client.EnableDNS = rel.EnableDNS
 	client.TakeOwnership = rel.TakeOwnership
@@ -102,23 +109,33 @@ func (rel *config) newUpgrade() *action.Upgrade {
 	client.HideSecret = rel.hideSecret
 
 	rel.Chart().CopyOptions(&client.ChartPathOptions)
+	rel.applyOCIRegistryClient(client.SetRegistryClient)
 
-	client.Force = rel.Force
+	client.ForceReplace = rel.ForceReplace
+	client.ForceConflicts = rel.ForceConflicts
+	client.ServerSideApply = rel.serverSideApply()
 	client.DisableHooks = rel.DisableHooks
 	client.SkipCRDs = rel.SkipCRDs
 	client.Timeout = rel.Timeout
-	client.Wait = rel.Wait
+	client.WaitStrategy = rel.WaitStrategy.Helm()
 	client.WaitForJobs = rel.WaitForJobs
-	client.Atomic = rel.Atomic
+	client.RollbackOnFailure = rel.RollbackOnFailure
 	client.DisableOpenAPIValidation = rel.DisableOpenAPIValidation
 	client.SubNotes = rel.SubNotes
 	client.Description = rel.Description()
+
+	// A dry run always goes through the install action (see config.upgrade), so this only needs
+	// to render without touching the cluster.
+	if rel.dryRun {
+		client.DryRunStrategy = action.DryRunClient
+	}
 
 	pr, err := rel.PostRenderer()
 	if err != nil {
 		rel.Logger().WithError(err).Warn("failed to create post_renderer")
 	} else {
 		client.PostRenderer = pr
+		client.PostRenderStrategy = rel.postRenderStrategy()
 	}
 
 	return client
@@ -134,7 +151,7 @@ func (rel *config) newUninstall() *action.Uninstall {
 	client.DryRun = rel.dryRun
 	client.DisableHooks = rel.DisableHooks
 	client.Timeout = rel.Timeout
-	client.Wait = rel.Wait
+	client.WaitStrategy = rel.WaitStrategy.Helm()
 	client.DeletionPropagation = rel.DeletePropagation
 	client.Description = rel.Description()
 
@@ -156,24 +173,21 @@ func (rel *config) newRollback() *action.Rollback {
 
 	client.CleanupOnFail = rel.CleanupOnFail
 	client.MaxHistory = rel.MaxHistory
-	client.Recreate = rel.Recreate
 	client.Timeout = rel.Timeout
 
 	client.DisableHooks = rel.DisableHooks
 	client.Timeout = rel.Timeout
-	client.Wait = rel.Wait
+	client.WaitStrategy = rel.WaitStrategy.Helm()
 	client.WaitForJobs = rel.WaitForJobs
-	client.Force = rel.Force
+	client.ForceReplace = rel.ForceReplace
+	client.ForceConflicts = rel.ForceConflicts
+	client.ServerSideApply = rel.serverSideApply()
 
 	return client
 }
 
 func (rel *config) newStatus() *action.Status {
-	client := action.NewStatus(rel.Cfg())
-
-	client.ShowDescription = true
-
-	return client
+	return action.NewStatus(rel.Cfg())
 }
 
 func (rel *config) newGet() *action.Get {
