@@ -67,9 +67,10 @@ func (h *SlogHandler) Enabled(_ context.Context, level slog.Level) bool {
 
 // Handle implements slog.Handler.
 //
+// slog.Record is passed by value and slog.Attr ranged over by value because
 // slog.Handler says so; neither signature is ours to change.
 //
-//nolint:gocritic // slog.Record is passed by value and slog.Attr ranged over by value because
+//nolint:gocritic
 func (h *SlogHandler) Handle(_ context.Context, r slog.Record) error {
 	fields := make(log.Fields, len(h.attrs)+r.NumAttrs())
 
@@ -95,9 +96,11 @@ func (h *SlogHandler) Handle(_ context.Context, r slog.Record) error {
 }
 
 // WithAttrs implements slog.Handler.
+//
+// []slog.Attr is what slog.Handler hands us; copying 40 bytes per attr is
 // cheaper than the map write that follows it.
 //
-//nolint:gocritic // []slog.Attr is what slog.Handler hands us; copying 40 bytes per attr is
+//nolint:gocritic
 func (h *SlogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	if len(attrs) == 0 {
 		return h
@@ -134,9 +137,11 @@ func (h *SlogHandler) WithGroup(name string) slog.Handler {
 }
 
 // flattenAttr writes a single attribute into fields, expanding groups into dotted keys.
+//
+// slog.Attr is a value type throughout slog's API, including the group
 // slices this walks.
 //
-//nolint:gocritic // slog.Attr is a value type throughout slog's API, including the group
+//nolint:gocritic
 func flattenAttr(fields log.Fields, prefix string, a slog.Attr) {
 	value := a.Value.Resolve()
 
