@@ -30,11 +30,24 @@ var (
 		"fromYamlAll":    FromYamlAll,
 		"exec":           Exec,
 		"setValueAtPath": SetValueAtPath,
+		"getValueAtPath": GetValueAtPath,
+		"hasValueAtPath": HasValueAtPath,
 		"requiredEnv":    RequiredEnv,
 		"required":       Required,
 		"readFile":       ReadFile,
-		"get":            Get,
-		"hasKey":         HasKey,
+	}
+
+	deprecatedFuncs = map[string]any{
+		"get": func(path string, varArgs ...any) (any, error) {
+			log.Warnf("helmwave provided `get` has been renamed to a more unified name `getValueAtPath`. Current `get` will be removed after next several releases.") //nolint:lll
+
+			return GetValueAtPath(path, varArgs...)
+		},
+		"hasKey": func(path string, varArgs ...any) (bool, error) {
+			log.Warnf("helmwave provided `hasKey` has been renamed to a more unified name `hasValueAtPath`. Current `hasKey` will be removed after next several releases.") //nolint:lll
+
+			return HasValueAtPath(path, varArgs...)
+		},
 	}
 )
 
@@ -93,6 +106,7 @@ func (t sprigTemplater) funcMap() template.FuncMap {
 
 	addToMap(funcMap, sprigFuncMap)
 	addToMap(funcMap, customFuncs)
+	addToMap(funcMap, deprecatedFuncs)
 
 	return funcMap
 }

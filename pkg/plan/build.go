@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"slices"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -27,6 +28,17 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 	}
 	p.body = body
 
+	// Calculate tags
+	tags := o.Tags
+	if len(tags) == 0 {
+		for _, rel := range p.body.Releases {
+			tags = append(tags, rel.Tags()...)
+		}
+		slices.Sort(tags)
+		tags = slices.Compact(tags)
+	}
+	p.tags = tags
+
 	// Run Pre hooks
 	err = p.body.Lifecycle.RunPreBuild(ctx)
 	if err != nil {
@@ -49,11 +61,6 @@ func (p *Plan) Build(ctx context.Context, o BuildOptions) (err error) {
 
 func (p *Plan) build(ctx context.Context, o BuildOptions) (err error) {
 	p.body.Releases, err = p.buildReleases(ctx, o)
-	if err != nil {
-		return err
-	}
-
-	err = p.buildValues(ctx)
 	if err != nil {
 		return err
 	}
@@ -85,6 +92,10 @@ func (p *Plan) build(ctx context.Context, o BuildOptions) (err error) {
 
 	err = p.body.Validate()
 	if err != nil {
+		return err
+	}
+
+	if err := p.ValidateValuesBuild(); err != nil {
 		return err
 	}
 

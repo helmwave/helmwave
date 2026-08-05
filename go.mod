@@ -1,6 +1,6 @@
 module github.com/helmwave/helmwave
 
-go 1.24.0
+go 1.26.0
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
@@ -30,7 +30,6 @@ require (
 	github.com/urfave/cli/v2 v2.27.4
 	github.com/werf/kubedog v0.13.0
 	github.com/werf/logboek v0.6.1
-	golang.org/x/sync v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.18.4
 	k8s.io/apimachinery v0.33.2
@@ -298,6 +297,7 @@ require (
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/oauth2 v0.28.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/term v0.34.0 // indirect
 	golang.org/x/text v0.28.0 // indirect

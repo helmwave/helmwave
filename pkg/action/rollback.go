@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"slices"
 
 	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
@@ -60,8 +61,5 @@ func (i *Rollback) flags() []cli.Flag {
 		},
 	}
 
-	self = append(self, flagsKubedog(i.dog)...)
-	self = append(self, i.build.flags()...)
-
-	return self
+	return slices.Concat(self, flagsKubedog(i.dog), i.build.flags())
 }

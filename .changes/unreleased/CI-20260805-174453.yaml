@@ -1,0 +1,6 @@
+kind: CI
+body: use go 1.26 to build the project
+time: 2026-08-05T17:44:53.956059+01:00
+custom:
+    Author: r3nic1e
+    Issue: ""

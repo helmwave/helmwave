@@ -82,7 +82,7 @@ func (ts *ValidateTestSuite) TestValidateValues() {
 	mockedRelease.On("KubeContext").Return("")
 
 	v := release.ValuesReference{Src: tmpValues}
-	ts.Require().NoError(v.SetViaRelease(ts.ctx, mockedRelease, tmpDir, template.TemplaterSprig, nil))
+	ts.Require().NoError(v.SetViaRelease(ts.ctx, mockedRelease, tmpDir, template.TemplaterSprig, nil, nil))
 
 	mockedRelease.On("Values").Return([]release.ValuesReference{v})
 

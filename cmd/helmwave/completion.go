@@ -82,9 +82,11 @@ complete -c helmwave -f -a '(__fish_helmwave_complete)'
 `
 )
 
+const completionCommandName = "completion"
+
 func completion() *cli.Command {
 	return &cli.Command{
-		Name:     "completion",
+		Name:     completionCommandName,
 		Category: action.Step_,
 		Usage:    "generate completion script",
 		Description: `

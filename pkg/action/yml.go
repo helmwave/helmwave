@@ -3,6 +3,7 @@ package action
 import (
 	"context"
 
+	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -18,6 +19,13 @@ type Yml struct {
 
 // Run is the main function for 'yml' command.
 func (i *Yml) Run(ctx context.Context) error {
+	if i.templater == "" {
+		cliCtx := clictx.GetCLIFromContext(ctx)
+		if cliCtx != nil {
+			i.templater = cliCtx.String("templater")
+		}
+	}
+
 	err := template.Tpl2yml(ctx, i.tpl, i.file, nil, i.templater)
 	if err != nil {
 		return err
@@ -46,6 +54,6 @@ func (i *Yml) flags() []cli.Flag {
 	return []cli.Flag{
 		flagTplFile(&i.tpl),
 		flagYmlFile(&i.file),
-		flagTemplateEngine(&i.templater),
+		flagTemplateEngine(),
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 
 	log "github.com/sirupsen/logrus"
 
@@ -79,12 +80,12 @@ func (l *Manifests) flags() []cli.Flag {
 			Name:     "uniqnames",
 			Aliases:  []string{"u"},
 			Usage:    "show manifest in the plan only for specific release: -u nginx@namespace -u nginx@ns,redis@ns",
-			Category: "SELECTION",
+			Category: CategorySelection,
 			EnvVars:  EnvVars("UNIQNAMES"),
 		},
 	}
 
-	return append(self, l.build.flags()...)
+	return slices.Concat(self, l.build.flags())
 }
 
 // func (l *Manifests) uniqnames() (r []uniqname.UniqName) {

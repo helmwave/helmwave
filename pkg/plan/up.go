@@ -245,7 +245,7 @@ func (p *Plan) ApplyReport(
 
 	if len(releasesFails) > 0 {
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"name", "namespace", "chart", "version", "error"})
+		table.SetHeader([]string{fieldName, fieldNamespace, fieldChart, "version", "error"})
 		table.SetAutoFormatHeaders(true)
 		table.SetBorder(false)
 
