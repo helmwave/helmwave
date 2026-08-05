@@ -1,0 +1,6 @@
+kind: New feature
+body: Add `getTags` template function that returns the active plan tags
+time: 2026-08-05T17:06:00.000000+01:00
+custom:
+    Author: Vigilans
+    Issue: "1192"
