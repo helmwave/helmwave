@@ -9,21 +9,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/monitor"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/dependency"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
-	"github.com/werf/kubedog/pkg/kube"
-	"github.com/werf/kubedog/pkg/tracker"
-	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 )
 
 // Up syncs repositories and releases.
-func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
+func (p *Plan) Up(ctx context.Context, dog *tracker.Config) (err error) {
 	// Run hooks
 	err = p.body.Lifecycle.RunPreUp(ctx)
 	if err != nil {
@@ -59,9 +55,11 @@ func (p *Plan) Up(ctx context.Context, dog *kubedog.Config) (err error) {
 	log.Info("🛥 sync releases...")
 
 	if dog.Enabled {
-		log.Warn("🐶 kubedog is enabled")
-		kubedog.FixLog(ctx, dog.LogWidth)
-		err = p.syncReleasesKubedog(ctx, dog)
+		log.Warn("🐶 live resource tracking is enabled")
+		if err = tracker.SilenceKlog(); err != nil {
+			return
+		}
+		err = p.syncReleasesTracked(ctx, dog)
 	} else {
 		err = p.syncReleases(ctx)
 	}
@@ -298,43 +296,26 @@ func (p *Plan) ApplyReport(
 	return nil
 }
 
-func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.Config) error {
+func (p *Plan) syncReleasesTracked(ctx context.Context, cfg *tracker.Config) error {
 	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Don't forget!
 
-	specs, kubecontext, err := p.kubedogSyncSpecs(kubedogConfig)
+	ids, kubecontext, err := p.trackerSyncObjects(cfg)
 	if err != nil {
 		return err
 	}
 
-	err = helper.KubeInit(kubecontext)
-	if err != nil {
-		return err
-	}
-
-	opts := multitrack.MultitrackOptions{
-		DynamicClient:        kube.DynamicClient,
-		DiscoveryClient:      kube.CachedDiscoveryClient,
-		Mapper:               kube.Mapper,
-		StatusProgressPeriod: kubedogConfig.StatusInterval,
-		Options: tracker.Options{
-			ParentContext: ctxCancel,
-			Timeout:       kubedogConfig.Timeout,
-			LogsFromTime:  time.Now(),
-		},
-	}
-
-	// Run kubedog
+	// Run the tracker
 	dogroup := parallel.NewWaitGroup()
 	dogroup.Add(1)
 	go func() {
 		defer dogroup.Done()
-		log.Trace("Multitrack is starting...")
-		dogroup.ErrChan() <- multitrack.Multitrack(kube.Client, specs, opts)
+		log.Trace("tracker is starting...")
+		dogroup.ErrChan() <- tracker.Track(ctxCancel, cfg, ids, kubecontext)
 	}()
 
 	// Run helm
-	time.Sleep(kubedogConfig.StartDelay)
+	time.Sleep(cfg.StartDelay)
 	err = p.syncReleases(ctx)
 	if err != nil {
 		cancel()
@@ -342,14 +323,14 @@ func (p *Plan) syncReleasesKubedog(ctx context.Context, kubedogConfig *kubedog.C
 		return err
 	}
 
-	// Allow kubedog to catch release installed
-	time.Sleep(kubedogConfig.StatusInterval)
-	cancel() // stop kubedog
+	// Allow the tracker to catch the final states
+	time.Sleep(cfg.StatusInterval)
+	cancel() // stop the tracker
 
 	err = dogroup.WaitWithContext(ctx)
 	if err != nil && !errors.Is(err, context.Canceled) {
-		// Ignore kubedog error
-		log.WithError(err).Warn("kubedog has error while watching resources.")
+		// Tracking is advisory: report and move on
+		log.WithError(err).Warn("tracker caught an error while watching resources")
 	}
 
 	return nil

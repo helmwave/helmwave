@@ -3,15 +3,15 @@ package action
 import (
 	"time"
 
-	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	"github.com/urfave/cli/v2"
 )
 
-func flagsKubedog(dog *kubedog.Config) []cli.Flag {
+func flagsTracker(dog *tracker.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:        "kubedog",
-			Usage:       "enable/disable kubedog",
+			Usage:       "enable live tracking of deployed resources",
 			Value:       false,
 			Category:    CategoryKubedog,
 			EnvVars:     EnvVars("KUBEDOG_ENABLED", "KUBEDOG"),
@@ -19,7 +19,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-status-interval",
-			Usage:       "interval of kubedog status messages: set -1s to stop showing status progress",
+			Usage:       "grace period for the tracker to catch final resource states after deploy",
 			Value:       5 * time.Second,
 			Category:    CategoryKubedog,
 			EnvVars:     EnvVars("KUBEDOG_STATUS_INTERVAL"),
@@ -27,7 +27,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-start-delay",
-			Usage:       "delay kubedog start, don't make it too late",
+			Usage:       "delay tracker start, don't make it too late",
 			Value:       time.Second,
 			Category:    CategoryKubedog,
 			EnvVars:     EnvVars("KUBEDOG_START_DELAY"),
@@ -35,15 +35,23 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 		},
 		&cli.DurationFlag{
 			Name:        "kubedog-timeout",
-			Usage:       "timeout of kubedog multitrackers",
+			Usage:       "timeout of resource tracking",
 			Value:       5 * time.Minute,
 			Category:    CategoryKubedog,
 			EnvVars:     EnvVars("KUBEDOG_TIMEOUT"),
 			Destination: &dog.Timeout,
 		},
+		&cli.BoolFlag{
+			Name:        "kubedog-logs",
+			Usage:       "stream logs of tracked pods",
+			Value:       true,
+			Category:    CategoryKubedog,
+			EnvVars:     EnvVars("KUBEDOG_LOGS"),
+			Destination: &dog.Logs,
+		},
 		&cli.IntFlag{
 			Name:        "kubedog-log-width",
-			Usage:       "set kubedog max log line width",
+			Usage:       "set max width of streamed log lines, 0 to not trim",
 			Value:       140,
 			Category:    CategoryKubedog,
 			EnvVars:     EnvVars("KUBEDOG_LOG_WIDTH"),
@@ -51,7 +59,7 @@ func flagsKubedog(dog *kubedog.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "kubedog-track-all",
-			Usage:       "track almost all resources, experimental",
+			Usage:       "track almost all resources, not only workloads",
 			Value:       false,
 			Category:    CategoryKubedog,
 			EnvVars:     EnvVars("KUBEDOG_TRACK_ALL"),

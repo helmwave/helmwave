@@ -1,0 +1,6 @@
+kind: Other
+body: 'New `--kubedog-logs` flag (default true) toggles pod log streaming during tracking; the other `--kubedog*` flags keep working with the new tracker'
+time: 2026-08-05T21:01:00.000000+01:00
+custom:
+    Author: r3nic1e
+    Issue: ""

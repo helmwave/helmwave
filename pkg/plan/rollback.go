@@ -5,18 +5,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/kubedog"
+	"github.com/fluxcd/cli-utils/pkg/object"
 	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	log "github.com/sirupsen/logrus"
-	"github.com/werf/kubedog/pkg/kube"
-	"github.com/werf/kubedog/pkg/tracker"
-	"github.com/werf/kubedog/pkg/trackers/rollout/multitrack"
 )
 
 // Rollback rollbacks helm release.
-func (p *Plan) Rollback(ctx context.Context, version int, dog *kubedog.Config) (err error) {
+func (p *Plan) Rollback(ctx context.Context, version int, dog *tracker.Config) (err error) {
 	// Run hooks
 	err = p.body.Lifecycle.RunPreRollback(ctx)
 	if err != nil {
@@ -34,9 +31,11 @@ func (p *Plan) Rollback(ctx context.Context, version int, dog *kubedog.Config) (
 	}()
 
 	if dog.Enabled {
-		log.Warn("🐶 kubedog is enabled")
-		kubedog.FixLog(ctx, dog.LogWidth)
-		err = p.rollbackReleasesKubedog(ctx, version, dog)
+		log.Warn("🐶 live resource tracking is enabled")
+		if err = tracker.SilenceKlog(); err != nil {
+			return
+		}
+		err = p.rollbackReleasesTracked(ctx, version, dog)
 	} else {
 		err = p.rollbackReleases(ctx, version)
 	}
@@ -64,43 +63,26 @@ func (p *Plan) rollbackReleases(ctx context.Context, version int) error {
 	return wg.Wait()
 }
 
-func (p *Plan) rollbackReleasesKubedog(ctx context.Context, version int, kubedogConfig *kubedog.Config) error {
+func (p *Plan) rollbackReleasesTracked(ctx context.Context, version int, cfg *tracker.Config) error {
 	ctxCancel, cancel := context.WithCancel(ctx)
 	defer cancel() // Don't forget!
 
-	specs, kubecontext, err := p.kubedogRollbackSpecs(version, kubedogConfig)
+	ids, kubecontext, err := p.trackerRollbackObjects(version, cfg)
 	if err != nil {
 		return err
 	}
 
-	err = helper.KubeInit(kubecontext)
-	if err != nil {
-		return err
-	}
-
-	opts := multitrack.MultitrackOptions{
-		DynamicClient:        kube.DynamicClient,
-		DiscoveryClient:      kube.CachedDiscoveryClient,
-		Mapper:               kube.Mapper,
-		StatusProgressPeriod: kubedogConfig.StatusInterval,
-		Options: tracker.Options{
-			ParentContext: ctxCancel,
-			Timeout:       kubedogConfig.Timeout,
-			LogsFromTime:  time.Now(),
-		},
-	}
-
-	// Run kubedog
+	// Run the tracker
 	dogroup := parallel.NewWaitGroup()
 	dogroup.Add(1)
 	go func() {
 		defer dogroup.Done()
-		log.Trace("Multitrack is starting...")
-		dogroup.ErrChan() <- multitrack.Multitrack(kube.Client, specs, opts)
+		log.Trace("tracker is starting...")
+		dogroup.ErrChan() <- tracker.Track(ctxCancel, cfg, ids, kubecontext)
 	}()
 
 	// Run helm
-	time.Sleep(kubedogConfig.StartDelay)
+	time.Sleep(cfg.StartDelay)
 	err = p.rollbackReleases(ctx, version)
 	if err != nil {
 		cancel()
@@ -108,29 +90,26 @@ func (p *Plan) rollbackReleasesKubedog(ctx context.Context, version int, kubedog
 		return err
 	}
 
-	// Allow kubedog to catch release installed
-	time.Sleep(kubedogConfig.StatusInterval)
-	cancel() // stop kubedog
+	// Allow the tracker to catch the final states
+	time.Sleep(cfg.StatusInterval)
+	cancel() // stop the tracker
 
 	err = dogroup.WaitWithContext(ctx)
 	if err != nil && !errors.Is(err, context.Canceled) {
-		// Ignore kubedog error
-		log.WithError(err).Warn("kubedog caught error while watching resources.")
+		// Tracking is advisory: report and move on
+		log.WithError(err).Warn("tracker caught an error while watching resources")
 	}
 
 	return nil
 }
 
-func (p *Plan) kubedogRollbackSpecs(
-	version int,
-	kubedogConfig *kubedog.Config,
-) (multitrack.MultitrackSpecs, string, error) {
-	return p.kubedogSpecs(kubedogConfig, func(rel release.Config) (string, error) {
-		return p.kubedogRollbackManifest(version, rel)
+func (p *Plan) trackerRollbackObjects(version int, cfg *tracker.Config) (object.ObjMetadataSet, string, error) {
+	return p.trackerObjects(cfg, func(rel release.Config) (string, error) {
+		return p.trackerRollbackManifest(version, rel)
 	})
 }
 
-func (p *Plan) kubedogRollbackManifest(version int, rel release.Config) (string, error) {
+func (p *Plan) trackerRollbackManifest(version int, rel release.Config) (string, error) {
 	r, err := rel.Get(version)
 	if err != nil {
 		return "", err
