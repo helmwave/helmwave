@@ -18,7 +18,7 @@ Docs: https://docs.helmwave.app (source: `helmwave/docs` repo; reference pages: 
 - `pkg/plan` — core: plan build/import/apply
 - `pkg/release`, `pkg/repo`, `pkg/registry` — helm releases, repos, OCI
 - `pkg/template` — values templating (gomplate v3/v4, sprig, sops)
-- `pkg/kubedog`, `pkg/monitor` — live resource tracking
+- `pkg/tracker`, `pkg/monitor` — live resource tracking (kstatus)
 - `tests/` — integration fixtures (`NN_helmwave.yml`)
 
 ## Rules

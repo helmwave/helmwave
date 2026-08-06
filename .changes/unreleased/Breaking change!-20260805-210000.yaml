@@ -1,0 +1,6 @@
+kind: Breaking change!
+body: 'Live resource tracking is now built on the same kstatus engine as helm''s `wait: watcher`, replacing kubedog. Pod logs are still streamed, but `helmwave.app/` tracking annotations (fail-mode, log-regex, ...) and Flagger-specific canary analysis are gone; resource status transitions and failures are logged through the normal helmwave log stream'
+time: 2026-08-05T21:00:00.000000+01:00
+custom:
+    Author: r3nic1e
+    Issue: ""

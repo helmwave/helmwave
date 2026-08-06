@@ -12,7 +12,7 @@ var (
 	// ErrPlansAreTheSame is returned when trying to compare plan with itself.
 	ErrPlansAreTheSame = errors.New("plan1 and plan2 are the same")
 
-	ErrMultipleKubecontexts = errors.New("kubedog can't work with releases in multiple kubecontexts")
+	ErrMultipleKubecontexts = errors.New("tracking can't work with releases in multiple kubecontexts")
 
 	// ErrManifestDirEmpty is an error for empty manifest dir.
 	ErrManifestDirEmpty = fmt.Errorf("manifests dir %s is empty", Manifest)

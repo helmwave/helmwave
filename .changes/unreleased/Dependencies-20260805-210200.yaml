@@ -1,0 +1,6 @@
+kind: Dependencies
+body: 'Dropped werf/kubedog, werf/logboek, fluxcd/flagger and k8s.io/klog (v1) from the dependency tree'
+time: 2026-08-05T21:02:00.000000+01:00
+custom:
+    Author: r3nic1e
+    Issue: ""

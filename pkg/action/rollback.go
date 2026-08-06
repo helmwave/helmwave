@@ -4,8 +4,8 @@ import (
 	"context"
 	"slices"
 
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	"github.com/urfave/cli/v2"
 )
 
@@ -14,7 +14,7 @@ var _ Action = (*Rollback)(nil)
 // Rollback is a struct for running 'rollback' command.
 type Rollback struct {
 	build     *Build
-	dog       *kubedog.Config
+	dog       *tracker.Config
 	autoBuild bool
 	revision  int
 }
@@ -49,7 +49,7 @@ func (i *Rollback) Cmd() *cli.Command {
 func (i *Rollback) flags() []cli.Flag {
 	// Init sub-structures
 	i.build = &Build{}
-	i.dog = &kubedog.Config{}
+	i.dog = &tracker.Config{}
 
 	self := []cli.Flag{
 		flagAutoBuild(&i.autoBuild),
@@ -61,5 +61,5 @@ func (i *Rollback) flags() []cli.Flag {
 		},
 	}
 
-	return slices.Concat(self, flagsKubedog(i.dog), i.build.flags())
+	return slices.Concat(self, flagsTracker(i.dog), i.build.flags())
 }

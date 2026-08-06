@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -62,7 +62,7 @@ func (ts *DownTestSuite) TestRun() {
 
 	u := &Up{
 		build: s,
-		dog:   &kubedog.Config{},
+		dog:   &tracker.Config{},
 	}
 
 	ts.Require().NoError(u.Run(ts.ctx))
@@ -86,7 +86,7 @@ func (ts *DownTestSuite) TestIdempotency() {
 
 	u := &Up{
 		build: s,
-		dog:   &kubedog.Config{},
+		dog:   &tracker.Config{},
 	}
 	d := Down{
 		build: s,

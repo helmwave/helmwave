@@ -4,69 +4,34 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	"github.com/stretchr/testify/suite"
 	helmRelease "helm.sh/helm/v4/pkg/release/v1"
 )
 
-type KubedogTestSuite struct {
+type TrackerTestSuite struct {
 	suite.Suite
 }
 
-func TestKubedogTestSuite(t *testing.T) {
+func TestTrackerTestSuite(t *testing.T) {
 	t.Parallel()
-	suite.Run(t, new(KubedogTestSuite))
+	suite.Run(t, new(TrackerTestSuite))
 }
 
-func (s *KubedogTestSuite) TestNoReleases() {
-	p := New("")
-	p.NewBody()
-
-	spec, _, err := p.kubedogSpecs(&kubedog.Config{}, nil)
-
-	s.Require().NoError(err)
-
-	s.Require().Empty(spec.Generics)
-	s.Require().Empty(spec.Jobs)
-	s.Require().Empty(spec.DaemonSets)
-	s.Require().Empty(spec.Canaries)
-	s.Require().Empty(spec.Deployments)
-	s.Require().Empty(spec.StatefulSets)
-}
-
-func (s *KubedogTestSuite) TestCallsManifestFunction() {
-	p := New("")
-	p.NewBody()
-
-	rel := NewMockReleaseConfig(s.T())
-	rel.On("KubeContext").Return("")
-	p.SetReleases(rel)
-
-	s.Require().Panics(func() {
-		_, _, _ = p.kubedogSpecs(&kubedog.Config{}, nil)
-	})
-}
-
-func (s *KubedogTestSuite) TestSyncSpecs() {
-	p := New("")
-	p.NewBody()
-
-	relName := "bla"
-	relNS := "blabla"
-	kubecontext := "blacontext"
-	u, _ := uniqname.New(relName, relNS, "")
-
-	p.manifests[u] = `
+const trackerTestManifest = `
+apiVersion: flagger.app/v1beta1
 kind: Canary
 metadata:
   name: blabla
 ---
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: blabla
 ---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blabla
@@ -76,15 +41,51 @@ kind: ServiceAccount
 metadata:
   name: bla
 ---
+apiVersion: batch/v1
 kind: Job
 metadata:
   name: blabla
 ---
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: blabla
 ---
 `
+
+func (s *TrackerTestSuite) TestNoReleases() {
+	p := New("")
+	p.NewBody()
+
+	ids, _, err := p.trackerObjects(&tracker.Config{}, nil)
+
+	s.Require().NoError(err)
+	s.Require().Empty(ids)
+}
+
+func (s *TrackerTestSuite) TestCallsManifestFunction() {
+	p := New("")
+	p.NewBody()
+
+	rel := NewMockReleaseConfig(s.T())
+	rel.On("KubeContext").Return("")
+	p.SetReleases(rel)
+
+	s.Require().Panics(func() {
+		_, _, _ = p.trackerObjects(&tracker.Config{}, nil)
+	})
+}
+
+func (s *TrackerTestSuite) TestSyncObjects() {
+	p := New("")
+	p.NewBody()
+
+	relName := "bla"
+	relNS := "blabla"
+	kubecontext := "blacontext"
+	u, _ := uniqname.New(relName, relNS, "")
+
+	p.manifests[u] = trackerTestManifest
 
 	mockedRelease := NewMockReleaseConfig(s.T())
 	mockedRelease.On("KubeContext").Return(kubecontext)
@@ -92,23 +93,23 @@ metadata:
 	mockedRelease.On("Namespace").Return(relNS)
 	p.SetReleases(mockedRelease)
 
-	spec, context, err := p.kubedogSyncSpecs(&kubedog.Config{TrackGeneric: true})
+	ids, context, err := p.trackerSyncObjects(&tracker.Config{TrackGeneric: true})
 
 	s.Require().NoError(err)
 
-	s.Require().Len(spec.Canaries, 1)
-	s.Require().Len(spec.DaemonSets, 1)
-	s.Require().Len(spec.Deployments, 1)
-	s.Require().Len(spec.Generics, 1)
-	s.Require().Len(spec.Jobs, 1)
-	s.Require().Len(spec.StatefulSets, 1)
+	// ServiceAccount is ignored, everything else is tracked.
+	s.Require().Len(ids, 5)
+	for i := range ids {
+		id := &ids[i]
+		s.Equal(relNS, id.Namespace)
+	}
 
 	s.Require().Equal(kubecontext, context)
 
 	mockedRelease.AssertExpectations(s.T())
 }
 
-func (s *KubedogTestSuite) TestRollbackSpecs() {
+func (s *TrackerTestSuite) TestRollbackObjects() {
 	p := New("")
 	p.NewBody()
 
@@ -118,58 +119,23 @@ func (s *KubedogTestSuite) TestRollbackSpecs() {
 	version := 666
 	u, _ := uniqname.New(relName, relNS, "")
 
-	manifest := `
-kind: Canary
-metadata:
-  name: blabla
----
-kind: DaemonSet
-metadata:
-  name: blabla
----
-kind: Deployment
-metadata:
-  name: blabla
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: bla
----
-kind: Job
-metadata:
-  name: blabla
----
-kind: StatefulSet
-metadata:
-  name: blabla
----
-`
-
 	mockedRelease := NewMockReleaseConfig(s.T())
 	mockedRelease.On("KubeContext").Return(kubecontext)
 	mockedRelease.On("Uniq").Return(u)
 	mockedRelease.On("Namespace").Return(relNS)
-	mockedRelease.On("Get", version).Return(&helmRelease.Release{Manifest: manifest}, nil)
+	mockedRelease.On("Get", version).Return(&helmRelease.Release{Manifest: trackerTestManifest}, nil)
 	p.SetReleases(mockedRelease)
 
-	spec, context, err := p.kubedogRollbackSpecs(version, &kubedog.Config{TrackGeneric: true})
+	ids, context, err := p.trackerRollbackObjects(version, &tracker.Config{TrackGeneric: true})
 
 	s.Require().NoError(err)
-
-	s.Require().Len(spec.Canaries, 1)
-	s.Require().Len(spec.DaemonSets, 1)
-	s.Require().Len(spec.Deployments, 1)
-	s.Require().Len(spec.Generics, 1)
-	s.Require().Len(spec.Jobs, 1)
-	s.Require().Len(spec.StatefulSets, 1)
-
+	s.Require().Len(ids, 5)
 	s.Require().Equal(kubecontext, context)
 
 	mockedRelease.AssertExpectations(s.T())
 }
 
-func (s *KubedogTestSuite) TestRollbackSpecsGetError() {
+func (s *TrackerTestSuite) TestRollbackObjectsGetError() {
 	p := New("")
 	p.NewBody()
 
@@ -182,13 +148,13 @@ func (s *KubedogTestSuite) TestRollbackSpecsGetError() {
 	mockedRelease.On("Get", version).Return((*helmRelease.Release)(nil), errExpected)
 	p.SetReleases(mockedRelease)
 
-	_, _, err := p.kubedogRollbackSpecs(version, &kubedog.Config{TrackGeneric: true})
+	_, _, err := p.trackerRollbackObjects(version, &tracker.Config{TrackGeneric: true})
 
 	s.Require().ErrorIs(err, errExpected)
 	mockedRelease.AssertExpectations(s.T())
 }
 
-func (s *KubedogTestSuite) TestSpecsMultipleContexts() {
+func (s *TrackerTestSuite) TestMultipleContexts() {
 	p := New("")
 	p.NewBody()
 
@@ -208,7 +174,7 @@ func (s *KubedogTestSuite) TestSpecsMultipleContexts() {
 
 	p.SetReleases(mockedRelease1, mockedRelease2)
 
-	_, _, err := p.kubedogSpecs(&kubedog.Config{TrackGeneric: true}, func(rel release.Config) (string, error) {
+	_, _, err := p.trackerObjects(&tracker.Config{TrackGeneric: true}, func(rel release.Config) (string, error) {
 		return "", nil
 	})
 

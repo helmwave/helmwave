@@ -5,13 +5,11 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/tests"
 	formatter "github.com/helmwave/logrus-emoji-formatter"
 	log "github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/suite"
-	"github.com/werf/logboek"
 	"k8s.io/klog/v2"
 )
 
@@ -193,11 +191,4 @@ func (ts *LogTestSuite) TestDefaultFormatter() {
 		ts.NoError(item.s.Init())
 		ts.Same(defaultFormatter, log.StandardLogger().Formatter, item.msg)
 	}
-}
-
-func (ts *LogTestSuite) TestLogboekWidth() {
-	width := 1
-
-	kubedog.FixLog(ts.ctx, width)
-	ts.Require().Equal(width, logboek.DefaultLogger().Streams().Width(), "logboek width should be set")
 }

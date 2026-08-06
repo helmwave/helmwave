@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/template"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 	"github.com/urfave/cli/v2"
@@ -56,7 +56,7 @@ func (ts *UpTestSuite) TestAutoBuild() {
 			autoYml: true,
 			yml:     y,
 		},
-		dog:       &kubedog.Config{},
+		dog:       &tracker.Config{},
 		autoBuild: true,
 	}
 
@@ -90,7 +90,7 @@ func (ts *UpTestSuite) TestPrometheusMonitors() {
 			autoYml: false,
 			yml:     y,
 		},
-		dog:       &kubedog.Config{},
+		dog:       &tracker.Config{},
 		autoBuild: true,
 	}
 

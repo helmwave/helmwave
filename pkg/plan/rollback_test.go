@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -36,7 +36,7 @@ func (ts *RollbackTestSuite) TestRollback() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback(ts.ctx, -1, &kubedog.Config{Enabled: false})
+	err := p.Rollback(ts.ctx, -1, &tracker.Config{Enabled: false})
 	ts.Require().NoError(err)
 
 	mockedRelease.AssertExpectations(ts.T())
@@ -52,7 +52,7 @@ func (ts *RollbackTestSuite) TestRollbackError() {
 
 	p.SetReleases(mockedRelease)
 
-	err := p.Rollback(ts.ctx, -1, &kubedog.Config{Enabled: false})
+	err := p.Rollback(ts.ctx, -1, &tracker.Config{Enabled: false})
 	ts.Require().ErrorIs(err, e)
 
 	mockedRelease.AssertExpectations(ts.T())
@@ -63,6 +63,6 @@ func (ts *RollbackTestSuite) TestRollbackNoReleases() {
 	p := plan.New(filepath.Join(tmpDir, plan.Dir))
 	p.NewBody()
 
-	err := p.Rollback(ts.ctx, -1, &kubedog.Config{Enabled: false})
+	err := p.Rollback(ts.ctx, -1, &tracker.Config{Enabled: false})
 	ts.Require().NoError(err)
 }

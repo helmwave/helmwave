@@ -6,8 +6,8 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/helper"
-	"github.com/helmwave/helmwave/pkg/kubedog"
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/tracker"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -17,7 +17,7 @@ var _ Action = (*Up)(nil)
 // Up is a struct for running 'up' command.
 type Up struct {
 	build     *Build
-	dog       *kubedog.Config
+	dog       *tracker.Config
 	autoBuild bool
 }
 
@@ -69,7 +69,7 @@ func (i *Up) Cmd() *cli.Command {
 // flags return flag set of CLI urfave.
 func (i *Up) flags() []cli.Flag {
 	// Init sub-structures
-	i.dog = &kubedog.Config{}
+	i.dog = &tracker.Config{}
 	i.build = &Build{}
 
 	self := []cli.Flag{
@@ -84,5 +84,5 @@ func (i *Up) flags() []cli.Flag {
 		},
 	}
 
-	return slices.Concat(self, flagsKubedog(i.dog), i.build.flags())
+	return slices.Concat(self, flagsTracker(i.dog), i.build.flags())
 }
