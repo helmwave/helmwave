@@ -70,7 +70,7 @@ func (ts *CreateNamespaceTestSuite) TestSyncIntoExistingNamespace() {
 	rel := release.NewConfig()
 	rel.NamespaceF = ns
 	rel.CreateNamespace = true
-	rel.Wait = false
+	rel.WaitStrategy = release.WaitStrategyHookOnly
 	rel.ChartF.Name = "bitnami/nginx"
 	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{
 		Dst: filepath.Join(tests.Root, "06_values.yaml"),

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v4/pkg/action"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 type ChartInternalTestSuite struct {
@@ -37,8 +37,7 @@ func (ts *ChartInternalTestSuite) TestChartTypeFields() {
 		fieldsR[i] = f.Name
 	}
 
-	for i := range bb.NumField() {
-		f := bb.Field(i)
+	for f := range bb.Fields() {
 		if !f.IsExported() {
 			continue
 		}

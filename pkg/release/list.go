@@ -3,7 +3,7 @@ package release
 import (
 	"fmt"
 
-	"helm.sh/helm/v3/pkg/release"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 func (rel *config) List() (*release.Release, error) {
@@ -18,7 +18,7 @@ func (rel *config) List() (*release.Release, error) {
 	case 0:
 		return nil, ErrNotFound
 	case 1:
-		return result[0], nil
+		return asRelease(result[0])
 	default:
 		return nil, ErrFoundMultiple
 	}

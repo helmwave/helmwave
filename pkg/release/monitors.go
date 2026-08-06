@@ -18,7 +18,7 @@ const (
 
 func (MonitorFailedAction) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
-		Type:    "string",
+		Type:    jsonSchemaString,
 		Default: MonitorActionNone,
 		Enum: []any{
 			MonitorActionNone,

@@ -8,8 +8,8 @@ import (
 	"github.com/helmwave/helmwave/pkg/log"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
-	helm "helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/repo"
+	helm "helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/repo/v1"
 )
 
 // Config is an interface to manage particular helm repository.

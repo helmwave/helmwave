@@ -36,6 +36,10 @@ const (
 
 	// Values is default directory for values.
 	Values = "values/"
+
+	fieldName      = "name"
+	fieldNamespace = "namespace"
+	fieldChart     = "chart"
 )
 
 // Plan contains full helmwave state.
@@ -46,8 +50,10 @@ type Plan struct {
 	tmpDir    string
 	graphMD   string
 	templater string
+	tags      []string
 
 	manifests map[uniqname.UniqName]string
+	values    map[uniqname.UniqName]map[string]string
 	unchanged release.Configs
 }
 
@@ -135,6 +141,7 @@ func New(dir string) *Plan {
 		dir:       dir,
 		fullPath:  filepath.Join(dir, File),
 		manifests: make(map[uniqname.UniqName]string),
+		values:    make(map[uniqname.UniqName]map[string]string),
 	}
 
 	return plan

@@ -3,7 +3,9 @@ package plan
 import (
 	"context"
 	"path/filepath"
+	"slices"
 	"testing"
+	gotemplate "text/template"
 
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/monitor"
@@ -12,9 +14,10 @@ import (
 	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chartutil"
-	helmRelease "helm.sh/helm/v3/pkg/release"
+	"helm.sh/helm/v4/pkg/action"
+	"helm.sh/helm/v4/pkg/chart/common"
+	releaseiface "helm.sh/helm/v4/pkg/release"
+	helmRelease "helm.sh/helm/v4/pkg/release/v1"
 )
 
 //nolint:govet // field alignment doesn't matter in tests
@@ -42,10 +45,10 @@ func (r *MockReleaseConfig) SetChartName(_ string) {
 	r.Called()
 }
 
-func (r *MockReleaseConfig) OfflineKubeVersion() *chartutil.KubeVersion {
+func (r *MockReleaseConfig) OfflineKubeVersion() *common.KubeVersion {
 	r.Called()
 
-	v := &chartutil.KubeVersion{
+	v := &common.KubeVersion{
 		Major:   "1",
 		Minor:   "22",
 		Version: "1.22.0",
@@ -91,28 +94,28 @@ func (r *MockReleaseConfig) Equal(_ release.Config) bool {
 	return r.Called().Bool(0)
 }
 
-func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater string) error {
+func (r *MockReleaseConfig) BuildValues(ctx context.Context, dir, templater string, templateFuncs gotemplate.FuncMap) (map[string]string, error) {
 	args := r.Called()
-	if errReturn := args.Error(0); errReturn != nil {
-		return errReturn
+	if errReturn := args.Error(1); errReturn != nil {
+		return nil, errReturn
 	}
 
-	for i := len(r.Values()) - 1; i >= 0; i-- {
-		v := r.Values()[i]
-		dst := filepath.Join(dir, Values, filepath.Base(v.Src))
-		err := template.Tpl2yml(ctx, v.Src, dst, nil, templater)
+	vals := r.Values()
+	for i := range slices.Backward(vals) {
+		dst := filepath.Join(dir, Values, filepath.Base(vals[i].Src))
+		err := template.Tpl2yml(ctx, vals[i].Src, dst, nil, templater)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	return map[string]string{}, nil
 }
 
-func (r *MockReleaseConfig) Uninstall(context.Context) (*helmRelease.UninstallReleaseResponse, error) {
+func (r *MockReleaseConfig) Uninstall(context.Context) (*releaseiface.UninstallReleaseResponse, error) {
 	args := r.Called()
 
-	return args.Get(0).(*helmRelease.UninstallReleaseResponse), args.Error(1)
+	return args.Get(0).(*releaseiface.UninstallReleaseResponse), args.Error(1)
 }
 
 func (r *MockReleaseConfig) Get(version int) (*helmRelease.Release, error) {

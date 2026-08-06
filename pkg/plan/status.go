@@ -47,9 +47,9 @@ func status(all []release.Config, names []string) error {
 		}
 
 		log.WithFields(log.Fields{
-			"name":          s.Name,
-			"namespace":     s.Namespace,
-			"chart":         fmt.Sprintf("%s-%s", s.Chart.Name(), s.Chart.Metadata.Version),
+			fieldName:       s.Name,
+			fieldNamespace:  s.Namespace,
+			fieldChart:      fmt.Sprintf("%s-%s", s.Chart.Name(), s.Chart.Metadata.Version),
 			"last deployed": s.Info.LastDeployed,
 			"status":        s.Info.Status,
 			"revision":      s.Version,

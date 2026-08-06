@@ -48,7 +48,7 @@ func (ts *SyncTestSuite) TestInstallUpgrade() {
 	rel := release.NewConfig()
 	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
-	rel.Wait = false
+	rel.WaitStrategy = release.WaitStrategyHookOnly
 	rel.ChartF.Name = "bitnami/nginx"
 	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{
 		Dst: filepath.Join(tests.Root, "06_values.yaml"),
@@ -67,7 +67,7 @@ func (ts *SyncTestSuite) TestInvalidValues() {
 	rel := release.NewConfig()
 	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
-	rel.Wait = false
+	rel.WaitStrategy = release.WaitStrategyHookOnly
 	rel.ChartF.Name = "bitnami/nginx"
 	rel.ValuesF = append(rel.ValuesF, release.ValuesReference{})
 
@@ -80,7 +80,7 @@ func (ts *SyncTestSuite) TestSyncWithoutCRD() {
 	rel := release.NewConfig()
 	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
-	rel.Wait = false
+	rel.WaitStrategy = release.WaitStrategyHookOnly
 	rel.ChartF.Name = "prometheus-community/kube-prometheus-stack"
 
 	rel.DryRun(true)

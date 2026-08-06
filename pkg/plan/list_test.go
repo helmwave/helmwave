@@ -7,8 +7,8 @@ import (
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/stretchr/testify/suite"
-	"helm.sh/helm/v3/pkg/chart"
-	helmRelease "helm.sh/helm/v3/pkg/release"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	helmRelease "helm.sh/helm/v4/pkg/release/v1"
 )
 
 type ListTestSuite struct {

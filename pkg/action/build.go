@@ -6,13 +6,16 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
 	"github.com/hashicorp/go-getter"
 	"github.com/helmwave/helmwave/pkg/cache"
+	"github.com/helmwave/helmwave/pkg/clictx"
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/plan"
+	"github.com/helmwave/helmwave/pkg/template"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -33,6 +36,8 @@ type Build struct {
 }
 
 // Run is the main function for 'build' CLI command.
+//
+//nolint:gocognit
 func (i *Build) Run(ctx context.Context) (err error) {
 	// Download Remote source
 	if i.remoteSource != "" {
@@ -65,7 +70,14 @@ func (i *Build) Run(ctx context.Context) (err error) {
 
 	i.options.Tags = i.normalizeTags()
 	i.options.Yml = i.yml.file
-	i.options.Templater = i.yml.templater
+	if i.options.Templater == "" {
+		cliCtx := clictx.GetCLIFromContext(ctx)
+		if cliCtx != nil {
+			i.options.Templater = cliCtx.String("templater")
+		} else {
+			i.options.Templater = template.TemplaterSprig
+		}
+	}
 
 	err = newPlan.Build(ctx, i.options)
 	if err != nil {
@@ -121,12 +133,14 @@ func (i *Build) flags() []cli.Flag {
 		flagGraphWidth(&i.options.GraphWidth),
 		flagSkipUnchanged(&i.skipUnchanged),
 		flagDiffMode(&i.diffMode),
+		flagYmlTemplateEngine(&i.yml.templater),
+		flagBuildTemplateEngine(&i.options.Templater),
 
 		&cli.BoolFlag{
 			Name:        "yml",
 			Usage:       "auto helmwave.yml.tpl --> helmwave.yml",
 			Value:       false,
-			Category:    "YML",
+			Category:    CategoryYML,
 			EnvVars:     EnvVars("AUTO_YML", "AUTO_YAML"),
 			Destination: &i.autoYml,
 		},
@@ -134,7 +148,7 @@ func (i *Build) flags() []cli.Flag {
 			Name:        "remote-source",
 			Usage:       "go-getter URL to download build sources",
 			Value:       "",
-			Category:    "BUILD",
+			Category:    Step1,
 			EnvVars:     EnvVars("REMOTE_SOURCE"),
 			Destination: &i.remoteSource,
 		},
@@ -148,10 +162,7 @@ func (i *Build) flags() []cli.Flag {
 		},
 	}
 
-	self = append(self, i.diff.flags()...)
-	self = append(self, i.yml.flags()...)
-
-	return self
+	return slices.Concat(self, i.diff.flags(), i.yml.flags())
 }
 
 // normalizeTags is wrapper for normalizeTagList.

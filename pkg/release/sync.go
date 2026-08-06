@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/release"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 func (rel *config) Sync(ctx context.Context, runHooks bool) (r *release.Release, err error) {

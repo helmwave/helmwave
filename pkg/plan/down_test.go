@@ -10,7 +10,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
-	helmRelease "helm.sh/helm/v3/pkg/release"
+	releaseiface "helm.sh/helm/v4/pkg/release"
 )
 
 type DestroyTestSuite struct {
@@ -37,7 +37,7 @@ func (ts *DestroyTestSuite) TestDestroy() {
 	mockedRelease.On("Namespace").Return("defaultblabla")
 	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
-	mockedRelease.On("Uninstall").Return(&helmRelease.UninstallReleaseResponse{}, nil)
+	mockedRelease.On("Uninstall").Return(&releaseiface.UninstallReleaseResponse{}, nil)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 
 	p.SetReleases(mockedRelease)
@@ -58,7 +58,7 @@ func (ts *DestroyTestSuite) TestDestroyFailedRelease() {
 	mockedRelease.On("KubeContext").Return("")
 	mockedRelease.On("Uniq").Return()
 	e := errors.New(ts.T().Name())
-	mockedRelease.On("Uninstall").Return(&helmRelease.UninstallReleaseResponse{}, e)
+	mockedRelease.On("Uninstall").Return(&releaseiface.UninstallReleaseResponse{}, e)
 	mockedRelease.On("DependsOn").Return([]*release.DependsOnReference{})
 
 	p.SetReleases(mockedRelease)

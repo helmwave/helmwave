@@ -10,7 +10,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/helper"
 	"github.com/helmwave/helmwave/pkg/repo"
 	log "github.com/sirupsen/logrus"
-	helmRepo "helm.sh/helm/v3/pkg/repo"
+	helmRepo "helm.sh/helm/v4/pkg/repo/v1"
 )
 
 func (p *Plan) syncRepositories(ctx context.Context) error {

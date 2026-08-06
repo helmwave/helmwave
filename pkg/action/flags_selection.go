@@ -8,7 +8,7 @@ func flagTags(v *cli.StringSlice) cli.Flag {
 		Name:        "tags",
 		Aliases:     []string{"t"},
 		Usage:       "build releases by tags: -t tag1 -t tag3,tag4",
-		Category:    "SELECTION",
+		Category:    CategorySelection,
 		EnvVars:     EnvVars("TAGS"),
 		Destination: v,
 	}
@@ -21,7 +21,7 @@ func flagMatchAllTags(v *bool) cli.Flag {
 		Aliases:     []string{"tt"},
 		Usage:       "match all provided tags",
 		Value:       false,
-		Category:    "SELECTION",
+		Category:    CategorySelection,
 		EnvVars:     EnvVars("MATCH_ALL_TAGS"),
 		Destination: v,
 	}
@@ -32,7 +32,7 @@ func flagMatchAllTags(v *bool) cli.Flag {
 //		Name:        "labels",
 //		Aliases:     []string{"l"},
 //		Usage:       "build releases by label: -l app=nginx",
-//		Category:    "SELECTION",
+//		Category:    CategorySelection,
 //		EnvVars:     EnvVars("LABELS"),
 //		Destination: v,
 //	}

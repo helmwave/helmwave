@@ -3,7 +3,7 @@ package release
 import (
 	"fmt"
 
-	"helm.sh/helm/v3/pkg/release"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 func (rel *config) Status() (*release.Release, error) {
@@ -14,5 +14,5 @@ func (rel *config) Status() (*release.Release, error) {
 		return nil, fmt.Errorf("failed to get status of release %s: %w", rel.Uniq(), err)
 	}
 
-	return r, nil
+	return asRelease(r)
 }

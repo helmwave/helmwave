@@ -13,6 +13,18 @@ import (
 
 var Default = &Settings{}
 
+const (
+	flagCategory = "LOGGER"
+
+	// FormatJSON and the other Format* constants are the --log-format values.
+	FormatJSON  = "json"
+	FormatPad   = "pad"
+	FormatEmoji = "emoji"
+	FormatText  = "text"
+
+	defaultLevel = "info"
+)
+
 // Settings stores configuration for logger.
 type Settings struct {
 	level      string
@@ -27,16 +39,16 @@ func (l *Settings) Flags() []cli.Flag {
 		&cli.StringFlag{
 			Name:        "log-format",
 			Usage:       "You can set: [ text | json | pad | emoji ]",
-			Value:       "emoji",
-			Category:    "LOGGER",
+			Value:       FormatEmoji,
+			Category:    flagCategory,
 			EnvVars:     []string{"HELMWAVE_LOG_FORMAT"},
 			Destination: &l.format,
 		},
 		&cli.StringFlag{
 			Name:        "log-level",
 			Usage:       "You can set: [ debug | info | warn  | fatal | panic | trace ]",
-			Value:       "info",
-			Category:    "LOGGER",
+			Value:       defaultLevel,
+			Category:    flagCategory,
 			EnvVars:     []string{"HELMWAVE_LOG_LEVEL", "HELMWAVE_LOG_LVL"},
 			Destination: &l.level,
 		},
@@ -44,7 +56,7 @@ func (l *Settings) Flags() []cli.Flag {
 			Name:        "log-color",
 			Usage:       "on/off color",
 			Value:       true,
-			Category:    "LOGGER",
+			Category:    flagCategory,
 			EnvVars:     []string{"HELMWAVE_LOG_COLOR"},
 			Destination: &l.color,
 		},
@@ -52,7 +64,7 @@ func (l *Settings) Flags() []cli.Flag {
 			Name:        "log-timestamps",
 			Usage:       "Add timestamps to log messages",
 			Value:       false,
-			Category:    "LOGGER",
+			Category:    flagCategory,
 			EnvVars:     []string{"HELMWAVE_LOG_TIMESTAMPS"},
 			Destination: &l.timestamps,
 		},
@@ -96,18 +108,18 @@ func (l *Settings) setFormat() {
 	ansi.DisableColors(!l.color)
 
 	switch l.format {
-	case "json":
+	case FormatJSON:
 		log.SetFormatter(&log.JSONFormatter{
 			PrettyPrint: true,
 		})
-	case "pad":
+	case FormatPad:
 		log.SetFormatter(&log.TextFormatter{
 			PadLevelText:     true,
 			ForceColors:      l.color,
 			FullTimestamp:    l.timestamps,
 			DisableTimestamp: !l.timestamps,
 		})
-	case "emoji":
+	case FormatEmoji:
 		cfg := &formatter.Config{
 			Color: l.color,
 		}
@@ -122,7 +134,7 @@ func (l *Settings) setFormat() {
 		}
 
 		log.SetFormatter(cfg)
-	case "text":
+	case FormatText:
 		log.SetFormatter(&log.TextFormatter{
 			ForceColors:      l.color,
 			FullTimestamp:    l.timestamps,

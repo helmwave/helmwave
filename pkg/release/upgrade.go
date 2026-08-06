@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/cli/values"
-	"helm.sh/helm/v3/pkg/getter"
-	"helm.sh/helm/v3/pkg/release"
+	"helm.sh/helm/v4/pkg/action"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	"helm.sh/helm/v4/pkg/cli/values"
+	"helm.sh/helm/v4/pkg/getter"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 // Helm wraps a lot of meta.NoKindMatchError into fmt.Errorf which makes errors.Is unusable.
@@ -89,16 +89,16 @@ func (rel *config) installWithRetry(
 		er := rel.forceOfflineKubeVersion()
 		// return original error if we can't get kubernetes version
 		if er != nil {
-			return r, err
+			return unwrapRelease(r, err)
 		}
 
 		client = rel.newInstall()
 		rel.adjustCreateNamespace(ctx, client)
 
-		return client.RunWithContext(ctx, ch, vals)
+		return unwrapRelease(client.RunWithContext(ctx, ch, vals))
 	}
 
-	return r, err
+	return unwrapRelease(r, err)
 }
 
 // adjustCreateNamespace implements a get-first namespace creation strategy.
@@ -155,13 +155,13 @@ func (rel *config) upgradeWithRetry(
 		er := rel.forceOfflineKubeVersion()
 		// return original error if we can't get kubernetes version
 		if er != nil {
-			return r, err
+			return unwrapRelease(r, err)
 		}
 
-		return rel.newUpgrade().RunWithContext(ctx, rel.Name(), ch, vals)
+		return unwrapRelease(rel.newUpgrade().RunWithContext(ctx, rel.Name(), ch, vals))
 	}
 
-	return r, err
+	return unwrapRelease(r, err)
 }
 
 func (rel *config) forceOfflineKubeVersion() error {
@@ -180,15 +180,30 @@ func (rel *config) forceOfflineKubeVersion() error {
 	return nil
 }
 
-func (rel *config) test() error {
+func (rel *config) test() (err error) {
 	rel.Logger().Info("running helm tests")
 
 	client := rel.newTest()
-	r, err := client.Run(rel.Name())
+
+	// helm defers deleting the test pods to the returned shutdown func, so that the logs below
+	// can still be read. It has to run whether or not the tests passed.
+	res, shutdown, err := client.Run(rel.Name())
+	defer func() {
+		if shutdownErr := shutdown(); shutdownErr != nil && err == nil {
+			err = shutdownErr
+		}
+	}()
 
 	if (err != nil) || rel.Tests.ForceShowLogs {
+		r, convErr := asRelease(res)
+		if convErr != nil {
+			return convErr
+		}
+
 		var buf bytes.Buffer
-		_ = client.GetPodLogs(&buf, r)
+		if r != nil {
+			_ = client.GetPodLogs(&buf, r)
+		}
 
 		if err != nil {
 			rel.Logger().WithError(err).WithField("output", buf.String()).Error("helm tests failed")

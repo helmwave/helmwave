@@ -8,7 +8,7 @@ import (
 	"github.com/helmwave/helmwave/pkg/registry"
 	"github.com/helmwave/helmwave/pkg/release"
 	"github.com/stretchr/testify/suite"
-	helmRegistry "helm.sh/helm/v3/pkg/registry"
+	helmRegistry "helm.sh/helm/v4/pkg/registry"
 )
 
 type BuildRegistriesTestSuite struct {

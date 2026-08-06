@@ -19,14 +19,14 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 		"ChartPathOptions",
 		"Install",
 		"Namespace",
-		"DryRun",
+		"DryRunStrategy", // helmwave drives dry-run itself, it is not a release setting
 		"HideSecret",
-		"DryRunOption",
 		"Description",
 		"PostRenderer",
 		"DependencyUpdate",
 		"Lock",
-		"Devel", // we removed that to force everyone specify the version
+		"WaitOptions", // a slice of Go option funcs, nothing a YAML file can express
+		"Devel",       // we removed that to force everyone specify the version
 	}
 
 	r := NewConfig()
@@ -36,8 +36,7 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 	c := r.newUpgrade()
 	rc := reflect.ValueOf(c).Elem().Type()
 
-	for i := range rr.NumField() {
-		f := rr.Field(i)
+	for f := range rr.Fields() {
 		if !f.IsExported() {
 			continue
 		}
@@ -48,8 +47,7 @@ func (s *ConfigInternalTestSuite) TestConfigHelmTypeFields() {
 		fieldsR = append(fieldsR, f.Name)
 	}
 
-	for i := range rc.NumField() {
-		f := rc.Field(i)
+	for f := range rc.Fields() {
 		if !f.IsExported() {
 			continue
 		}

@@ -2,11 +2,13 @@ package plan
 
 import (
 	"context"
+	"sync"
 
 	"github.com/helmwave/helmwave/pkg/helper"
+	"github.com/helmwave/helmwave/pkg/parallel"
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/pkg/release/dependency"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/sync/errgroup"
 )
 
 func (p *Plan) buildValues(ctx context.Context) error {
@@ -15,21 +17,65 @@ func (p *Plan) buildValues(ctx context.Context) error {
 		return err
 	}
 
-	limit := p.ParallelLimiter(ctx)
-	wg, ctx := errgroup.WithContext(ctx)
-	wg.SetLimit(limit)
+	parallelLimit := p.ParallelLimiter(ctx)
 
-	for _, rel := range p.body.Releases {
-		wg.Go(func() error {
-			return p.buildReleaseValues(ctx, rel)
-		})
+	releasesNodesChan := p.Graph().Run()
+
+	releasesWG := parallel.NewWaitGroup()
+	releasesWG.Add(parallelLimit)
+
+	releasesFails := make(map[release.Config]error)
+
+	releasesMutex := &sync.Mutex{}
+
+	for range parallelLimit {
+		go p.buildReleaseValuesWorker(ctx, releasesWG, releasesNodesChan, releasesMutex, releasesFails)
 	}
-	//nolint:wrapcheck
-	return wg.Wait()
+
+	if err := releasesWG.WaitWithContext(ctx); err != nil {
+		return err
+	}
+
+	return p.ApplyReport(releasesFails, nil)
 }
 
-func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config) error {
-	err := rel.BuildValues(ctx, p.tmpDir, p.templater)
+//nolint:dupl
+func (p *Plan) buildReleaseValuesWorker(
+	ctx context.Context,
+	wg *parallel.WaitGroup,
+	nodesChan <-chan *dependency.Node[release.Config],
+	mu *sync.Mutex,
+	fails map[release.Config]error,
+) {
+	for node := range nodesChan {
+		rel := node.Data
+		err := p.buildReleaseValues(ctx, rel, mu)
+		if err != nil {
+			if rel.AllowFailure() {
+				rel.Logger().Errorf("release is allowed to fail, marked as succeeded to dependencies")
+				node.SetSucceeded()
+			} else {
+				node.SetFailed()
+			}
+
+			mu.Lock()
+			fails[rel] = err
+			mu.Unlock()
+
+			wg.ErrChan() <- err
+		} else {
+			node.SetSucceeded()
+		}
+	}
+	wg.Done()
+}
+
+func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config, mu *sync.Mutex) error {
+	log.Info("🔨 Building release values...")
+
+	templateFuncs := p.templateFuncs(mu)
+
+	renderedValues, err := rel.BuildValues(ctx, p.tmpDir, p.templater, templateFuncs)
 	if err != nil {
 		log.Errorf("❌ %s values: %v", rel.Uniq(), err)
 
@@ -44,6 +90,10 @@ func (p *Plan) buildReleaseValues(ctx context.Context, rel release.Config) error
 		} else {
 			log.WithField("release", rel.Uniq()).WithField("values", vals).Infof("✅ found %d values count", len(vals))
 		}
+
+		mu.Lock()
+		p.values[rel.Uniq()] = renderedValues
+		mu.Unlock()
 	}
 
 	return nil

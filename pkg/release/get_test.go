@@ -6,6 +6,7 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/helmwave/helmwave/pkg/plan"
 	"github.com/helmwave/helmwave/pkg/release"
@@ -46,7 +47,7 @@ func (ts *GetTestSuite) TestGetNotInstalled() {
 	rel := release.NewConfig()
 	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
-	rel.Wait = false
+	rel.WaitStrategy = release.WaitStrategyHookOnly
 	rel.ChartF.Name = "bitnami/nginx"
 
 	r, err := rel.Get(0)
@@ -61,14 +62,22 @@ func (ts *GetTestSuite) TestGet() {
 	rel := release.NewConfig()
 	rel.NamespaceF = strings.ToLower(strings.ReplaceAll(ts.T().Name(), "/", ""))
 	rel.CreateNamespace = true
-	rel.Wait = false
+	rel.WaitStrategy = release.WaitStrategyHookOnly
 	rel.ChartF.Name = "bitnami/nginx"
 
 	r1, err := rel.Sync(ts.ctx, false)
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r1)
 
-	r2, err := rel.Get(0)
+	// Retry Get with backoff to handle race condition
+	var r2 any
+	for i := range 5 {
+		r2, err = rel.Get(0)
+		if err == nil {
+			break
+		}
+		time.Sleep(time.Duration(i+1) * time.Second)
+	}
 	ts.Require().NoError(err)
 	ts.Require().NotNil(r2)
 

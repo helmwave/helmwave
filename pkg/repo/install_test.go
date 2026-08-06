@@ -7,8 +7,8 @@ import (
 	"github.com/helmwave/helmwave/pkg/repo"
 	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
-	helm "helm.sh/helm/v3/pkg/cli"
-	helmRepo "helm.sh/helm/v3/pkg/repo"
+	helm "helm.sh/helm/v4/pkg/cli"
+	helmRepo "helm.sh/helm/v4/pkg/repo/v1"
 )
 
 type InstallTestSuite struct {

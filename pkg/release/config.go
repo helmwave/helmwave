@@ -9,9 +9,10 @@ import (
 	"github.com/helmwave/helmwave/pkg/hooks"
 	"github.com/helmwave/helmwave/pkg/release/uniqname"
 	log "github.com/sirupsen/logrus"
-	"helm.sh/helm/v3/pkg/chartutil"
-	helm "helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/postrender"
+	"helm.sh/helm/v4/pkg/action"
+	"helm.sh/helm/v4/pkg/chart/common"
+	helm "helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/postrenderer"
 )
 
 type configTests struct {
@@ -37,6 +38,10 @@ type config struct {
 	OfflineKubeVersionF string `yaml:"offline_kube_version,omitempty" json:"offline_kube_version,omitempty" jsonschema:"description=Kubernetes version for offline mode"`
 	KubeContextF        string `yaml:"context,omitempty" json:"context,omitempty"`
 	DeletePropagation   string `yaml:"delete_propagation,omitempty" json:"delete_propagation,omitempty" jsonschema:"description=Selects the deletion cascading strategy for the dependents,enum=background,enum=orphan,enum=foreground,default=background"`
+	ServerSideApply     string `yaml:"server_side_apply,omitempty" json:"server_side_apply,omitempty" jsonschema:"description=Whether to apply objects server-side,enum=true,enum=false,enum=auto,default=auto"`
+	PostRenderStrategy  string `yaml:"post_render_strategy,omitempty" json:"post_render_strategy,omitempty" jsonschema:"description=How hooks and templates are handed to the post_renderer,enum=combined,enum=separate,enum=nohooks,default=combined"`
+
+	WaitStrategy WaitStrategy `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=How to wait for resources to become ready: watcher, legacy or hookOnly,default=hookOnly"`
 
 	DependsOnF    []*DependsOnReference `yaml:"depends_on,omitempty" json:"depends_on,omitempty" jsonschema:"title=Needs,description=List of dependencies that are required to succeed before this release"`
 	MonitorsF     []MonitorReference    `yaml:"monitors,omitempty" json:"monitors,omitempty" jsonschema:"title=Monitors to execute after upgrade"`
@@ -51,21 +56,20 @@ type config struct {
 
 	MaxHistory               int  `yaml:"max_history,omitempty" json:"max_history,omitempty" jsonschema:"default=0"`
 	AllowFailureF            bool `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty" jsonschema:"description=Whether to ignore errors and proceed with dependant releases,default=false"`
-	Atomic                   bool `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"default=false"`
+	RollbackOnFailure        bool `yaml:"atomic,omitempty" json:"atomic,omitempty" jsonschema:"description=Whether to roll the release back if it fails,default=false"`
 	CleanupOnFail            bool `yaml:"cleanup_on_fail,omitempty" json:"cleanup_on_fail,omitempty" jsonschema:"default=false"`
 	CreateNamespace          bool `yaml:"create_namespace,omitempty" json:"create_namespace,omitempty" jsonschema:"description=Whether to create namespace if it doesnt exist. The namespace is only created when it is missing (get-first) so this works with identities that cannot create namespaces at the cluster scope,default=false"`
 	DisableHooks             bool `yaml:"disable_hooks,omitempty" json:"disable_hooks,omitempty" jsonschema:"default=false"`
 	DisableOpenAPIValidation bool `yaml:"disable_open_api_validation,omitempty" json:"disable_open_api_validation,omitempty" jsonschema:"default=false"`
 	EnableDNS                bool `yaml:"enable_dns,omitempty" json:"enable_dns,omitempty" jsonschema:"default=false"`
-	Force                    bool `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"default=false"`
-	Recreate                 bool `yaml:"recreate,omitempty" json:"recreate,omitempty" jsonschema:"default=false"`
+	ForceReplace             bool `yaml:"force,omitempty" json:"force,omitempty" jsonschema:"description=Whether to force resource updates by replacement,default=false"`
+	ForceConflicts           bool `yaml:"force_conflicts,omitempty" json:"force_conflicts,omitempty" jsonschema:"description=Whether server-side apply forces changes against conflicts,default=false"`
 	ResetValues              bool `yaml:"reset_values,omitempty" json:"reset_values,omitempty" jsonschema:"default=false"`
 	ReuseValues              bool `yaml:"reuse_values,omitempty" json:"reuse_values,omitempty" jsonschema:"default=false"`
 	ResetThenReuseValues     bool `yaml:"reset_then_reuse_values,omitempty" json:"reset_then_reuse_values,omitempty" jsonschema:"default=false"`
 	SkipCRDs                 bool `yaml:"skip_crds,omitempty" json:"skip_crds,omitempty" jsonschema:"description=Skips installing CRDs when install flag is enabled during upgrade,default=false"`
 	HideNotes                bool `yaml:"hide_notes,omitempty" json:"hide_notes,omitempty" jsonschema:"description=Output rendered chart notes after upgrade/install,default=true"`
 	SubNotes                 bool `yaml:"sub_notes,omitempty" json:"sub_notes,omitempty" jsonschema:"description=Determines whether sub-notes are rendered in the chart,default=false"`
-	Wait                     bool `yaml:"wait,omitempty" json:"wait,omitempty" jsonschema:"description=Whether to wait for all resource to become ready,default=false"`
 	WaitForJobs              bool `yaml:"wait_for_jobs,omitempty" json:"wait_for_jobs,omitempty" jsonschema:"description=Whether to wait for all jobs to become ready,default=false"`
 	TakeOwnership            bool `yaml:"take_ownership,omitempty" json:"take_ownership,omitempty" jsonschema:"description=Will ignore the check for helm annotations and take ownership of the resources,default=false"`
 	SkipSchemaValidation     bool `yaml:"skip_schema_validation,omitempty" json:"skip_schema_validation,omitempty" jsonschema:"description=Determines if JSON schema validation is disabled.,default=false"`
@@ -163,7 +167,26 @@ func (rel *config) AllowFailure() bool {
 }
 
 func (rel *config) HelmWait() bool {
-	return rel.Wait
+	return rel.WaitStrategy.Enabled()
+}
+
+// serverSideApply returns the apply mode for helm, defaulting to what helm's own CLI defaults to.
+func (rel *config) serverSideApply() string {
+	if rel.ServerSideApply == "" {
+		return "auto"
+	}
+
+	return rel.ServerSideApply
+}
+
+// postRenderStrategy returns how the post-renderer is fed, defaulting to helm's own default.
+// combined feeds hooks through the post-renderer too; set nohooks to exclude them.
+func (rel *config) postRenderStrategy() action.PostRenderStrategy {
+	if rel.PostRenderStrategy == "" {
+		return action.PostRenderStrategyCombined
+	}
+
+	return action.PostRenderStrategy(rel.PostRenderStrategy)
 }
 
 func (rel *config) buildAfterUnmarshal(allReleases []*config) {
@@ -232,12 +255,12 @@ func (rel *config) buildAfterUnmarshalDependency(dep *DependsOnReference) error 
 	return u.Validate()
 }
 
-func (rel *config) PostRenderer() (postrender.PostRenderer, error) {
+func (rel *config) PostRenderer() (postrenderer.PostRenderer, error) {
 	if len(rel.PostRendererF) < 1 {
 		return nil, nil //nolint:nilnil
 	}
 
-	return postrender.NewExec(rel.PostRendererF[0], rel.PostRendererF[1:]...) //nolint:wrapcheck
+	return newExecPostRenderer(rel.PostRendererF[0], rel.PostRendererF[1:]...)
 }
 
 func (rel *config) KubeContext() string {
@@ -266,9 +289,9 @@ func (rel *config) HooksDisabled() bool {
 	return rel.DisableHooks
 }
 
-func (rel *config) OfflineKubeVersion() *chartutil.KubeVersion {
+func (rel *config) OfflineKubeVersion() *common.KubeVersion {
 	if rel.OfflineKubeVersionF != "" {
-		v, err := chartutil.ParseKubeVersion(rel.OfflineKubeVersionF)
+		v, err := common.ParseKubeVersion(rel.OfflineKubeVersionF)
 		if err != nil {
 			log.Fatalf("invalid kube version %q: %s", rel.OfflineKubeVersionF, err)
 

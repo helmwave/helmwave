@@ -2,7 +2,7 @@ package registry
 
 import (
 	"github.com/helmwave/helmwave/pkg/helper"
-	"helm.sh/helm/v3/pkg/registry"
+	"helm.sh/helm/v4/pkg/registry"
 )
 
 func (c *config) Install() error {

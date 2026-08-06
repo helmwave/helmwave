@@ -13,6 +13,7 @@ linters:
     - gochecknoinits
     - gocyclo
     - godox
+    - gomodguard
     - inamedparam
     - interfacebloat
     - ireturn
@@ -148,10 +149,6 @@ linters:
     nolintlint:
       require-specific: true
       allow-unused: false
-    prealloc:
-      simple: true
-      range-loops: true
-      for-loops: false
     predeclared:
       qualified-name: false
     promlinter:
