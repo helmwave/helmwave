@@ -32,6 +32,7 @@ func TestDiffLocalTestSuite(t *testing.T) {
 }
 
 func (ts *DiffLocalTestSuite) SetupTest() {
+	tests.RequireCluster(ts.T())
 	ts.ctx = tests.GetContext(ts.T())
 
 	log.StandardLogger().SetOutput(&buf)

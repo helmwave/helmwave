@@ -23,6 +23,7 @@ func TestRollbackTestSuite(t *testing.T) {
 }
 
 func (ts *RollbackTestSuite) SetupSuite() {
+	tests.RequireCluster(ts.T())
 	ts.ctx = tests.GetContext(ts.T())
 }
 

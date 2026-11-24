@@ -28,6 +28,7 @@ func TestGetTestSuite(t *testing.T) { //nolint:paralleltest // uses helm reposit
 }
 
 func (ts *GetTestSuite) SetupSuite() {
+	tests.RequireCluster(ts.T())
 	ts.ctx = tests.GetContext(ts.T())
 
 	var rs repo.Configs

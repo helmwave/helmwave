@@ -1,0 +1,6 @@
+kind: CI
+body: 'tests don''t use KUBECONFIG anymore'
+time: 2026-08-05T20:00:00.000000+01:00
+custom:
+    Author: r3nic1e
+    Issue: ""
