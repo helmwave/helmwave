@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/helmwave/helmwave/pkg/release"
+	"github.com/helmwave/helmwave/tests"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -14,6 +15,7 @@ type ListTestSuite struct {
 }
 
 func (s *ListTestSuite) TestNonExistingList() {
+	tests.RequireCluster(s.T())
 	rel := release.NewConfig()
 	rel.NameF = "blabla"
 	rel.NamespaceF = "blabla"
