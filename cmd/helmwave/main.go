@@ -56,7 +56,7 @@ func CreateApp() *cli.App {
 
 	c.Before = before
 	c.Flags = action.GlobalFlags()
-	c.Commands = commands
+	c.Commands = commands()
 	c.CommandNotFound = command404
 
 	return c
