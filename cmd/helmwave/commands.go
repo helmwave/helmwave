@@ -8,22 +8,25 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// commands is a registration list for commands.
-var commands = []*cli.Command{
-	new(action.Build).Cmd(),
-	new(action.Diff).Cmd(),
-	new(action.Up).Cmd(),
-	new(action.List).Cmd(),
-	new(action.Rollback).Cmd(),
-	new(action.Status).Cmd(),
-	new(action.Down).Cmd(),
-	new(action.Validate).Cmd(),
-	new(action.Yml).Cmd(),
-	new(action.GenSchema).Cmd(),
-	new(action.Graph).Cmd(),
-	new(action.Manifests).Cmd(),
-	version(),
-	completion(),
+// commands returns the registration list for commands. It is a function so that
+// flags are bound after helper.Dotenv has recreated helper.Helm.
+func commands() []*cli.Command {
+	return []*cli.Command{
+		new(action.Build).Cmd(),
+		new(action.Diff).Cmd(),
+		new(action.Up).Cmd(),
+		new(action.List).Cmd(),
+		new(action.Rollback).Cmd(),
+		new(action.Status).Cmd(),
+		new(action.Down).Cmd(),
+		new(action.Validate).Cmd(),
+		new(action.Yml).Cmd(),
+		new(action.GenSchema).Cmd(),
+		new(action.Graph).Cmd(),
+		new(action.Manifests).Cmd(),
+		version(),
+		completion(),
+	}
 }
 
 func version() *cli.Command {
